@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadar Living Portfolio — Athena Lonsdale</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Mono:wght@300;400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --navy: #1B3A6B;
+    --navy-light: #2d5499;
+    --gold: #B8963E;
+    --gold-light: #D4AF6A;
+    --cream: #F7F4EE;
+    --cream-dark: #EDE9DF;
+    --ink: #1C1917;
+    --ink-mid: #44403C;
+    --ink-light: #78716C;
+    --ink-faint: #A8A29E;
+    --white: #FEFDFB;
+    --teal: #2E7D5E;
+    --rule: #D6D0C4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Lora', Georgia, serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ── */
+  .sidenav {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: 200px; background: var(--navy);
+    padding: 2rem 0; z-index: 100;
+    display: flex; flex-direction: column;
+  }
+  .sidenav .logo {
+    padding: 0 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    margin-bottom: 1.5rem;
+  }
+  .sidenav .logo-mark {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: .14em;
+    color: var(--gold-light); text-transform: uppercase; margin-bottom: 5px;
+  }
+  .sidenav .school-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px; color: white; line-height: 1.3; font-weight: 400;
+  }
+  .sidenav a {
+    display: block; padding: 9px 1.5rem;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: rgba(255,255,255,.55); text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all .2s;
+  }
+  .sidenav a:hover, .sidenav a.active {
+    color: white; border-left-color: var(--gold);
+    background: rgba(255,255,255,.06);
+  }
+  .sidenav .nav-label {
+    padding: 1.5rem 1.5rem .4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px; letter-spacing: .15em;
+    color: rgba(255,255,255,.3); text-transform: uppercase;
+  }
+
+  /* ── LAYOUT ── */
+  .main { margin-left: 200px; }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--navy);
+    padding: 4rem 4rem 3rem;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 320px; height: 320px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: -80px; right: 60px;
+    width: 200px; height: 200px;
+    border: 1px solid rgba(255,255,255,.04);
+    border-radius: 50%;
+  }
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: .16em;
+    color: var(--gold-light); text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem; font-weight: 400; color: white;
+    line-height: 1.1; margin-bottom: .4rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--gold-light); }
+  .hero-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: rgba(255,255,255,.45);
+    letter-spacing: .08em; margin-bottom: 2.5rem;
+  }
+  .hero-metrics {
+    display: grid; grid-template-columns: repeat(4,1fr);
+    gap: 1px; background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 4px; overflow: hidden; max-width: 720px;
+  }
+  .hero-metric {
+    background: rgba(255,255,255,.04);
+    padding: 1.1rem 1.25rem;
+    transition: background .2s;
+  }
+  .hero-metric:hover { background: rgba(255,255,255,.08); }
+  .hero-metric .lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: .12em;
+    color: rgba(255,255,255,.4); text-transform: uppercase; margin-bottom: 5px;
+  }
+  .hero-metric .val {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; color: white; line-height: 1;
+    margin-bottom: 3px;
+  }
+  .hero-metric .val.gold { color: var(--gold-light); }
+  .hero-metric .ctx {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; color: rgba(255,255,255,.35);
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 4rem 4rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  section:last-child { border-bottom: none; }
+
+  .section-header {
+    display: flex; align-items: baseline; gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: .12em;
+    color: var(--gold); text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem; font-weight: 400; color: var(--navy);
+    flex: 1;
+  }
+  .section-rule {
+    flex: 1; height: 1px; background: var(--rule);
+    margin-left: 1rem;
+  }
+
+  /* ── CALLOUT ── */
+  .callout {
+    background: var(--navy);
+    color: white; padding: 1.5rem 2rem;
+    border-radius: 4px; margin-bottom: 2rem;
+    display: flex; gap: 2rem; align-items: center;
+  }
+  .callout .big {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; color: var(--gold-light);
+    line-height: 1; flex-shrink: 0;
+  }
+  .callout .text { font-size: .9rem; color: rgba(255,255,255,.8); line-height: 1.5; }
+  .callout .text strong { color: white; }
+
+  /* ── CHARTS ── */
+  .chart-wrap {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 4px; padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .chart-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: .1em;
+    color: var(--ink-light); text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .legend {
+    display: flex; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap;
+  }
+  .legend span {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--ink-mid);
+  }
+  .legend-dot {
+    width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
+  }
+
+  /* ── LEXILE BAR ── */
+  .lexile-track {
+    position: relative;
+    height: 8px; background: var(--cream-dark);
+    border-radius: 4px; margin: .5rem 0 .25rem; overflow: visible;
+  }
+  .lexile-fill {
+    position: absolute; left: 0; height: 100%;
+    background: var(--navy); border-radius: 4px;
+    transition: width 1s ease;
+  }
+  .lexile-marker {
+    position: absolute; top: -4px;
+    width: 16px; height: 16px;
+    background: var(--gold);
+    border: 2px solid var(--white);
+    border-radius: 50%;
+    transform: translateX(-50%);
+  }
+  .lexile-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .lexile-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--ink-light);
+    width: 110px; flex-shrink: 0; text-align: right;
+  }
+  .lexile-bar-outer {
+    flex: 1; height: 6px; background: var(--cream-dark);
+    border-radius: 3px; overflow: hidden;
+  }
+  .lexile-bar-inner {
+    height: 100%; background: var(--navy); border-radius: 3px;
+  }
+  .lexile-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--ink-light);
+    width: 40px; text-align: right;
+  }
+
+  /* ── HEBREW BENCHMARK ── */
+  .bench-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .bench-card {
+    background: var(--white); border: 1px solid var(--rule);
+    border-radius: 4px; padding: 1.25rem 1.5rem;
+  }
+  .bench-card .skill-name {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-light); margin-bottom: 14px;
+  }
+  .bench-bar-row { margin-bottom: 10px; }
+  .bench-bar-label {
+    display: flex; justify-content: space-between;
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    color: var(--ink-faint); margin-bottom: 4px;
+  }
+  .bench-bar-label.athena { color: var(--navy); font-weight: 500; }
+  .bench-bar-track {
+    height: 6px; background: var(--cream-dark);
+    border-radius: 3px; overflow: hidden;
+  }
+  .bench-bar-fill { height: 100%; border-radius: 3px; }
+
+  /* ── BOOKSHELF ── */
+  .bookshelf {
+    background: var(--cream-dark);
+    border-radius: 4px; padding: 2.5rem 2rem 1rem;
+    position: relative;
+  }
+  .bookshelf::after {
+    content: '';
+    display: block; height: 12px;
+    background: var(--ink-mid); border-radius: 0 0 4px 4px;
+    margin: 1.5rem -2rem -1rem; opacity: .12;
+  }
+  .books-row {
+    display: flex; align-items: flex-end; gap: 6px;
+    flex-wrap: wrap;
+  }
+  .book {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: .4rem .3rem;
+    border-radius: 3px 2px 2px 3px;
+    cursor: default;
+    transition: transform .2s, box-shadow .2s;
+    position: relative;
+    writing-mode: vertical-rl; text-orientation: mixed;
+    transform: rotate(180deg);
+    min-width: 28px;
+    font-family: 'DM Mono', monospace;
+  }
+  .book:hover {
+    transform: rotate(180deg) translateY(8px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.2);
+  }
+  .book .book-title {
+    font-size: 9px; letter-spacing: .04em;
+    line-height: 1.2; text-align: center;
+    padding: .5rem .1rem; font-weight: 500;
+  }
+  .book .book-done {
+    font-size: 8px; font-family: 'DM Mono', monospace;
+    opacity: .7; margin-top: auto;
+    font-weight: 300;
+  }
+  .book.done { opacity: 1; }
+  .book.pending { opacity: .55; filter: grayscale(.4); }
+
+  /* ── FLIPBOOK WRITING ── */
+  .flipbook {
+    position: relative; min-height: 320px;
+  }
+  .flip-tabs {
+    display: flex; gap: 0; margin-bottom: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .flip-tab {
+    padding: 10px 20px;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase;
+    background: none; border: none; cursor: pointer;
+    color: var(--ink-light); border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all .15s;
+  }
+  .flip-tab.active {
+    color: var(--navy); border-bottom-color: var(--navy);
+    background: var(--white);
+  }
+  .flip-pane {
+    display: none; padding: 2rem;
+    background: var(--white);
+    border: 1px solid var(--rule); border-top: none;
+    border-radius: 0 0 4px 4px;
+    min-height: 240px;
+  }
+  .flip-pane.active { display: block; animation: fadeUp .3s ease; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .flip-date {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: .1em; color: var(--gold);
+    text-transform: uppercase; margin-bottom: .75rem;
+  }
+  .flip-text {
+    font-size: .925rem; line-height: 1.8; color: var(--ink-mid);
+    font-style: italic;
+  }
+  .flip-note {
+    margin-top: 1rem; padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    color: var(--ink-faint); letter-spacing: .06em;
+  }
+  .flip-growth {
+    display: inline-block; margin-top: 8px;
+    padding: 4px 12px; border-radius: 20px;
+    background: var(--cream-dark); font-size: 9px;
+    font-family: 'DM Mono', monospace; color: var(--teal);
+    font-weight: 500;
+  }
+
+  /* ── VIDEO SLOTS ── */
+  .video-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .video-card {
+    background: var(--white); border: 1px solid var(--rule);
+    border-radius: 4px; overflow: hidden;
+  }
+  .video-header {
+    padding: .75rem 1rem;
+    border-bottom: 1px solid var(--rule);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .video-grade {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-light);
+  }
+  .video-type {
+    font-family: 'DM Mono', monospace; font-size: 8px;
+    padding: 3px 8px; border-radius: 20px;
+    background: var(--cream-dark); color: var(--ink-mid);
+    letter-spacing: .06em; text-transform: uppercase;
+  }
+  .video-slot {
+    aspect-ratio: 16/9;
+    background: var(--cream-dark);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px; cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: background .2s;
+  }
+  .video-slot:hover { background: var(--cream); }
+  .video-slot::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 4px,
+      rgba(0,0,0,.015) 4px,
+      rgba(0,0,0,.015) 8px
+    );
+  }
+  .play-btn {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--navy); display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0; transition: transform .2s;
+  }
+  .video-slot:hover .play-btn { transform: scale(1.08); }
+  .play-btn svg { margin-left: 3px; }
+  .video-caption {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    color: var(--ink-light); text-align: center; line-height: 1.5;
+    padding: 0 1.5rem;
+  }
+  .video-footer {
+    padding: .75rem 1rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    color: var(--ink-faint);
+  }
+
+  /* ── VIRTUE BADGES ── */
+  .badges-row {
+    display: flex; gap: 1.5rem; flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .badge-card {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 1.5rem 1rem; gap: .75rem;
+    background: var(--white); border: 1px solid var(--rule);
+    border-radius: 4px; width: 150px; text-align: center;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .badge-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(27,58,107,.1);
+  }
+  .badge-icon {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .badge-heb {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; color: var(--navy);
+    line-height: 1;
+  }
+  .badge-en {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-light);
+  }
+  .badge-date {
+    font-family: 'DM Mono', monospace; font-size: 8px;
+    color: var(--ink-faint); margin-top: -4px;
+  }
+
+  /* ── POETRY ACHIEVEMENT ── */
+  .achievement-banner {
+    background: var(--navy); border-radius: 4px;
+    padding: 2rem 2.5rem;
+    display: flex; align-items: center; gap: 2rem;
+  }
+  .achievement-medal {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--gold); display: flex;
+    align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 11px; color: var(--navy);
+    text-align: center; line-height: 1.3;
+    font-weight: 600; flex-shrink: 0;
+  }
+  .achievement-text h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; color: white; font-weight: 400;
+    margin-bottom: .3rem;
+  }
+  .achievement-text p {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    color: rgba(255,255,255,.5); line-height: 1.6;
+  }
+  .poems-list {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 1rem;
+  }
+  .poem-chip {
+    padding: 4px 10px; border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.2);
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    color: rgba(255,255,255,.6); letter-spacing: .04em;
+  }
+
+  /* ── THEN & NOW ── */
+  .then-now {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem;
+    align-items: stretch; margin-bottom: 1.5rem;
+  }
+  .then-now-divider {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 6px;
+  }
+  .then-now-line {
+    flex: 1; width: 1px; background: var(--rule);
+  }
+  .then-now-arrow {
+    font-family: 'DM Mono', monospace; font-size: 20px;
+    color: var(--gold);
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── FOOTER ── */
+  .portfolio-footer {
+    background: var(--navy); padding: 2rem 4rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .portfolio-footer .left {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    color: rgba(255,255,255,.35); letter-spacing: .08em;
+  }
+  .portfolio-footer .right {
+    font-family: 'Playfair Display', serif;
+    font-size: 12px; color: rgba(255,255,255,.25); font-style: italic;
+  }
+
+  @media (max-width: 900px) {
+    .sidenav { display: none; }
+    .main { margin-left: 0; }
+    section, .hero { padding: 2rem 1.5rem; }
+    .hero h1 { font-size: 2.2rem; }
+    .hero-metrics { grid-template-columns: repeat(2,1fr); }
+    .bench-grid, .video-grid, .then-now { grid-template-columns: 1fr; }
+    .then-now-divider { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDENAV -->
+<nav class="sidenav">
+  <div class="logo">
+    <div class="logo-mark">Hadar · 2025–26</div>
+    <div class="school-name">Jewish Classical Academy</div>
+  </div>
+  <div class="nav-label">Portfolio</div>
+  <a href="#overview" class="active" onclick="setActive(this)">Overview</a>
+  <a href="#academics" onclick="setActive(this)">Intellectual Arc</a>
+  <a href="#hebrew" onclick="setActive(this)">Immersion Engine</a>
+  <a href="#canon" onclick="setActive(this)">The Canon</a>
+  <a href="#writing" onclick="setActive(this)">Creative Evolution</a>
+  <a href="#rhetoric" onclick="setActive(this)">Rhetoric Room</a>
+  <a href="#character" onclick="setActive(this)">Character Arc</a>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- HERO -->
+<div class="hero" id="overview">
+  <div class="hero-tag">Hadar Living Portfolio · Grade 3 · Academic Year 2025–26</div>
+  <h1>Athena<br><em>Lonsdale</em></h1>
+  <div class="hero-sub">Age 8 &nbsp;·&nbsp; Enrolled since 1st Grade &nbsp;·&nbsp; Hadar Jewish Classical Academy</div>
+  <div class="hero-metrics">
+    <div class="hero-metric">
+      <div class="lbl">Math — Jan '26</div>
+      <div class="val gold">95th</div>
+      <div class="ctx">Percentile · RIT 219</div>
+    </div>
+    <div class="hero-metric">
+      <div class="lbl">English — Jan '26</div>
+      <div class="val gold">98th</div>
+      <div class="ctx">Percentile · RIT 229</div>
+    </div>
+    <div class="hero-metric">
+      <div class="lbl">Reading Level</div>
+      <div class="val">1225L</div>
+      <div class="ctx">Upper HS / College Entry</div>
+    </div>
+    <div class="hero-metric">
+      <div class="lbl">Hebrew Composite</div>
+      <div class="val">4.75</div>
+      <div class="ctx">vs. 6th-grade avg 4.02</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── INTELLECTUAL ARC ── -->
+<section id="academics">
+  <div class="section-header reveal">
+    <span class="section-num">01</span>
+    <h2 class="section-title">The Intellectual Arc</h2>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="callout reveal">
+    <div class="big">+19</div>
+    <div class="text">
+      <strong>From 76th to 95th percentile in math</strong> across two years.<br>
+      Athena entered 1st grade performing above the national average. By January 2026, she has accelerated into the top 5% of all students nationwide — a trajectory that demonstrates what classical immersion education does for a learner.
+    </div>
+  </div>
+
+  <div class="chart-wrap reveal">
+    <div class="chart-title">MAPS RIT Scores — Grade 1 through Grade 3</div>
+    <div class="legend">
+      <span><span class="legend-dot" style="background:#1B3A6B"></span>English (RIT)</span>
+      <span><span class="legend-dot" style="background:#B8963E"></span>Math (RIT)</span>
+    </div>
+    <div style="position:relative;height:260px"><canvas id="mapsChart"></canvas></div>
+  </div>
+
+  <div class="chart-wrap reveal">
+    <div class="chart-title">Lexile Reading Level — Athena vs. Grade Benchmarks</div>
+    <div style="margin-bottom:8px;font-style:italic;font-size:.85rem;color:var(--ink-light)">
+      At age 8, Athena reads at the same level as college-entry seniors. Her current range (1150–1300L) aligns with 11th–12th grade readiness benchmarks.
+    </div>
+    <div style="margin-top:1.25rem">
+      <div class="lexile-row">
+        <span class="lexile-lbl">3rd Grade avg</span>
+        <div class="lexile-bar-outer"><div class="lexile-bar-inner" style="width:32%;opacity:.3;background:var(--ink-faint)"></div></div>
+        <span class="lexile-val">420L</span>
+      </div>
+      <div class="lexile-row">
+        <span class="lexile-lbl">8th Grade avg</span>
+        <div class="lexile-bar-outer"><div class="lexile-bar-inner" style="width:61%;opacity:.4"></div></div>
+        <span class="lexile-val">1010L</span>
+      </div>
+      <div class="lexile-row">
+        <span class="lexile-lbl">11th Grade avg</span>
+        <div class="lexile-bar-outer"><div class="lexile-bar-inner" style="width:80%;opacity:.55"></div></div>
+        <span class="lexile-val">1200L</span>
+      </div>
+      <div class="lexile-row">
+        <span class="lexile-lbl" style="color:var(--navy);font-weight:500">Athena (age 8)</span>
+        <div class="lexile-bar-outer" style="background:rgba(27,58,107,.1)"><div class="lexile-bar-inner" style="width:90%;background:var(--navy)"></div></div>
+        <span class="lexile-val" style="color:var(--navy);font-weight:500">1225L</span>
+      </div>
+      <div class="lexile-row">
+        <span class="lexile-lbl">College-ready</span>
+        <div class="lexile-bar-outer"><div class="lexile-bar-inner" style="width:100%;background:var(--gold);opacity:.4"></div></div>
+        <span class="lexile-val">1300L</span>
+      </div>
+    </div>
+    <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--rule);font-family:'DM Mono',monospace;font-size:10px;color:var(--ink-light)">
+      Currently reading: <em style="font-style:normal;color:var(--ink)">Tales from Shakespeare · Great Expectations · The Jungle Book</em>
+    </div>
+  </div>
+</section>
+
+<!-- ── IMMERSION ENGINE ── -->
+<section id="hebrew">
+  <div class="section-header reveal">
+    <span class="section-num">02</span>
+    <h2 class="section-title">The Immersion Engine</h2>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="callout reveal">
+    <div class="big" style="font-size:1.8rem;line-height:1.1;text-align:center">6th<br><span style="font-size:1rem;color:rgba(255,255,255,.5)">Grade</span></div>
+    <div class="text">
+      <strong>A 3rd grader with 6th-grade Hebrew skills.</strong><br>
+      On the national AVANT STAMP benchmark for Hebrew immersion schools (2022–23), Athena scores at or above the average for students three years her senior. Her reading score of 6.0 and listening score of 7.0 exceed the 6th-grade national averages of 4.75.
+    </div>
+  </div>
+
+  <div class="chart-wrap reveal">
+    <div class="chart-title">AVANT Hebrew — Four Skills Over Time</div>
+    <div class="legend">
+      <span><span class="legend-dot" style="background:#1B3A6B"></span>Speaking</span>
+      <span><span class="legend-dot" style="background:#B8963E"></span>Reading</span>
+      <span><span class="legend-dot" style="background:#2E7D5E"></span>Listening</span>
+      <span><span class="legend-dot" style="background:#7C3AED"></span>Writing</span>
+    </div>
+    <div style="position:relative;height:260px"><canvas id="avantChart"></canvas></div>
+  </div>
+
+  <div class="bench-grid reveal">
+    <div class="bench-card">
+      <div class="skill-name">Reading — Athena vs. national averages</div>
+      <div class="bench-bar-row"><div class="bench-bar-label"><span>3rd grade national</span><span>2.49</span></div><div class="bench-bar-track"><div class="bench-bar-fill" style="width:25%;background:var(--ink-faint);opacity:.4"></div></div></div>
+      <div class="bench-bar-row"><div class="bench-bar-label"><span>4th grade national</span><span>3.44</span></div><div class="bench-bar-track"><div class="bench-bar-fill" style="width:34%;background:var(--ink-faint);opacity:.5"></div></div></div>
+      <div class="bench-bar-row"><div class="bench-bar-label"><span>5th grade national</span><span>3.86</span></div><div class="bench-bar-track"><div class="bench-bar-fill" style="width:38%;background:var(--ink-faint);opacity:.6"></div></div></div>
+      <div class="bench-bar-row"><div class="bench-bar-label"><span>6th grade national</span><span>4.75</span></div><div class="bench-bar-track"><div class="bench-bar-fill" style="width:47%;background:var(--ink-mid);opacity:.55"></div></div></div>
+      <div class="bench-bar-row"><div class="bench-bar-label athena"><span>Athena (Grade 3)</span><span>6.00</span></div><div class="bench-bar-track"><div class="bench-bar-fill" style="width:100%;background:var(--navy)"></div></div></div>
+    </div>
+    <div class="bench-card">
+      <div class="skill-name">Listening — Athena vs. national averages</div>
+      <div class="bench-bar-row"><div class="bench-bar-label"><span>3rd grade national</span><span>3.09</span></div><div class="bench-bar-track"><div class="bench-bar-fill" style="width:31%;background:var(--ink-faint);opacity:.4"></div></div></div>
+      <div class="bench-bar-row"><div class="bench-bar-label"><span>4th grade national</span><span>3.65</span></div><div class="bench-bar-track"><div class="bench-bar-fill" style="width:36%;background:var(--ink-faint);opacity:.5"></div></div></div>
+      <div class="bench-bar-row"><div class="bench-bar-label"><span>5th grade national</span><span>4.18</span></div><div class="bench-bar-track"><div class="bench-bar-fill" style="width:42%;background:var(--ink-faint);opacity:.6"></div></div></div>
+      <div class="bench-bar-row"><div class="bench-bar-label"><span>6th grade national</span><span>4.75</span></div><div class="bench-bar-track"><div class="bench-bar-fill" style="width:48%;background:var(--ink-mid);opacity:.55"></div></div></div>
+      <div class="bench-bar-row"><div class="bench-bar-label athena"><span>Athena (Grade 3)</span><span>7.00</span></div><div class="bench-bar-track"><div class="bench-bar-fill" style="width:100%;background:var(--navy)"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── THE CANON ── -->
+<section id="canon">
+  <div class="section-header reveal">
+    <span class="section-num">03</span>
+    <h2 class="section-title">The Canon</h2>
+    <div class="section-rule"></div>
+  </div>
+  <p class="reveal" style="font-size:.9rem;color:var(--ink-light);margin-bottom:1.75rem;max-width:560px">
+    Athena's Grade 3 reading list. Nine of ten titles completed — from Lewis Carroll to Charles and Mary Lamb's Tales from Shakespeare.
+  </p>
+
+  <div class="bookshelf reveal">
+    <div class="books-row" id="booksRow"></div>
+  </div>
+  <div style="margin-top:1rem;font-family:'DM Mono',monospace;font-size:9px;color:var(--ink-faint);letter-spacing:.06em">
+    Hover to browse · Faded spine = upcoming
+  </div>
+</section>
+
+<!-- ── CREATIVE EVOLUTION ── -->
+<section id="writing">
+  <div class="section-header reveal">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Creative Evolution</h2>
+    <div class="section-rule"></div>
+  </div>
+  <p class="reveal" style="font-size:.9rem;color:var(--ink-light);margin-bottom:1.5rem;max-width:560px">
+    Three years of written composition — from phonetic invention in Grade 1 to nuanced literary retelling in Grade 3.
+  </p>
+
+  <div class="flipbook reveal">
+    <div class="flip-tabs">
+      <button class="flip-tab active" onclick="flipTo(1,this)">Grade 1 · 2024</button>
+      <button class="flip-tab" onclick="flipTo(2,this)">Grade 2 · 2025</button>
+      <button class="flip-tab" onclick="flipTo(3,this)">Grade 3 · 2025</button>
+    </div>
+    <div id="fp1" class="flip-pane active">
+      <div class="flip-date">June 2024 · Animal Research · Age 6</div>
+      <div class="flip-text">"fox. There are foxis at my School too babys and a moms. whet will hapin too them the babys plad neer the chikin Koop so that is hoo has bin diping the holin the prawnd but the foxis wor so cute Gabex Kold Artameood and Oameeams. thaeechast the mommy fox in srcols arawnd the Scool"</div>
+      <div class="flip-note">Age 6 · Phonetic spelling, strong phonemic awareness, beginning sentence structure, genuine curiosity and narrative intent. MAPS English: 90th–94th percentile.</div>
+      <span class="flip-growth">→ Novice composition</span>
+    </div>
+    <div id="fp2" class="flip-pane">
+      <div class="flip-date">May 13, 2025 · Personal Narrative · Age 7</div>
+      <div class="flip-text">"One day I went to the animal care center with my Aunty Rutty. We met a small cat named Buddy, he was very playful. He was light orange with dark orange stripes and he had white and green eyes and a pink nose. He jumped into my lap, we played for a long time. Then we had to go have dinner at Aunty Rutty's house. We watched a movie and did a sleepover. I'm looking forward to it. I'm also looking forward to going to Cape Cod — I've told myself I'll catch a fiddler crab."</div>
+      <div class="flip-note">Age 7 · Controlled narrative structure, specific sensory detail, temporal transitions, forward-looking conclusion. Grade 2 English MAPS: 98th–99th percentile.</div>
+      <span class="flip-growth">→ Emerging voice</span>
+    </div>
+    <div id="fp3" class="flip-pane">
+      <div class="flip-date">November 17, 2025 · Literary Retelling — "A Good Idea" · Age 8</div>
+      <div class="flip-text">"In the Hundred Acre Woods it rained miserably for many days, so there was a flood. Piglet was in his tree. He was miserable because he was lonely. He sent a bottle message: 'Help! Piglet needs help on one side and Piglet needs help fast on the other side.' Pooh was still in his house when he woke up. He found out that his house was flooded. So he took his ten honey pots one at a time and sat on a tree branch above the water. Just then he saw Piglet's bottle — and thought it was a jar of honey."</div>
+      <div class="flip-note">Age 8 · Complex sentence variety, embedded dialogue, cause-and-effect reasoning, ironic ending preserved. Grade 3 English MAPS: 95th–98th percentile.</div>
+      <span class="flip-growth">→ Literary craft emerging</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── RHETORIC ROOM ── -->
+<section id="rhetoric">
+  <div class="section-header reveal">
+    <span class="section-num">05</span>
+    <h2 class="section-title">The Rhetoric Room</h2>
+    <div class="section-rule"></div>
+  </div>
+
+  <p class="reveal" style="font-size:.9rem;color:var(--ink-light);margin-bottom:.5rem;max-width:560px">
+    "Then &amp; Now" — add video clips to trace Athena's spoken voice from first-grade Hebrew introduction to Grade 3 public recitation.
+  </p>
+  <p class="reveal" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--ink-faint);letter-spacing:.06em;margin-bottom:2rem">
+    Upload video recordings or paste YouTube/Vimeo links to activate each slot.
+  </p>
+
+  <div class="then-now reveal">
+    <div class="video-card">
+      <div class="video-header">
+        <span class="video-grade">Grade 1 · Fall 2023</span>
+        <span class="video-type">Hebrew Speaking</span>
+      </div>
+      <div class="video-slot">
+        <div class="play-btn">
+          <svg width="14" height="16" viewBox="0 0 14 16" fill="none"><path d="M1 1l12 7L1 15V1z" fill="white"/></svg>
+        </div>
+        <div class="video-caption">First-grade Hebrew<br>classroom introduction</div>
+      </div>
+      <div class="video-footer">Link video · AVANT Speaking: Level 2</div>
+    </div>
+    <div class="then-now-divider">
+      <div class="then-now-line"></div>
+      <div class="then-now-arrow">→</div>
+      <div class="then-now-line"></div>
+    </div>
+    <div class="video-card">
+      <div class="video-header">
+        <span class="video-grade">Grade 3 · Jan 2026</span>
+        <span class="video-type">Poetry Recitation</span>
+      </div>
+      <div class="video-slot">
+        <div class="play-btn">
+          <svg width="14" height="16" viewBox="0 0 14 16" fill="none"><path d="M1 1l12 7L1 15V1z" fill="white"/></svg>
+        </div>
+        <div class="video-caption">Bronze Level Poetry<br>Recitation — school stage</div>
+      </div>
+      <div class="video-footer">Link video · 10 poems memorized & recited</div>
+    </div>
+  </div>
+
+  <div class="video-grid reveal">
+    <div class="video-card">
+      <div class="video-header">
+        <span class="video-grade">Socratic Reflection</span>
+        <span class="video-type">Self-Assessment</span>
+      </div>
+      <div class="video-slot">
+        <div class="play-btn">
+          <svg width="14" height="16" viewBox="0 0 14 16" fill="none"><path d="M1 1l12 7L1 15V1z" fill="white"/></svg>
+        </div>
+        <div class="video-caption">Athena explains Ometz (courage)<br>in her own words</div>
+      </div>
+      <div class="video-footer">Student explains a Middah or Latin phrase they mastered</div>
+    </div>
+    <div class="video-card">
+      <div class="video-header">
+        <span class="video-grade">Hebrew Fluency · Grade 3</span>
+        <span class="video-type">Immersion</span>
+      </div>
+      <div class="video-slot">
+        <div class="play-btn">
+          <svg width="14" height="16" viewBox="0 0 14 16" fill="none"><path d="M1 1l12 7L1 15V1z" fill="white"/></svg>
+        </div>
+        <div class="video-caption">Conversational Hebrew<br>classroom moment</div>
+      </div>
+      <div class="video-footer">AVANT Listening: Level 7 · Advanced tier</div>
+    </div>
+  </div>
+
+  <div class="achievement-banner reveal">
+    <div class="achievement-medal">BRZ<br>LEVEL</div>
+    <div class="achievement-text">
+      <h3>Bronze Poetry Recitation Shield</h3>
+      <p>Awarded by Dr. Liliana Worth, Hadar Jewish Classical Academy<br>
+      "Hard work, determination and consistent effort to perform beautiful recitations of classic poetry."</p>
+      <div class="poems-list">
+        <span class="poem-chip">Poem I</span>
+        <span class="poem-chip">Poem II</span>
+        <span class="poem-chip">Poem III</span>
+        <span class="poem-chip">Poem IV</span>
+        <span class="poem-chip">Poem V</span>
+        <span class="poem-chip">Poem VI</span>
+        <span class="poem-chip">Poem VII</span>
+        <span class="poem-chip">Poem VIII</span>
+        <span class="poem-chip">Poem IX</span>
+        <span class="poem-chip">Poem X</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CHARACTER ARC ── -->
+<section id="character">
+  <div class="section-header reveal">
+    <span class="section-num">06</span>
+    <h2 class="section-title">The Character Arc</h2>
+    <div class="section-rule"></div>
+  </div>
+
+  <p class="reveal" style="font-size:.9rem;color:var(--ink-light);margin-bottom:1.75rem;max-width:560px">
+    Torah Im Derech Eretz — Athena was recognized as Student Exemplar of the Week on three separate occasions for embodying core character virtues.
+  </p>
+
+  <div class="badges-row reveal">
+    <div class="badge-card">
+      <div class="badge-icon" style="background:rgba(27,58,107,.08)">🦁</div>
+      <div class="badge-heb">עֹמֶץ</div>
+      <div class="badge-en">Ometz</div>
+      <div style="font-size:.8rem;color:var(--ink-light);font-style:italic;line-height:1.4;margin:.2rem 0">Courage</div>
+      <div class="badge-date">Dec 19, 2025</div>
+    </div>
+    <div class="badge-card">
+      <div class="badge-icon" style="background:rgba(184,150,62,.1)">🕊️</div>
+      <div class="badge-heb">חֵרוּת</div>
+      <div class="badge-en">Herut</div>
+      <div style="font-size:.8rem;color:var(--ink-light);font-style:italic;line-height:1.4;margin:.2rem 0">Freedom</div>
+      <div class="badge-date">Apr 4, 2025</div>
+    </div>
+    <div class="badge-card">
+      <div class="badge-icon" style="background:rgba(46,125,94,.1)">⚖️</div>
+      <div class="badge-heb">אַחְרָיוּת</div>
+      <div class="badge-en">Achrayut</div>
+      <div style="font-size:.8rem;color:var(--ink-light);font-style:italic;line-height:1.4;margin:.2rem 0">Responsibility</div>
+      <div class="badge-date">Feb 21, 2025</div>
+    </div>
+    <div class="badge-card" style="opacity:.4;border-style:dashed">
+      <div class="badge-icon" style="background:var(--cream-dark)">+</div>
+      <div class="badge-heb" style="color:var(--ink-faint)">???</div>
+      <div class="badge-en">Next Virtue</div>
+      <div style="font-size:.8rem;color:var(--ink-faint);font-style:italic;line-height:1.4;margin:.2rem 0">To be earned</div>
+      <div class="badge-date" style="color:transparent">—</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="portfolio-footer">
+  <div class="left">Hadar Jewish Classical Academy · Student Living Portfolio · Confidential</div>
+  <div class="right">Torah Im Derech Eretz</div>
+</div>
+
+</div><!-- .main -->
+
+<script>
+/* ── CHARTS ── */
+new Chart(document.getElementById('mapsChart'), {
+  type: 'line',
+  data: {
+    labels: ["Feb '24\nGr.1","May '24\nGr.1","Aug '24\nGr.2","Jan '25\nGr.2","May '25\nGr.2","Aug '25\nGr.3","Jan '26\nGr.3"],
+    datasets: [
+      { label: 'English', data: [183,193,216,212,221,216,229], borderColor: '#1B3A6B', backgroundColor: 'rgba(27,58,107,.06)', pointBackgroundColor: '#1B3A6B', tension: 0.35, borderWidth: 2.5, pointRadius: 5, fill: true },
+      { label: 'Math', data: [179,194,188,199,211,214,219], borderColor: '#B8963E', backgroundColor: 'rgba(184,150,62,.04)', pointBackgroundColor: '#B8963E', tension: 0.35, borderWidth: 2.5, pointRadius: 5, fill: true }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          afterLabel: function(ctx) {
+            var pcts = [[90,76],[94,91],[99,84],[98,87],[99,94],[96,97],[98,95]];
+            return pcts[ctx.dataIndex][ctx.datasetIndex] + 'th percentile';
+          }
+        }
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'DM Mono', size: 9 }, maxRotation: 0 } },
+      y: { min: 170, max: 240, grid: { color: 'rgba(0,0,0,.04)' }, ticks: { font: { family: 'DM Mono', size: 9 }, stepSize: 10 } }
+    }
+  }
+});
+
+new Chart(document.getElementById('avantChart'), {
+  type: 'bar',
+  data: {
+    labels: ["Nov '24\n2nd Gr.", "May '25\n2nd Gr.", "Aug '25\n3rd Gr.", "Jan '26\n3rd Gr."],
+    datasets: [
+      { label: 'Speaking', data: [2,3,2,3], backgroundColor: '#1B3A6B', borderRadius: 3, borderSkipped: false },
+      { label: 'Reading',  data: [3,5,4,6], backgroundColor: '#B8963E', borderRadius: 3, borderSkipped: false },
+      { label: 'Listening',data: [4,6,7,7], backgroundColor: '#2E7D5E', borderRadius: 3, borderSkipped: false },
+      { label: 'Writing',  data: [null,null,2,3], backgroundColor: '#7C3AED', borderRadius: 3, borderSkipped: false }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'DM Mono', size: 9 }, maxRotation: 0 } },
+      y: {
+        min: 0, max: 9,
+        grid: { color: 'rgba(0,0,0,.04)' },
+        ticks: {
+          font: { family: 'DM Mono', size: 9 }, stepSize: 3,
+          callback: function(v) { return v===0?'Novice':v===3?'Intermed.':v===6?'Advanced':v===9?'Mastery':''; }
+        }
+      }
+    }
+  }
+});
+
+/* ── BOOKSHELF ── */
+var books = [
+  { title: "Alice in Wonderland", done: true, color: '#1B3A6B', text: '#E8EDF5', h: 160 },
+  { title: "Grimm's Fairy Tales", done: true, color: '#8B4A2D', text: '#F5EDE8', h: 150 },
+  { title: "Black Beauty", done: true, color: '#2E4A3B', text: '#E8F0EC', h: 155 },
+  { title: "The Snow Queen", done: true, color: '#5E7FA0', text: '#EBF0F5', h: 148 },
+  { title: "Charlie & the Chocolate Factory", done: true, color: '#7B5EA0', text: '#F0EBF5', h: 158 },
+  { title: "The Jungle Book", done: true, color: '#4A7A5E', text: '#E8F2ED', h: 144 },
+  { title: "Homer Price", done: true, color: '#A07B3E', text: '#F5EEE0', h: 152 },
+  { title: "Tales from Shakespeare", done: true, color: '#6B2D2D', text: '#F5E8E8', h: 162 },
+  { title: "Aladdin & Arabian Nights", done: true, color: '#4A6B8A', text: '#E8EFF5', h: 156 },
+  { title: "Guns for General Washington", done: false, color: '#8A8074', text: '#F5F3F0', h: 145 }
+];
+var row = document.getElementById('booksRow');
+books.forEach(function(b) {
+  var el = document.createElement('div');
+  el.className = 'book ' + (b.done ? 'done' : 'pending');
+  el.style.cssText = 'background:'+b.color+';color:'+b.text+';height:'+b.h+'px;width:36px;';
+  el.innerHTML = '<span class="book-title">'+b.title+'</span><span class="book-done">'+(b.done?'✓':'…')+'</span>';
+  row.appendChild(el);
+});
+
+/* ── FLIPBOOK ── */
+function flipTo(n, btn) {
+  [1,2,3].forEach(function(i) {
+    var p = document.getElementById('fp'+i);
+    if(p) p.className = 'flip-pane' + (i===n?' active':'');
+  });
+  btn.closest('.flipbook').querySelectorAll('.flip-tab').forEach(function(t) { t.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+/* ── NAV ACTIVE ── */
+function setActive(el) {
+  document.querySelectorAll('.sidenav a').forEach(function(a) { a.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+/* ── SCROLL REVEAL ── */
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+
+/* ── SCROLL SPY ── */
+window.addEventListener('scroll', function() {
+  var sections = ['overview','academics','hebrew','canon','writing','rhetoric','character'];
+  var current = sections[0];
+  sections.forEach(function(id) {
+    var el = document.getElementById(id);
+    if(el && el.getBoundingClientRect().top < 120) current = id;
+  });
+  document.querySelectorAll('.sidenav a').forEach(function(a) {
+    var href = a.getAttribute('href').replace('#','');
+    a.classList.toggle('active', href === current);
+  });
+});
+</script>
+</body>
+</html>
