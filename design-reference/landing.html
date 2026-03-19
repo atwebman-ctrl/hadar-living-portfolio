@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadar Jewish Classical Academy — Living Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --lapis:      #1E3A5F;
+  --lapis-deep: #152A47;
+  --lapis-mid:  #2A5298;
+  --gold:       #C49A2A;
+  --gold-light: #D4AF6A;
+  --gold-pale:  #EDD99A;
+  --gold-bright:#F0C84A;
+  --crimson:    #8B2635;
+  --forest:     #3A5C38;
+  --parchment:  #F2E8CC;
+  --parch-mid:  #E8DDB8;
+  --parch-dark: #DDD0A0;
+  --ink:        #1E1608;
+  --ink-mid:    #4A3C28;
+  --ink-light:  #7A6A50;
+  --ink-faint:  #A89878;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══ PAGE ══ */
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ════════════════════════════
+   LEFT — LAPIS MANUSCRIPT PANEL
+════════════════════════════ */
+.left {
+  background: var(--lapis-deep);
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  position: relative; overflow: hidden;
+  min-height: 100vh;
+}
+
+/* Gold radiance from center */
+.left::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(196,154,42,.16) 0%, transparent 60%),
+    radial-gradient(ellipse at 20% 80%, rgba(196,154,42,.07) 0%, transparent 45%);
+  pointer-events: none;
+}
+
+/* Double manuscript border */
+.ms-frame          { position:absolute; inset:18px; pointer-events:none; }
+.ms-frame::before  { content:''; position:absolute; inset:0; border:1.5px solid rgba(196,154,42,.45); }
+.ms-frame::after   { content:''; position:absolute; inset:9px; border:1px solid rgba(196,154,42,.2); }
+
+.corner { position:absolute; font-size:11px; color:var(--gold); opacity:.8; z-index:2; line-height:1; }
+.corner.tl{top:11px;left:12px} .corner.tr{top:11px;right:12px}
+.corner.bl{bottom:11px;left:12px} .corner.br{bottom:11px;right:12px}
+
+/* Vine ornaments */
+.vine { position:absolute; opacity:.25; pointer-events:none; }
+
+/* Content */
+.left-inner {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  padding: 4rem 4rem;
+  width: 100%;
+  gap: 0;
+}
+.left-inner > * { animation: fadeUp .9s ease both; }
+.left-inner > *:nth-child(1){animation-delay:.08s}
+.left-inner > *:nth-child(2){animation-delay:.18s}
+.left-inner > *:nth-child(3){animation-delay:.26s}
+.left-inner > *:nth-child(4){animation-delay:.34s}
+.left-inner > *:nth-child(5){animation-delay:.4s}
+.left-inner > *:nth-child(6){animation-delay:.46s}
+.left-inner > *:nth-child(7){animation-delay:.52s}
+.left-inner > *:nth-child(8){animation-delay:.58s}
+
+/* Ornamental rules */
+.orule {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; margin-bottom: 1.5rem;
+}
+.orule-line { flex:1; height:1px; background:linear-gradient(to right,transparent,rgba(196,154,42,.55),transparent); }
+.orule-center { display:flex; align-items:center; gap:5px; }
+.odot { width:4px; height:4px; border-radius:50%; background:var(--gold); opacity:.65; }
+.odiamond { width:7px; height:7px; background:var(--gold); opacity:.75; transform:rotate(45deg); }
+
+/* Logo / crest area */
+.logo-zone {
+  width: 168px; height: 100px;
+  border: 1.5px solid rgba(196,154,42,.5);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.5rem;
+  position: relative;
+  background: rgba(196,154,42,.05);
+}
+.logo-zone::before {
+  content: ''; position:absolute; inset:6px;
+  border: 1px solid rgba(196,154,42,.2);
+}
+.logo-placeholder {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: .14em;
+  color: rgba(196,154,42,.5); text-transform: uppercase;
+  text-align: center; line-height: 2;
+}
+
+/* School name block */
+.school-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: .24em;
+  color: var(--gold-light); text-transform: uppercase;
+  opacity: .7; margin-bottom: .6rem;
+}
+.school-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.8rem; font-weight: 400;
+  color: var(--gold-pale); line-height: .88;
+  margin-bottom: .45rem;
+}
+.school-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .9rem; font-weight: 300;
+  letter-spacing: .32em; text-transform: uppercase;
+  color: rgba(196,154,42,.5);
+  margin-bottom: 1.6rem;
+}
+
+/* Illuminated text block */
+.ms-text-block {
+  border: 1px solid rgba(196,154,42,.28);
+  border-top: 2.5px solid rgba(196,154,42,.65);
+  padding: 1.1rem 1.5rem 1.15rem;
+  max-width: 310px;
+  background: rgba(196,154,42,.04);
+  position: relative;
+  margin-bottom: 1.6rem;
+}
+.ms-text-block::before {
+  content:''; position:absolute; top:4px; left:1.2rem; right:1.2rem;
+  height:1px; background:var(--gold); opacity:.25;
+}
+.ms-text {
+  font-size: .93rem; line-height: 1.85;
+  color: rgba(220,185,110,.68);
+  font-style: italic; font-weight: 300;
+}
+.dropcap {
+  float: left;
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem; line-height: .82;
+  color: var(--gold); opacity: .9;
+  margin: .05rem .22rem 0 0; font-style: normal;
+}
+
+/* Colophon — legible founding text woven into bottom rule */
+.colophon {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; max-width: 300px;
+}
+.colophon-line {
+  flex:1; height:1px;
+  background:linear-gradient(to right,transparent,rgba(196,154,42,.45),transparent);
+}
+/* ↑ FIXED: font-size bumped to 10px, opacity to .65 so it reads on navy */
+.colophon-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .16em;
+  color: rgba(196,154,42,.65); text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ════════════════════════════
+   RIGHT — PARCHMENT PORTAL
+════════════════════════════ */
+.right {
+  position: relative;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: 4rem 4rem;
+  /* Genuine parchment — layered warm gradients, no SVG grain needed */
+  background-color: var(--parchment);
+  background-image:
+    /* Warm age spots */
+    radial-gradient(ellipse at 8%  12%, rgba(160,120,50,.09) 0%, transparent 35%),
+    radial-gradient(ellipse at 92% 88%, rgba(140,100,40,.08) 0%, transparent 35%),
+    radial-gradient(ellipse at 75% 15%, rgba(180,140,60,.06) 0%, transparent 30%),
+    radial-gradient(ellipse at 25% 85%, rgba(130,100,40,.07) 0%, transparent 30%),
+    /* Overall warm depth */
+    radial-gradient(ellipse at 50% 50%, rgba(245,235,200,.5) 0%, transparent 70%);
+}
+
+/* Gilded manuscript spine — the binding between pages */
+.right::before {
+  content: '';
+  position: absolute; top:0; bottom:0; left:0;
+  width: 6px;
+  background: linear-gradient(to bottom,
+    var(--lapis-deep) 0%,
+    rgba(196,154,42,.3) 15%,
+    var(--gold) 35%,
+    var(--gold-bright) 50%,
+    var(--gold) 65%,
+    rgba(196,154,42,.3) 85%,
+    var(--lapis-deep) 100%);
+}
+
+/* Illuminated top band */
+.right::after {
+  content: '';
+  position: absolute; top:0; left:0; right:0; height:5px;
+  background: linear-gradient(to right,
+    var(--lapis-deep), var(--lapis-mid) 15%,
+    var(--gold) 30%, var(--crimson) 45%,
+    var(--forest) 55%, var(--gold) 70%,
+    var(--lapis-mid) 85%, var(--lapis-deep));
+  opacity: .8;
+}
+
+.right > * { animation: fadeUp .9s ease both; }
+.right > *:nth-child(1){animation-delay:.42s}
+.right > *:nth-child(2){animation-delay:.5s}
+.right > *:nth-child(3){animation-delay:.56s}
+.right > *:nth-child(4){animation-delay:.62s}
+.right > *:nth-child(5){animation-delay:.7s}
+
+.portal-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: .22em;
+  color: var(--ink-faint); text-transform: uppercase;
+  margin-bottom: 1.25rem; text-align: center;
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; max-width: 390px;
+}
+.portal-eyebrow::before, .portal-eyebrow::after {
+  content:''; flex:1; height:1px; background:rgba(120,90,30,.25);
+}
+
+.portal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.15rem; font-weight: 400;
+  color: var(--ink); line-height: 1.15;
+  text-align: center; margin-bottom: .6rem; max-width: 340px;
+}
+.portal-title em { font-style: italic; color: var(--lapis); }
+
+.portal-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .98rem; color: var(--ink-light);
+  text-align: center; line-height: 1.8;
+  max-width: 295px; margin: 0 auto 2rem;
+  font-weight: 300; font-style: italic;
+}
+
+/* ── SIGN-IN CARD
+   Key fix: card bg is noticeably darker than surrounding parchment
+   so it reads as a physical object laid on the desk surface ── */
+.signin-card {
+  width: 100%; max-width: 375px;
+  background: var(--parch-mid);          /* visibly darker than right panel */
+  border: 1px solid rgba(120,90,30,.35);
+  border-top: 2.5px solid var(--gold);
+  padding: 2.1rem 2.1rem 1.8rem;
+  position: relative;
+  /* Three-layer physical shadow */
+  box-shadow:
+    inset  0  1px 4px rgba(80,60,20,.1),   /* recessed top edge */
+    inset  0 -1px 3px rgba(80,60,20,.07),  /* recessed bottom */
+    0  3px 10px rgba(30,22,8,.1),          /* soft lift */
+    0 10px 32px rgba(30,22,8,.08),         /* ambient drop */
+    0  1px  0  rgba(196,154,42,.35);       /* gold lip at base */
+}
+.signin-card::before {
+  content:''; position:absolute; top:8px; left:1rem; right:1rem;
+  height:1px; background:rgba(196,154,42,.22);
+}
+.card-corner {
+  position:absolute; font-size:9px;
+  color:var(--gold); opacity:.6;
+  font-family:'Playfair Display',serif;
+}
+.card-corner.tl{top:5px;left:8px} .card-corner.tr{top:5px;right:8px}
+.card-corner.bl{bottom:7px;left:8px} .card-corner.br{bottom:7px;right:8px}
+
+.input-group { margin-bottom: 1rem; }
+.input-label {
+  display:block; font-family:'DM Mono',monospace;
+  font-size:8px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-light);
+  margin-bottom:.4rem;
+}
+.input-field {
+  width:100%; padding:.68rem .9rem;
+  /* Input sits even more recessed */
+  background: rgba(250,245,230,.7);
+  border:1px solid rgba(120,90,30,.25);
+  border-bottom:1px solid rgba(120,90,30,.45);
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem; color:var(--ink);
+  outline:none; border-radius:0;
+  box-shadow: inset 0 2px 5px rgba(80,60,20,.08);
+  transition:border-color .2s, background .2s;
+  -webkit-appearance:none;
+}
+.input-field:focus {
+  border-color:var(--lapis);
+  border-bottom-color:var(--lapis);
+  background:rgba(255,252,240,.95);
+  box-shadow: inset 0 2px 5px rgba(30,58,95,.07);
+}
+.input-field::placeholder { color:var(--ink-faint); font-style:italic; }
+
+/* ── CLASSICAL BUTTON
+   Fully rethought: wide gold border-frame treatment, 
+   Cormorant italic text, ornamental rules top+bottom,
+   reads as a manuscript panel heading not a UI button ── */
+.signin-btn {
+  width: 100%;
+  padding: 1rem 1.5rem .95rem;
+  background: transparent;
+  border-top:    2px solid var(--gold);
+  border-bottom: 2px solid var(--gold);
+  border-left:   1px solid rgba(196,154,42,.4);
+  border-right:  1px solid rgba(196,154,42,.4);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-style: italic;
+  letter-spacing: .14em;
+  color: var(--lapis-deep);
+  cursor: pointer;
+  margin-top: .5rem;
+  position: relative;
+  transition: all .25s;
+  border-radius: 0;
+}
+/* Inner rule lines — like a framed panel */
+.signin-btn::before,
+.signin-btn::after {
+  content: '';
+  position: absolute; left: 12%; right: 12%;
+  height: 1px; background: rgba(196,154,42,.3);
+}
+.signin-btn::before { top: 4px; }
+.signin-btn::after  { bottom: 4px; }
+/* Gold leaf corner marks on the button */
+.signin-btn .btn-corner {
+  position: absolute; font-size: 7px;
+  color: var(--gold); opacity: .55;
+  font-style: normal;
+}
+.signin-btn .btn-corner.tl { top:3px; left:5px; }
+.signin-btn .btn-corner.tr { top:3px; right:5px; }
+.signin-btn .btn-corner.bl { bottom:3px; left:5px; }
+.signin-btn .btn-corner.br { bottom:3px; right:5px; }
+
+.signin-btn:hover {
+  background: rgba(196,154,42,.1);
+  border-top-color: var(--lapis);
+  border-bottom-color: var(--lapis);
+  color: var(--lapis);
+}
+.signin-btn:active { transform: scale(.99); }
+
+.signin-divider {
+  display:flex; align-items:center; gap:.75rem; margin:1.25rem 0;
+}
+.signin-divider-line { flex:1; height:1px; background:rgba(120,90,30,.18); }
+.signin-divider-text {
+  font-family:'DM Mono',monospace; font-size:7px;
+  letter-spacing:.12em; color:var(--ink-faint); text-transform:uppercase;
+}
+
+.demo-btn {
+  width:100%; padding:.75rem 1.5rem;
+  background:transparent;
+  border:1px solid rgba(120,90,30,.3);
+  font-family:'DM Mono',monospace;
+  font-size:8px; letter-spacing:.15em;
+  text-transform:uppercase; color:var(--ink-mid);
+  cursor:pointer; border-radius:0; transition:all .2s;
+}
+.demo-btn:hover {
+  background:rgba(30,58,95,.05);
+  border-color:var(--lapis); color:var(--lapis);
+}
+
+.signin-footer {
+  margin-top:1.1rem; text-align:center;
+  font-family:'Cormorant Garamond',serif;
+  font-size:.88rem; color:var(--ink-faint); font-style:italic;
+}
+.signin-footer a {
+  color:var(--lapis); text-decoration:none;
+  border-bottom:1px solid rgba(30,58,95,.2);
+  transition:border-color .2s;
+}
+.signin-footer a:hover { border-color:var(--lapis); }
+
+/* Pull quote */
+.pull-quote {
+  margin-top:2.25rem; max-width:340px; text-align:center;
+}
+.pull-quote::before {
+  content:''; display:block; width:36px; height:1px;
+  background:rgba(120,90,30,.3); margin:0 auto 1.1rem;
+}
+.heb-mark {
+  display:block; font-size:1.35rem;
+  color:var(--lapis); opacity:.3; margin-bottom:.45rem;
+}
+.pull-quote blockquote {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem; font-weight:300;
+  color:var(--ink-mid); line-height:1.8; font-style:italic;
+}
+.pull-quote cite {
+  display:block; margin-top:.7rem;
+  font-family:'DM Mono',monospace; font-size:7px;
+  letter-spacing:.18em; color:var(--ink-faint);
+  text-transform:uppercase; font-style:normal;
+}
+
+/* Bottom illuminated manuscript bar */
+.illuminated-bar {
+  position:fixed; bottom:0; left:0; right:0; height:4px; z-index:100;
+  background:linear-gradient(to right,
+    var(--lapis-deep) 0%, var(--lapis-mid) 15%, var(--gold) 30%,
+    var(--crimson) 45%, var(--forest) 55%,
+    var(--gold) 70%, var(--lapis-mid) 85%, var(--lapis-deep) 100%);
+  opacity:.8;
+}
+
+@media(max-width:860px){
+  .page{grid-template-columns:1fr}
+  .left{min-height:60vh; padding:3rem 1.5rem}
+  .right{padding:3rem 1.5rem 4rem}
+  .right::before{width:100%;height:4px;top:0;bottom:auto}
+  .school-name{font-size:2.8rem}
+}
+</style>
+</head>
+<body>
+<div class="illuminated-bar"></div>
+<div class="page">
+
+  <!-- ══ LEFT ══ -->
+  <div class="left">
+    <div class="ms-frame"></div>
+    <span class="corner tl">✦</span><span class="corner tr">✦</span>
+    <span class="corner bl">✦</span><span class="corner br">✦</span>
+
+    <svg class="vine" style="left:30px;top:48px;width:16px;height:calc(100% - 96px)" viewBox="0 0 16 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 0 Q13 55 8 110 Q3 165 8 220 Q13 275 8 330 Q3 370 8 400" stroke="#C49A2A" stroke-width="1.2" fill="none"/>
+      <circle cx="8" cy="65"  r="3.5" fill="#C49A2A"/>
+      <circle cx="8" cy="155" r="3"   fill="#C49A2A"/>
+      <circle cx="8" cy="240" r="3.5" fill="#C49A2A"/>
+      <circle cx="8" cy="325" r="3"   fill="#C49A2A"/>
+      <ellipse cx="3"  cy="90"  rx="4" ry="6" transform="rotate(-25  3  90)" fill="#3A5C38"/>
+      <ellipse cx="13" cy="180" rx="4" ry="6" transform="rotate( 25 13 180)" fill="#3A5C38"/>
+      <ellipse cx="3"  cy="268" rx="4" ry="6" transform="rotate(-25  3 268)" fill="#3A5C38"/>
+      <ellipse cx="13" cy="355" rx="4" ry="6" transform="rotate( 25 13 355)" fill="#3A5C38"/>
+    </svg>
+    <svg class="vine" style="right:30px;top:48px;width:16px;height:calc(100% - 96px)" viewBox="0 0 16 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 0 Q3 55 8 110 Q13 165 8 220 Q3 275 8 330 Q13 370 8 400" stroke="#C49A2A" stroke-width="1.2" fill="none"/>
+      <circle cx="8" cy="65"  r="3.5" fill="#C49A2A"/>
+      <circle cx="8" cy="155" r="3"   fill="#C49A2A"/>
+      <circle cx="8" cy="240" r="3.5" fill="#C49A2A"/>
+      <circle cx="8" cy="325" r="3"   fill="#C49A2A"/>
+      <ellipse cx="13" cy="90"  rx="4" ry="6" transform="rotate( 25 13  90)" fill="#3A5C38"/>
+      <ellipse cx="3"  cy="180" rx="4" ry="6" transform="rotate(-25  3 180)" fill="#3A5C38"/>
+      <ellipse cx="13" cy="268" rx="4" ry="6" transform="rotate( 25 13 268)" fill="#3A5C38"/>
+      <ellipse cx="3"  cy="355" rx="4" ry="6" transform="rotate(-25  3 355)" fill="#3A5C38"/>
+    </svg>
+
+    <div class="left-inner">
+      <div class="orule">
+        <div class="orule-line"></div>
+        <div class="orule-center"><div class="odot"></div><div class="odiamond"></div><div class="odot"></div></div>
+        <div class="orule-line"></div>
+      </div>
+
+      <div class="logo-zone">
+        <div class="logo-placeholder">School Crest / Mark</div>
+      </div>
+
+      <div class="school-tag">Hadar · Austin, Texas</div>
+      <h1 class="school-name">Hadar</h1>
+      <div class="school-sub">Jewish Classical Academy</div>
+
+      <div class="ms-text-block">
+        <p class="ms-text">
+          <span class="dropcap">ה</span>Every child is the protagonist of their own intellectual and moral development.
+        </p>
+      </div>
+
+      <div class="colophon">
+        <div class="colophon-line"></div>
+        <div class="colophon-text">Founded 2022 · Austin, Texas</div>
+        <div class="colophon-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT ══ -->
+  <div class="right">
+    <div class="portal-eyebrow">Living Portfolio · Parent Access</div>
+    <h2 class="portal-title">Your child's<br><em>learning story</em></h2>
+    <p class="portal-sub">An interactive portrait of your student's intellectual, linguistic, and moral development — updated each semester.</p>
+
+    <div class="signin-card">
+      <span class="card-corner tl">✦</span><span class="card-corner tr">✦</span>
+      <span class="card-corner bl">✦</span><span class="card-corner br">✦</span>
+
+      <div class="input-group">
+        <label class="input-label">Email address</label>
+        <input type="email" class="input-field" placeholder="your@email.com">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Password</label>
+        <input type="password" class="input-field" placeholder="············">
+      </div>
+
+      <button class="signin-btn">
+        <span class="btn-corner tl">✦</span>
+        <span class="btn-corner tr">✦</span>
+        <span class="btn-corner bl">✦</span>
+        <span class="btn-corner br">✦</span>
+        Enter the Portfolio
+      </button>
+
+      <div class="signin-divider">
+        <div class="signin-divider-line"></div>
+        <div class="signin-divider-text">or</div>
+        <div class="signin-divider-line"></div>
+      </div>
+
+      <button class="demo-btn" onclick="window.location.href='index.html'">
+        View sample portfolio — Athena L.
+      </button>
+
+      <div class="signin-footer">
+        First time? <a href="#">Request access</a> &nbsp;·&nbsp; <a href="#">Forgot password</a>
+      </div>
+    </div>
+
+    <div class="pull-quote">
+      <span class="heb-mark">תּוֹרָה</span>
+      <blockquote>Wisdom begins with wonder — and wonder begins here.</blockquote>
+      <cite>Hadar Jewish Classical Academy · Torah Im Derech Eretz</cite>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
