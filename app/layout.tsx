@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, DM_Mono, Lora } from "next/font/google";
+import { Playfair_Display, DM_Mono, Lora, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 
 const playfairDisplay = Playfair_Display({
@@ -21,6 +21,13 @@ const lora = Lora({
   display: "swap",
 });
 
+const cormorantGaramond = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Hadar Living Portfolio",
   description: "Interactive student portfolio — Hadar Jewish Classical Academy",
@@ -34,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${playfairDisplay.variable} ${dmMono.variable} ${lora.variable} h-full antialiased`}
+      className={`${playfairDisplay.variable} ${dmMono.variable} ${lora.variable} ${cormorantGaramond.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
