@@ -581,9 +581,14 @@ html, body {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
   }
-  .lp-left { display: none; }
+  .lp-left {
+    display: block;
+    min-height: auto;
+  }
+  .left-inner {
+    padding: 2rem 1.5rem;
+  }
   .lp-right {
-    order: -1;
     padding-top: 3rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
