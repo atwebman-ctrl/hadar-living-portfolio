@@ -580,6 +580,8 @@ html, body {
   .lp-page {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
+    overflow: visible;
+    height: auto;
   }
   .lp-left {
     display: block;
@@ -596,6 +598,9 @@ html, body {
     padding-bottom: 3rem;
     justify-content: flex-start;
     order: -1;
+    overflow: visible;
+    height: auto;
+    min-height: auto;
   }
   .mobile-header {
     display: block;
