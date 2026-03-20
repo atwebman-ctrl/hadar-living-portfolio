@@ -24,7 +24,6 @@ export default function Home() {
         .odot{width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:.65}
         .odiamond{width:7px;height:7px;background:var(--gold);opacity:.75;transform:rotate(45deg)}
 
-.school-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.24em;color:var(--gold-light);text-transform:uppercase;opacity:.7;margin-bottom:.6rem}
         .school-name{font-family:'Playfair Display',serif;font-size:4.2rem;font-weight:500;color:var(--gold-pale);line-height:.88;margin-bottom:.45rem}
         .school-sub{font-family:'Cormorant Garamond',serif;font-size:.9rem;font-weight:300;letter-spacing:.32em;text-transform:uppercase;color:rgba(196,154,42,.5);margin-top:-.2rem;margin-bottom:1rem}
         .ms-text-block{border:1px solid rgba(196,154,42,.28);border-top:2.5px solid rgba(196,154,42,.65);padding:1.1rem 1.5rem 1.15rem;max-width:310px;background:rgba(196,154,42,.04);position:relative;margin-bottom:1.6rem}
@@ -36,7 +35,7 @@ export default function Home() {
         .colophon-text{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.16em;color:rgba(225,200,130,.9);text-transform:uppercase;white-space:nowrap}
         .lp-right{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:4rem;background-color:var(--parchment);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"),radial-gradient(ellipse at 8% 12%,rgba(160,120,50,.09) 0%,transparent 35%),radial-gradient(ellipse at 92% 88%,rgba(140,100,40,.08) 0%,transparent 35%),radial-gradient(ellipse at 75% 15%,rgba(180,140,60,.06) 0%,transparent 30%),radial-gradient(ellipse at 25% 85%,rgba(130,100,40,.07) 0%,transparent 30%),radial-gradient(ellipse at 50% 50%,rgba(245,235,200,.5) 0%,transparent 70%)}
         .lp-right::before{content:'';position:absolute;top:0;bottom:0;left:0;width:6px;background:linear-gradient(to bottom,var(--lapis-deep) 0%,rgba(196,154,42,.3) 15%,var(--gold) 35%,var(--gold-bright) 50%,var(--gold) 65%,rgba(196,154,42,.3) 85%,var(--lapis-deep) 100%);filter:blur(0.5px)}
-        .lp-right::after{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(to right,var(--lapis-deep),var(--lapis-mid) 15%,var(--gold) 30%,var(--crimson) 45%,var(--forest) 55%,var(--gold) 70%,var(--lapis-mid) 85%,var(--lapis-deep));opacity:.8}
+        .lp-right::after{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(to right,var(--lapis-deep) 0%,rgba(196,154,42,.4) 20%,var(--gold) 40%,var(--gold-bright) 50%,var(--gold) 60%,rgba(196,154,42,.4) 80%,var(--lapis-deep) 100%);opacity:.8}
         .lp-right>*{animation:fadeUp .9s ease both}
         .lp-right>*:nth-child(1){animation-delay:.42s}.lp-right>*:nth-child(2){animation-delay:.5s}.lp-right>*:nth-child(3){animation-delay:.56s}.lp-right>*:nth-child(4){animation-delay:.62s}.lp-right>*:nth-child(5){animation-delay:.7s}
         .portal-eyebrow{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.22em;color:var(--ink-faint);text-transform:uppercase;margin-bottom:1.25rem;text-align:center;display:flex;align-items:center;gap:10px;width:100%;max-width:390px}
@@ -50,7 +49,7 @@ export default function Home() {
         .card-corner.tl{top:5px;left:8px}.card-corner.tr{top:5px;right:8px}.card-corner.bl{bottom:7px;left:8px}.card-corner.br{bottom:7px;right:8px}
         .input-group{margin-bottom:1rem}
         .input-label{display:block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.4rem}
-        .input-field{width:100%;padding:.68rem .9rem;background:rgba(210,195,165,.35);border:1px solid rgba(120,90,30,.25);border-bottom:1px solid rgba(120,90,30,.45);font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--ink);outline:none;border-radius:0;box-shadow:inset 0 2px 6px rgba(60,40,10,.1),inset 0 1px 0 rgba(255,255,255,.4);transition:border-color .2s,background .2s;-webkit-appearance:none}
+        .input-field{width:100%;padding:.68rem .9rem;background:rgba(225,205,165,.4);border:1px solid rgba(120,90,30,.25);border-bottom:1px solid rgba(120,90,30,.45);font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--ink);outline:none;border-radius:0;box-shadow:inset 0 2px 6px rgba(60,40,10,.1),inset 0 1px 0 rgba(255,255,255,.4);transition:border-color .2s,background .2s;-webkit-appearance:none}
         .input-field:focus{border-color:var(--gold);border-bottom-color:var(--gold);background:rgba(245,235,210,.6);box-shadow:inset 0 2px 4px rgba(60,40,10,.08),0 0 0 1px rgba(196,154,42,.3)}
         .input-field::placeholder{color:var(--ink-faint);font-style:italic}
         .signin-btn{width:100%;padding:1rem 1.5rem .95rem;background:transparent;border-top:2px solid var(--gold-metal);border-bottom:2px solid var(--gold-metal);border-left:1px solid rgba(196,154,42,.4);border-right:1px solid rgba(196,154,42,.4);font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;letter-spacing:.14em;color:var(--lapis-deep);cursor:pointer;margin-top:.5rem;position:relative;transition:all .25s;border-radius:0}
@@ -58,7 +57,7 @@ export default function Home() {
         .signin-btn::before{top:4px}.signin-btn::after{bottom:4px}
         .btn-corner{position:absolute;font-size:7px;color:var(--gold);opacity:.55;font-style:normal}
         .btn-corner.tl{top:3px;left:5px}.btn-corner.tr{top:3px;right:5px}.btn-corner.bl{bottom:3px;left:5px}.btn-corner.br{bottom:3px;right:5px}
-        .signin-btn:hover{background:rgba(196,154,42,.1);border-top-color:var(--lapis);border-bottom-color:var(--lapis);color:var(--lapis);box-shadow:0 0 0 1px var(--gold)}
+        .signin-btn:hover{background:rgba(196,154,42,.1);border-top-color:var(--lapis);border-bottom-color:var(--lapis);color:rgba(212,175,106,1);box-shadow:0 0 0 1px var(--gold)}
         .signin-btn:active{transform:scale(.99)}
         .signin-divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0}
         .signin-divider-line{flex:1;height:1px;background:rgba(120,90,30,.18)}
@@ -73,8 +72,21 @@ export default function Home() {
         .heb-mark{display:block;font-size:1.35rem;color:var(--lapis);opacity:.3;margin-bottom:.45rem}
         .pull-quote blockquote{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:300;color:var(--ink-mid);line-height:1.8;font-style:italic}
         .pull-quote cite{display:block;margin-top:.7rem;font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.18em;color:var(--ink-faint);text-transform:uppercase;font-style:normal}
-        .illuminated-bar{position:fixed;bottom:0;left:0;right:0;height:4px;z-index:100;background:linear-gradient(to right,var(--lapis-deep) 0%,var(--lapis-mid) 15%,var(--gold) 30%,var(--crimson) 45%,var(--forest) 55%,var(--gold) 70%,var(--lapis-mid) 85%,var(--lapis-deep) 100%);opacity:.8}
-        @media(max-width:860px){.lp-page{grid-template-columns:1fr}.lp-left{min-height:60vh;padding:3rem 1.5rem}.lp-right{padding:3rem 1.5rem 4rem}.lp-right::before{width:100%;height:4px;top:0;bottom:auto}.school-name{font-size:2.8rem}}
+        .illuminated-bar{position:fixed;bottom:0;left:0;right:0;height:4px;z-index:100;background:linear-gradient(to right,var(--lapis-deep) 0%,rgba(196,154,42,.4) 20%,var(--gold) 40%,var(--gold-bright) 50%,var(--gold) 60%,rgba(196,154,42,.4) 80%,var(--lapis-deep) 100%);opacity:.8}
+        .mobile-crest{display:none}
+        @media(max-width:860px){
+          .lp-page{grid-template-columns:1fr;grid-template-rows:auto auto}
+          .lp-right{order:-1;padding:2.5rem 1.5rem 3rem}
+          .lp-left{order:1;min-height:auto;padding:2rem 1.5rem}
+          .lp-right::before{width:100%;height:4px;top:0;left:0;right:0;bottom:auto}
+          .vine{display:none}
+          .ms-frame{display:none}
+          .lp-corner{display:none}
+          .mobile-crest{display:block;width:80px;height:auto;opacity:.25;mix-blend-mode:multiply;margin:0 auto 1rem}
+          .school-name{font-size:2.6rem}
+          .portal-title{font-size:1.7rem}
+          .signin-card{max-width:100%;padding:1.5rem}
+        }
       `}</style>
 
       <div className="illuminated-bar" />
@@ -125,8 +137,7 @@ export default function Home() {
 
             <img src="/images/crest.png" width={320} style={{ height: 'auto', mixBlendMode: 'lighten', marginBottom: '1.5rem' }} alt="Hadar crest" />
 
-            <div className="school-tag">Hadar · Austin, Texas</div>
-            <h1 className="school-name">Hadar</h1>
+<h1 className="school-name">Hadar</h1>
             <div className="school-sub">Jewish Classical Academy</div>
 
             <div className="ms-text-block">
@@ -146,6 +157,8 @@ export default function Home() {
 
         {/* ══ RIGHT — PARCHMENT PORTAL ══ */}
         <div className="lp-right">
+          {/* Mobile-only watermark crest */}
+          <img src="/images/crest.png" className="mobile-crest" alt="" aria-hidden="true" />
           <div className="portal-eyebrow">Living Portfolio · Parent Access</div>
           <h2 className="portal-title">Your child&apos;s<br /><em>learning story</em></h2>
           <p className="portal-sub">
