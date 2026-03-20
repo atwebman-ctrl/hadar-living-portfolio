@@ -584,6 +584,7 @@ html, body {
   .lp-left {
     display: block;
     min-height: auto;
+    order: 1;
   }
   .left-inner {
     padding: 2rem 1.5rem;
@@ -594,6 +595,7 @@ html, body {
     padding-right: 1.5rem;
     padding-bottom: 3rem;
     justify-content: flex-start;
+    order: -1;
   }
   .mobile-header {
     display: block;
