@@ -48,6 +48,10 @@ export default function Home() {
 
         {/* ══ RIGHT — PARCHMENT PORTAL ══ */}
         <div className="lp-right">
+          <div className="mobile-header">
+            <h1>Hadar</h1>
+            <p>Jewish Classical Academy</p>
+          </div>
           <div className="portal-eyebrow" style={{ position: 'relative', zIndex: 1 }}>Living Portfolio · Parent Access</div>
           <h2 className="portal-title" style={{ position: 'relative', zIndex: 1 }}><span className="portal-title-plain">Your child&apos;s</span><br /><em>learning story</em></h2>
           <p className="portal-sub" style={{ position: 'relative', zIndex: 1 }}>
