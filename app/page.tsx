@@ -15,18 +15,24 @@ export default function Home() {
           <span className="lp-corner bl">✦</span>
           <span className="lp-corner br">✦</span>
 
-          <div className="left-inner">
-            <div className="brand-group">
-              {/* Top: crest + header */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <img src="/images/crest.png" width={80} style={{ height: 'auto', mixBlendMode: 'lighten' }} alt="Hadar crest" />
-                <h1 className="school-name" style={{ marginTop: '0.75rem' }}>Hadar</h1>
-                <div className="school-sub">Jewish Classical Academy</div>
-              </div>
+          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true"
+            style={{ position: 'absolute', top: 8, left: 8, opacity: 0.85, zIndex: 3, transform: 'rotate(0deg)' }} />
+          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true"
+            style={{ position: 'absolute', top: 8, right: 8, opacity: 0.85, zIndex: 3, transform: 'rotate(90deg)' }} />
+          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true"
+            style={{ position: 'absolute', bottom: 8, right: 8, opacity: 0.85, zIndex: 3, transform: 'rotate(180deg)' }} />
+          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true"
+            style={{ position: 'absolute', bottom: 8, left: 8, opacity: 0.85, zIndex: 3, transform: 'rotate(270deg)' }} />
 
-              {/* Middle: illustration — optically centered slightly above true center */}
-              <img src="/images/kid.png" className="left-illustration" alt="Hadar student" />
+          <div className="left-inner">
+            {/* Top: crest + school name */}
+            <div className="brand-group">
+              <h1 className="school-name">Hadar</h1>
+              <div className="school-sub">Jewish Classical Academy</div>
             </div>
+
+            {/* Middle: illustration — takes ~50% of vertical space */}
+            <img src="/images/kid.png" className="left-illustration" alt="Hadar student" />
 
             {/* Bottom: colophon anchored to foot */}
             <div className="colophon">
@@ -39,16 +45,14 @@ export default function Home() {
 
         {/* ══ RIGHT — PARCHMENT PORTAL ══ */}
         <div className="lp-right">
-          {/* Mobile-only watermark crest */}
-          <img src="/images/crest.png" className="mobile-crest" alt="" aria-hidden="true" />
-          <div className="portal-eyebrow">Living Portfolio · Parent Access</div>
-          <h2 className="portal-title"><span className="portal-title-plain">Your child&apos;s</span><br /><em>learning story</em></h2>
-          <p className="portal-sub">
+          <div className="portal-eyebrow" style={{ position: 'relative', zIndex: 1 }}>Living Portfolio · Parent Access</div>
+          <h2 className="portal-title" style={{ position: 'relative', zIndex: 1 }}><span className="portal-title-plain">Your child&apos;s</span><br /><em>learning story</em></h2>
+          <p className="portal-sub" style={{ position: 'relative', zIndex: 1 }}>
             An interactive portrait of your student&apos;s intellectual, linguistic, and moral
             development — updated each semester.
           </p>
 
-          <div className="signin-card">
+          <div className="signin-card" style={{ position: 'relative', zIndex: 1 }}>
             <span className="card-corner tl">✦</span>
             <span className="card-corner tr">✦</span>
             <span className="card-corner bl">✦</span>
@@ -86,11 +90,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="pull-quote">
+          <div className="pull-quote" style={{ position: 'relative', zIndex: 1 }}>
             <span className="heb-mark">תּוֹרָה</span>
             <blockquote>Wisdom begins with wonder — and wonder begins here.</blockquote>
             <cite>Hadar Jewish Classical Academy · Torah Im Derech Eretz</cite>
           </div>
+
+          {/* Deckled spine shadow — positioned absolute, no animation */}
+          <div className="book-edge" aria-hidden="true" />
         </div>
 
       </div>
