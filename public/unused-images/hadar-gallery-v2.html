@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadar — Visual Asset Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #0f1e35;
+  --gold: #C49A2A;
+  --gold-pale: #EDD99A;
+  --gold-dim: rgba(196,154,42,.35);
+  --cream: #F2E8CC;
+  --ink: #1E1608;
+  --ink-mid: #4A3C28;
+  --ink-light: #7A6A50;
+  --ink-faint: #A89878;
+}
+
+html, body {
+  background: var(--cream);
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── MASTHEAD ── */
+.masthead {
+  background: var(--navy);
+  padding: 0;
+  border-bottom: 2px solid var(--gold);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: stretch;
+}
+.masthead-left {
+  padding: 2rem 3rem;
+  border-right: 1px solid rgba(196,154,42,.2);
+}
+.masthead-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: .22em;
+  color: rgba(196,154,42,.5);
+  text-transform: uppercase;
+  margin-bottom: .5rem;
+}
+.masthead-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem; font-weight: 400;
+  color: var(--gold-pale);
+  letter-spacing: .04em;
+  line-height: 1;
+}
+.masthead-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .85rem; font-style: italic;
+  color: rgba(196,154,42,.45);
+  margin-top: .4rem;
+}
+.masthead-right {
+  padding: 2rem 3rem;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: flex-end; gap: .35rem;
+}
+.masthead-right span {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: .16em;
+  color: rgba(196,154,42,.35);
+  text-transform: uppercase;
+}
+
+/* ── CHAPTER HEADERS ── */
+.chapter {
+  padding: 3rem 3rem 1.5rem;
+  display: flex; align-items: baseline; gap: 1.25rem;
+}
+.chapter-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: .18em;
+  color: var(--gold); text-transform: uppercase;
+  flex-shrink: 0;
+}
+.chapter-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; font-weight: 400;
+  color: var(--ink); letter-spacing: .03em;
+}
+.chapter-rule {
+  flex: 1; height: 1px;
+  background: linear-gradient(to right, rgba(139,109,56,.3), transparent);
+}
+
+/* ── IMAGE GRID ── */
+.grid {
+  display: grid;
+  padding: 0 3rem 1rem;
+  gap: 1rem;
+}
+.g2 { grid-template-columns: 1fr 1fr; }
+.g3 { grid-template-columns: 1fr 1fr 1fr; }
+.g1 { grid-template-columns: 1fr; }
+
+/* ── IMAGE TILES ── */
+.tile {
+  position: relative;
+  overflow: hidden;
+  background: #1a1208;
+  cursor: zoom-in;
+}
+.tile img {
+  width: 100%;
+  display: block;
+  transition: transform .5s ease, filter .5s ease;
+}
+.tile:hover img {
+  transform: scale(1.03);
+  filter: brightness(1.05);
+}
+/* Gold top lip */
+.tile::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  opacity: .55;
+  z-index: 2;
+}
+/* Caption overlay on hover */
+.tile-caption {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: .75rem 1rem .7rem;
+  background: linear-gradient(to top, rgba(15,30,53,.92) 0%, transparent 100%);
+  transform: translateY(100%);
+  transition: transform .3s ease;
+  z-index: 3;
+}
+.tile:hover .tile-caption { transform: translateY(0); }
+.tile-caption p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .85rem; font-style: italic;
+  color: var(--gold-pale); line-height: 1.4;
+}
+.tile-caption span {
+  font-family: 'DM Mono', monospace;
+  font-size: 7px; letter-spacing: .12em;
+  color: rgba(196,154,42,.5); text-transform: uppercase;
+  display: block; margin-top: .2rem;
+}
+
+/* Specific heights */
+.h-sm  img { height: 240px; object-fit: cover; }
+.h-md  img { height: 320px; object-fit: cover; }
+.h-lg  img { height: 420px; object-fit: cover; }
+.h-xl  img { height: 520px; object-fit: cover; }
+.h-auto img { height: auto; max-height: 480px; object-fit: contain; background: var(--cream); }
+
+/* ── DIVIDER ── */
+.divider {
+  margin: 1.5rem 3rem 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(139,109,56,.2), transparent);
+}
+
+/* ── FOOTER ── */
+.footer {
+  background: var(--navy);
+  margin-top: 3rem;
+  padding: 1.5rem 3rem;
+  border-top: 1px solid rgba(196,154,42,.25);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-l {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: .14em;
+  color: rgba(196,154,42,.35); text-transform: uppercase;
+}
+.footer-r {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .85rem; font-style: italic;
+  color: rgba(196,154,42,.3);
+}
+
+/* ── LIGHTBOX ── */
+.lb-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(5,10,20,.92);
+  z-index: 1000; align-items: center; justify-content: center;
+  cursor: zoom-out;
+}
+.lb-overlay.open { display: flex; }
+.lb-overlay img {
+  max-width: 90vw; max-height: 90vh;
+  object-fit: contain;
+  box-shadow: 0 0 80px rgba(0,0,0,.6);
+}
+.lb-close {
+  position: absolute; top: 1.5rem; right: 2rem;
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: .14em; color: rgba(196,154,42,.6);
+  text-transform: uppercase; cursor: pointer;
+  background: none; border: none;
+}
+
+@media(max-width:860px) {
+  .g2, .g3 { grid-template-columns: 1fr; }
+  .grid { padding: 0 1.5rem 1rem; }
+  .chapter { padding: 2rem 1.5rem 1rem; }
+  .masthead-left, .masthead-right { padding: 1.5rem; }
+  .footer { padding: 1.5rem; flex-direction: column; gap: .5rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- LIGHTBOX -->
+<div class="lb-overlay" id="lb" onclick="closeLB()">
+  <button class="lb-close" onclick="closeLB()">✕ Close</button>
+  <img id="lb-img" src="" alt="">
+</div>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-left">
+    <div class="masthead-eyebrow">Hadar Jewish Classical Academy · Austin, Texas</div>
+    <div class="masthead-title">Visual Asset Library</div>
+    <div class="masthead-sub">Illustrations, crests, and design references — March 2026</div>
+  </div>
+  <div class="masthead-right">
+    <span>11 assets</span>
+    <span>Confidential</span>
+    <span>Draft use only</span>
+  </div>
+</div>
+
+<!-- ── I. IDENTITY & CRESTS ── -->
+<div class="chapter">
+  <span class="chapter-num">I</span>
+  <span class="chapter-title">Identity & Crests</span>
+  <div class="chapter-rule"></div>
+</div>
+
+<div class="grid g3">
+  <div class="tile h-md" onclick="openLB(this)">
+    <img src="Gemini_Generated_Image_5rl74y5rl74y5rl7.jpeg" alt="Crest horizontal">
+    <div class="tile-caption">
+      <p>Horizontal crest — lulav, flaming swords, Texas star, הדר scroll</p>
+      <span>Crest · Parchment ground</span>
+    </div>
+  </div>
+  <div class="tile h-md" onclick="openLB(this)">
+    <img src="Gemini_Generated_Image_q1f68mq1f68mq1f6.jpeg" alt="Circular seal">
+    <div class="tile-caption">
+      <p>Circular academic seal — "Hadar Jewish Classical Academy · Austin, Texas"</p>
+      <span>Seal · Circular format</span>
+    </div>
+  </div>
+  <div class="tile h-md" onclick="openLB(this)">
+    <img src="Gemini_Generated_Image_t51x6t51x6t51x6t.jpeg" alt="Full ornate border composition">
+    <div class="tile-caption">
+      <p>Full ornate border with crest, motto, and founding information</p>
+      <span>Identity · Decorative border</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ── II. BOOK COVER REFERENCES ── -->
+<div class="chapter">
+  <span class="chapter-num">II</span>
+  <span class="chapter-title">Book Cover References</span>
+  <div class="chapter-rule"></div>
+</div>
+
+<div class="grid g2">
+  <div class="tile h-lg" onclick="openLB(this)">
+    <img src="Gemini_Generated_Image_ehmzrdehmzrdehmz.jpeg" alt="Book cover reference">
+    <div class="tile-caption">
+      <p>Primary book cover reference — the aspirational design target</p>
+      <span>Reference · Hardcover composition</span>
+    </div>
+  </div>
+  <div class="tile h-lg" onclick="openLB(this)">
+    <img src="Gemini_Generated_Image_6p69ym6p69ym6p69.jpeg" alt="Frontier Faith framed illustration">
+    <div class="tile-caption">
+      <p>"A Frontier Faith" — framed classroom scene with baroque gold border</p>
+      <span>Composite · Frame + scene</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ── III. SCHOOL LIFE ── -->
+<div class="chapter">
+  <span class="chapter-num">III</span>
+  <span class="chapter-title">School Life — Classroom</span>
+  <div class="chapter-rule"></div>
+</div>
+
+<div class="grid g3">
+  <div class="tile h-md" onclick="openLB(this)">
+    <img src="Gemini_Generated_Image_bkthw2bkthw2bkth.jpeg" alt="Classroom raising hands">
+    <div class="tile-caption">
+      <p>Socratic classroom — students raising hands, Israeli & American flags</p>
+      <span>Interior · Parchment style</span>
+    </div>
+  </div>
+  <div class="tile h-md" onclick="openLB(this)">
+    <img src="Gemini_Generated_Image_p37ni5p37ni5p37n.jpeg" alt="Science lesson">
+    <div class="tile-caption">
+      <p>Science experiment — student presenting, redhead teacher observing</p>
+      <span>Interior · Sketch style</span>
+    </div>
+  </div>
+  <div class="tile h-md" onclick="openLB(this)">
+    <img src="Gemini_Generated_Image_j1ujfrj1ujfrj1uj.jpeg" alt="Hebrew classroom">
+    <div class="tile-caption">
+      <p>Hebrew classroom — "Shalom" on chalkboard, compass rose, Texas star</p>
+      <span>Interior · Parchment edge</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ── IV. SCHOOL LIFE — OUTDOORS ── -->
+<div class="chapter">
+  <span class="chapter-num">IV</span>
+  <span class="chapter-title">School Life — Outdoors & Portraits</span>
+  <div class="chapter-rule"></div>
+</div>
+
+<div class="grid g3">
+  <div class="tile h-lg" onclick="openLB(this)">
+    <img src="Gemini_Generated_Image_fzcknrfzcknrfzck.jpeg" alt="Boy balancing">
+    <div class="tile-caption">
+      <p>Boy balancing on fence — kippah, tzitzit visible, trees and gardens</p>
+      <span>Portrait · Watercolor + sketch</span>
+    </div>
+  </div>
+  <div class="tile h-lg" onclick="openLB(this)">
+    <img src="Gemini_Generated_Image_ekgdriekgdriekgd.jpeg" alt="Three girls at playground">
+    <div class="tile-caption">
+      <p>Three girls in school uniform — playground porthole, joyful moment</p>
+      <span>Group portrait · Sketch style</span>
+    </div>
+  </div>
+  <div class="tile h-lg" onclick="openLB(this)">
+    <img src="Gemini_Generated_Image_hdzdxnhdzdxnhdzd.jpeg" alt="School courtyard with chicken">
+    <div class="tile-caption">
+      <p>School courtyard — teacher, students, oak trees, chicken in foreground</p>
+      <span>Exterior · Austin setting</span>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span class="footer-l">Hadar Jewish Classical Academy · Visual Asset Library · Confidential · March 2026</span>
+  <span class="footer-r">Torah Im Derech Eretz</span>
+</div>
+
+<script>
+function openLB(tile) {
+  const img = tile.querySelector('img');
+  document.getElementById('lb-img').src = img.src;
+  document.getElementById('lb').classList.add('open');
+}
+function closeLB() {
+  document.getElementById('lb').classList.remove('open');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeLB();
+});
+</script>
+</body>
+</html>
