@@ -4,7 +4,6 @@ import './page.css';
 export default function Home() {
   return (
     <>
-      <div className="illuminated-bar" />
       <div className="lp-page">
 
         {/* ══ LEFT — LAPIS MANUSCRIPT PANEL ══ */}
@@ -15,14 +14,18 @@ export default function Home() {
           <span className="lp-corner bl">✦</span>
           <span className="lp-corner br">✦</span>
 
-          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true"
-            style={{ position: 'absolute', top: 8, left: 8, opacity: 0.85, zIndex: 3, transform: 'rotate(0deg)' }} />
-          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true"
-            style={{ position: 'absolute', top: 8, right: 8, opacity: 0.85, zIndex: 3, transform: 'rotate(90deg)' }} />
-          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true"
-            style={{ position: 'absolute', bottom: 8, right: 8, opacity: 0.85, zIndex: 3, transform: 'rotate(180deg)' }} />
-          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true"
-            style={{ position: 'absolute', bottom: 8, left: 8, opacity: 0.85, zIndex: 3, transform: 'rotate(270deg)' }} />
+          <div className="lp-corner" style={{ top: 8, left: 8, zIndex: 3, opacity: 0.85, fontSize: 0 }}>
+            <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true" style={{ transform: 'rotate(0deg)', display: 'block' }} />
+          </div>
+          <div className="lp-corner" style={{ top: 8, right: 8, zIndex: 3, opacity: 0.85, fontSize: 0 }}>
+            <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true" style={{ transform: 'rotate(90deg)', display: 'block' }} />
+          </div>
+          <div className="lp-corner" style={{ bottom: 8, right: 8, zIndex: 3, opacity: 0.85, fontSize: 0 }}>
+            <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true" style={{ transform: 'rotate(180deg)', display: 'block' }} />
+          </div>
+          <div className="lp-corner" style={{ bottom: 8, left: 8, zIndex: 3, opacity: 0.85, fontSize: 0 }}>
+            <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true" style={{ transform: 'rotate(270deg)', display: 'block' }} />
+          </div>
 
           <div className="left-inner">
             {/* Top: crest + school name */}
@@ -91,9 +94,8 @@ export default function Home() {
           </div>
 
           <div className="pull-quote" style={{ position: 'relative', zIndex: 1 }}>
-            <span className="heb-mark">תּוֹרָה</span>
-            <blockquote>Wisdom begins with wonder — and wonder begins here.</blockquote>
-            <cite>Hadar Jewish Classical Academy · Torah Im Derech Eretz</cite>
+            <blockquote dir="rtl">שֶׂכֶל אֵינוֹ חָכְמָה</blockquote>
+            <cite>Thomas Sowell</cite>
           </div>
 
           {/* Deckled spine shadow — positioned absolute, no animation */}
