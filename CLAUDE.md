@@ -71,7 +71,7 @@ Next.js 15 (App Router) · TypeScript (strict) · Tailwind CSS · Supabase · Cl
 - `design-reference/index.html` — full visual reference, open before any UI work
 
 ## Build Sprints (update checkboxes each session)
-- [x] Sprint 1: Next.js init, Tailwind, Supabase schema, Clerk auth, static Athena demo page — landing page complete; Clerk + Supabase credentials pending
+- [x] Sprint 1: Next.js init, Tailwind, Supabase schema, landing page, static Athena demo at /demo — COMPLETE
 - [ ] Sprint 2: Data layer — `getStudentPortfolio()`, portfolio renders from DB, admin CRUD
 - [ ] Sprint 3: Media — video upload, VideoSlot component, ThenNowPlayer, thumbnails
 - [ ] Sprint 4: Parent portal — Clerk parent accounts, `parent_user_ids` linking, PDF export
