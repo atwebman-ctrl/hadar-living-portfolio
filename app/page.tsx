@@ -1,5 +1,8 @@
 import Link from "next/link";
-import './page.css';
+import './styles/landing-layout.css';
+import './styles/landing-left-panel.css';
+import './styles/landing-right-panel.css';
+import './styles/landing-mobile.css';
 
 export default function Home() {
   return (

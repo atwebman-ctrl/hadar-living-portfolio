@@ -1,0 +1,51 @@
+/* ============================================================
+   landing-layout.css
+   CSS custom properties, keyframes, html/body reset, and the
+   two-column page grid. Imported first by page.tsx.
+   ============================================================ */
+
+:root {
+  --lapis: #1E3A5F;
+  --lapis-deep: #152A47;
+  --lapis-mid: #2A5298;
+  --gold: #C49A2A;
+  --gold-metal: #C49A2A;
+  --gold-light: #D4AF6A;
+  --gold-pale: #EDD99A;
+  --gold-bright: #F0C84A;
+  --crimson: #8B2635;
+  --forest: #3A5C38;
+  --parchment: #F2E8CC;
+  --parch-mid: #E8DDB8;
+  --ink: #1E1608;
+  --ink-mid: #4A3C28;
+  --ink-light: #7A6A50;
+  --ink-faint: #A89878;
+}
+
+html, body {
+  overflow: hidden;
+  height: 100vh;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cornerPulse {
+  0%, 100% { opacity: .8; }
+  50%       { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.lp-page {
+  height: 100vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
