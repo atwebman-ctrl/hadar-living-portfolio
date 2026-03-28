@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Playfair_Display, DM_Mono, Lora, Cormorant_Garamond, Cinzel_Decorative } from "next/font/google";
 import "./globals.css";
 
@@ -46,11 +47,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${playfairDisplay.variable} ${dmMono.variable} ${lora.variable} ${cormorantGaramond.variable} ${cinzelDecorative.variable} antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
+    <ClerkProvider>
+      <html
+        lang="en"
+        className={`${playfairDisplay.variable} ${dmMono.variable} ${lora.variable} ${cormorantGaramond.variable} ${cinzelDecorative.variable} antialiased`}
+      >
+        <body className="min-h-full flex flex-col">{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }
