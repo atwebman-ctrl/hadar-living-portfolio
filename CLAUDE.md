@@ -56,6 +56,8 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 7. Check file tree + line counts before every commit
 8. Refactor checkpoint after every 3–4 features
 9. Validate all API inputs with Zod — no unvalidated data hits Supabase
+10. Run `npx tsc --noEmit` and `npx next build` before every push — never push a broken build
+11. Once Jest exists, run tests before every push — CI will catch it anyway but catch it locally first
 
 ## Key Files
 
@@ -124,7 +126,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Create `lib/auth.ts`, `lib/types.ts`, `lib/validation.ts`
   - [x] Install Zod
   - [x] Split `page.css` (639 lines) into 4 partials under app/styles/
-  - [ ] Unify CSS color variables — page.css (lapis/parchment/ink vars) and portfolio.css use different sets; need single source in globals.css
+  - [x] Unify CSS color variables — single canonical :root in globals.css; landing and portfolio :root blocks removed; --lapis* aliases kept for landing CSS compatibility
   - [ ] Set up Jest + basic tests (two-school fixture required)
   - [ ] Set up GitHub Actions CI (lint + typecheck + test + build)
   - [ ] Add Sentry error tracking

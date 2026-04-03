@@ -1,27 +1,9 @@
 /* ============================================================
    landing-layout.css
-   CSS custom properties, keyframes, html/body reset, and the
-   two-column page grid. Imported first by page.tsx.
+   Keyframes, scoped html/body overflow lock, and the two-column
+   page grid. All colour tokens live in app/globals.css — no
+   :root block here.
    ============================================================ */
-
-:root {
-  --lapis: #1E3A5F;
-  --lapis-deep: #152A47;
-  --lapis-mid: #2A5298;
-  --gold: #C49A2A;
-  --gold-metal: #C49A2A;
-  --gold-light: #D4AF6A;
-  --gold-pale: #EDD99A;
-  --gold-bright: #F0C84A;
-  --crimson: #8B2635;
-  --forest: #3A5C38;
-  --parchment: #F2E8CC;
-  --parch-mid: #E8DDB8;
-  --ink: #1E1608;
-  --ink-mid: #4A3C28;
-  --ink-light: #7A6A50;
-  --ink-faint: #A89878;
-}
 
 /* Scoped to the landing page grid — prevents bleed into other routes.
    :has(.lp-page) fires only when the landing page is in the DOM. */

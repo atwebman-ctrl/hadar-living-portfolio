@@ -1,14 +1,68 @@
 @import "tailwindcss";
 
+/* ============================================================
+   globals.css — Canonical CSS design tokens (Hadar default theme)
+   Loaded by layout.tsx → available on every route.
+   Never define colour values anywhere else — always var(--token).
+
+   Multi-tenancy note: when ThemeProvider is wired in Sprint 2,
+   school-specific overrides will be injected via inline style on
+   a wrapper element. These values become the Hadar fallback defaults.
+   ============================================================ */
+
 :root {
-  --background: #F7F4EE;
-  --foreground: #171717;
-  --color-navy: #1B3A6B;
-  --color-gold: #B8963E;
-  --color-border: #D6D0C4;
+  /* ── Core brand ─────────────────────────────────────────── */
+  --navy:        #1B3A6B;  /* primary brand, sidenav, headers */
+  --navy-deep:   #152A47;  /* deep accents, left panel base */
+  --navy-mid:    #2A5298;  /* mid accent, hover states */
+  --navy-light:  #2D5499;  /* lighter navy, used in portfolio */
+
+  --gold:        #C49A2A;  /* accent — borders, ornaments, active states */
+  --gold-light:  #D4AF6A;  /* hover states, subtle accents */
+  --gold-pale:   #EDD99A;  /* display text on dark surfaces */
+  --gold-bright: #F0C84A;  /* shimmer / focus highlight */
+  --gold-metal:  #C49A2A;  /* landing CSS alias — same value as --gold */
+
+  /* ── Backgrounds ────────────────────────────────────────── */
+  --cream:       #F7F4EE;  /* page background — bg-white anywhere is a bug */
+  --parchment:   #F2E8CC;  /* right panel, card backgrounds */
+  --parch-mid:   #E8DDB8;  /* signin card fill */
+  --cream-dark:  #EDE9DF;  /* bars, bookshelf, secondary backgrounds */
+  --white:       #FEFDFB;  /* portfolio card fill — distinct from page cream */
+
+  /* ── Text ───────────────────────────────────────────────── */
+  --ink:         #1C1917;  /* body text */
+  --ink-mid:     #44403C;  /* secondary text */
+  --ink-light:   #78716C;  /* tertiary text, captions */
+  --ink-faint:   #A89878;  /* muted labels on parchment surfaces */
+
+  /* ── Borders ────────────────────────────────────────────── */
+  --rule:        #D6D0C4;  /* borders — never Tailwind default gray */
+
+  /* ── Utility ────────────────────────────────────────────── */
+  --teal:        #2E7D5E;  /* growth / positive indicators */
+  --crimson:     #8B2635;  /* error, alert */
+  --forest:      #3A5C38;  /* secondary positive */
+
+  /* ── Landing page aliases ───────────────────────────────── */
+  /* landing-layout.css was written with --lapis* names.       */
+  /* Aliases let it work without a find-replace sweep while    */
+  /* canonical names remain --navy*.                           */
+  --lapis:       #1B3A6B;  /* = --navy */
+  --lapis-deep:  #152A47;  /* = --navy-deep */
+  --lapis-mid:   #2A5298;  /* = --navy-mid */
+
+  /* ── Tailwind v4 / layout aliases ──────────────────────── */
+  --background:  var(--cream);
+  --foreground:  var(--ink);
+  --color-navy:  var(--navy);
+  --color-gold:  var(--gold);
+  --color-border: var(--rule);
+
+  /* ── Font stack (populated by next/font in layout.tsx) ──── */
   --font-heading: var(--font-playfair);
-  --font-mono: var(--font-dm-mono);
-  --font-body: var(--font-lora);
+  --font-mono:    var(--font-dm-mono);
+  --font-body:    var(--font-lora);
 }
 
 @theme inline {

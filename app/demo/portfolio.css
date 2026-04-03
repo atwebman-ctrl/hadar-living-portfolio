@@ -1,18 +1,4 @@
-:root {
-  --navy: #1B3A6B;
-  --navy-light: #2d5499;
-  --gold: #B8963E;
-  --gold-light: #D4AF6A;
-  --cream: #F7F4EE;
-  --cream-dark: #EDE9DF;
-  --ink: #1C1917;
-  --ink-mid: #44403C;
-  --ink-light: #78716C;
-  --ink-faint: #A8A29E;
-  --white: #FEFDFB;
-  --teal: #2E7D5E;
-  --rule: #D6D0C4;
-}
+/* All colour tokens live in app/globals.css — no :root block here. */
 
 /* ── NAV ── */
 .sidenav {
