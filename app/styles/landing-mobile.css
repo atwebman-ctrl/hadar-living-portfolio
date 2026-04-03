@@ -229,7 +229,8 @@
 /* ── Responsive: ≤ 860px ─────────────────────────────────────── */
 
 @media (max-width: 860px) {
-  html, body {
+  html:has(.lp-page),
+  body:has(.lp-page) {
     overflow-y: auto;
     height: auto;
   }

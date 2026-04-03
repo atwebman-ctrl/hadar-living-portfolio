@@ -23,7 +23,10 @@
   --ink-faint: #A89878;
 }
 
-html, body {
+/* Scoped to the landing page grid — prevents bleed into other routes.
+   :has(.lp-page) fires only when the landing page is in the DOM. */
+html:has(.lp-page),
+body:has(.lp-page) {
   overflow: hidden;
   height: 100vh;
 }
