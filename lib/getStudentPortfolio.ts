@@ -1,3 +1,18 @@
+// ============================================================
+// lib/getStudentPortfolio.ts
+//
+// Single source of truth for all student portfolio data fetching.
+// Always called server-side (API routes or server components).
+// Every query double-filters by both student_id AND school_id —
+// school_id isolation is enforced here, not just by RLS.
+//
+// Row mappers live in lib/mappers.ts.
+//
+// Note: handwriting_samples, photos, parent_uploads, and teachers
+// tables are created in Sprint 3. safeQuery() returns [] gracefully
+// if a table doesn't exist yet.
+// ============================================================
+
 import { supabaseAdmin } from "./supabaseAdmin";
 import type { PortfolioData } from "./types";
 import {
@@ -14,21 +29,6 @@ import {
   mapTeacher,
   mapAiDraft,
 } from "./mappers";
-
-// ============================================================
-// lib/getStudentPortfolio.ts
-//
-// Single source of truth for all student portfolio data fetching.
-// Always called server-side (API routes or server components).
-// Every query double-filters by both student_id AND school_id —
-// school_id isolation is enforced here, not just by RLS.
-//
-// Row mappers live in lib/mappers.ts.
-//
-// Note: handwriting_samples, photos, parent_uploads, and teachers
-// tables are created in Sprint 3. safeQuery() returns [] gracefully
-// if a table doesn't exist yet.
-// ============================================================
 
 // Wraps a Supabase query and returns an empty array on error instead
 // of throwing, so a missing Sprint-3 table doesn't crash the whole fetch.

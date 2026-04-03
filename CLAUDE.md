@@ -48,7 +48,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 
 ## Code Hygiene Rules (enforce always)
 1. No file over 300 lines — split into sub-components immediately
-2. `SUPABASE_SERVICE_ROLE_KEY` only in `app/api/` — never client-side
+2. `SUPABASE_SERVICE_ROLE_KEY` only in `lib/supabaseAdmin.ts` (its definition) and `app/api/` routes. `supabaseAdmin` may be imported in server-only `lib/` helpers (e.g. `lib/auth.ts`, `lib/getStudentPortfolio.ts`) that are themselves only ever called from `app/api/` routes or server components — never from client components.
 3. No hardcoded student data in components — data flows from `getStudentPortfolio(id)`
 4. No hardcoded school name, branding, or theme in components — always from school config
 5. Every query filters by `school_id` — no exceptions
