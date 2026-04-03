@@ -130,7 +130,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [ ] Set up Jest + basic tests (two-school fixture required)
   - [ ] Set up GitHub Actions CI (lint + typecheck + test + build)
   - [ ] Add Sentry error tracking
-  - [ ] Audit package.json for phantom dependencies
+  - [x] Audit package.json for phantom dependencies
   - [ ] Remove Hadar-specific strings from reusable components
 - [ ] Sprint 2: Data layer — Supabase + Clerk wired, dynamic `/portfolio/[studentId]`, admin CRUD
 - [ ] Sprint 3: Expand to full 12 sections — Parent Uploads, Teacher Profiles, Handwriting, Photos, Scope & Sequence, Bookshelf animation
