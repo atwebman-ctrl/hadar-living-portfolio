@@ -5,20 +5,40 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } fro
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
 
-const data = {
-  labels: ["Nov '24\n2nd Gr.", "May '25\n2nd Gr.", "Aug '25\n3rd Gr.", "Jan '26\n3rd Gr."],
-  datasets: [
-    { label: 'Speaking',  data: [2,3,2,3] as (number|null)[], backgroundColor: '#1B3A6B', borderRadius: 3, borderSkipped: false as const },
-    { label: 'Reading',   data: [3,5,4,6] as (number|null)[], backgroundColor: '#B8963E', borderRadius: 3, borderSkipped: false as const },
-    { label: 'Listening', data: [4,6,7,7] as (number|null)[], backgroundColor: '#2E7D5E', borderRadius: 3, borderSkipped: false as const },
-    { label: 'Writing',   data: [null,null,2,3] as (number|null)[], backgroundColor: '#7C3AED', borderRadius: 3, borderSkipped: false as const },
-  ],
+export interface AvantDataPoint {
+  label: string
+  speaking: number | null
+  reading: number | null
+  listening: number | null
+  writing: number | null
 }
 
-export default function AvantChart() {
+// Demo fallback — used when no data prop is provided (/demo route)
+const DEMO_DATA: AvantDataPoint[] = [
+  { label: "Nov '24\n2nd Gr.", speaking: 2, reading: 3, listening: 4, writing: null },
+  { label: "May '25\n2nd Gr.", speaking: 3, reading: 5, listening: 6, writing: null },
+  { label: "Aug '25\n3rd Gr.", speaking: 2, reading: 4, listening: 7, writing: 2 },
+  { label: "Jan '26\n3rd Gr.", speaking: 3, reading: 6, listening: 7, writing: 3 },
+]
+
+interface Props {
+  data?: AvantDataPoint[]
+}
+
+export default function AvantChart({ data = DEMO_DATA }: Props) {
+  const chartData = {
+    labels: data.map((d) => d.label),
+    datasets: [
+      { label: 'Speaking',  data: data.map((d) => d.speaking),  backgroundColor: '#1B3A6B', borderRadius: 3, borderSkipped: false as const },
+      { label: 'Reading',   data: data.map((d) => d.reading),   backgroundColor: '#B8963E', borderRadius: 3, borderSkipped: false as const },
+      { label: 'Listening', data: data.map((d) => d.listening), backgroundColor: '#2E7D5E', borderRadius: 3, borderSkipped: false as const },
+      { label: 'Writing',   data: data.map((d) => d.writing),   backgroundColor: '#7C3AED', borderRadius: 3, borderSkipped: false as const },
+    ],
+  }
+
   return (
     <Bar
-      data={data}
+      data={chartData}
       options={{
         responsive: true,
         maintainAspectRatio: false,
@@ -29,13 +49,14 @@ export default function AvantChart() {
             ticks: { font: { family: 'DM Mono', size: 9 }, maxRotation: 0 },
           },
           y: {
-            min: 0, max: 9,
+            min: 0,
+            max: 9,
             grid: { color: 'rgba(0,0,0,.04)' },
             ticks: {
               font: { family: 'DM Mono', size: 9 },
               stepSize: 3,
               callback: (v) =>
-                v===0 ? 'Novice' : v===3 ? 'Intermed.' : v===6 ? 'Advanced' : v===9 ? 'Mastery' : '',
+                v === 0 ? 'Novice' : v === 3 ? 'Intermed.' : v === 6 ? 'Advanced' : v === 9 ? 'Mastery' : '',
             },
           },
         },

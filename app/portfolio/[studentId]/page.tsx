@@ -6,8 +6,7 @@
 // the full PortfolioData via getStudentPortfolio(), enforces
 // parent access control, then renders the layout shell.
 //
-// HeroSection and IntellectualArc are wired to real data.
-// Remaining sections receive props as they are updated each sprint.
+// All six sections are now wired to typed PortfolioData slices.
 // ============================================================
 
 // This page is always server-rendered on demand — never statically generated.
@@ -56,11 +55,11 @@ export default async function PortfolioPage({ params }: Props) {
       <div className="main">
         <HeroSection student={portfolio.student} school={portfolio.school} />
         <IntellectualArc assessments={portfolio.assessments} />
-        <ImmersionEngine />
-        <TheCanon />
-        <CreativeEvolution />
-        <RhetoricRoom />
-        <CharacterArc />
+        <ImmersionEngine assessments={portfolio.assessments} />
+        <TheCanon readings={portfolio.readings} />
+        <CreativeEvolution writingSamples={portfolio.writingSamples} />
+        <RhetoricRoom videos={portfolio.videos} />
+        <CharacterArc characterAwards={portfolio.characterAwards} />
         <PortfolioFooter />
       </div>
     </>
