@@ -86,6 +86,10 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `middleware.ts` — Clerk auth + route protection
 - `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies
 - `design-reference/` — Target aesthetic HTML files (landing.html, hadar-portfolio.html)
+- `app/dashboard/page.tsx` — Teacher/admin student list; server component
+- `app/dashboard/AddStudentForm.tsx` — Client component modal form; POSTs to /api/dashboard/students
+- `app/admin/page.tsx` — Admin-only school settings overview; Sprint 3 placeholders for Teachers + Theme
+- `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio; passes school.name + student name to SideNav
 
 ### Does NOT exist yet (do not reference as if it does)
 - `components/shared/AiDraftEditor.tsx` — Universal AI edit-and-accept component
@@ -131,14 +135,15 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [ ] Set up GitHub Actions CI (lint + typecheck + test + build)
   - [ ] Add Sentry error tracking
   - [x] Audit package.json for phantom dependencies
-  - [ ] Remove Hadar-specific strings from reusable components
-- [ ] Sprint 2: Data layer — Supabase + Clerk wired, dynamic `/portfolio/[studentId]`, admin CRUD
+  - [x] Remove Hadar-specific strings from reusable components (SideNav now accepts schoolName/studentName props; falls back to "Hadar" for demo)
+- [x] Sprint 2: Data layer — Supabase + Clerk wired, dynamic `/portfolio/[studentId]`, admin CRUD — COMPLETE
   - [x] Create `app/portfolio/[studentId]/page.tsx` — server component with Clerk auth, school_id derivation, parent access guard
   - [x] Wire all six section components to typed `PortfolioData` props with demo fallbacks (HeroSection, IntellectualArc, ImmersionEngine, TheCanon, CreativeEvolution, RhetoricRoom, CharacterArc)
   - [x] Export typed chart data interfaces (`MapsDataPoint`, `AvantDataPoint`); charts accept data props, fall back to demo
   - [x] Fix `supabaseAdmin` to lazy-initialize via Proxy (prevents build-time crash when env vars absent)
   - [x] Admin CRUD routes — `GET/POST /api/dashboard/students`, `GET/PATCH /api/dashboard/students/[studentId]`, `POST /api/dashboard/students/[studentId]/assessments`; `lib/apiHelpers.ts` with shared `authErrorResponse()`
-  - [ ] Dynamic `/dashboard` and `/admin` pages
+  - [x] Dynamic `/dashboard` — teacher/admin student list with Add Student form
+  - [x] Dynamic `/admin` — admin-only school settings overview; teacher/parent redirected
 - [ ] Sprint 3: Expand to full 12 sections — Parent Uploads, Teacher Profiles, Handwriting, Photos, Scope & Sequence, Bookshelf animation
 - [ ] Sprint 4: AI layer — OCR, writing/rhetoric critique, test score extraction, edit-and-accept UI
 - [ ] Sprint 5 (V2): School-wide analysis, State of the Union, multi-school theming

@@ -49,9 +49,11 @@ export default async function PortfolioPage({ params }: Props) {
     notFound()
   }
 
+  const studentName = `${portfolio.student.firstName} ${portfolio.student.lastName}`
+
   return (
     <>
-      <SideNav />
+      <SideNav schoolName={portfolio.school.name} studentName={studentName} />
       <div className="main">
         <HeroSection student={portfolio.student} school={portfolio.school} />
         <IntellectualArc assessments={portfolio.assessments} />

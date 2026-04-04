@@ -12,7 +12,14 @@ const navItems = [
   { href: '#character', label: 'Character Arc' },
 ]
 
-export default function SideNav() {
+interface SideNavProps {
+  /** School display name. Defaults to 'Hadar · 2025–26' (demo fallback). */
+  schoolName?: string
+  /** Student full name shown below the Portfolio label. */
+  studentName?: string
+}
+
+export default function SideNav({ schoolName, studentName }: SideNavProps = {}) {
   const [active, setActive] = useState('overview')
 
   useEffect(() => {
@@ -32,10 +39,17 @@ export default function SideNav() {
   return (
     <nav className="sidenav">
       <div className="logo">
-        <div className="logo-mark">Hadar · 2025–26</div>
-        <div className="school-name">Jewish Classical Academy</div>
+        <div className="logo-mark">{schoolName ?? 'Hadar · 2025–26'}</div>
+        {!schoolName && (
+          <div className="school-name">Jewish Classical Academy</div>
+        )}
       </div>
       <div className="nav-label">Portfolio</div>
+      {studentName && (
+        <div style={{ padding: '0 1.5rem 1rem', fontFamily: 'var(--font-heading)', fontSize: '13px', color: 'white', lineHeight: 1.3 }}>
+          {studentName}
+        </div>
+      )}
       {navItems.map(({ href, label }) => (
         <a
           key={href}
