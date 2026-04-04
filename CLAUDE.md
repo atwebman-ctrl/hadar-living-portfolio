@@ -137,7 +137,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Wire all six section components to typed `PortfolioData` props with demo fallbacks (HeroSection, IntellectualArc, ImmersionEngine, TheCanon, CreativeEvolution, RhetoricRoom, CharacterArc)
   - [x] Export typed chart data interfaces (`MapsDataPoint`, `AvantDataPoint`); charts accept data props, fall back to demo
   - [x] Fix `supabaseAdmin` to lazy-initialize via Proxy (prevents build-time crash when env vars absent)
-  - [ ] Admin CRUD routes (`/api/admin/*`, `/api/dashboard/*`)
+  - [x] Admin CRUD routes — `GET/POST /api/dashboard/students`, `GET/PATCH /api/dashboard/students/[studentId]`, `POST /api/dashboard/students/[studentId]/assessments`; `lib/apiHelpers.ts` with shared `authErrorResponse()`
   - [ ] Dynamic `/dashboard` and `/admin` pages
 - [ ] Sprint 3: Expand to full 12 sections — Parent Uploads, Teacher Profiles, Handwriting, Photos, Scope & Sequence, Bookshelf animation
 - [ ] Sprint 4: AI layer — OCR, writing/rhetoric critique, test score extraction, edit-and-accept UI
