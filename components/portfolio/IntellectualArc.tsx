@@ -5,6 +5,7 @@ import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 interface Props {
   assessments?:  Assessment[]
   studentId?:    string
+  studentName?:  string
   role?:         UserRole
   existingDraft?: AiDraft
 }
@@ -119,18 +120,20 @@ function buildDraftContext(
   delta: string | null,
   firstPct: number | null,
   lastPct: number | null,
+  studentFirstName: string | null,
 ): Record<string, unknown> {
   const mathRows    = assessments.filter((a) => a.assessmentType === 'maps_math' && a.percentile !== null)
   const englishRows = assessments.filter((a) => a.assessmentType === 'maps_english' && a.percentile !== null)
   const lexile      = assessments.find((a) => a.assessmentType === 'lexile')
   return {
-    mathPercentileLatest:   mathRows[0]?.percentile    ?? null,
-    mathPercentileEarliest: mathRows[mathRows.length - 1]?.percentile ?? null,
-    mathDelta:              delta,
-    mathFromPct:            firstPct,
-    mathToPct:              lastPct,
+    studentFirstName,
+    mathPercentileLatest:    mathRows[0]?.percentile    ?? null,
+    mathPercentileEarliest:  mathRows[mathRows.length - 1]?.percentile ?? null,
+    mathDelta:               delta,
+    mathFromPct:             firstPct,
+    mathToPct:               lastPct,
     englishPercentileLatest: englishRows[0]?.percentile ?? null,
-    lexile:                 lexile?.lexileValue ?? null,
+    lexile:                  lexile?.lexileValue ?? null,
   }
 }
 
@@ -158,7 +161,7 @@ function buildStudentLexileRow(assessments: Assessment[]) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function IntellectualArc({ assessments, studentId, role, existingDraft }: Props) {
+export default function IntellectualArc({ assessments, studentId, studentName, role, existingDraft }: Props) {
   const hasData = !!assessments && assessments.length > 0
 
   // MAPS chart
@@ -173,7 +176,7 @@ export default function IntellectualArc({ assessments, studentId, role, existing
 
   // AI narrative context — only computed when teacher/admin view is active
   const draftContext = (studentId && role && role !== 'parent' && hasData)
-    ? buildDraftContext(assessments!, callout?.delta ?? null, callout?.firstPct ?? null, callout?.lastPct ?? null)
+    ? buildDraftContext(assessments!, callout?.delta ?? null, callout?.firstPct ?? null, callout?.lastPct ?? null, studentName ?? null)
     : null
 
   // Lexile bars: benchmarks are always shown; student row is dynamic or demo

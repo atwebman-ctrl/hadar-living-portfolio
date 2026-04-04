@@ -29,14 +29,18 @@ import { authErrorResponse } from '@/lib/apiHelpers'
 
 // ── Prompt construction ───────────────────────────────────────
 
-const SYSTEM_PROMPT = `\
-You are a writing assistant for teachers at a small classical Jewish academy.
-Generate a single paragraph (2–4 sentences) for a student's living portfolio.
+function buildSystemPrompt(firstName: string | null): string {
+  const nameClause = firstName
+    ? `The student's first name is ${firstName}. Refer to them by this name throughout.`
+    : `Use the student's first name where it appears in the data.`
+  return `You are a writing assistant for teachers at a small classical Jewish academy.\
+Generate a single paragraph (2–4 sentences) for a student's living portfolio.\
 The audience is the student's parents. The tone is warm, literate, and celebratory — \
-like a thoughtful letter from an admired teacher.
-Write in third person. Use the student's first name where it appears in the data.
-Plain prose only — no bullet points, no headings, no markdown formatting.
+like a thoughtful letter from an admired teacher.\
+Write in third person. ${nameClause}\
+Plain prose only — no bullet points, no headings, no markdown formatting.\
 Never invent scores or specific facts that are not present in the provided data.`
+}
 
 const SECTION_LABELS: Record<string, string> = {
   student_header:    'Student Overview',
@@ -126,6 +130,10 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  const firstName = typeof input.context.studentFirstName === 'string'
+    ? input.context.studentFirstName
+    : null
+
   let draftText: string
   try {
     const anthropic = new Anthropic({ apiKey })
@@ -134,7 +142,7 @@ export async function POST(req: NextRequest) {
       // Upgrade to claude-sonnet-4-6 for higher-quality output if needed.
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 512,
-      system: SYSTEM_PROMPT,
+      system: buildSystemPrompt(firstName),
       messages: [{ role: 'user', content: buildUserPrompt(input) }],
     })
     const block = message.content[0]

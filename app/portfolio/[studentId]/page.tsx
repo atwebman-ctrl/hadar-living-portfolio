@@ -66,6 +66,7 @@ export default async function PortfolioPage({ params }: Props) {
         <IntellectualArc
           assessments={portfolio.assessments}
           studentId={studentId}
+          studentName={portfolio.student.firstName}
           role={role}
           existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'academic_scores')}
         />
