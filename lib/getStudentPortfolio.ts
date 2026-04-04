@@ -39,9 +39,7 @@ async function safeQuery<T>(
 ): Promise<T[]> {
   const { data, error } = await queryFn();
   if (error) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn("[getStudentPortfolio] query failed:", error);
-    }
+    console.warn("[getStudentPortfolio] query failed:", error);
     return [];
   }
   return data ?? [];

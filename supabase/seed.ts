@@ -27,8 +27,8 @@ if (existsSync('.env.local')) {
 }
 
 // ── Fixed UUIDs ───────────────────────────────────────────────────────────────
-const SCHOOL_ID  = 'a1000000-0000-0000-0000-000000000001' // Hadar (in migration 0002)
-const STUDENT_ID = 'b1000000-0000-0000-0000-000000000001' // Athena Lonsdale
+const SCHOOL_ID  = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d' // Hadar (in migration 0002)
+const STUDENT_ID = 'b1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c' // Athena Lonsdale
 
 // ── Supabase admin client ─────────────────────────────────────────────────────
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL

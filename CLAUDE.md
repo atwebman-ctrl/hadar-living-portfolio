@@ -119,7 +119,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - [ ] Sprint 1.5: Security, multi-tenancy foundation, code hygiene — IN PROGRESS
   - [x] Create `schools` table with theme_json, enabled_sections, clerk_org_id
   - [x] Add `school_id` to all existing tables (0002 migration)
-  - [x] Create Hadar seed record (fixed UUID `a1000000-0000-0000-0000-000000000001`)
+  - [x] Create Hadar seed record (fixed UUID `a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d`)
   - [x] Create `ai_drafts` table
   - [x] Create `school_members` table
   - [x] Install Clerk, wrap ClerkProvider in layout.tsx

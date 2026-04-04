@@ -50,7 +50,7 @@ insert into schools (
   website_url,
   created_at
 ) values (
-  'a1000000-0000-0000-0000-000000000001',
+  'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d',
   'Hadar Jewish Classical Academy',
   'hadar',
   '{
@@ -92,12 +92,12 @@ alter table writing_samples  add column school_id uuid;
 -- ============================================================
 -- 4. Backfill all existing rows with the Hadar school_id
 -- ============================================================
-update students         set school_id = 'a1000000-0000-0000-0000-000000000001';
-update assessments      set school_id = 'a1000000-0000-0000-0000-000000000001';
-update character_awards set school_id = 'a1000000-0000-0000-0000-000000000001';
-update readings         set school_id = 'a1000000-0000-0000-0000-000000000001';
-update videos           set school_id = 'a1000000-0000-0000-0000-000000000001';
-update writing_samples  set school_id = 'a1000000-0000-0000-0000-000000000001';
+update students         set school_id = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
+update assessments      set school_id = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
+update character_awards set school_id = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
+update readings         set school_id = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
+update videos           set school_id = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
+update writing_samples  set school_id = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
 
 -- ============================================================
 -- 5. Enforce NOT NULL + FK now that every row has a school_id
