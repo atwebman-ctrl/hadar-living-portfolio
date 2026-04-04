@@ -6,7 +6,8 @@
 // the full PortfolioData via getStudentPortfolio(), enforces
 // parent access control, then renders the layout shell.
 //
-// All six sections are now wired to typed PortfolioData slices.
+// Sprint 2: original 6 sections wired to typed PortfolioData slices.
+// Sprint 3: 6 additional stub sections added below.
 // ============================================================
 
 // This page is always server-rendered on demand — never statically generated.
@@ -24,6 +25,12 @@ import TheCanon from '@/components/portfolio/TheCanon'
 import CreativeEvolution from '@/components/portfolio/CreativeEvolution'
 import RhetoricRoom from '@/components/portfolio/RhetoricRoom'
 import CharacterArc from '@/components/portfolio/CharacterArc'
+import ScopeAndSequence from '@/components/portfolio/ScopeAndSequence'
+import HandwritingSamples from '@/components/portfolio/HandwritingSamples'
+import PhotoGallery from '@/components/portfolio/PhotoGallery'
+import TeacherNotes from '@/components/portfolio/TeacherNotes'
+import ParentUploads from '@/components/portfolio/ParentUploads'
+import BookshelfAnimation from '@/components/portfolio/BookshelfAnimation'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 // Shared portfolio stylesheet — also consumed by /demo
 import '../../demo/portfolio.css'
@@ -62,6 +69,13 @@ export default async function PortfolioPage({ params }: Props) {
         <CreativeEvolution writingSamples={portfolio.writingSamples} />
         <RhetoricRoom videos={portfolio.videos} />
         <CharacterArc characterAwards={portfolio.characterAwards} />
+        {/* Sprint 3 sections — stub components, data from safeQuery */}
+        <ScopeAndSequence gradeLevel={portfolio.student.gradeLevel} />
+        <HandwritingSamples samples={portfolio.handwritingSamples} />
+        <PhotoGallery photos={portfolio.photos} />
+        <TeacherNotes notes={portfolio.teacherNotes} />
+        <ParentUploads uploads={portfolio.parentUploads} />
+        <BookshelfAnimation readings={portfolio.readings} />
         <PortfolioFooter />
       </div>
     </>

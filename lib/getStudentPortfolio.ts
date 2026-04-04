@@ -27,6 +27,7 @@ import {
   mapPhoto,
   mapParentUpload,
   mapTeacher,
+  mapTeacherNote,
   mapAiDraft,
 } from "./mappers";
 
@@ -82,6 +83,7 @@ export async function getStudentPortfolio(
     photoRows,
     parentUploadRows,
     teacherRows,
+    teacherNoteRows,
     aiDraftRows,
   ] = await Promise.all([
     safeQuery(() =>
@@ -157,6 +159,15 @@ export async function getStudentPortfolio(
         .eq("school_id", schoolId)
         .order("last_name", { ascending: true })
     ),
+    // teacher_notes: Sprint 3 table — safeQuery returns [] until migration lands.
+    safeQuery(() =>
+      supabaseAdmin
+        .from("teacher_notes")
+        .select("*")
+        .eq("student_id", studentId)
+        .eq("school_id", schoolId)
+        .order("created_at", { ascending: false })
+    ),
     // ai_drafts: accepted only — parents never see draft or rejected content.
     safeQuery(() =>
       supabaseAdmin
@@ -182,6 +193,7 @@ export async function getStudentPortfolio(
     photos: photoRows.map((r) => mapPhoto(r as Row)),
     parentUploads: parentUploadRows.map((r) => mapParentUpload(r as Row)),
     teachers: teacherRows.map((r) => mapTeacher(r as Row)),
+    teacherNotes: teacherNoteRows.map((r) => mapTeacherNote(r as Row)),
     aiDrafts: aiDraftRows.map((r) => mapAiDraft(r as Row)),
   };
 }

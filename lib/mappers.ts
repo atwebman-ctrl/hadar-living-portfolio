@@ -19,6 +19,7 @@ import type {
   Photo,
   ParentUpload,
   Teacher,
+  TeacherNote,
   AiDraft,
   SectionType,
   ThemeConfig,
@@ -194,6 +195,18 @@ export function mapTeacher(row: Row): Teacher {
     bio: (row.bio as string) ?? null,
     subjects: (row.subjects as string[]) ?? [],
     startYear: (row.start_year as number) ?? null,
+    createdAt: row.created_at as string,
+  };
+}
+
+export function mapTeacherNote(row: Row): TeacherNote {
+  return {
+    id: row.id as string,
+    schoolId: row.school_id as string,
+    studentId: row.student_id as string,
+    sectionType: row.section_type as SectionType,
+    authorName: row.author_name as string,
+    text: row.text as string,
     createdAt: row.created_at as string,
   };
 }

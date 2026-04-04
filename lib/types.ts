@@ -223,6 +223,30 @@ export interface SchoolMember {
   createdAt: string;
 }
 
+// ── Sprint 3 new types ────────────────────────────────────────
+
+/** One subject's curriculum progress within a grade level. */
+export interface SubjectProgress {
+  subject: string;        // e.g. "Mathematics"
+  unit: string | null;    // e.g. "Fractions & Decimals"
+  completionPct: number;  // 0–100
+  notes: string | null;
+}
+
+/**
+ * Teacher-authored narrative attached to a portfolio section.
+ * DB table: teacher_notes (Sprint 3 migration).
+ */
+export interface TeacherNote {
+  id: string;
+  schoolId: string;
+  studentId: string;
+  sectionType: SectionType;
+  authorName: string;   // denormalized display name
+  text: string;
+  createdAt: string;
+}
+
 // ── Aggregated portfolio response ────────────────────────────
 
 export interface PortfolioData {
@@ -237,6 +261,7 @@ export interface PortfolioData {
   photos: Photo[];
   parentUploads: ParentUpload[];
   teachers: Teacher[];
+  teacherNotes: TeacherNote[];
   aiDrafts: AiDraft[];  // only accepted drafts in parent view
 }
 
