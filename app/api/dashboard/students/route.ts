@@ -1,20 +1,11 @@
 // ============================================================
 // app/api/dashboard/students/route.ts
 //
+// GET  /api/dashboard/students — List all students for the school.
 // POST /api/dashboard/students — Create a new student record.
-// GET  /api/dashboard/students — (Sprint 2, next session) List all
-//   students for the authenticated school.
 //
-// Auth:     Clerk session required.
-// Role:     admin or teacher.
+// Auth: Clerk session required. Role: admin or teacher.
 // school_id is derived from the Clerk org — never from the request.
-//
-// Every API route in this codebase must:
-//   1. Validate input with Zod
-//   2. Derive school_id from Clerk (never from request body)
-//   3. Check role authorisation
-//   4. Filter/scope all queries by school_id
-//   5. Return { error: string, code: string } on failure
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -27,29 +18,52 @@ import {
 } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
+import { authErrorResponse } from '@/lib/apiHelpers'
 
-// ── Shared auth-error helper ──────────────────────────────────────────────────
-// Maps lib/auth.ts error prefixes to HTTP status codes and safe messages.
+// ── GET /api/dashboard/students ───────────────────────────────────────────────
 
-function authErrorResponse(err: Error): NextResponse {
-  const msg = err.message
-  if (msg.startsWith('AUTH_FORBIDDEN') || msg.startsWith('AUTH_INVALID_ROLE')) {
+export async function GET(_req: NextRequest) {
+  // Auth + role
+  let ctx!: Awaited<ReturnType<typeof getAuthContext>>
+  try {
+    ctx = await getAuthContext()
+  } catch (err) {
+    if (err instanceof Error) return authErrorResponse(err)
+    throw err
+  }
+
+  if (ctx.role !== 'admin' && ctx.role !== 'teacher') {
     return NextResponse.json(
-      { error: 'You do not have permission to perform this action.', code: 'FORBIDDEN' },
+      { error: 'Only admins and teachers can list students.', code: 'FORBIDDEN' },
       { status: 403 }
     )
   }
-  // AUTH_UNAUTHENTICATED | AUTH_NO_ORG | AUTH_NO_SCHOOL
+
+  // Fetch all students scoped to the authenticated school
+  const { data, error: dbError } = await supabaseAdmin
+    .from('students')
+    .select('*')
+    .eq('school_id', ctx.schoolId)
+    .order('last_name', { ascending: true })
+    .order('first_name', { ascending: true })
+
+  if (dbError) {
+    console.error('[GET /api/dashboard/students]', dbError)
+    return NextResponse.json(
+      { error: 'Failed to fetch students.', code: 'DB_ERROR' },
+      { status: 500 }
+    )
+  }
+
   return NextResponse.json(
-    { error: 'Authentication required.', code: 'UNAUTHORIZED' },
-    { status: 401 }
+    (data ?? []).map((row) => mapStudent(row as Record<string, unknown>))
   )
 }
 
-// ── POST /api/dashboard/students ─────────────────────────────────────────────
+// ── POST /api/dashboard/students ──────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  // ── 1. Parse body ───────────────────────────────────────────────────────────
+  // 1. Parse body
   let body: unknown
   try {
     body = await req.json()
@@ -60,7 +74,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // ── 2. Validate — school_id is never accepted from the client ───────────────
+  // 2. Validate — school_id is never accepted from the client
   let input: CreateStudentInput
   try {
     input = validate(CreateStudentSchema, body)
@@ -74,10 +88,7 @@ export async function POST(req: NextRequest) {
     throw err
   }
 
-  // ── 3. Auth + role check ────────────────────────────────────────────────────
-  // getAuthContext() resolves userId, schoolId, and role in one Clerk call.
-  // Declaring with definite assignment (!) — the catch block always
-  // returns or re-throws, so ctx is guaranteed assigned past this block.
+  // 3. Auth + role
   let ctx!: Awaited<ReturnType<typeof getAuthContext>>
   try {
     ctx = await getAuthContext()
@@ -93,9 +104,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // ── 4. Insert ───────────────────────────────────────────────────────────────
-  // school_id comes from auth, never from the request body.
-  // is_demo is always false — demo students are only created via seed.ts.
+  // 4. Insert — school_id from auth; is_demo always false via API
   const { data, error: dbError } = await supabaseAdmin
     .from('students')
     .insert({
@@ -120,7 +129,6 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // ── 5. Return the created record mapped to camelCase ────────────────────────
   return NextResponse.json(
     mapStudent(data as Record<string, unknown>),
     { status: 201 }
