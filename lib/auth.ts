@@ -13,25 +13,22 @@ import type { UserRole } from "./types";
 // NEVER call these in client components.
 // ============================================================
 
-// Cache school_id lookups for the duration of the request.
-// This avoids redundant DB round-trips when multiple helpers
-// are called in the same API route.
-const schoolIdCache = new Map<string, string>();
-
 /**
  * Returns the school_id for the authenticated user's Clerk org.
  * Throws if the user is not authenticated or their org has no
  * matching school record.
+ *
+ * Note: no module-level cache — a per-module Map is not safe across
+ * requests in a long-lived Node.js worker (multiple orgs could share
+ * the same process and receive each other's cached school_id).
+ * The schools table lookup is a single indexed query; the cost is
+ * negligible.
  */
 export async function getSchoolId(): Promise<string> {
   const { orgId } = await auth();
 
   if (!orgId) {
     throw new Error("AUTH_NO_ORG: User is not a member of any organization.");
-  }
-
-  if (schoolIdCache.has(orgId)) {
-    return schoolIdCache.get(orgId)!;
   }
 
   const { data, error } = await supabaseAdmin
@@ -46,7 +43,6 @@ export async function getSchoolId(): Promise<string> {
     );
   }
 
-  schoolIdCache.set(orgId, data.id);
   return data.id;
 }
 
@@ -66,30 +62,61 @@ export async function getUserId(): Promise<string> {
 
 /**
  * Returns the user's role within their organization.
- * Clerk org roles map directly to UserRole: admin | teacher | parent.
- * Throws if the role is missing or unrecognized.
+ *
+ * Primary source: Clerk orgRole claim (org:admin | org:teacher | org:parent).
+ *
+ * Fallback: if orgRole is absent, 'org:member' (Clerk default), or any other
+ * unrecognized value, the school_members table is queried. This handles users
+ * who have been provisioned in the DB but not yet assigned a custom Clerk role.
+ *
+ * Throws AUTH_INVALID_ROLE if neither source yields a valid role.
  */
 export async function getRole(): Promise<UserRole> {
-  const { orgRole } = await auth();
+  const { orgRole, userId } = await auth();
 
-  if (!orgRole) {
-    throw new Error("AUTH_NO_ROLE: User has no role in the current organization.");
+  if (!userId) {
+    throw new Error("AUTH_UNAUTHENTICATED: No active Clerk session.");
   }
 
-  // Clerk stores org roles as "org:admin", "org:teacher", etc.
-  // Strip the "org:" prefix to get our internal role string.
-  const role = orgRole.replace(/^org:/, "") as UserRole;
-
-  if (!["admin", "teacher", "parent"].includes(role)) {
-    throw new Error(`AUTH_INVALID_ROLE: Unrecognized role "${role}".`);
+  // Happy path — recognized Clerk org role
+  if (orgRole) {
+    const stripped = orgRole.replace(/^org:/, "");
+    if (["admin", "teacher", "parent"].includes(stripped)) {
+      return stripped as UserRole;
+    }
   }
 
-  return role;
+  // Fallback — orgRole is undefined, 'org:member', or unrecognized.
+  // Check school_members for an explicitly provisioned role.
+  const schoolId = await getSchoolId();
+
+  const { data } = await supabaseAdmin
+    .from("school_members")
+    .select("role")
+    .eq("clerk_user_id", userId)
+    .eq("school_id", schoolId)
+    .limit(1)
+    .single();
+
+  if (data?.role && ["admin", "teacher", "parent"].includes(data.role as string)) {
+    return data.role as UserRole;
+  }
+
+  throw new Error(
+    `AUTH_INVALID_ROLE: No valid role found for user "${userId}". ` +
+    `Assign org:admin, org:teacher, or org:parent in Clerk, ` +
+    `or add a row to school_members.`
+  );
 }
 
 /**
  * Convenience helper — returns userId, schoolId, and role together.
  * Use this in API routes that need all three to avoid three separate awaits.
+ *
+ * getSchoolId() and getRole() both call auth() internally; Clerk memoises
+ * the JWT parse within the same request so there is no redundant work.
+ * If getRole() falls back to the school_members query it will call
+ * getSchoolId() a second time — two cheap indexed lookups, acceptable.
  */
 export async function getAuthContext(): Promise<{
   userId: string;
