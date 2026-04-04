@@ -152,7 +152,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] `POST /api/ai/draft` — generate narrative draft via Claude Haiku; store in ai_drafts
   - [x] `PATCH /api/ai/drafts/[draftId]` — accept/reject/edit a draft
   - [x] `components/shared/AiDraftEditor.tsx` — three-mode UI (view / edit / resolved)
-  - [ ] Wire AiDraftEditor into at least one portfolio section (e.g. IntellectualArc or CreativeEvolution)
+  - [x] Wire AiDraftEditor into at least one portfolio section (IntellectualArc — academic_scores)
   - [ ] OCR pipeline for handwriting samples
   - [ ] Writing/rhetoric critique generation
   - [ ] Test score extraction
