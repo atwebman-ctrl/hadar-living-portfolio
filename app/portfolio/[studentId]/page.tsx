@@ -63,7 +63,12 @@ export default async function PortfolioPage({ params }: Props) {
       <SideNav schoolName={portfolio.school.name} studentName={studentName} />
       <div className="main">
         <HeroSection student={portfolio.student} school={portfolio.school} />
-        <IntellectualArc assessments={portfolio.assessments} />
+        <IntellectualArc
+          assessments={portfolio.assessments}
+          studentId={studentId}
+          role={role}
+          existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'academic_scores')}
+        />
         <ImmersionEngine assessments={portfolio.assessments} />
         <TheCanon readings={portfolio.readings} />
         <CreativeEvolution writingSamples={portfolio.writingSamples} />

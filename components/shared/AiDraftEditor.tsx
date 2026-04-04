@@ -8,10 +8,13 @@
 // teacher for review.
 //
 // Props:
-//   draftId     — uuid of the ai_drafts row
-//   initialText — content_draft from the AI
-//   sectionType — display label only
-//   onResolved  — called with the final text once accepted
+//   draftId          — uuid of the ai_drafts row
+//   initialText      — content_draft from the AI
+//   sectionType      — display label only
+//   onResolved       — called with the final text once accepted
+//   initialStatus    — pre-set status (e.g. 'accepted' for already-resolved drafts)
+//   initialFinalText — pre-set final text (used when initialStatus is 'accepted'
+//                      and content_final differs from content_draft)
 //
 // Three modes:
 //   view    — shows draft text + Accept / Edit & Accept / Reject
@@ -26,10 +29,12 @@ import { useState } from 'react'
 type Status = 'draft' | 'accepted' | 'rejected'
 
 interface Props {
-  draftId:     string
-  initialText: string
-  sectionType: string
-  onResolved?: (finalText: string, status: 'accepted' | 'rejected') => void
+  draftId:          string
+  initialText:      string
+  sectionType:      string
+  onResolved?:      (finalText: string, status: 'accepted' | 'rejected') => void
+  initialStatus?:   Status
+  initialFinalText?: string
 }
 
 // ── Styles (design system tokens) ────────────────────────────
@@ -127,11 +132,14 @@ const S = {
 
 // ── Component ─────────────────────────────────────────────────
 
-export default function AiDraftEditor({ draftId, initialText, sectionType, onResolved }: Props) {
+export default function AiDraftEditor({
+  draftId, initialText, sectionType, onResolved,
+  initialStatus, initialFinalText,
+}: Props) {
   const [mode,     setMode]     = useState<'view' | 'edit'>('view')
-  const [status,   setStatus]   = useState<Status>('draft')
+  const [status,   setStatus]   = useState<Status>(initialStatus ?? 'draft')
   const [editText, setEditText] = useState(initialText)
-  const [finalText,setFinalText]= useState(initialText)
+  const [finalText,setFinalText]= useState(initialFinalText ?? initialText)
   const [loading,  setLoading]  = useState(false)
   const [error,    setError]    = useState<string | null>(null)
 

@@ -1,8 +1,12 @@
-import type { Assessment } from '@/lib/types'
+import type { Assessment, AiDraft, UserRole } from '@/lib/types'
 import MapsChart, { type MapsDataPoint } from '@/components/charts/MapsChart'
+import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 
 interface Props {
-  assessments?: Assessment[]
+  assessments?:  Assessment[]
+  studentId?:    string
+  role?:         UserRole
+  existingDraft?: AiDraft
 }
 
 // ── Demo fallback data ────────────────────────────────────────────────────────
@@ -107,6 +111,30 @@ function getMathCallout(assessments: Assessment[]): {
 }
 
 /**
+ * Assembles the context payload sent to POST /api/ai/draft for the
+ * academic_scores section: latest MAPS percentiles, Lexile value, math delta.
+ */
+function buildDraftContext(
+  assessments: Assessment[],
+  delta: string | null,
+  firstPct: number | null,
+  lastPct: number | null,
+): Record<string, unknown> {
+  const mathRows    = assessments.filter((a) => a.assessmentType === 'maps_math' && a.percentile !== null)
+  const englishRows = assessments.filter((a) => a.assessmentType === 'maps_english' && a.percentile !== null)
+  const lexile      = assessments.find((a) => a.assessmentType === 'lexile')
+  return {
+    mathPercentileLatest:   mathRows[0]?.percentile    ?? null,
+    mathPercentileEarliest: mathRows[mathRows.length - 1]?.percentile ?? null,
+    mathDelta:              delta,
+    mathFromPct:            firstPct,
+    mathToPct:              lastPct,
+    englishPercentileLatest: englishRows[0]?.percentile ?? null,
+    lexile:                 lexile?.lexileValue ?? null,
+  }
+}
+
+/**
  * Builds the student's Lexile bar row from the most recent lexile assessment.
  * Returns null when no lexile assessment exists.
  */
@@ -130,7 +158,7 @@ function buildStudentLexileRow(assessments: Assessment[]) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function IntellectualArc({ assessments }: Props) {
+export default function IntellectualArc({ assessments, studentId, role, existingDraft }: Props) {
   const hasData = !!assessments && assessments.length > 0
 
   // MAPS chart
@@ -142,6 +170,11 @@ export default function IntellectualArc({ assessments }: Props) {
   const firstPct   = callout?.firstPct ?? DEMO_CALLOUT.firstPct
   const lastPct    = callout?.lastPct  ?? DEMO_CALLOUT.lastPct
   const narrative  = callout?.narrative ?? DEMO_CALLOUT.narrative
+
+  // AI narrative context — only computed when teacher/admin view is active
+  const draftContext = (studentId && role && role !== 'parent' && hasData)
+    ? buildDraftContext(assessments!, callout?.delta ?? null, callout?.firstPct ?? null, callout?.lastPct ?? null)
+    : null
 
   // Lexile bars: benchmarks are always shown; student row is dynamic or demo
   const studentRow = hasData ? buildStudentLexileRow(assessments!) : DEMO_STUDENT_LEXILE
@@ -164,6 +197,17 @@ export default function IntellectualArc({ assessments }: Props) {
           {narrative && <><br />{narrative}</>}
         </div>
       </div>
+
+      {/* AI narrative panel — teacher/admin: generate/review; parent: accepted text only */}
+      {studentId && role && (draftContext || role === 'parent') && (
+        <AiNarrativePanel
+          studentId={studentId}
+          role={role}
+          sectionType="academic_scores"
+          existingDraft={existingDraft}
+          draftContext={draftContext ?? {}}
+        />
+      )}
 
       <div className="chart-wrap reveal">
         <div className="chart-title">MAPS RIT Scores — Grade 1 through Grade 3</div>
