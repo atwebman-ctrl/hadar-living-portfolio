@@ -11,6 +11,12 @@ import TheCanon from '@/components/portfolio/TheCanon'
 import CreativeEvolution from '@/components/portfolio/CreativeEvolution'
 import RhetoricRoom from '@/components/portfolio/RhetoricRoom'
 import CharacterArc from '@/components/portfolio/CharacterArc'
+import ScopeAndSequence from '@/components/portfolio/ScopeAndSequence'
+import HandwritingSamples from '@/components/portfolio/HandwritingSamples'
+import PhotoGallery from '@/components/portfolio/PhotoGallery'
+import TeacherNotes from '@/components/portfolio/TeacherNotes'
+import ParentUploads from '@/components/portfolio/ParentUploads'
+import BookshelfAnimation from '@/components/portfolio/BookshelfAnimation'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 
 export default function DemoPortfolio() {
@@ -55,6 +61,12 @@ export default function DemoPortfolio() {
         <CreativeEvolution />
         <RhetoricRoom />
         <CharacterArc />
+        <ScopeAndSequence />
+        <HandwritingSamples />
+        <PhotoGallery />
+        <TeacherNotes />
+        <ParentUploads />
+        <BookshelfAnimation />
         <PortfolioFooter />
       </div>
     </>

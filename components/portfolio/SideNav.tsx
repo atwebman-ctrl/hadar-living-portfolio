@@ -3,13 +3,19 @@
 import { useEffect, useState } from 'react'
 
 const navItems = [
-  { href: '#overview',  label: 'Overview' },
-  { href: '#academics', label: 'Intellectual Arc' },
-  { href: '#hebrew',    label: 'Immersion Engine' },
-  { href: '#canon',     label: 'The Canon' },
-  { href: '#writing',   label: 'Creative Evolution' },
-  { href: '#rhetoric',  label: 'Rhetoric Room' },
-  { href: '#character', label: 'Character Arc' },
+  { href: '#overview',       label: 'Overview' },
+  { href: '#academics',      label: 'Intellectual Arc' },
+  { href: '#hebrew',         label: 'Immersion Engine' },
+  { href: '#canon',          label: 'The Canon' },
+  { href: '#writing',        label: 'Creative Evolution' },
+  { href: '#rhetoric',       label: 'Rhetoric Room' },
+  { href: '#character',      label: 'Character Arc' },
+  { href: '#scope',          label: 'Scope & Sequence' },
+  { href: '#handwriting',    label: 'Handwriting' },
+  { href: '#photos',         label: 'Photo Gallery' },
+  { href: '#teacher-notes',  label: 'Teacher Notes' },
+  { href: '#parent-uploads', label: 'Parent Uploads' },
+  { href: '#bookshelf-anim', label: 'Bookshelf' },
 ]
 
 interface SideNavProps {
