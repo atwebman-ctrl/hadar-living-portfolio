@@ -1,12 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Routes that require a valid Clerk session
+// Routes that require a valid Clerk session.
+// API routes are intentionally excluded — they handle auth internally
+// and return JSON 401/403 responses via authErrorResponse(), not redirects.
 const isProtectedRoute = createRouteMatcher([
   "/portfolio(.*)",
   "/dashboard(.*)",
   "/admin(.*)",
-  "/api/dashboard(.*)",
-  "/api/admin(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
