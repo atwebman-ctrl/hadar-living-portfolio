@@ -90,9 +90,11 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/dashboard/AddStudentForm.tsx` — Client component modal form; POSTs to /api/dashboard/students
 - `app/admin/page.tsx` — Admin-only school settings overview; Sprint 3 placeholders for Teachers + Theme
 - `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio; passes school.name + student name to SideNav
+- `app/api/ai/draft/route.ts` — POST: generate AI narrative draft via Claude; stores in ai_drafts; returns { draftId, text, sectionType }
+- `app/api/ai/drafts/[draftId]/route.ts` — PATCH: accept/reject/edit an AI draft; sets content_final, status, reviewed_by, reviewed_at
+- `components/shared/AiDraftEditor.tsx` — Client component: view/edit/resolve AI draft; Accept, Edit & Accept, Reject buttons
 
 ### Does NOT exist yet (do not reference as if it does)
-- `components/shared/AiDraftEditor.tsx` — Universal AI edit-and-accept component
 - `components/theme/ThemeProvider.tsx` — School theme context
 - `lib/getSchoolConfig.ts` — Fetch school settings + theme
 
@@ -146,6 +148,14 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Dynamic `/admin` — admin-only school settings overview; teacher/parent redirected
 - [ ] Sprint 3: Expand to full 12 sections — Parent Uploads, Teacher Profiles, Handwriting, Photos, Scope & Sequence, Bookshelf animation
 - [ ] Sprint 4: AI layer — OCR, writing/rhetoric critique, test score extraction, edit-and-accept UI
+  - [x] Install `@anthropic-ai/sdk`; add `ANTHROPIC_API_KEY` to env vars
+  - [x] `POST /api/ai/draft` — generate narrative draft via Claude Haiku; store in ai_drafts
+  - [x] `PATCH /api/ai/drafts/[draftId]` — accept/reject/edit a draft
+  - [x] `components/shared/AiDraftEditor.tsx` — three-mode UI (view / edit / resolved)
+  - [ ] Wire AiDraftEditor into at least one portfolio section (e.g. IntellectualArc or CreativeEvolution)
+  - [ ] OCR pipeline for handwriting samples
+  - [ ] Writing/rhetoric critique generation
+  - [ ] Test score extraction
 - [ ] Sprint 5 (V2): School-wide analysis, State of the Union, multi-school theming
 
 ## Environment Variables
@@ -156,6 +166,7 @@ SUPABASE_SERVICE_ROLE_KEY=          # server routes only — never client
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 DEMO_PASSWORD=                      # do NOT commit the actual value
+ANTHROPIC_API_KEY=                  # server routes only — never client
 ```
 
 ## Verification Commands

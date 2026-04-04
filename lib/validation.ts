@@ -171,6 +171,37 @@ export type CreateParentUploadInput = z.infer<typeof CreateParentUploadSchema>;
 
 // ── AI drafts ─────────────────────────────────────────────────
 
+const sectionTypeEnum = z.enum([
+  "student_header",
+  "academic_scores",
+  "reading_bookshelf",
+  "writing",
+  "handwriting",
+  "rhetoric",
+  "virtue_badges",
+  "photos",
+  "parent_uploads",
+  "teacher_profiles",
+  "scope_sequence",
+  "state_of_union",
+]);
+
+/**
+ * Body for POST /api/ai/draft — requests an AI-generated narrative draft.
+ * context is a free-form JSON blob of relevant student data (e.g. assessment
+ * rows, writing sample text) that the route passes to the Claude API.
+ * referenceId is optional: when provided it identifies the specific content
+ * row this draft belongs to. Falls back to studentId when omitted.
+ */
+export const CreateAiDraftRequestSchema = z.object({
+  studentId:   uuid,
+  sectionType: sectionTypeEnum,
+  context:     z.record(z.string(), z.unknown()),
+  referenceId: uuid.optional(),
+});
+
+export type CreateAiDraftRequestInput = z.infer<typeof CreateAiDraftRequestSchema>;
+
 export const UpdateAiDraftSchema = z.object({
   contentFinal: z.string().min(1, "Final content cannot be empty"),
   status: z.enum(["accepted", "rejected"]),
