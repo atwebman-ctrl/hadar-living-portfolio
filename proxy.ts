@@ -21,7 +21,7 @@ export default clerkMiddleware(async (auth, req) => {
   // reach the picker.
   const { userId } = await auth();
   if (!userId) {
-    return NextResponse.redirect(new URL("/sign-in", req.url));
+    return NextResponse.redirect(new URL(`/sign-in?redirect_url=${encodeURIComponent(req.url)}`, req.url));
   }
 });
 
