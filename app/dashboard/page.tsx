@@ -25,6 +25,8 @@ export default async function DashboardPage() {
   // an org (e.g. just signed up) get the org picker instead of a redirect.
   const { userId, orgId } = await auth()
 
+  console.log(`DASHBOARD: userId=${userId} orgId=${orgId}`)
+
   if (!userId) redirect('/sign-in')
 
   if (!orgId) {
@@ -33,6 +35,8 @@ export default async function DashboardPage() {
 
   // Derive auth context entirely server-side.
   const ctx = await getAuthContext().catch(() => redirect('/sign-in'))
+
+  console.log(`DASHBOARD: ctx resolved role=${ctx.role} schoolId=${ctx.schoolId}`)
 
   if (ctx.role !== 'admin' && ctx.role !== 'teacher') {
     redirect('/')
