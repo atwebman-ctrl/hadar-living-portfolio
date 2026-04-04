@@ -42,9 +42,13 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - Video slots accept either `storage_path` (Supabase) OR `external_url` (YouTube/Vimeo) — never assume one format
 - All chart components accept typed `data` prop — no inline data
 
+### Data
+- **Zod v4 strict UUID validation** — `z.string().uuid()` in Zod v4 enforces RFC 4122 (version nibble 1–5, variant nibble 8/9/a/b). All fixed/seed UUIDs must be real v4 UUIDs. The Hadar school UUID is `a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d`.
+
 ### Tooling
 - Cursor commit button is bugged — always use terminal for git
 - If using Cursor, run in Claude-only mode (not Auto)
+- Next.js 16 uses `proxy.ts` (not `middleware.ts`) for Clerk middleware
 
 ## Code Hygiene Rules (enforce always)
 1. No file over 300 lines — split into sub-components immediately
@@ -83,20 +87,24 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `lib/getStudentPortfolio.ts` — Single data-fetch entry point
 - `lib/auth.ts` — Clerk helpers: getSchoolId(), getRole(), getAuthContext(), requireRole()
 - `lib/validation.ts` — Zod schemas for all API route inputs
-- `middleware.ts` — Clerk auth + route protection
-- `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies
+- `proxy.ts` — Clerk middleware (Next.js 16); protects /dashboard, /admin, /portfolio; userId-only check (org not required) so OrgPickerScreen handles no-org case
+- `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies, 0004 Sprint 3 tables
 - `design-reference/` — Target aesthetic HTML files (landing.html, hadar-portfolio.html)
 - `app/dashboard/page.tsx` — Teacher/admin student list; server component
 - `app/dashboard/AddStudentForm.tsx` — Client component modal form; POSTs to /api/dashboard/students
 - `app/admin/page.tsx` — Admin-only school settings overview; Sprint 3 placeholders for Teachers + Theme
 - `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio; passes school.name + student name to SideNav
-- `app/api/ai/draft/route.ts` — POST: generate AI narrative draft via Claude; stores in ai_drafts; returns { draftId, text, sectionType }
+- `app/sign-in/[[...sign-in]]/page.tsx` — Clerk SignIn centered on cream background
+- `app/sign-up/[[...sign-up]]/page.tsx` — Clerk SignUp centered on cream background
+- `app/api/ai/draft/route.ts` — POST: generate AI narrative draft via Claude Haiku; studentFirstName injected into system prompt; stores in ai_drafts; returns { draftId, text, sectionType }
 - `app/api/ai/drafts/[draftId]/route.ts` — PATCH: accept/reject/edit an AI draft; sets content_final, status, reviewed_by, reviewed_at
 - `components/shared/AiDraftEditor.tsx` — Client component: view/edit/resolve AI draft; Accept, Edit & Accept, Reject buttons
+- `components/portfolio/AiNarrativePanel.tsx` — Generate button + inline AiDraftEditor; teacher/admin sees generate flow or resolved draft; parent sees accepted text only
 
 ### Does NOT exist yet (do not reference as if it does)
 - `components/theme/ThemeProvider.tsx` — School theme context
 - `lib/getSchoolConfig.ts` — Fetch school settings + theme
+- `middleware.ts` — does not exist; Next.js 16 uses `proxy.ts` instead
 
 ## Auth (Clerk Organizations)
 - Each school = one Clerk Organization
@@ -105,7 +113,8 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `teacher` — upload, edit, comment, review/accept AI drafts for assigned students
 - `parent` — view-only on teacher content, upload-only in Parent Uploads section, sees only own children via `parent_user_ids`
 - `/demo` — cookie-based password gate (`demo_session` cookie), no Clerk required
-- `/dashboard` and `/admin` — Clerk protected via middleware.ts
+- `/dashboard`, `/admin`, `/portfolio` — Clerk protected via `proxy.ts`; unauthenticated → `/sign-in?redirect_url=...`; authenticated with no org → `OrgPickerScreen` (`<OrganizationSwitcher />`) in dashboard
+- Role fallback: if Clerk orgRole is absent or `org:member`, `getRole()` queries `school_members` table before throwing `AUTH_INVALID_ROLE`
 
 ## Architectural Decisions (locked — do not reverse without discussion)
 - **`on delete restrict` for all `school_id` FKs** — A school record cannot be deleted while student/content rows exist under it. Deletion must be a deliberate multi-step operation. (`school_members` uses cascade — member records are disposable.)
@@ -123,7 +132,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Create `ai_drafts` table
   - [x] Create `school_members` table
   - [x] Install Clerk, wrap ClerkProvider in layout.tsx
-  - [x] Create middleware.ts with route protection
+  - [x] Create proxy.ts with route protection (Next.js 16 — not middleware.ts)
   - [x] Write Supabase RLS policies (0003 migration — pending Clerk JWT setup in Supabase dashboard)
   - [x] Add `/demo` password gate (server component + API route)
   - [x] Create `lib/supabase.ts`
@@ -146,7 +155,12 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Admin CRUD routes — `GET/POST /api/dashboard/students`, `GET/PATCH /api/dashboard/students/[studentId]`, `POST /api/dashboard/students/[studentId]/assessments`; `lib/apiHelpers.ts` with shared `authErrorResponse()`
   - [x] Dynamic `/dashboard` — teacher/admin student list with Add Student form
   - [x] Dynamic `/admin` — admin-only school settings overview; teacher/parent redirected
-- [ ] Sprint 3: Expand to full 12 sections — Parent Uploads, Teacher Profiles, Handwriting, Photos, Scope & Sequence, Bookshelf animation
+- [x] Sprint 3: Expand to full 12 sections — COMPLETE
+  - [x] ScopeAndSequence, HandwritingSamples, PhotoGallery, TeacherNotes, ParentUploads, BookshelfAnimation components wired with real data
+  - [x] `supabase/migrations/0004_sprint3_tables.sql` — 5 new tables with RLS (apply to live DB)
+  - [x] Seed updated with demo data for all Sprint 3 tables
+  - [x] SideNav expanded to all 13 sections; Sprint 3 sections in DemoPortfolio
+  - [x] `lib/types.ts` + `lib/mappers.ts` + `getStudentPortfolio.ts` updated for all Sprint 3 tables
 - [ ] Sprint 4: AI layer — OCR, writing/rhetoric critique, test score extraction, edit-and-accept UI
   - [x] Install `@anthropic-ai/sdk`; add `ANTHROPIC_API_KEY` to env vars
   - [x] `POST /api/ai/draft` — generate narrative draft via Claude Haiku; store in ai_drafts
@@ -167,6 +181,10 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 DEMO_PASSWORD=                      # do NOT commit the actual value
 ANTHROPIC_API_KEY=                  # server routes only — never client
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 ```
 
 ## Verification Commands
