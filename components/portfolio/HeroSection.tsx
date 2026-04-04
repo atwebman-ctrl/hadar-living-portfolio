@@ -40,7 +40,7 @@ export default function HeroSection({ student, school }: Props) {
   return (
     <div className="hero" id="overview">
       <div className="hero-tag">
-        {schoolName} Living Portfolio\u00a0·\u00a0{grade}\u00a0·\u00a0Academic Year {year}
+        {schoolName} Living Portfolio{'\u00a0'}·{'\u00a0'}{grade}{'\u00a0'}·{'\u00a0'}Academic Year {year}
       </div>
 
       <h1>
