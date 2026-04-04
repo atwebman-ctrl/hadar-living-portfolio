@@ -11,6 +11,8 @@ export const dynamic = 'force-dynamic'
 
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { auth } from '@clerk/nextjs/server'
+import { OrganizationSwitcher } from '@clerk/nextjs'
 import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
@@ -18,8 +20,18 @@ import type { Student } from '@/lib/types'
 import AddStudentForm from './AddStudentForm'
 
 export default async function DashboardPage() {
-  // Derive auth context entirely server-side. Unauthenticated users are
-  // redirected to sign-in; users without the correct role go to home.
+  // Check for active org before calling getAuthContext(), which throws
+  // AUTH_NO_ORG when orgId is absent. Users authenticated but not yet in
+  // an org (e.g. just signed up) get the org picker instead of a redirect.
+  const { userId, orgId } = await auth()
+
+  if (!userId) redirect('/sign-in')
+
+  if (!orgId) {
+    return <OrgPickerScreen />
+  }
+
+  // Derive auth context entirely server-side.
   const ctx = await getAuthContext().catch(() => redirect('/sign-in'))
 
   if (ctx.role !== 'admin' && ctx.role !== 'teacher') {
@@ -68,6 +80,22 @@ export default async function DashboardPage() {
 }
 
 // ── Sub-components ────────────────────────────────────────────
+
+function OrgPickerScreen() {
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--cream)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
+      <div style={{ background: 'var(--parchment)', border: '1px solid var(--rule)', padding: '2.5rem 3rem', maxWidth: '28rem', width: '100%', textAlign: 'center' }}>
+        <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink-faint)', margin: '0 0 0.75rem' }}>
+          Hadar Living Portfolio
+        </p>
+        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', color: 'var(--navy)', margin: '0 0 1.75rem' }}>
+          Select your school
+        </h1>
+        <OrganizationSwitcher hidePersonal afterSelectOrganizationUrl="/dashboard" />
+      </div>
+    </div>
+  )
+}
 
 function PageHeader({
   role,
