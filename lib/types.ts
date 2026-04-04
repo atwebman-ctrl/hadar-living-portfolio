@@ -261,6 +261,7 @@ export interface PortfolioData {
   photos: Photo[];
   parentUploads: ParentUpload[];
   teachers: Teacher[];
+  scopeAndSequence: SubjectProgress[];
   teacherNotes: TeacherNote[];
   aiDrafts: AiDraft[];  // only accepted drafts in parent view
 }

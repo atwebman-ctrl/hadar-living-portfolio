@@ -21,6 +21,7 @@ import type {
   Teacher,
   TeacherNote,
   AiDraft,
+  SubjectProgress,
   SectionType,
   ThemeConfig,
 } from "./types";
@@ -208,6 +209,15 @@ export function mapTeacherNote(row: Row): TeacherNote {
     authorName: row.author_name as string,
     text: row.text as string,
     createdAt: row.created_at as string,
+  };
+}
+
+export function mapScopeAndSequence(row: Row): SubjectProgress {
+  return {
+    subject:       row.subject as string,
+    unit:          (row.unit as string) ?? null,
+    completionPct: row.completion_pct as number,
+    notes:         (row.notes as string) ?? null,
   };
 }
 

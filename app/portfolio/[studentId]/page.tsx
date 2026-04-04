@@ -74,8 +74,11 @@ export default async function PortfolioPage({ params }: Props) {
         <CreativeEvolution writingSamples={portfolio.writingSamples} />
         <RhetoricRoom videos={portfolio.videos} />
         <CharacterArc characterAwards={portfolio.characterAwards} />
-        {/* Sprint 3 sections — stub components, data from safeQuery */}
-        <ScopeAndSequence gradeLevel={portfolio.student.gradeLevel} />
+        {/* Sprint 3 sections — all wired to real PortfolioData */}
+        <ScopeAndSequence
+          gradeLevel={portfolio.student.gradeLevel}
+          subjects={portfolio.scopeAndSequence}
+        />
         <HandwritingSamples samples={portfolio.handwritingSamples} />
         <PhotoGallery photos={portfolio.photos} />
         <TeacherNotes notes={portfolio.teacherNotes} />
