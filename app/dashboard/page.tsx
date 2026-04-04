@@ -34,7 +34,10 @@ export default async function DashboardPage() {
   }
 
   // Derive auth context entirely server-side.
-  const ctx = await getAuthContext().catch(() => redirect('/sign-in'))
+  const ctx = await getAuthContext().catch((err) => {
+    console.error('DASHBOARD getAuthContext FAILED:', err.message)
+    redirect('/sign-in')
+  })
 
   console.log(`DASHBOARD: ctx resolved role=${ctx.role} schoolId=${ctx.schoolId}`)
 
