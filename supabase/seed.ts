@@ -248,6 +248,204 @@ async function main() {
     },
   ])
 
+  // 10. Handwriting samples (3 — Fall / Winter / Spring) ────────────────────────
+  await insert('handwriting_samples', [
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      image_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/handwriting/fall-2025-cursive.jpg`,
+      ocr_text: null,
+      teacher_notes: 'Cursive introduction — consistent letter height observed. Loop formation on g and y needs attention.',
+      term: 'Fall 2025',
+      academic_year: '2025-2026',
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      image_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/handwriting/winter-2026-cursive.jpg`,
+      ocr_text: null,
+      teacher_notes: 'Improved spacing and word separation. Pen pressure is now much more controlled.',
+      term: 'Winter 2026',
+      academic_year: '2025-2026',
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      image_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/handwriting/spring-2026-cursive.jpg`,
+      ocr_text: null,
+      teacher_notes: null,
+      term: 'Spring 2026',
+      academic_year: '2025-2026',
+    },
+  ])
+
+  // 11. Photos (4 — key school events across the year) ─────────────────────────
+  await insert('photos', [
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      storage_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/photos/science-fair-2026.jpg`,
+      caption:       'Science fair project — life cycle diagram',
+      date_taken:    '2026-02-18',
+      grade_level:   'Grade 3',
+      academic_year: '2025-2026',
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      storage_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/photos/purim-play-2026.jpg`,
+      caption:       'Purim play — Queen Esther costume',
+      date_taken:    '2026-03-13',
+      grade_level:   'Grade 3',
+      academic_year: '2025-2026',
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      storage_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/photos/shabbat-celebration-2025.jpg`,
+      caption:       'Classroom Shabbat celebration',
+      date_taken:    '2025-11-07',
+      grade_level:   'Grade 3',
+      academic_year: '2025-2026',
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      storage_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/photos/art-exhibition-2026.jpg`,
+      caption:       'Art exhibition — watercolor landscape',
+      date_taken:    '2026-01-22',
+      grade_level:   'Grade 3',
+      academic_year: '2025-2026',
+    },
+  ])
+
+  // 12. Parent uploads (2 — art + story) ────────────────────────────────────────
+  await insert('parent_uploads', [
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      upload_type:   'art',
+      title:         'Mosaic — Jerusalem skyline',
+      storage_path:  `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/parent-uploads/mosaic-jerusalem.jpg`,
+      description:   'Mixed-media mosaic created for the Hanukkah art show.',
+      date:          '2026-01-01',
+      grade_level:   'Grade 3',
+      academic_year: '2025-2026',
+      uploaded_by:   'demo_parent_clerk_user_id',
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      upload_type:   'story',
+      title:         'The Lost Compass',
+      storage_path:  `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/parent-uploads/the-lost-compass.pdf`,
+      description:   'Original short story written over a weekend.',
+      date:          '2025-10-18',
+      grade_level:   'Grade 3',
+      academic_year: '2025-2026',
+      uploaded_by:   'demo_parent_clerk_user_id',
+    },
+  ])
+
+  // 13. Teacher notes (3 — one per key section) ─────────────────────────────────
+  // Text matches the demo fallback in components/portfolio/TeacherNotes.tsx
+  await insert('teacher_notes', [
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      section_type: 'academic_scores',
+      author_name:  'Mrs. Sarah Klein',
+      text:
+        'Athena continues to demonstrate exceptional mathematical intuition, particularly in ' +
+        'pattern recognition. Her MAPS growth of 14 RIT points this year places her in the ' +
+        'top 2% nationally for third-grade progress. She benefits most from open-ended ' +
+        'challenge problems.',
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      section_type: 'writing',
+      author_name:  'Mr. David Ofer',
+      text:
+        "The voice in Athena's writing is unusually mature and consistent. She has moved from " +
+        'narrating events to exploring motivation and consequence — a hallmark of a developing ' +
+        'literary mind. Her Hebrew composition is equally impressive, showing transfer of craft ' +
+        'across languages.',
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      section_type: 'virtue_badges',
+      author_name:  'Mrs. Rachel Stern',
+      text:
+        'Ometz — courage — is not merely an award for Athena; it is a lived practice. She ' +
+        'consistently volunteers to present first, advocates for quieter classmates, and ' +
+        'accepts correction with genuine grace.',
+    },
+  ])
+
+  // 14. Scope and sequence (7 subjects — matches ScopeAndSequence.tsx demo data) ─
+  await insert('scope_and_sequence', [
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      subject:        'Mathematics',
+      unit:           'Fractions & Decimals',
+      completion_pct: 88,
+      notes:          null,
+      grade_level:    'Grade 3',
+      academic_year:  '2025-2026',
+      sort_order:     1,
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      subject:        'English Language',
+      unit:           'Narrative Writing',
+      completion_pct: 95,
+      notes:          null,
+      grade_level:    'Grade 3',
+      academic_year:  '2025-2026',
+      sort_order:     2,
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      subject:        'Hebrew Language',
+      unit:           'Conversational Fluency',
+      completion_pct: 72,
+      notes:          'Accelerated track',
+      grade_level:    'Grade 3',
+      academic_year:  '2025-2026',
+      sort_order:     3,
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      subject:        'Tanakh Studies',
+      unit:           'Bereishit — Lech Lecha',
+      completion_pct: 100,
+      notes:          null,
+      grade_level:    'Grade 3',
+      academic_year:  '2025-2026',
+      sort_order:     4,
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      subject:        'Science',
+      unit:           'Life Cycles & Ecosystems',
+      completion_pct: 60,
+      notes:          null,
+      grade_level:    'Grade 3',
+      academic_year:  '2025-2026',
+      sort_order:     5,
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      subject:        'History',
+      unit:           'Ancient Civilizations',
+      completion_pct: 75,
+      notes:          null,
+      grade_level:    'Grade 3',
+      academic_year:  '2025-2026',
+      sort_order:     6,
+    },
+    {
+      school_id: SCHOOL_ID, student_id: STUDENT_ID,
+      subject:        'Art & Music',
+      unit:           'Composition & Expression',
+      completion_pct: 50,
+      notes:          null,
+      grade_level:    'Grade 3',
+      academic_year:  '2025-2026',
+      sort_order:     7,
+    },
+  ])
+
   console.log('\nSeed complete.')
 }
 
