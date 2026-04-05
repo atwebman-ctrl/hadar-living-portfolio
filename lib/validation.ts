@@ -174,6 +174,7 @@ export type CreateParentUploadInput = z.infer<typeof CreateParentUploadSchema>;
 const sectionTypeEnum = z.enum([
   "student_header",
   "academic_scores",
+  "immersion",
   "reading_bookshelf",
   "writing",
   "handwriting",
@@ -226,6 +227,7 @@ export const UpdateSchoolSchema = z.object({
       z.enum([
         "student_header",
         "academic_scores",
+        "immersion",
         "reading_bookshelf",
         "writing",
         "handwriting",

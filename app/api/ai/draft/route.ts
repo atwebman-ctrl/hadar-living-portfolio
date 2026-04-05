@@ -45,6 +45,7 @@ Never invent scores or specific facts that are not present in the provided data.
 const SECTION_LABELS: Record<string, string> = {
   student_header:    'Student Overview',
   academic_scores:   'Academic Assessment Performance',
+  immersion:         'Hebrew Language Immersion',
   reading_bookshelf: 'Reading List and Bookshelf',
   writing:           'Writing Portfolio',
   handwriting:       'Handwriting Development',

@@ -14,6 +14,7 @@ export type AiDraftStatus = "draft" | "accepted" | "rejected";
 export type SectionType =
   | "student_header"
   | "academic_scores"
+  | "immersion"
   | "reading_bookshelf"
   | "writing"
   | "handwriting"

@@ -1,7 +1,12 @@
-import type { Reading } from '@/lib/types'
+import type { Reading, AiDraft, UserRole } from '@/lib/types'
+import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 
 interface Props {
-  readings?: Reading[]
+  readings?:      Reading[]
+  studentId?:     string
+  studentName?:   string
+  role?:          UserRole
+  existingDraft?: AiDraft
 }
 
 // Cycled palette — same colours as the demo spines, in order
@@ -36,9 +41,23 @@ const DEMO_BOOKS = [
   { title: 'Guns for Gen. Washington',     done: false },
 ]
 
+function buildDraftContext(readings: Reading[], studentFirstName: string | null): Record<string, unknown> {
+  return {
+    studentFirstName,
+    completedCount: readings.filter((r) => r.completed).length,
+    totalCount: readings.length,
+    books: readings.map((r) => ({
+      title: r.title,
+      author: r.author,
+      completed: r.completed,
+      whyChosen: r.whyChosen,
+    })),
+  }
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function TheCanon({ readings }: Props) {
+export default function TheCanon({ readings, studentId, studentName, role, existingDraft }: Props) {
   const hasData = !!readings && readings.length > 0
 
   const books = hasData
@@ -49,6 +68,10 @@ export default function TheCanon({ readings }: Props) {
   const description = hasData
     ? `${completedCount} of ${books.length} title${books.length !== 1 ? 's' : ''} completed.`
     : "Athena\u2019s Grade 3 reading list. Nine of ten titles completed \u2014 from Lewis Carroll to Charles and Mary Lamb\u2019s Tales from Shakespeare."
+
+  const draftContext = (studentId && role && role !== 'parent' && hasData)
+    ? buildDraftContext(readings!, studentName ?? null)
+    : null
 
   return (
     <section id="canon">
@@ -82,6 +105,17 @@ export default function TheCanon({ readings }: Props) {
       <div style={{ marginTop: '1rem', fontFamily: "'DM Mono',monospace", fontSize: 9, color: 'var(--ink-faint)', letterSpacing: '.06em' }}>
         Hover to browse\u00a0·\u00a0Faded spine = upcoming
       </div>
+
+      {/* AI narrative panel */}
+      {studentId && role && (draftContext || role === 'parent') && (
+        <AiNarrativePanel
+          studentId={studentId}
+          role={role}
+          sectionType="reading_bookshelf"
+          existingDraft={existingDraft}
+          draftContext={draftContext ?? {}}
+        />
+      )}
     </section>
   )
 }

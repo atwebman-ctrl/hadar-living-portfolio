@@ -1,8 +1,13 @@
-import type { Assessment } from '@/lib/types'
+import type { Assessment, AiDraft, UserRole } from '@/lib/types'
 import AvantChart, { type AvantDataPoint } from '@/components/charts/AvantChart'
+import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 
 interface Props {
-  assessments?: Assessment[]
+  assessments?:  Assessment[]
+  studentId?:    string
+  studentName?:  string
+  role?:         UserRole
+  existingDraft?: AiDraft
 }
 
 // ── National benchmark constants (AVANT STAMP Hebrew immersion, 2022–23) ─────
@@ -102,15 +107,20 @@ function buildBenchRows(skill: 'reading' | 'listening', studentScore: number | n
 
   return [
     ...benchmarks,
-    {
-      lbl: 'Current Level',
-      val: studentScore.toFixed(2),
-      pct: '100%',
-      bg: 'var(--navy)',
-      opacity: 1,
-      highlight: true,
-    },
+    { lbl: 'Current Level', val: studentScore.toFixed(2), pct: '100%', bg: 'var(--navy)', opacity: 1, highlight: true },
   ]
+}
+
+function buildDraftContext(assessments: Assessment[], studentFirstName: string | null): Record<string, unknown> {
+  const avantRows = assessments.filter((a) => (AVANT_TYPES as readonly string[]).includes(a.assessmentType))
+  return {
+    studentFirstName,
+    avantScores: avantRows.map((a) => ({ skill: a.assessmentType, score: a.score, term: a.term, academicYear: a.academicYear })),
+    latestReading:   assessments.find((a) => a.assessmentType === 'avant_reading')?.score   ?? null,
+    latestListening: assessments.find((a) => a.assessmentType === 'avant_listening')?.score ?? null,
+    latestSpeaking:  assessments.find((a) => a.assessmentType === 'avant_speaking')?.score  ?? null,
+    latestWriting:   assessments.find((a) => a.assessmentType === 'avant_writing')?.score   ?? null,
+  }
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -135,20 +145,16 @@ function BenchCard({ title, rows }: { title: string; rows: BenchRow[] }) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function ImmersionEngine({ assessments }: Props) {
+export default function ImmersionEngine({ assessments, studentId, studentName, role, existingDraft }: Props) {
   const hasData = !!assessments && assessments.length > 0
 
   const avantData = hasData ? buildAvantData(assessments!) : null
 
   // Latest AVANT reading and listening scores for bench cards + callout
-  const latestReading = hasData
-    ? (assessments!.find((a) => a.assessmentType === 'avant_reading')?.score ?? null)
-    : null
-  const latestListening = hasData
-    ? (assessments!.find((a) => a.assessmentType === 'avant_listening')?.score ?? null)
-    : null
+  const latestReading   = hasData ? (assessments!.find((a) => a.assessmentType === 'avant_reading')?.score   ?? null) : null
+  const latestListening = hasData ? (assessments!.find((a) => a.assessmentType === 'avant_listening')?.score ?? null) : null
 
-  const readingRows  = hasData ? buildBenchRows('reading',   latestReading)  : DEMO_READING_ROWS
+  const readingRows   = hasData ? buildBenchRows('reading',   latestReading)   : DEMO_READING_ROWS
   const listeningRows = hasData ? buildBenchRows('listening', latestListening) : DEMO_LISTENING_ROWS
 
   // Callout: grade-equivalent based on reading score
@@ -160,6 +166,10 @@ export default function ImmersionEngine({ assessments }: Props) {
         detail: null,
       }
     : DEMO_CALLOUT
+
+  const draftContext = (studentId && role && role !== 'parent' && hasData)
+    ? buildDraftContext(assessments!, studentName ?? null)
+    : null
 
   return (
     <section id="hebrew">
@@ -179,6 +189,17 @@ export default function ImmersionEngine({ assessments }: Props) {
           {callout.detail && <><br />{callout.detail}</>}
         </div>
       </div>
+
+      {/* AI narrative panel */}
+      {studentId && role && (draftContext || role === 'parent') && (
+        <AiNarrativePanel
+          studentId={studentId}
+          role={role}
+          sectionType="immersion"
+          existingDraft={existingDraft}
+          draftContext={draftContext ?? {}}
+        />
+      )}
 
       <div className="chart-wrap reveal">
         <div className="chart-title">AVANT Hebrew — Four Skills Over Time</div>

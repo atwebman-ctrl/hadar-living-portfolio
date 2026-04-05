@@ -70,11 +70,35 @@ export default async function PortfolioPage({ params }: Props) {
           role={role}
           existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'academic_scores')}
         />
-        <ImmersionEngine assessments={portfolio.assessments} />
-        <TheCanon readings={portfolio.readings} />
-        <CreativeEvolution writingSamples={portfolio.writingSamples} />
+        <ImmersionEngine
+          assessments={portfolio.assessments}
+          studentId={studentId}
+          studentName={portfolio.student.firstName}
+          role={role}
+          existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'immersion')}
+        />
+        <TheCanon
+          readings={portfolio.readings}
+          studentId={studentId}
+          studentName={portfolio.student.firstName}
+          role={role}
+          existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'reading_bookshelf')}
+        />
+        <CreativeEvolution
+          writingSamples={portfolio.writingSamples}
+          studentId={studentId}
+          studentName={portfolio.student.firstName}
+          role={role}
+          existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'writing')}
+        />
         <RhetoricRoom videos={portfolio.videos} />
-        <CharacterArc characterAwards={portfolio.characterAwards} />
+        <CharacterArc
+          characterAwards={portfolio.characterAwards}
+          studentId={studentId}
+          studentName={portfolio.student.firstName}
+          role={role}
+          existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'virtue_badges')}
+        />
         {/* Sprint 3 sections — all wired to real PortfolioData */}
         <ScopeAndSequence
           gradeLevel={portfolio.student.gradeLevel}

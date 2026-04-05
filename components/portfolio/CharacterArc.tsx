@@ -1,7 +1,12 @@
-import type { CharacterAward } from '@/lib/types'
+import type { CharacterAward, AiDraft, UserRole } from '@/lib/types'
+import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 
 interface Props {
   characterAwards?: CharacterAward[]
+  studentId?:       string
+  studentName?:     string
+  role?:            UserRole
+  existingDraft?:   AiDraft
 }
 
 // Background tints for badge icons — cycled when there are more awards than colours
@@ -53,9 +58,23 @@ const DEMO_BADGES = [
   },
 ]
 
+function buildDraftContext(characterAwards: CharacterAward[], studentFirstName: string | null): Record<string, unknown> {
+  return {
+    studentFirstName,
+    virtueCount: characterAwards.length,
+    virtues: characterAwards.map((a) => ({
+      virtueHebrew: a.virtueHebrew,
+      virtueTransliteration: a.virtueTransliteration,
+      virtueEnglish: a.virtueEnglish,
+      description: a.description,
+      awardDate: a.awardDate,
+    })),
+  }
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function CharacterArc({ characterAwards }: Props) {
+export default function CharacterArc({ characterAwards, studentId, studentName, role, existingDraft }: Props) {
   const hasData = !!characterAwards && characterAwards.length > 0
 
   const badges = hasData
@@ -74,6 +93,10 @@ export default function CharacterArc({ characterAwards }: Props) {
   const introText = hasData
     ? `${badges.length} character virtue${badges.length !== 1 ? 's' : ''} awarded — recognized for embodying core middot.`
     : 'Torah Im Derech Eretz \u2014 Athena was recognized as Student Exemplar of the Week on three separate occasions for embodying core character virtues.'
+
+  const draftContext = (studentId && role && role !== 'parent' && hasData)
+    ? buildDraftContext(characterAwards!, studentName ?? null)
+    : null
 
   return (
     <section id="character">
@@ -115,6 +138,17 @@ export default function CharacterArc({ characterAwards }: Props) {
           <div className="badge-date" style={{ color: 'transparent' }}>&mdash;</div>
         </div>
       </div>
+
+      {/* AI narrative panel */}
+      {studentId && role && (draftContext || role === 'parent') && (
+        <AiNarrativePanel
+          studentId={studentId}
+          role={role}
+          sectionType="virtue_badges"
+          existingDraft={existingDraft}
+          draftContext={draftContext ?? {}}
+        />
+      )}
     </section>
   )
 }

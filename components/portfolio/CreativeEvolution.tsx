@@ -1,10 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import type { WritingSample } from '@/lib/types'
+import type { WritingSample, AiDraft, UserRole } from '@/lib/types'
+import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 
 interface Props {
   writingSamples?: WritingSample[]
+  studentId?:      string
+  studentName?:    string
+  role?:           UserRole
+  existingDraft?:  AiDraft
 }
 
 // Internal display shape — same whether source is DB or demo fallback
@@ -49,30 +54,42 @@ const DEMO_SAMPLES: Sample[] = [
 // ── Data transformation ───────────────────────────────────────────────────────
 
 function mapToSamples(writingSamples: WritingSample[]): Sample[] {
-  // Sort oldest-first so tabs read chronologically left-to-right
-  const sorted = [...writingSamples].sort((a, b) =>
-    a.academicYear.localeCompare(b.academicYear)
-  )
-
+  const sorted = [...writingSamples].sort((a, b) => a.academicYear.localeCompare(b.academicYear))
   return sorted.map((s) => ({
     id: s.id,
     tab: `${s.gradeLevel} · ${s.academicYear}`,
     date: s.title,
-    // Prefer the full body text; fall back to OCR transcription if body is absent
     text: s.body ?? s.ocrText ?? '',
-    // ocrText serves as the note context when body is the primary display field
     note: s.body && s.ocrText ? s.ocrText : undefined,
   }))
 }
 
+function buildDraftContext(writingSamples: WritingSample[], studentFirstName: string | null): Record<string, unknown> {
+  const sorted = [...writingSamples].sort((a, b) => a.academicYear.localeCompare(b.academicYear))
+  return {
+    studentFirstName,
+    sampleCount: sorted.length,
+    samples: sorted.map((s) => ({
+      title: s.title,
+      gradeLevel: s.gradeLevel,
+      academicYear: s.academicYear,
+      excerpt: (s.body ?? s.ocrText ?? '').slice(0, 300) || null,
+    })),
+  }
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function CreativeEvolution({ writingSamples }: Props) {
+export default function CreativeEvolution({ writingSamples, studentId, studentName, role, existingDraft }: Props) {
   const hasData = !!writingSamples && writingSamples.length > 0
   const samples = hasData ? mapToSamples(writingSamples!) : DEMO_SAMPLES
 
   const [activeId, setActiveId] = useState<string>(samples[0]?.id ?? '')
   const current = samples.find((s) => s.id === activeId) ?? samples[0]
+
+  const draftContext = (studentId && role && role !== 'parent' && hasData)
+    ? buildDraftContext(writingSamples!, studentName ?? null)
+    : null
 
   return (
     <section id="writing">
@@ -108,6 +125,17 @@ export default function CreativeEvolution({ writingSamples }: Props) {
           </div>
         )}
       </div>
+
+      {/* AI narrative panel */}
+      {studentId && role && (draftContext || role === 'parent') && (
+        <AiNarrativePanel
+          studentId={studentId}
+          role={role}
+          sectionType="writing"
+          existingDraft={existingDraft}
+          draftContext={draftContext ?? {}}
+        />
+      )}
     </section>
   )
 }
