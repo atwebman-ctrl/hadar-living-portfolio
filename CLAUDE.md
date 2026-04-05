@@ -98,8 +98,10 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/sign-up/[[...sign-up]]/page.tsx` — Clerk SignUp centered on cream background
 - `app/api/ai/draft/route.ts` — POST: generate AI narrative draft via Claude Haiku; studentFirstName injected into system prompt; stores in ai_drafts; returns { draftId, text, sectionType }
 - `app/api/ai/drafts/[draftId]/route.ts` — PATCH: accept/reject/edit an AI draft; sets content_final, status, reviewed_by, reviewed_at
+- `app/api/dashboard/students/[studentId]/uploads/route.ts` — POST: multipart upload to portfolio-assets Supabase Storage; inserts into photos, handwriting_samples, or parent_uploads; role-gated (parent ownership check)
 - `components/shared/AiDraftEditor.tsx` — Client component: view/edit/resolve AI draft; Accept, Edit & Accept, Reject buttons
-- `components/portfolio/AiNarrativePanel.tsx` — Generate button + inline AiDraftEditor; teacher/admin sees generate flow or resolved draft; parent sees accepted text only
+- `components/portfolio/AiNarrativePanel.tsx` — Generate button + inline AiDraftEditor; teacher/admin sees generate flow or resolved draft; parent sees accepted text only; wired into IntellectualArc, ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc
+- `components/shared/UploadButton.tsx` — Client component: hidden file input, XHR upload with progress bar, onSuccess/onError callbacks; wired into PhotoGallery, HandwritingSamples, ParentUploads
 
 ### Does NOT exist yet (do not reference as if it does)
 - `components/theme/ThemeProvider.tsx` — School theme context
@@ -125,7 +127,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 
 ## Build Sprints (update checkboxes each session)
 - [x] Sprint 1: Landing page, demo portfolio, design system, six-section UI — COMPLETE
-- [ ] Sprint 1.5: Security, multi-tenancy foundation, code hygiene — IN PROGRESS
+- [x] Sprint 1.5: Security, multi-tenancy foundation, code hygiene — COMPLETE
   - [x] Create `schools` table with theme_json, enabled_sections, clerk_org_id
   - [x] Add `school_id` to all existing tables (0002 migration)
   - [x] Create Hadar seed record (fixed UUID `a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d`)
@@ -142,6 +144,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Install Zod
   - [x] Split `page.css` (639 lines) into 4 partials under app/styles/
   - [x] Unify CSS color variables — single canonical :root in globals.css; landing and portfolio :root blocks removed; --lapis* aliases kept for landing CSS compatibility
+  - [x] Clerk org setup — sign-in/sign-up pages, OrgPickerScreen for no-org users, role fallback via school_members table
   - [ ] Set up Jest + basic tests (two-school fixture required)
   - [ ] Set up GitHub Actions CI (lint + typecheck + test + build)
   - [ ] Add Sentry error tracking
@@ -163,10 +166,12 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] `lib/types.ts` + `lib/mappers.ts` + `getStudentPortfolio.ts` updated for all Sprint 3 tables
 - [ ] Sprint 4: AI layer — OCR, writing/rhetoric critique, test score extraction, edit-and-accept UI
   - [x] Install `@anthropic-ai/sdk`; add `ANTHROPIC_API_KEY` to env vars
-  - [x] `POST /api/ai/draft` — generate narrative draft via Claude Haiku; store in ai_drafts
+  - [x] `POST /api/ai/draft` — generate narrative draft via Claude Haiku; store in ai_drafts; sectionTypes: academic_scores, immersion, reading_bookshelf, writing, virtue_badges
   - [x] `PATCH /api/ai/drafts/[draftId]` — accept/reject/edit a draft
   - [x] `components/shared/AiDraftEditor.tsx` — three-mode UI (view / edit / resolved)
-  - [x] Wire AiDraftEditor into at least one portfolio section (IntellectualArc — academic_scores)
+  - [x] Wire AiNarrativePanel into 5 sections: IntellectualArc, ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc; studentFirstName in all contexts
+  - [x] `POST /api/dashboard/students/[studentId]/uploads` — multipart upload to Supabase Storage (portfolio-assets); photos, handwriting, parent uploads
+  - [x] `components/shared/UploadButton.tsx` — XHR upload with progress; wired into PhotoGallery, HandwritingSamples, ParentUploads
   - [ ] OCR pipeline for handwriting samples
   - [ ] Writing/rhetoric critique generation
   - [ ] Test score extraction
