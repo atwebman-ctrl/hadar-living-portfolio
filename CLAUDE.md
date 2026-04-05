@@ -102,6 +102,9 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `components/shared/AiDraftEditor.tsx` — Client component: view/edit/resolve AI draft; Accept, Edit & Accept, Reject buttons
 - `components/portfolio/AiNarrativePanel.tsx` — Generate button + inline AiDraftEditor; teacher/admin sees generate flow or resolved draft; parent sees accepted text only; wired into IntellectualArc, ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc
 - `components/shared/UploadButton.tsx` — Client component: hidden file input, XHR upload with progress bar, onSuccess/onError callbacks; wired into PhotoGallery, HandwritingSamples, ParentUploads
+- `components/shared/InviteParentButton.tsx` — Client component: modal with email input, POSTs to invite-parent route; shown below HeroSection for admin/teacher only
+- `app/api/dashboard/students/[studentId]/invite-parent/route.ts` — POST: inserts pending parent_students row, calls Clerk createOrganizationInvitation with role 'org:parent'
+- `supabase/migrations/0005_parent_students.sql` — parent_students table: invited_email, nullable parent_clerk_user_id, status (pending/active), RLS; apply before testing invite flow
 
 ### Does NOT exist yet (do not reference as if it does)
 - `components/theme/ThemeProvider.tsx` — School theme context
@@ -172,6 +175,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Wire AiNarrativePanel into 5 sections: IntellectualArc, ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc; studentFirstName in all contexts
   - [x] `POST /api/dashboard/students/[studentId]/uploads` — multipart upload to Supabase Storage (portfolio-assets); photos, handwriting, parent uploads
   - [x] `components/shared/UploadButton.tsx` — XHR upload with progress; wired into PhotoGallery, HandwritingSamples, ParentUploads
+  - [x] Parent invite flow: `0005_parent_students.sql` (pending/active table with email+user_id indexes, RLS), `POST /api/dashboard/students/[studentId]/invite-parent` (Clerk org invite + DB row), `components/shared/InviteParentButton.tsx` (modal with email input, success/error states), `enforceParentAccess()` in portfolio page (email→userId linking on first visit)
   - [ ] OCR pipeline for handwriting samples
   - [ ] Writing/rhetoric critique generation
   - [ ] Test score extraction
