@@ -133,11 +133,11 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     await clerk.organizations.createOrganizationInvitation({
       organizationId: orgId,
       emailAddress:   input.email.toLowerCase(),
-      role:           'org:parent',
+      role:           'parent',
       inviterUserId:  ctx.userId,
     })
   } catch (err) {
-    console.error('[POST invite-parent] Clerk invitation error:', err)
+    console.error('[POST invite-parent] Clerk invitation error (full):', JSON.stringify(err, Object.getOwnPropertyNames(err)))
     // The DB row was inserted. The admin can retry sending the invite
     // without triggering a duplicate; Clerk's failure is logged only.
     return NextResponse.json(
