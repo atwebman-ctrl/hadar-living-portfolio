@@ -140,12 +140,36 @@
 .portfolio-footer .left { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,.35); letter-spacing: .08em; }
 .portfolio-footer .right { font-family: 'Playfair Display', serif; font-size: 12px; color: rgba(255,255,255,.25); font-style: italic; }
 
+/* ── TABLET (769px–900px): sidenav stays vertical, reduce spacing ── */
 @media (max-width: 900px) {
-  .sidenav { display: none; }
-  .main { margin-left: 0; }
   .main section, .hero { padding: 2rem 1.5rem; }
   .hero h1 { font-size: 2.2rem; }
   .hero-metrics { grid-template-columns: repeat(2,1fr); }
   .bench-grid, .video-grid, .then-now { grid-template-columns: 1fr; }
   .then-now-divider { display: none; }
+}
+
+/* ── MOBILE (≤768px): sidenav collapses to horizontal scrollable top bar ── */
+@media (max-width: 768px) {
+  .sidenav {
+    top: 0; left: 0; right: 0; bottom: auto;
+    width: 100%; height: auto;
+    flex-direction: row; align-items: center;
+    padding: 0;
+    overflow-x: auto; overflow-y: hidden;
+    scrollbar-width: none;
+    border-bottom: 1px solid rgba(255,255,255,.15);
+  }
+  .sidenav::-webkit-scrollbar { display: none; }
+  .sidenav .logo,
+  .sidenav .nav-label,
+  .sidenav .sidenav-student-name { display: none; }
+  .sidenav a {
+    display: inline-block; white-space: nowrap;
+    padding: 13px 14px; border-left: none; border-bottom: 2px solid transparent;
+  }
+  .sidenav a.active, .sidenav a:hover {
+    border-left-color: transparent; border-bottom-color: var(--gold);
+  }
+  .main { margin-left: 0; padding-top: 44px; }
 }

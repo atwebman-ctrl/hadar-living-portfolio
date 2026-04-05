@@ -111,11 +111,8 @@ export default async function DashboardPage() {
           <EmptyState />
         ) : (
           <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '1.25rem',
-            }}
+            className="student-grid"
+            style={{ display: 'grid', gap: '1.25rem' }}
           >
             {students.map((s) => (
               <StudentCard key={s.id} student={s} />

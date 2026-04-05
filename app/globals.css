@@ -79,3 +79,11 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading), Georgia, serif;
 }
+
+/* ── Dashboard student grid ── */
+.student-grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+@media (max-width: 768px) {
+  .student-grid { grid-template-columns: 1fr; }
+}

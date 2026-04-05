@@ -52,7 +52,7 @@ export default function SideNav({ schoolName, studentName }: SideNavProps = {}) 
       </div>
       <div className="nav-label">Portfolio</div>
       {studentName && (
-        <div style={{ padding: '0 1.5rem 1rem', fontFamily: 'var(--font-heading)', fontSize: '13px', color: 'white', lineHeight: 1.3 }}>
+        <div className="sidenav-student-name" style={{ padding: '0 1.5rem 1rem', fontFamily: 'var(--font-heading)', fontSize: '13px', color: 'white', lineHeight: 1.3 }}>
           {studentName}
         </div>
       )}
