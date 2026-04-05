@@ -34,6 +34,7 @@ import TeacherNotes from '@/components/portfolio/TeacherNotes'
 import ParentUploads from '@/components/portfolio/ParentUploads'
 import BookshelfAnimation from '@/components/portfolio/BookshelfAnimation'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
+import InviteParentButton from '@/components/shared/InviteParentButton'
 // Shared portfolio stylesheet — also consumed by /demo
 import '../../demo/portfolio.css'
 
@@ -65,6 +66,11 @@ export default async function PortfolioPage({ params }: Props) {
       <SideNav schoolName={portfolio.school.name} studentName={studentName} />
       <div className="main">
         <HeroSection student={portfolio.student} school={portfolio.school} />
+        {(role === 'admin' || role === 'teacher') && (
+          <div style={{ padding: '1rem 2rem 0', display: 'flex', justifyContent: 'flex-end' }}>
+            <InviteParentButton studentId={studentId} />
+          </div>
+        )}
         <IntellectualArc
           assessments={portfolio.assessments}
           studentId={studentId}
