@@ -137,7 +137,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     await clerk.organizations.createOrganizationInvitation({
       organizationId: orgId,
       emailAddress:   input.email.toLowerCase(),
-      role:           'org:member', // TODO: revert to 'org:parent' once role exists in Clerk Dashboard
+      role:           'org:parent',
       inviterUserId:  ctx.userId,
     })
   } catch (err) {
