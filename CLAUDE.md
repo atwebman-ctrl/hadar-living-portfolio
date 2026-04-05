@@ -90,8 +90,10 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `proxy.ts` — Clerk middleware (Next.js 16); protects /dashboard, /admin, /portfolio; userId-only check (org not required) so OrgPickerScreen handles no-org case
 - `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies, 0004 Sprint 3 tables
 - `design-reference/` — Target aesthetic HTML files (landing.html, hadar-portfolio.html)
-- `app/dashboard/page.tsx` — Teacher/admin student list; server component
+- `app/dashboard/page.tsx` — Teacher/admin student list; parent redirect (OR filter on parent_clerk_user_id + invited_email); server component
+- `app/dashboard/DashboardUI.tsx` — Presentational sub-components: OrgPickerScreen, ParentPendingScreen, PageHeader, StudentCard, EmptyState
 - `app/dashboard/AddStudentForm.tsx` — Client component modal form; POSTs to /api/dashboard/students
+- `app/not-found.tsx` — Styled 404 page using design system tokens
 - `app/admin/page.tsx` — Admin-only school settings overview; Sprint 3 placeholders for Teachers + Theme
 - `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio; passes school.name + student name to SideNav
 - `app/sign-in/[[...sign-in]]/page.tsx` — Clerk SignIn centered on cream background
@@ -175,7 +177,8 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Wire AiNarrativePanel into 5 sections: IntellectualArc, ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc; studentFirstName in all contexts
   - [x] `POST /api/dashboard/students/[studentId]/uploads` — multipart upload to Supabase Storage (portfolio-assets); photos, handwriting, parent uploads
   - [x] `components/shared/UploadButton.tsx` — XHR upload with progress; wired into PhotoGallery, HandwritingSamples, ParentUploads
-  - [x] Parent invite flow: `0005_parent_students.sql` (pending/active table with email+user_id indexes, RLS), `POST /api/dashboard/students/[studentId]/invite-parent` (Clerk org invite + DB row), `components/shared/InviteParentButton.tsx` (modal with email input, success/error states), `enforceParentAccess()` in portfolio page (email→userId linking on first visit)
+  - [x] Parent invite flow: `0005_parent_students.sql` (pending/active table with email+user_id indexes, RLS), `POST /api/dashboard/students/[studentId]/invite-parent` (Clerk org invite + DB row), `components/shared/InviteParentButton.tsx` (modal with email input, success/error states), `enforceParentAccess()` in portfolio page (email→userId linking on first visit) — COMPLETE
+  - [x] Parent dashboard redirect: `/dashboard` detects `role=parent`, queries `parent_students` with OR(parent_clerk_user_id, invited_email) fallback, links Clerk user ID on first email-match, redirects to `/portfolio/[studentId]`; shows `ParentPendingScreen` if no row found
   - [ ] OCR pipeline for handwriting samples
   - [ ] Writing/rhetoric critique generation
   - [ ] Test score extraction
