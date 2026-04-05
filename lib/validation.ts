@@ -245,6 +245,14 @@ export const UpdateSchoolSchema = z.object({
 
 export type UpdateSchoolInput = z.infer<typeof UpdateSchoolSchema>;
 
+// ── Parent invite ─────────────────────────────────────────────
+
+export const InviteParentSchema = z.object({
+  email: z.string().email("Must be a valid email address"),
+});
+
+export type InviteParentInput = z.infer<typeof InviteParentSchema>;
+
 // ── Helper ────────────────────────────────────────────────────
 
 /**

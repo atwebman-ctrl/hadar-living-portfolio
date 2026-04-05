@@ -15,7 +15,9 @@
 export const dynamic = 'force-dynamic'
 
 import { notFound } from 'next/navigation'
+import { clerkClient } from '@clerk/nextjs/server'
 import { getAuthContext } from '@/lib/auth'
+import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { getStudentPortfolio } from '@/lib/getStudentPortfolio'
 import SideNav from '@/components/portfolio/SideNav'
 import HeroSection from '@/components/portfolio/HeroSection'
@@ -52,8 +54,8 @@ export default async function PortfolioPage({ params }: Props) {
 
   // Parents may only view portfolios for their own children.
   // Admins and teachers have broad access within their school.
-  if (role === 'parent' && !portfolio.student.parentUserIds.includes(userId)) {
-    notFound()
+  if (role === 'parent') {
+    await enforceParentAccess(userId, schoolId, studentId)
   }
 
   const studentName = `${portfolio.student.firstName} ${portfolio.student.lastName}`
@@ -131,4 +133,57 @@ export default async function PortfolioPage({ params }: Props) {
       </div>
     </>
   )
+}
+
+// ── Parent access guard ───────────────────────────────────────
+//
+// Replaces the legacy parentUserIds array check with the
+// parent_students table, which supports the invite flow.
+//
+// Match logic (OR):
+//   a) parent_clerk_user_id = userId  — returning parent
+//   b) invited_email = primaryEmail   — first visit after invite
+//
+// On first match by email (parent_clerk_user_id is null), the row
+// is updated to link the Clerk user ID and flip status to 'active'.
+// This is idempotent: subsequent visits match via parent_clerk_user_id.
+//
+// Calls notFound() (throws) if no matching row exists.
+
+async function enforceParentAccess(
+  userId: string,
+  schoolId: string,
+  studentId: string,
+): Promise<void> {
+  // Resolve parent's primary email from Clerk
+  const clerk = await clerkClient()
+  const clerkUser = await clerk.users.getUser(userId).catch(() => null)
+  const primaryEmail =
+    clerkUser?.emailAddresses.find((e) => e.id === clerkUser.primaryEmailAddressId)
+      ?.emailAddress ??
+    clerkUser?.emailAddresses[0]?.emailAddress ??
+    null
+
+  // Build OR filter: match by Clerk user ID or invited email
+  const orParts = [`parent_clerk_user_id.eq.${userId}`]
+  if (primaryEmail) orParts.push(`invited_email.eq.${primaryEmail.toLowerCase()}`)
+
+  const { data: row } = await supabaseAdmin
+    .from('parent_students')
+    .select('id, parent_clerk_user_id')
+    .eq('school_id', schoolId)
+    .eq('student_id', studentId)
+    .or(orParts.join(','))
+    .limit(1)
+    .maybeSingle()
+
+  if (!row) notFound()
+
+  // First visit: link the Clerk user ID to the pending invitation
+  if (!row.parent_clerk_user_id) {
+    await supabaseAdmin
+      .from('parent_students')
+      .update({ parent_clerk_user_id: userId, status: 'active' })
+      .eq('id', row.id)
+  }
 }
