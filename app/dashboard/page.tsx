@@ -14,7 +14,7 @@
 export const dynamic = 'force-dynamic'
 
 import { redirect } from 'next/navigation'
-import { auth } from '@clerk/nextjs/server'
+import { auth, clerkClient } from '@clerk/nextjs/server'
 import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
@@ -44,20 +44,41 @@ export default async function DashboardPage() {
   const ctx = await getAuthContext().catch(() => redirect('/sign-in'))
 
   if (ctx.role === 'parent') {
-    // Parents don't have a student list — send them straight to their child's portfolio.
+    // Resolve the parent's primary email for the email-based fallback.
+    // On first login parent_clerk_user_id is null — the row was created
+    // with only invited_email, so we must match by email as well.
+    const clerk = await clerkClient()
+    const clerkUser = await clerk.users.getUser(ctx.userId).catch(() => null)
+    const primaryEmail =
+      clerkUser?.emailAddresses.find((e) => e.id === clerkUser.primaryEmailAddressId)
+        ?.emailAddress ??
+      clerkUser?.emailAddresses[0]?.emailAddress ??
+      null
+
+    // OR filter: match by Clerk user ID (returning parent) or invited email (first visit).
+    const orParts = [`parent_clerk_user_id.eq.${ctx.userId}`]
+    if (primaryEmail) orParts.push(`invited_email.eq.${primaryEmail.toLowerCase()}`)
+
     const { data: link } = await supabaseAdmin
       .from('parent_students')
-      .select('student_id')
-      .eq('parent_clerk_user_id', ctx.userId)
+      .select('id, student_id, parent_clerk_user_id')
       .eq('school_id', ctx.schoolId)
+      .or(orParts.join(','))
       .limit(1)
       .maybeSingle()
 
     if (link?.student_id) {
+      // First visit matched by email — link the Clerk user ID to the row.
+      if (!link.parent_clerk_user_id) {
+        await supabaseAdmin
+          .from('parent_students')
+          .update({ parent_clerk_user_id: ctx.userId, status: 'active' })
+          .eq('id', link.id)
+      }
       redirect(`/portfolio/${link.student_id}`)
     }
 
-    // Invited but hasn't visited their portfolio yet — student_id not linked.
+    // No matched row — invitation pending or not yet sent.
     return <ParentPendingScreen />
   }
 
