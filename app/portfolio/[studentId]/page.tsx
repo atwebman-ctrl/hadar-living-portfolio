@@ -80,10 +80,28 @@ export default async function PortfolioPage({ params }: Props) {
           gradeLevel={portfolio.student.gradeLevel}
           subjects={portfolio.scopeAndSequence}
         />
-        <HandwritingSamples samples={portfolio.handwritingSamples} />
-        <PhotoGallery photos={portfolio.photos} />
+        <HandwritingSamples
+          samples={portfolio.handwritingSamples}
+          uploadEnabled={role !== 'parent'}
+          studentId={studentId}
+          academicYear={portfolio.student.academicYear}
+          gradeLevel={portfolio.student.gradeLevel}
+        />
+        <PhotoGallery
+          photos={portfolio.photos}
+          uploadEnabled={role !== 'parent'}
+          studentId={studentId}
+          academicYear={portfolio.student.academicYear}
+          gradeLevel={portfolio.student.gradeLevel}
+        />
         <TeacherNotes notes={portfolio.teacherNotes} />
-        <ParentUploads uploads={portfolio.parentUploads} />
+        <ParentUploads
+          uploads={portfolio.parentUploads}
+          uploadEnabled={true}
+          studentId={studentId}
+          academicYear={portfolio.student.academicYear}
+          gradeLevel={portfolio.student.gradeLevel}
+        />
         <BookshelfAnimation readings={portfolio.readings} />
         <PortfolioFooter />
       </div>

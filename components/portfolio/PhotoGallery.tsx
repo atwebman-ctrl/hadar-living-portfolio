@@ -1,7 +1,15 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
 import type { Photo } from '@/lib/types'
+import UploadButton from '@/components/shared/UploadButton'
 
 interface Props {
-  photos?: Photo[]
+  photos?:        Photo[]
+  uploadEnabled?: boolean
+  studentId?:     string
+  academicYear?:  string
+  gradeLevel?:    string
 }
 
 const DEMO_PHOTOS = [
@@ -13,9 +21,10 @@ const DEMO_PHOTOS = [
   { id: '6', caption: 'Poetry recitation — school assembly',       gradeLevel: 'Grade 3', academicYear: '2025–26' },
 ]
 
-export default function PhotoGallery({ photos }: Props) {
+export default function PhotoGallery({ photos, uploadEnabled, studentId, academicYear = '', gradeLevel = '' }: Props) {
+  const router  = useRouter()
   const hasData = !!photos && photos.length > 0
-  const items = hasData
+  const items   = hasData
     ? photos!.map((p) => ({ id: p.id, caption: p.caption ?? '', gradeLevel: p.gradeLevel, academicYear: p.academicYear }))
     : DEMO_PHOTOS
 
@@ -31,6 +40,20 @@ export default function PhotoGallery({ photos }: Props) {
           ? `${items.length} photo${items.length !== 1 ? 's' : ''} — moments from the academic year.`
           : 'Six photographs from the 2025–26 academic year — celebrations, projects, and school events.'}
       </p>
+
+      {uploadEnabled && studentId && (
+        <div className="reveal" style={{ marginBottom: '1.5rem' }}>
+          <UploadButton
+            studentId={studentId}
+            uploadType="photo"
+            academicYear={academicYear}
+            gradeLevel={gradeLevel}
+            accept="image/*"
+            label="Upload Photo"
+            onSuccess={() => router.refresh()}
+          />
+        </div>
+      )}
 
       <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
         {items.map((p) => (

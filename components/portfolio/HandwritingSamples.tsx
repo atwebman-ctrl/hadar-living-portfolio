@@ -1,7 +1,15 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
 import type { HandwritingSample } from '@/lib/types'
+import UploadButton from '@/components/shared/UploadButton'
 
 interface Props {
-  samples?: HandwritingSample[]
+  samples?:       HandwritingSample[]
+  uploadEnabled?: boolean
+  studentId?:     string
+  academicYear?:  string
+  gradeLevel?:    string
 }
 
 // Demo fallback — three placeholder samples
@@ -11,12 +19,8 @@ const DEMO_SAMPLES = [
   { id: '3', term: 'Spring 2026', gradeLabel: 'Grade 3', notes: null },
 ]
 
-function fmtDate(iso: string): string {
-  const d = iso.includes('T') ? new Date(iso) : new Date(`${iso}T00:00:00`)
-  return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-}
-
-export default function HandwritingSamples({ samples }: Props) {
+export default function HandwritingSamples({ samples, uploadEnabled, studentId, academicYear = '', gradeLevel = '' }: Props) {
+  const router  = useRouter()
   const hasData = !!samples && samples.length > 0
 
   return (
@@ -31,6 +35,20 @@ export default function HandwritingSamples({ samples }: Props) {
           ? `${samples!.length} handwriting sample${samples!.length !== 1 ? 's' : ''} — scanned originals with teacher observations.`
           : 'Three handwriting samples collected across the academic year, charting growth in cursive fluency and spatial consistency.'}
       </p>
+
+      {uploadEnabled && studentId && (
+        <div className="reveal" style={{ marginBottom: '1.5rem' }}>
+          <UploadButton
+            studentId={studentId}
+            uploadType="handwriting"
+            academicYear={academicYear}
+            gradeLevel={gradeLevel}
+            accept="image/*"
+            label="Upload Handwriting Sample"
+            onSuccess={() => router.refresh()}
+          />
+        </div>
+      )}
 
       <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1.25rem' }}>
         {hasData

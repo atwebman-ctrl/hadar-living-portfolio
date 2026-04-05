@@ -1,7 +1,15 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
 import type { ParentUpload } from '@/lib/types'
+import UploadButton from '@/components/shared/UploadButton'
 
 interface Props {
-  uploads?: ParentUpload[]
+  uploads?:       ParentUpload[]
+  uploadEnabled?: boolean
+  studentId?:     string
+  academicYear?:  string
+  gradeLevel?:    string
 }
 
 const TYPE_ICONS: Record<string, string> = {
@@ -24,9 +32,10 @@ function fmtDate(iso: string | null): string | null {
   return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 }
 
-export default function ParentUploads({ uploads }: Props) {
+export default function ParentUploads({ uploads, uploadEnabled, studentId, academicYear = '', gradeLevel = '' }: Props) {
+  const router  = useRouter()
   const hasData = !!uploads && uploads.length > 0
-  const items = hasData
+  const items   = hasData
     ? uploads!.map((u) => ({
         id: u.id,
         uploadType: u.uploadType,
@@ -49,6 +58,20 @@ export default function ParentUploads({ uploads }: Props) {
           ? `${items.length} artifact${items.length !== 1 ? 's' : ''} submitted by parents — home projects, recordings, and creative work.`
           : 'Three artifacts submitted by parents — work created at home that complements the classroom portfolio.'}
       </p>
+
+      {uploadEnabled && studentId && (
+        <div className="reveal" style={{ marginBottom: '1.5rem' }}>
+          <UploadButton
+            studentId={studentId}
+            uploadType="parent_upload"
+            academicYear={academicYear}
+            gradeLevel={gradeLevel}
+            accept="image/*,audio/*,video/*,.pdf"
+            label="Upload from Home"
+            onSuccess={() => router.refresh()}
+          />
+        </div>
+      )}
 
       <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
         {items.map((u) => {
