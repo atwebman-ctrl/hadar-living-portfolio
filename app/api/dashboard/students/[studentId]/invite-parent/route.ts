@@ -128,12 +128,16 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   }
 
   // 7. Send Clerk org invitation
+  // Role key must match a custom role created in the Clerk Dashboard.
+  // Custom roles are always prefixed with org: (e.g. org:parent).
+  // orgId is the Clerk org ID (org_xxx) from the session JWT — not the DB UUID.
+  console.log('[POST invite-parent] Clerk orgId:', orgId, 'inviterUserId:', ctx.userId)
   try {
     const clerk = await clerkClient()
     await clerk.organizations.createOrganizationInvitation({
       organizationId: orgId,
       emailAddress:   input.email.toLowerCase(),
-      role:           'parent',
+      role:           'org:parent',
       inviterUserId:  ctx.userId,
     })
   } catch (err) {
