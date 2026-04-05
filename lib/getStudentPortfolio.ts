@@ -8,9 +8,9 @@
 //
 // Row mappers live in lib/mappers.ts.
 //
-// Note: handwriting_samples, photos, parent_uploads, and teachers
-// tables are created in Sprint 3. safeQuery() returns [] gracefully
-// if a table doesn't exist yet.
+// Note: some Sprint 3 tables use safeQuery() to return [] gracefully
+// if a table doesn't exist yet. teachers table has no migration yet —
+// teachers: [] is returned directly until that migration lands.
 // ============================================================
 
 import { supabaseAdmin } from "./supabaseAdmin";
@@ -26,7 +26,6 @@ import {
   mapCharacterAward,
   mapPhoto,
   mapParentUpload,
-  mapTeacher,
   mapTeacherNote,
   mapScopeAndSequence,
   mapAiDraft,
@@ -69,9 +68,6 @@ export async function getStudentPortfolio(
   }
 
   // Run all content queries in parallel.
-  // safeQuery() returns [] instead of throwing for Sprint-3 tables
-  // (handwriting_samples, photos, parent_uploads, teachers) that don't
-  // exist yet. Remove safeQuery() wrapping when those tables land.
   const [
     assessmentRows,
     readingRows,
@@ -81,7 +77,6 @@ export async function getStudentPortfolio(
     characterAwardRows,
     photoRows,
     parentUploadRows,
-    teacherRows,
     teacherNoteRows,
     scopeRows,
     aiDraftRows,
@@ -150,15 +145,6 @@ export async function getStudentPortfolio(
         .eq("school_id", schoolId)
         .order("date", { ascending: false })
     ),
-    // Teachers: all teachers at this school. Narrowed to assigned
-    // teachers once a student_teachers join table exists (Sprint 3).
-    safeQuery(() =>
-      supabaseAdmin
-        .from("teachers")
-        .select("*")
-        .eq("school_id", schoolId)
-        .order("last_name", { ascending: true })
-    ),
     // teacher_notes: Sprint 3 table — safeQuery returns [] until migration lands.
     safeQuery(() =>
       supabaseAdmin
@@ -175,7 +161,7 @@ export async function getStudentPortfolio(
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
-        .order("sort_order", { ascending: true })
+        .order("subject", { ascending: true })
     ),
     // ai_drafts: accepted only — parents never see draft or rejected content.
     safeQuery(() =>
@@ -201,7 +187,7 @@ export async function getStudentPortfolio(
     characterAwards: characterAwardRows.map((r) => mapCharacterAward(r as Row)),
     photos: photoRows.map((r) => mapPhoto(r as Row)),
     parentUploads: parentUploadRows.map((r) => mapParentUpload(r as Row)),
-    teachers: teacherRows.map((r) => mapTeacher(r as Row)),
+    teachers: [],
     scopeAndSequence: scopeRows.map((r) => mapScopeAndSequence(r as Row)),
     teacherNotes: teacherNoteRows.map((r) => mapTeacherNote(r as Row)),
     aiDrafts: aiDraftRows.map((r) => mapAiDraft(r as Row)),
