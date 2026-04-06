@@ -16,6 +16,19 @@ const ASSESSMENT_TYPES = [
   { value: 'avant_writing',   label: 'AVANT Writing' },
 ] as const
 
+interface ScoreRange { min: number; max: number; hint: string }
+
+function getScoreRange(type: string): ScoreRange | null {
+  if (type === 'maps_math' || type === 'maps_english') {
+    return { min: 100, max: 350, hint: '100–350' }
+  }
+  if (type === 'avant_reading' || type === 'avant_listening' ||
+      type === 'avant_speaking' || type === 'avant_writing') {
+    return { min: 1, max: 10, hint: '1–10' }
+  }
+  return null
+}
+
 const inputStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
   fontSize: '0.875rem',
@@ -101,6 +114,8 @@ export default function AssessmentForm({ studentId, onStatus }: Props) {
   const set = (k: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setFields((f) => ({ ...f, [k]: e.target.value }))
 
+  const scoreRange = getScoreRange(fields.assessmentType)
+
   return (
     <form onSubmit={handleSubmit}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
@@ -113,8 +128,18 @@ export default function AssessmentForm({ studentId, onStatus }: Props) {
           </select>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>Score</label>
-          <input type="number" value={fields.score} onChange={set('score')} style={inputStyle} placeholder="e.g. 220" />
+          <label style={labelStyle}>
+            Score{scoreRange && <span style={{ fontWeight: 'normal', letterSpacing: 0, textTransform: 'none' }}> ({scoreRange.hint})</span>}
+          </label>
+          <input
+            type="number"
+            min={scoreRange?.min}
+            max={scoreRange?.max}
+            value={fields.score}
+            onChange={set('score')}
+            style={inputStyle}
+            placeholder={scoreRange ? scoreRange.hint : 'Score'}
+          />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <label style={labelStyle}>Percentile (0–100)</label>

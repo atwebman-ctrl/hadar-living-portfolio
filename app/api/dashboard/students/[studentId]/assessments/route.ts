@@ -14,7 +14,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth'
 import {
   validate,
-  CreateAssessmentSchema,
+  CreateAssessmentBodySchema,
+  type CreateAssessmentBodyInput,
   ValidationError,
 } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
@@ -23,13 +24,9 @@ import { authErrorResponse } from '@/lib/apiHelpers'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
 
-// Body schema: identical to CreateAssessmentSchema but without studentId,
-// which is sourced from the URL instead.
-const AssessmentBodySchema = CreateAssessmentSchema.omit({ studentId: true })
-type AssessmentBodyInput = Omit<
-  import('@/lib/validation').CreateAssessmentInput,
-  'studentId'
->
+// studentId is sourced from the URL, not the request body.
+// CreateAssessmentBodySchema omits studentId and applies score-range superRefine.
+type AssessmentBodyInput = CreateAssessmentBodyInput
 
 // ── POST /api/dashboard/students/[studentId]/assessments ─────────────────────
 
@@ -50,7 +47,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   // 2. Validate body (studentId excluded — it comes from the URL)
   let input: AssessmentBodyInput
   try {
-    input = validate(AssessmentBodySchema, body)
+    input = validate(CreateAssessmentBodySchema, body)
   } catch (err) {
     if (err instanceof ValidationError) {
       return NextResponse.json(

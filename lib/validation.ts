@@ -44,21 +44,79 @@ const assessmentTypeEnum = z.enum([
   "lexile",
 ]);
 
-export const CreateAssessmentSchema = z.object({
-  studentId: uuid,
+// ── Score range refinement ────────────────────────────────────
+//
+// MAP RIT scores: 100–350 (industry standard range for K-12)
+// AVANT proficiency scores: 1–10 (AVANT's published scale)
+// lexile: uses lexileValue (string), not score — no range check
+//
+// Only applied when score is present. null/undefined is always allowed
+// because score is optional at entry time.
+
+function refineScoreRange(
+  data: { assessmentType: string; score?: number | null },
+  ctx: z.RefinementCtx,
+): void {
+  if (data.score == null) return;
+  const { assessmentType: type, score } = data;
+
+  if (type === "maps_math" || type === "maps_english") {
+    if (score < 100 || score > 350) {
+      ctx.addIssue({
+        code: "custom" as const,
+        path: ["score"],
+        message: "MAP RIT score must be between 100 and 350.",
+      });
+    }
+  } else if (
+    type === "avant_reading" ||
+    type === "avant_listening" ||
+    type === "avant_speaking" ||
+    type === "avant_writing"
+  ) {
+    if (score < 1 || score > 10) {
+      ctx.addIssue({
+        code: "custom" as const,
+        path: ["score"],
+        message: "AVANT proficiency score must be between 1 and 10.",
+      });
+    }
+  }
+}
+
+// Base object — plain ZodObject so .omit() / .partial() work on it.
+// The superRefine is applied on top for schemas that validate full input.
+const assessmentBaseObject = z.object({
+  studentId:      uuid,
   assessmentType: assessmentTypeEnum,
-  score: z.number().nullable().optional(),
-  percentile: z.number().min(0).max(100).nullable().optional(),
-  ritScore: z.number().nullable().optional(),
-  lexileValue: z.string().nullable().optional(),
-  term: nonEmptyString,
+  score:          z.number().nullable().optional(),
+  percentile:     z.number().min(0).max(100).nullable().optional(),
+  ritScore:       z.number().nullable().optional(),
+  lexileValue:    z.string().nullable().optional(),
+  term:           nonEmptyString,
   academicYear,
-  notes: z.string().nullable().optional(),
+  notes:          z.string().nullable().optional(),
 });
 
-export const UpdateAssessmentSchema = CreateAssessmentSchema.omit({ studentId: true }).partial();
+// Full create schema (includes studentId for internal use / type derivation)
+export const CreateAssessmentSchema = assessmentBaseObject.superRefine(refineScoreRange);
+
+// Body schema for POST /api/.../assessments — studentId from URL, not body.
+// Exported so the route can import it directly (avoids calling .omit() on
+// a ZodEffects, which Zod does not support).
+export const CreateAssessmentBodySchema = assessmentBaseObject
+  .omit({ studentId: true })
+  .superRefine(refineScoreRange);
+
+// Partial update — range check intentionally omitted: a PATCH may send
+// { score: 5 } without assessmentType, making cross-field validation
+// impossible. Validate at the application layer when both fields are present.
+export const UpdateAssessmentSchema = assessmentBaseObject
+  .omit({ studentId: true })
+  .partial();
 
 export type CreateAssessmentInput = z.infer<typeof CreateAssessmentSchema>;
+export type CreateAssessmentBodyInput = z.infer<typeof CreateAssessmentBodySchema>;
 export type UpdateAssessmentInput = z.infer<typeof UpdateAssessmentSchema>;
 
 // ── Readings ──────────────────────────────────────────────────

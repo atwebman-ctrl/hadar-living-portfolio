@@ -154,6 +154,107 @@ describe('CreateAssessmentSchema', () => {
     const result = CreateAssessmentSchema.safeParse({ ...validInput, studentId: 'not-a-uuid' })
     expect(result.success).toBe(false)
   })
+
+  describe('score range superRefine', () => {
+    // ── MAP tests (maps_math, maps_english) — valid range 100–350 ──
+
+    it('accepts a MAP score at the lower boundary (100)', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, assessmentType: 'maps_math', score: 100 })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts a MAP score at the upper boundary (350)', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, assessmentType: 'maps_english', score: 350 })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts a typical MAP score in range (220)', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, score: 220 })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects a MAP score below the lower boundary (99)', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, score: 99 })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0].path).toEqual(['score'])
+        expect(result.error.issues[0].message).toMatch(/100/)
+      }
+    })
+
+    it('rejects a MAP score above the upper boundary (351)', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, score: 351 })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0].path).toEqual(['score'])
+        expect(result.error.issues[0].message).toMatch(/350/)
+      }
+    })
+
+    it('rejects a MAP score of 0', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, score: 0 })
+      expect(result.success).toBe(false)
+    })
+
+    // ── AVANT tests — valid range 1–10 ──
+
+    it('accepts an AVANT score at the lower boundary (1)', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, assessmentType: 'avant_reading', score: 1 })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts an AVANT score at the upper boundary (10)', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, assessmentType: 'avant_writing', score: 10 })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts a typical AVANT score in range (6)', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, assessmentType: 'avant_speaking', score: 6 })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects an AVANT score below the lower boundary (0)', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, assessmentType: 'avant_listening', score: 0 })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0].path).toEqual(['score'])
+        expect(result.error.issues[0].message).toMatch(/1/)
+      }
+    })
+
+    it('rejects an AVANT score above the upper boundary (11)', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, assessmentType: 'avant_reading', score: 11 })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0].path).toEqual(['score'])
+        expect(result.error.issues[0].message).toMatch(/10/)
+      }
+    })
+
+    // ── Null / omitted score — always valid ──
+
+    it('accepts null score for a MAP assessment (score entry is optional)', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, score: null })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts null score for an AVANT assessment', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, assessmentType: 'avant_writing', score: null })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts omitted score (score field not present)', () => {
+      const result = CreateAssessmentSchema.safeParse(validInput)
+      expect(result.success).toBe(true)
+    })
+
+    // ── lexile — no score range constraint ──
+
+    it('accepts any score for a lexile assessment', () => {
+      const result = CreateAssessmentSchema.safeParse({ ...validInput, assessmentType: 'lexile', score: 820 })
+      expect(result.success).toBe(true)
+    })
+  })
 })
 
 describe('validate helper', () => {
