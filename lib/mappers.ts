@@ -40,6 +40,7 @@ export function mapStudent(row: Row): Student {
     profilePhotoPath: (row.profile_photo_path as string) ?? null,
     summary: (row.summary as string) ?? null,
     isDemo: row.is_demo as boolean,
+    archivedAt: (row.archived_at as string) ?? null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };

@@ -39,11 +39,12 @@ export async function GET(_req: NextRequest) {
     )
   }
 
-  // Fetch all students scoped to the authenticated school
+  // Fetch all non-archived students scoped to the authenticated school
   const { data, error: dbError } = await supabaseAdmin
     .from('students')
     .select('*')
     .eq('school_id', ctx.schoolId)
+    .is('archived_at', null)
     .order('last_name', { ascending: true })
     .order('first_name', { ascending: true })
 

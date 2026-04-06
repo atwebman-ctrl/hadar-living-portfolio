@@ -90,6 +90,7 @@ export default async function DashboardPage() {
     .from('students')
     .select('*')
     .eq('school_id', ctx.schoolId)
+    .is('archived_at', null)
     .order('last_name', { ascending: true })
     .order('first_name', { ascending: true })
 
@@ -115,7 +116,7 @@ export default async function DashboardPage() {
             style={{ display: 'grid', gap: '1.25rem' }}
           >
             {students.map((s) => (
-              <StudentCard key={s.id} student={s} />
+              <StudentCard key={s.id} student={s} role={ctx.role} />
             ))}
           </div>
         )}

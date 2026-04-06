@@ -72,6 +72,7 @@ export interface Student {
   profilePhotoPath: string | null;
   summary: string | null;
   isDemo: boolean;
+  archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

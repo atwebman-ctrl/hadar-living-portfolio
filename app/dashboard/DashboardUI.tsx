@@ -8,6 +8,7 @@
 import Link from 'next/link'
 import { OrganizationSwitcher } from '@clerk/nextjs'
 import type { Student } from '@/lib/types'
+import DeleteStudentButton from '@/components/dashboard/DeleteStudentButton'
 
 export function OrgPickerScreen() {
   return (
@@ -90,17 +91,18 @@ export function PageHeader({
   )
 }
 
-export function StudentCard({ student }: { student: Student }) {
+export function StudentCard({ student, role }: { student: Student; role: string }) {
+  const canArchive = (role === 'admin' || role === 'teacher') && !student.isDemo
   return (
-    <Link href={`/portfolio/${student.id}`} style={{ textDecoration: 'none' }}>
-      <article
-        style={{
-          background: 'var(--parchment)',
-          border: '1px solid var(--rule)',
-          padding: '1.25rem 1.5rem',
-          height: '100%',
-        }}
-      >
+    <article
+      style={{
+        background: 'var(--parchment)',
+        border: '1px solid var(--rule)',
+        padding: '1.25rem 1.5rem',
+        height: '100%',
+      }}
+    >
+      <Link href={`/portfolio/${student.id}`} style={{ textDecoration: 'none', display: 'block' }}>
         <div
           style={{
             borderBottom: '1px solid var(--rule)',
@@ -152,8 +154,9 @@ export function StudentCard({ student }: { student: Student }) {
         >
           View Portfolio →
         </p>
-      </article>
-    </Link>
+      </Link>
+      {canArchive && <DeleteStudentButton studentId={student.id} />}
+    </article>
   )
 }
 

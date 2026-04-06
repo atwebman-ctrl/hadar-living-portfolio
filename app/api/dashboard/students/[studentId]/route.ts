@@ -50,6 +50,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
     .select('*')
     .eq('id', studentId)
     .eq('school_id', ctx.schoolId)
+    .is('archived_at', null)
     .single()
 
   if (dbError || !data) {
@@ -60,6 +61,71 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
   }
 
   return NextResponse.json(mapStudent(data as Record<string, unknown>))
+}
+
+// ── DELETE /api/dashboard/students/[studentId] ────────────────────────────────
+//
+// Soft delete: sets archived_at to now. The student record is preserved;
+// all dashboard queries filter on archived_at IS NULL to exclude it.
+// Demo students cannot be archived via this API.
+
+export async function DELETE(_req: NextRequest, { params }: RouteContext) {
+  const { studentId } = await params
+
+  // Auth + role
+  let ctx!: Awaited<ReturnType<typeof getAuthContext>>
+  try {
+    ctx = await getAuthContext()
+  } catch (err) {
+    if (err instanceof Error) return authErrorResponse(err)
+    throw err
+  }
+
+  if (ctx.role !== 'admin' && ctx.role !== 'teacher') {
+    return NextResponse.json(
+      { error: 'Only admins and teachers can archive students.', code: 'FORBIDDEN' },
+      { status: 403 }
+    )
+  }
+
+  // Verify student belongs to the authenticated school and is not a demo student.
+  const { data: student, error: fetchError } = await supabaseAdmin
+    .from('students')
+    .select('id, is_demo')
+    .eq('id', studentId)
+    .eq('school_id', ctx.schoolId)
+    .is('archived_at', null)
+    .single()
+
+  if (fetchError || !student) {
+    return NextResponse.json(
+      { error: 'Student not found.', code: 'NOT_FOUND' },
+      { status: 404 }
+    )
+  }
+
+  if ((student as Record<string, unknown>).is_demo) {
+    return NextResponse.json(
+      { error: 'Demo students cannot be archived.', code: 'FORBIDDEN' },
+      { status: 403 }
+    )
+  }
+
+  const { error: dbError } = await supabaseAdmin
+    .from('students')
+    .update({ archived_at: new Date().toISOString() })
+    .eq('id', studentId)
+    .eq('school_id', ctx.schoolId)
+
+  if (dbError) {
+    console.error('[DELETE /api/dashboard/students/:id]', dbError)
+    return NextResponse.json(
+      { error: 'Failed to archive student.', code: 'DB_ERROR' },
+      { status: 500 }
+    )
+  }
+
+  return new NextResponse(null, { status: 204 })
 }
 
 // ── PATCH /api/dashboard/students/[studentId] ─────────────────────────────────
