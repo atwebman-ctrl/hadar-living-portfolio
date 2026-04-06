@@ -61,7 +61,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 8. Refactor checkpoint after every 3–4 features
 9. Validate all API inputs with Zod — no unvalidated data hits Supabase
 10. Run `npx tsc --noEmit` and `npx next build` before every push — never push a broken build
-11. Once Jest exists, run tests before every push — CI will catch it anyway but catch it locally first
+11. Run `npx vitest run` before every commit — the husky pre-commit hook enforces this automatically
 
 ## Key Files
 
