@@ -35,6 +35,7 @@ import ParentUploads from '@/components/portfolio/ParentUploads'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 import InviteParentButton from '@/components/shared/InviteParentButton'
 import TeacherDataPanel from '@/components/portfolio/TeacherDataPanel'
+import RevealObserver from '@/components/portfolio/RevealObserver'
 // Shared portfolio stylesheet — also consumed by /demo
 import '../../demo/portfolio.css'
 
@@ -63,6 +64,7 @@ export default async function PortfolioPage({ params }: Props) {
 
   return (
     <>
+      <RevealObserver />
       <SideNav schoolName={portfolio.school.name} studentName={studentName} />
       <div className="main">
         <HeroSection student={portfolio.student} school={portfolio.school} />

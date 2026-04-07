@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
 import Link from 'next/link'
 import './portfolio.css'
+import RevealObserver from '@/components/portfolio/RevealObserver'
 import SideNav from '@/components/portfolio/SideNav'
 import HeroSection from '@/components/portfolio/HeroSection'
 import IntellectualArc from '@/components/portfolio/IntellectualArc'
@@ -19,17 +19,9 @@ import ParentUploads from '@/components/portfolio/ParentUploads'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 
 export default function DemoPortfolio() {
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('visible') }),
-      { threshold: 0.08 }
-    )
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
-  }, [])
-
   return (
     <>
+      <RevealObserver />
       <Link
         href="/"
         style={{
