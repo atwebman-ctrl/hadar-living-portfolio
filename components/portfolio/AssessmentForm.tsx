@@ -63,8 +63,9 @@ const submitBtnStyle: React.CSSProperties = {
 }
 
 interface Props {
-  studentId: string
-  onStatus: (s: { type: 'success' | 'error'; msg: string } | null) => void
+  studentId:   string
+  onStatus:    (s: { type: 'success' | 'error'; msg: string } | null) => void
+  defaultType?: string
 }
 
 interface Fields {
@@ -75,10 +76,12 @@ interface Fields {
   academicYear: string
 }
 
-const blank: Fields = { assessmentType: 'maps_math', score: '', percentile: '', term: '', academicYear: '' }
+const makeBlank = (type = 'maps_math'): Fields => ({
+  assessmentType: type, score: '', percentile: '', term: '', academicYear: '',
+})
 
-export default function AssessmentForm({ studentId, onStatus }: Props) {
-  const [fields, setFields] = useState<Fields>(blank)
+export default function AssessmentForm({ studentId, onStatus, defaultType = 'maps_math' }: Props) {
+  const [fields, setFields] = useState<Fields>(() => makeBlank(defaultType))
   const [saving, setSaving] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -102,7 +105,7 @@ export default function AssessmentForm({ studentId, onStatus }: Props) {
         onStatus({ type: 'error', msg: (body as { error?: string }).error ?? 'Failed to save.' })
       } else {
         onStatus({ type: 'success', msg: 'Assessment saved.' })
-        setFields(blank)
+        setFields(makeBlank(defaultType))
       }
     } catch {
       onStatus({ type: 'error', msg: 'Network error.' })

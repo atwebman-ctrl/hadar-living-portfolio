@@ -1,5 +1,6 @@
 import type { Reading, AiDraft, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
+import InlineReadingForm from '@/components/portfolio/InlineReadingForm'
 
 interface Props {
   readings?:      Reading[]
@@ -115,6 +116,11 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
           existingDraft={existingDraft}
           draftContext={draftContext ?? {}}
         />
+      )}
+
+      {/* Inline data entry for admin/teacher */}
+      {studentId && role && role !== 'parent' && (
+        <InlineReadingForm studentId={studentId} />
       )}
     </section>
   )

@@ -2,6 +2,7 @@ import type { Assessment, AiDraft, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import SubjectScoreRows, { type ScoreDisplayRow } from '@/components/portfolio/SubjectScoreRows'
 import MapPercentileChart, { type StudentScorePoint } from '@/components/charts/MapPercentileChart'
+import InlineAssessmentForm from '@/components/portfolio/InlineAssessmentForm'
 
 interface Props {
   assessments?:          Assessment[]
@@ -204,6 +205,9 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
         <div style={{ position: 'relative', height: 260, marginTop: '1rem' }}>
           <MapPercentileChart subject="math" studentScores={mathScores} />
         </div>
+        {studentId && role !== 'parent' && (
+          <InlineAssessmentForm studentId={studentId} defaultType="maps_math" label="Add MAP Math Score" />
+        )}
       </div>
 
       {/* ── English Language Arts ────────────────────────────── */}
@@ -216,6 +220,9 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
         <div style={{ position: 'relative', height: 260, marginTop: '1rem' }}>
           <MapPercentileChart subject="reading" studentScores={readingScores} />
         </div>
+        {studentId && role !== 'parent' && (
+          <InlineAssessmentForm studentId={studentId} defaultType="maps_english" label="Add MAP Reading Score" />
+        )}
       </div>
 
       {/* ── Lexile chart ─────────────────────────────────────── */}
