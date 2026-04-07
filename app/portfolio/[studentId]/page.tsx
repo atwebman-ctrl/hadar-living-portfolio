@@ -79,6 +79,8 @@ export default async function PortfolioPage({ params }: Props) {
           studentId={studentId}
           studentName={portfolio.student.firstName}
           role={role}
+          gradeLevel={portfolio.student.gradeLevel}
+          academicYear={portfolio.student.academicYear}
           existingMathDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'math_scores')}
           existingEnglishDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'english_scores')}
         />

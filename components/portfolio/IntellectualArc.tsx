@@ -1,7 +1,7 @@
 import type { Assessment, AiDraft, UserRole } from '@/lib/types'
-import MapsChart, { type MapsDataPoint } from '@/components/charts/MapsChart'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import SubjectScoreRows, { type ScoreDisplayRow } from '@/components/portfolio/SubjectScoreRows'
+import MapPercentileChart, { type StudentScorePoint } from '@/components/charts/MapPercentileChart'
 
 interface Props {
   assessments?:          Assessment[]
@@ -10,11 +10,14 @@ interface Props {
   role?:                 UserRole
   existingMathDraft?:    AiDraft
   existingEnglishDraft?: AiDraft
+  /** Student's current grade level string, e.g. "3rd Grade" */
+  gradeLevel?:           string
+  /** Student's current academic year, e.g. "2025-2026" */
+  academicYear?:         string
 }
 
 // ── Demo fallback data ────────────────────────────────────────
 
-// Newest-first, matching DB order, so delta computation is consistent.
 const DEMO_MATH_ROWS: ScoreDisplayRow[] = [
   { term: 'Spring 2025', academicYear: '2024-2025', ritScore: 231, score: null, percentile: 95 },
   { term: 'Fall 2024',   academicYear: '2024-2025', ritScore: 224, score: null, percentile: 90 },
@@ -27,6 +30,27 @@ const DEMO_ENGLISH_ROWS: ScoreDisplayRow[] = [
   { term: 'Fall 2024',   academicYear: '2024-2025', ritScore: 212, score: null, percentile: 85 },
   { term: 'Spring 2024', academicYear: '2023-2024', ritScore: 205, score: null, percentile: 78 },
   { term: 'Fall 2023',   academicYear: '2023-2024', ritScore: 198, score: null, percentile: 72 },
+]
+
+// Demo student scores for the percentile chart (derived from MapsChart DEMO_DATA)
+const DEMO_MATH_SCORES: StudentScorePoint[] = [
+  { grade: 1, season: 'fall',   ritScore: 179 },
+  { grade: 1, season: 'spring', ritScore: 194 },
+  { grade: 2, season: 'fall',   ritScore: 188 },
+  { grade: 2, season: 'winter', ritScore: 199 },
+  { grade: 2, season: 'spring', ritScore: 211 },
+  { grade: 3, season: 'fall',   ritScore: 214 },
+  { grade: 3, season: 'winter', ritScore: 219 },
+]
+
+const DEMO_READING_SCORES: StudentScorePoint[] = [
+  { grade: 1, season: 'fall',   ritScore: 183 },
+  { grade: 1, season: 'spring', ritScore: 193 },
+  { grade: 2, season: 'fall',   ritScore: 216 },
+  { grade: 2, season: 'winter', ritScore: 212 },
+  { grade: 2, season: 'spring', ritScore: 221 },
+  { grade: 3, season: 'fall',   ritScore: 216 },
+  { grade: 3, season: 'winter', ritScore: 229 },
 ]
 
 const LEXILE_BENCHMARKS = [
@@ -43,43 +67,8 @@ const DEMO_BOOKS = 'Tales from Shakespeare · Great Expectations · The Jungle B
 
 function toDisplayRows(assessments: Assessment[]): ScoreDisplayRow[] {
   return assessments.map((a) => ({
-    id: a.id,
-    term: a.term,
-    academicYear: a.academicYear,
-    ritScore: a.ritScore,
-    score: a.score,
-    percentile: a.percentile,
-  }))
-}
-
-function buildMapsData(assessments: Assessment[]): MapsDataPoint[] | null {
-  const mapsOnly = assessments.filter(
-    (a) => a.assessmentType === 'maps_math' || a.assessmentType === 'maps_english'
-  )
-  if (mapsOnly.length === 0) return null
-
-  const grouped = new Map<string, { english?: Assessment; math?: Assessment }>()
-  for (const a of mapsOnly) {
-    const key = `${a.academicYear}||${a.term}`
-    const entry = grouped.get(key) ?? {}
-    if (a.assessmentType === 'maps_english') entry.english = a
-    else entry.math = a
-    grouped.set(key, entry)
-  }
-
-  const sorted = [...grouped.entries()].sort(([a], [b]) => {
-    const [yearA, termA] = a.split('||')
-    const [yearB, termB] = b.split('||')
-    if (yearA !== yearB) return yearA < yearB ? -1 : 1
-    return termA < termB ? -1 : 1
-  })
-
-  return sorted.map(([key, entry]) => ({
-    label:      key.split('||')[1],
-    englishRit: entry.english?.ritScore ?? null,
-    mathRit:    entry.math?.ritScore    ?? null,
-    englishPct: entry.english?.percentile ?? null,
-    mathPct:    entry.math?.percentile    ?? null,
+    id: a.id, term: a.term, academicYear: a.academicYear,
+    ritScore: a.ritScore, score: a.score, percentile: a.percentile,
   }))
 }
 
@@ -88,11 +77,9 @@ function buildSubjectContext(
   subject: string,
   studentFirstName: string | null,
 ): Record<string, unknown> {
-  const latest   = rows[0]
-  const earliest = rows[rows.length - 1]
+  const latest = rows[0], earliest = rows[rows.length - 1]
   return {
-    studentFirstName,
-    subject,
+    studentFirstName, subject,
     latestRit:          latest?.ritScore ?? latest?.score ?? null,
     latestPercentile:   latest?.percentile ?? null,
     earliestRit:        earliest?.ritScore ?? earliest?.score ?? null,
@@ -106,11 +93,34 @@ function buildStudentLexileRow(assessments: Assessment[]) {
   if (!lexile?.lexileValue) return null
   const n = parseInt(lexile.lexileValue, 10)
   if (isNaN(n)) return null
-  return {
-    lbl: 'Current Level',
-    pct: `${Math.min(100, Math.round((n / 1300) * 100))}%`,
-    bg: 'var(--navy)', opacity: 1, val: lexile.lexileValue, highlight: true,
-  }
+  return { lbl: 'Current Level', pct: `${Math.min(100, Math.round((n / 1300) * 100))}%`, bg: 'var(--navy)', opacity: 1, val: lexile.lexileValue, highlight: true }
+}
+
+function parseGradeNumber(gradeLevel: string): number | null {
+  const lower = gradeLevel.toLowerCase()
+  if (lower.startsWith('k')) return 0
+  const m = lower.match(/(\d+)/)
+  return m ? parseInt(m[1], 10) : null
+}
+
+function toStudentScorePoints(
+  assessments: Assessment[],
+  currentGradeNum: number,
+  currentAcademicYear: string,
+): StudentScorePoint[] {
+  const curStart = parseInt(currentAcademicYear.split('-')[0], 10)
+  if (isNaN(curStart)) return []
+  return assessments.flatMap((a) => {
+    if (!a.ritScore) return []
+    const aStart = parseInt(a.academicYear.split('-')[0], 10)
+    if (isNaN(aStart)) return []
+    const grade = currentGradeNum - (curStart - aStart)
+    if (grade < 0 || grade > 8) return []
+    const t = a.term.toLowerCase()
+    const season = t.includes('fall') ? 'fall' : t.includes('winter') ? 'winter' : t.includes('spring') ? 'spring' : null
+    if (!season) return []
+    return [{ grade, season, ritScore: a.ritScore }]
+  })
 }
 
 // ── Sub-section heading ───────────────────────────────────────
@@ -126,7 +136,7 @@ function SubjectHeading({ title, tag }: { title: string; tag: string }) {
 
 // ── Component ─────────────────────────────────────────────────
 
-export default function IntellectualArc({ assessments, studentId, studentName, role, existingMathDraft, existingEnglishDraft }: Props) {
+export default function IntellectualArc({ assessments, studentId, studentName, role, existingMathDraft, existingEnglishDraft, gradeLevel, academicYear }: Props) {
   const hasData = !!assessments && assessments.length > 0
 
   const mathAssessments    = hasData ? assessments!.filter((a) => a.assessmentType === 'maps_math')    : []
@@ -136,24 +146,31 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
   const englishRows = hasData ? toDisplayRows(englishAssessments) : DEMO_ENGLISH_ROWS
 
   // Math percentile delta for callout (DB newest-first)
-  const mathPcts  = mathRows.filter((r) => r.percentile != null).map((r) => r.percentile as number)
-  const firstPct  = mathPcts.length >= 2 ? mathPcts[mathPcts.length - 1] : (hasData ? null : 76)
-  const lastPct   = mathPcts.length >= 2 ? mathPcts[0]                   : (hasData ? null : 95)
-  const deltaNum  = firstPct != null && lastPct != null ? lastPct - firstPct : null
+  const mathPcts = mathRows.filter((r) => r.percentile != null).map((r) => r.percentile as number)
+  const firstPct = mathPcts.length >= 2 ? mathPcts[mathPcts.length - 1] : (hasData ? null : 76)
+  const lastPct  = mathPcts.length >= 2 ? mathPcts[0]                   : (hasData ? null : 95)
+  const deltaNum = firstPct != null && lastPct != null ? lastPct - firstPct : null
   const deltaText = deltaNum != null ? (deltaNum >= 0 ? '+' : '') + deltaNum : '+19'
 
-  // AI contexts for each subject (only computed for teacher/admin)
-  const canGenerate  = !!studentId && !!role && role !== 'parent'
-  const mathContext  = canGenerate ? buildSubjectContext(mathRows, 'Mathematics', studentName ?? null) : null
+  // AI contexts (teacher/admin only)
+  const canGenerate    = !!studentId && !!role && role !== 'parent'
+  const mathContext    = canGenerate ? buildSubjectContext(mathRows, 'Mathematics', studentName ?? null) : null
   const englishContext = canGenerate ? buildSubjectContext(englishRows, 'English Language Arts', studentName ?? null) : null
+
+  // Percentile chart student scores
+  const gradeNum = gradeLevel ? parseGradeNumber(gradeLevel) : null
+  const mathScores = (hasData && gradeNum !== null && academicYear)
+    ? toStudentScorePoints(mathAssessments, gradeNum, academicYear)
+    : DEMO_MATH_SCORES
+  const readingScores = (hasData && gradeNum !== null && academicYear)
+    ? toStudentScorePoints(englishAssessments, gradeNum, academicYear)
+    : DEMO_READING_SCORES
 
   // Lexile
   const studentLexileRow = hasData ? buildStudentLexileRow(assessments!) : DEMO_STUDENT_LEXILE
   const lexileRows = studentLexileRow
     ? [...LEXILE_BENCHMARKS.slice(0, 3), studentLexileRow, LEXILE_BENCHMARKS[3]]
     : LEXILE_BENCHMARKS
-
-  const mapsData = buildMapsData(assessments ?? []) ?? undefined
 
   return (
     <section id="academics">
@@ -166,7 +183,6 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
       {/* ── Mathematics ──────────────────────────────────────── */}
       <div className="chart-wrap reveal">
         <SubjectHeading title="Mathematics" tag="MAP Assessment" />
-
         {firstPct != null && lastPct != null && (
           <div className="callout" style={{ marginBottom: '1rem' }}>
             <div className="big">{deltaText}</div>
@@ -175,42 +191,24 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
             </div>
           </div>
         )}
-
         <SubjectScoreRows rows={mathRows} />
-
         {studentId && role && (mathContext || role === 'parent') && (
-          <AiNarrativePanel
-            studentId={studentId}
-            role={role}
-            sectionType="math_scores"
-            existingDraft={existingMathDraft}
-            draftContext={mathContext ?? {}}
-          />
+          <AiNarrativePanel studentId={studentId} role={role} sectionType="math_scores" existingDraft={existingMathDraft} draftContext={mathContext ?? {}} />
         )}
-
-        <div style={{ position: 'relative', height: 220, marginTop: '1rem' }}>
-          <MapsChart data={mapsData} subject="math" />
+        <div style={{ position: 'relative', height: 260, marginTop: '1rem' }}>
+          <MapPercentileChart subject="math" studentScores={mathScores} />
         </div>
       </div>
 
       {/* ── English Language Arts ────────────────────────────── */}
       <div className="chart-wrap reveal">
         <SubjectHeading title="English Language Arts" tag="MAP Assessment" />
-
         <SubjectScoreRows rows={englishRows} />
-
         {studentId && role && (englishContext || role === 'parent') && (
-          <AiNarrativePanel
-            studentId={studentId}
-            role={role}
-            sectionType="english_scores"
-            existingDraft={existingEnglishDraft}
-            draftContext={englishContext ?? {}}
-          />
+          <AiNarrativePanel studentId={studentId} role={role} sectionType="english_scores" existingDraft={existingEnglishDraft} draftContext={englishContext ?? {}} />
         )}
-
-        <div style={{ position: 'relative', height: 220, marginTop: '1rem' }}>
-          <MapsChart data={mapsData} subject="english" />
+        <div style={{ position: 'relative', height: 260, marginTop: '1rem' }}>
+          <MapPercentileChart subject="reading" studentScores={readingScores} />
         </div>
       </div>
 
