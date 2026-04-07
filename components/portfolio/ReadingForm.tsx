@@ -6,6 +6,7 @@
 // ============================================================
 
 import { useState } from 'react'
+import BookCatalogPicker from './BookCatalogPicker'
 
 const inputStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
@@ -56,8 +57,13 @@ interface Fields {
 const blank: Fields = { title: '', author: '', whyChosen: '', completed: false, academicYear: '' }
 
 export default function ReadingForm({ studentId, onStatus }: Props) {
-  const [fields, setFields] = useState<Fields>(blank)
-  const [saving, setSaving] = useState(false)
+  const [fields,     setFields]     = useState<Fields>(blank)
+  const [saving,     setSaving]     = useState(false)
+  const [showPicker, setShowPicker] = useState(false)
+
+  function handleCatalogSelect(book: { title: string; author: string }) {
+    setFields((f) => ({ ...f, title: book.title, author: book.author }))
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -94,10 +100,26 @@ export default function ReadingForm({ studentId, onStatus }: Props) {
       setFields((f) => ({ ...f, [k]: e.target.value }))
 
   return (
+    <>
+      {showPicker && (
+        <BookCatalogPicker
+          onSelect={handleCatalogSelect}
+          onClose={() => setShowPicker(false)}
+        />
+      )}
     <form onSubmit={handleSubmit}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gridColumn: '1 / -1' }}>
-          <label style={labelStyle}>Title</label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.25rem' }}>
+            <label style={{ ...labelStyle, marginBottom: 0 }}>Title</label>
+            <button
+              type="button"
+              onClick={() => setShowPicker(true)}
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--navy)', background: 'none', border: '1px solid var(--navy)', padding: '2px 8px', cursor: 'pointer' }}
+            >
+              Add from catalog
+            </button>
+          </div>
           <input type="text" value={fields.title} onChange={set('title')} style={inputStyle} placeholder="Book title" required />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -131,5 +153,6 @@ export default function ReadingForm({ studentId, onStatus }: Props) {
         </button>
       </div>
     </form>
+    </>
   )
 }

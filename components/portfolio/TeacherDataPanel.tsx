@@ -11,8 +11,9 @@
 import { useState } from 'react'
 import AssessmentForm from './AssessmentForm'
 import ReadingForm from './ReadingForm'
+import BookCatalogManager from './BookCatalogManager'
 
-type Tab = 'assessment' | 'reading'
+type Tab = 'assessment' | 'reading' | 'catalog'
 
 interface StatusMessage {
   type: 'success' | 'error'
@@ -58,7 +59,7 @@ export default function TeacherDataPanel({ studentId }: { studentId: string }) {
 
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '1px solid var(--rule)' }}>
-        {(['assessment', 'reading'] as Tab[]).map((t) => (
+        {(['assessment', 'reading', 'catalog'] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => switchTab(t)}
@@ -76,7 +77,7 @@ export default function TeacherDataPanel({ studentId }: { studentId: string }) {
               marginBottom: '-1px',
             }}
           >
-            {t === 'assessment' ? 'Assessment Scores' : 'Reading List'}
+            {t === 'assessment' ? 'Assessment Scores' : t === 'reading' ? 'Reading List' : 'Book Catalog'}
           </button>
         ))}
       </div>
@@ -100,11 +101,9 @@ export default function TeacherDataPanel({ studentId }: { studentId: string }) {
 
       {/* Active form */}
       <div style={{ padding: '1.25rem' }}>
-        {tab === 'assessment' ? (
-          <AssessmentForm studentId={studentId} onStatus={setStatus} />
-        ) : (
-          <ReadingForm studentId={studentId} onStatus={setStatus} />
-        )}
+        {tab === 'assessment' && <AssessmentForm studentId={studentId} onStatus={setStatus} />}
+        {tab === 'reading'    && <ReadingForm studentId={studentId} onStatus={setStatus} />}
+        {tab === 'catalog'    && <BookCatalogManager />}
       </div>
     </section>
   )

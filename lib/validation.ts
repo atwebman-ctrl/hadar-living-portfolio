@@ -315,6 +315,19 @@ export const InviteParentSchema = z.object({
 
 export type InviteParentInput = z.infer<typeof InviteParentSchema>;
 
+// ── Book catalog ──────────────────────────────────────────────
+
+export const CreateBookCatalogSchema = z.object({
+  title: nonEmptyString,
+  author: nonEmptyString,
+  gradeLevel: nonEmptyString,
+  yearPublished: z.number().int().min(1000).max(9999).nullable().optional(),
+  pageCount: z.number().int().positive().nullable().optional(),
+  learningObjectives: z.string().nullable().optional(),
+});
+
+export type CreateBookCatalogInput = z.infer<typeof CreateBookCatalogSchema>;
+
 // ── Helper ────────────────────────────────────────────────────
 
 /**

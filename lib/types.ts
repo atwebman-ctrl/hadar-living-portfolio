@@ -270,6 +270,20 @@ export interface PortfolioData {
   aiDrafts: AiDraft[];  // only accepted drafts in parent view
 }
 
+// ── Book catalog ──────────────────────────────────────────────
+
+export interface BookCatalogEntry {
+  id: string;
+  schoolId: string;
+  title: string;
+  author: string;
+  gradeLevel: string;
+  yearPublished: number | null;
+  pageCount: number | null;
+  learningObjectives: string | null;
+  createdAt: string;
+}
+
 // ── API response shapes ───────────────────────────────────────
 
 export interface ApiError {
