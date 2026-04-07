@@ -16,6 +16,8 @@ export interface MapsDataPoint {
   mathPct: number | null
 }
 
+export type MapsSubject = 'math' | 'english' | 'both'
+
 // Demo fallback — used when no data prop is provided (/demo route)
 const DEMO_DATA: MapsDataPoint[] = [
   { label: "Feb '24\nGr.1", englishRit: 183, mathRit: 179, englishPct: 90, mathPct: 76 },
@@ -29,40 +31,60 @@ const DEMO_DATA: MapsDataPoint[] = [
 
 interface Props {
   data?: MapsDataPoint[]
+  subject?: MapsSubject
 }
 
-export default function MapsChart({ data = DEMO_DATA }: Props) {
-  const chartData = {
-    labels: data.map((d) => d.label),
-    datasets: [
-      {
-        label: 'English',
-        data: data.map((d) => d.englishRit),
-        borderColor: '#1B3A6B',
-        backgroundColor: 'rgba(27,58,107,.06)',
-        pointBackgroundColor: '#1B3A6B',
-        tension: 0.35,
-        borderWidth: 2.5,
-        pointRadius: 5,
-        fill: true,
-      },
-      {
-        label: 'Math',
-        data: data.map((d) => d.mathRit),
-        borderColor: '#B8963E',
-        backgroundColor: 'rgba(184,150,62,.04)',
-        pointBackgroundColor: '#B8963E',
-        tension: 0.35,
-        borderWidth: 2.5,
-        pointRadius: 5,
-        fill: true,
-      },
-    ],
+function yBounds(values: (number | null)[]): { min: number; max: number } {
+  const nums = values.filter((v): v is number => v !== null)
+  if (nums.length === 0) return { min: 170, max: 240 }
+  const lo = Math.min(...nums)
+  const hi = Math.max(...nums)
+  return {
+    min: Math.floor((lo - 10) / 10) * 10,
+    max: Math.ceil((hi + 10) / 10) * 10,
   }
+}
+
+export default function MapsChart({ data = DEMO_DATA, subject = 'both' }: Props) {
+  const englishDataset = {
+    label: 'English',
+    data: data.map((d) => d.englishRit),
+    borderColor: '#1B3A6B',
+    backgroundColor: 'rgba(27,58,107,.06)',
+    pointBackgroundColor: '#1B3A6B',
+    tension: 0.35,
+    borderWidth: 2.5,
+    pointRadius: 5,
+    fill: true,
+  }
+
+  const mathDataset = {
+    label: 'Math',
+    data: data.map((d) => d.mathRit),
+    borderColor: '#B8963E',
+    backgroundColor: 'rgba(184,150,62,.04)',
+    pointBackgroundColor: '#B8963E',
+    tension: 0.35,
+    borderWidth: 2.5,
+    pointRadius: 5,
+    fill: true,
+  }
+
+  const datasets =
+    subject === 'english' ? [englishDataset]
+    : subject === 'math'  ? [mathDataset]
+    : [englishDataset, mathDataset]
+
+  const visibleValues =
+    subject === 'english' ? data.map((d) => d.englishRit)
+    : subject === 'math'  ? data.map((d) => d.mathRit)
+    : [...data.map((d) => d.englishRit), ...data.map((d) => d.mathRit)]
+
+  const { min: yMin, max: yMax } = yBounds(visibleValues)
 
   return (
     <Line
-      data={chartData}
+      data={{ labels: data.map((d) => d.label), datasets }}
       options={{
         responsive: true,
         maintainAspectRatio: false,
@@ -72,7 +94,10 @@ export default function MapsChart({ data = DEMO_DATA }: Props) {
             callbacks: {
               afterLabel: (ctx) => {
                 const point = data[ctx.dataIndex]
-                const pct = ctx.datasetIndex === 0 ? point.englishPct : point.mathPct
+                const pct =
+                  subject === 'english' ? point.englishPct
+                  : subject === 'math'  ? point.mathPct
+                  : ctx.datasetIndex === 0 ? point.englishPct : point.mathPct
                 return pct !== null ? `${pct}th percentile` : ''
               },
             },
@@ -84,8 +109,8 @@ export default function MapsChart({ data = DEMO_DATA }: Props) {
             ticks: { font: { family: 'DM Mono', size: 9 }, maxRotation: 0 },
           },
           y: {
-            min: 170,
-            max: 240,
+            min: yMin,
+            max: yMax,
             grid: { color: 'rgba(0,0,0,.04)' },
             ticks: { font: { family: 'DM Mono', size: 9 }, stepSize: 10 },
           },

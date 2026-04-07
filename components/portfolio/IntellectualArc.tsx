@@ -153,6 +153,8 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
     ? [...LEXILE_BENCHMARKS.slice(0, 3), studentLexileRow, LEXILE_BENCHMARKS[3]]
     : LEXILE_BENCHMARKS
 
+  const mapsData = buildMapsData(assessments ?? []) ?? undefined
+
   return (
     <section id="academics">
       <div className="section-header reveal">
@@ -185,6 +187,10 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
             draftContext={mathContext ?? {}}
           />
         )}
+
+        <div style={{ position: 'relative', height: 220, marginTop: '1rem' }}>
+          <MapsChart data={mapsData} subject="math" />
+        </div>
       </div>
 
       {/* ── English Language Arts ────────────────────────────── */}
@@ -202,17 +208,9 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
             draftContext={englishContext ?? {}}
           />
         )}
-      </div>
 
-      {/* ── Combined MAPS chart ──────────────────────────────── */}
-      <div className="chart-wrap reveal">
-        <div className="chart-title">MAPS RIT Scores — Grade 1 through Grade 3</div>
-        <div className="legend">
-          <span><span className="legend-dot" style={{ background: '#1B3A6B' }} /> English (RIT)</span>
-          <span><span className="legend-dot" style={{ background: '#B8963E' }} /> Math (RIT)</span>
-        </div>
-        <div style={{ position: 'relative', height: 260 }}>
-          <MapsChart data={buildMapsData(assessments ?? []) ?? undefined} />
+        <div style={{ position: 'relative', height: 220, marginTop: '1rem' }}>
+          <MapsChart data={mapsData} subject="english" />
         </div>
       </div>
 
