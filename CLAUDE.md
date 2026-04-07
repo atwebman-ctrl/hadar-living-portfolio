@@ -81,10 +81,14 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `components/portfolio/` — Section components (CharacterArc, CreativeEvolution, HeroSection, ImmersionEngine, IntellectualArc, PortfolioFooter, RhetoricRoom, SideNav, TheCanon)
 - `components/portfolio/SubjectScoreRows.tsx` — Compact RIT/percentile score table; accepts `ScoreDisplayRow[]`; used by IntellectualArc for Math and ELA sub-sections
 - `components/portfolio/AssessmentForm.tsx` — TeacherDataPanel sub-form; MAP score input has dynamic min/max/placeholder (100–350 MAP, 1–10 AVANT)
-- `components/portfolio/ReadingForm.tsx` — TeacherDataPanel sub-form; title, author, whyChosen, completed, academicYear
-- `components/portfolio/TeacherDataPanel.tsx` — Tabbed data-entry panel (Assessment Scores + Reading List); visible admin/teacher only in portfolio page
-- `components/charts/` — MapsChart, AvantChart
-- `lib/types.ts` — Shared TypeScript types (all domain models)
+- `components/portfolio/ReadingForm.tsx` — TeacherDataPanel sub-form; "Add from catalog" button opens BookCatalogPicker to auto-fill title+author; fields: title, author, whyChosen, completed, academicYear
+- `components/portfolio/TeacherDataPanel.tsx` — Tabbed data-entry panel (Assessment Scores | Reading List | Book Catalog); visible admin/teacher only in portfolio page
+- `components/portfolio/BookCatalogPicker.tsx` — Modal overlay; fetches school book catalog, live search, auto-fills ReadingForm title+author on selection
+- `components/portfolio/BookCatalogManager.tsx` — Book Catalog tab content; add-book form (title, author, gradeLevel) + paginated catalog list; school-scoped, no props needed
+- `components/charts/` — MapsChart (kept for compat, not rendered), AvantChart, MapPercentileChart
+- `components/charts/MapPercentileChart.tsx` — NWEA MAP percentile band chart; 5 stacked teal area fills (p5/p25/p50/p75/p95); student dots navy/gold (latest); auto-scales grade range and y-axis; subject='math'|'reading'
+- `lib/nweaNorms.ts` — NWEA MAP Growth 2025 norm lookup (K–8, Math + Reading, fall/winter/spring); `getPercentileBands(subject, gradeRange)` returns p5–p95 via z-scores
+- `lib/types.ts` — Shared TypeScript types (all domain models; includes `BookCatalogEntry`)
 - `lib/mappers.ts` — Row mappers: Supabase snake_case → camelCase TS
 - `lib/supabase.ts` — Client-side Supabase client (anon key)
 - `lib/supabaseAdmin.ts` — Server-side admin client (service role key — API routes only)
@@ -92,7 +96,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `lib/auth.ts` — Clerk helpers: getSchoolId(), getRole(), getAuthContext(), requireRole()
 - `lib/validation.ts` — Zod schemas for all API route inputs
 - `proxy.ts` — Clerk middleware (Next.js 16); protects /dashboard, /admin, /portfolio; userId-only check (org not required) so OrgPickerScreen handles no-org case
-- `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies, 0004 Sprint 3 tables
+- `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies, 0004 Sprint 3 tables, 0005 parent_students, 0006 student archived_at, 0007 book_catalog
 - `design-reference/` — Target aesthetic HTML files (landing.html, hadar-portfolio.html)
 - `app/dashboard/page.tsx` — Teacher/admin student list; parent redirect (OR filter on parent_clerk_user_id + invited_email); server component
 - `app/dashboard/DashboardUI.tsx` — Presentational sub-components: OrgPickerScreen, ParentPendingScreen, PageHeader, StudentCard, EmptyState
@@ -193,10 +197,10 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 ## Tayler's Pending Feedback Items
 Items raised by Tayler after reviewing the live portfolio. Not yet scheduled to a sprint — address before the next stakeholder review.
 
-- [ ] **Book database** — The Canon and reading list need a searchable book database so teachers can look up titles rather than typing them manually; consider Open Library API or a curated seed table
-- [ ] **Replace Lexile metric** — Tayler wants Lexile removed or deprioritised; find a better reading-level indicator that fits the classical/humanities framing (e.g. Fountas & Pinnell level, or a narrative description)
-- [ ] **Dynamic MAP percentile curves from NWEA 2025 norms** — The current Lexile bar chart is static; replace or supplement with real NWEA 2025 RIT-to-percentile norm curves so percentile context is accurate per grade and season
-- [ ] **Scope and sequence from Lobel team** — ScopeAndSequence section currently shows placeholder/seed data; Lobel team to supply actual curriculum scope and sequence; build import or admin UI once format is confirmed
+- [x] **Book database** — `supabase/migrations/0007_book_catalog.sql`; `GET/POST /api/dashboard/schools/book-catalog`; `BookCatalogPicker` modal in ReadingForm auto-fills title+author; `BookCatalogManager` tab in TeacherDataPanel for adding/viewing catalog entries
+- [x] **Dynamic MAP percentile curves from NWEA 2025 norms** — `lib/nweaNorms.ts` (K–8 fall means + SDs, winter/spring offsets, z-score bands); `MapPercentileChart.tsx` (5 stacked teal area fills, student dots in navy/gold); replaces per-subject MapsChart in IntellectualArc; grade derived from student gradeLevel + academicYear offset
+- [ ] **Replace Lexile metric** — ⏳ BLOCKED: pending Karissa's input on preferred reading-level framework (Fountas & Pinnell, DRA, or narrative description). Lexile bar chart remains in place until decision.
+- [ ] **Scope and sequence from Lobel team** — ⏳ BLOCKED: Lobel team has not yet supplied curriculum scope and sequence content. ScopeAndSequence section shows placeholder/seed data. Build import or admin UI once format is confirmed.
 - [ ] **Load real Athena data** — Demo student currently uses hardcoded seed data; once DB is live, seed Athena's real assessment scores, readings, and samples so the demo portfolio reflects genuine student work
 
 ## Environment Variables
