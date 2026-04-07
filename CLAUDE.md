@@ -79,6 +79,10 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/globals.css` — Global styles
 - `app/api/demo/auth/route.ts` — Demo password gate API route
 - `components/portfolio/` — Section components (CharacterArc, CreativeEvolution, HeroSection, ImmersionEngine, IntellectualArc, PortfolioFooter, RhetoricRoom, SideNav, TheCanon)
+- `components/portfolio/SubjectScoreRows.tsx` — Compact RIT/percentile score table; accepts `ScoreDisplayRow[]`; used by IntellectualArc for Math and ELA sub-sections
+- `components/portfolio/AssessmentForm.tsx` — TeacherDataPanel sub-form; MAP score input has dynamic min/max/placeholder (100–350 MAP, 1–10 AVANT)
+- `components/portfolio/ReadingForm.tsx` — TeacherDataPanel sub-form; title, author, whyChosen, completed, academicYear
+- `components/portfolio/TeacherDataPanel.tsx` — Tabbed data-entry panel (Assessment Scores + Reading List); visible admin/teacher only in portfolio page
 - `components/charts/` — MapsChart, AvantChart
 - `lib/types.ts` — Shared TypeScript types (all domain models)
 - `lib/mappers.ts` — Row mappers: Supabase snake_case → camelCase TS
@@ -102,7 +106,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/api/ai/drafts/[draftId]/route.ts` — PATCH: accept/reject/edit an AI draft; sets content_final, status, reviewed_by, reviewed_at
 - `app/api/dashboard/students/[studentId]/uploads/route.ts` — POST: multipart upload to portfolio-assets Supabase Storage; inserts into photos, handwriting_samples, or parent_uploads; role-gated (parent ownership check)
 - `components/shared/AiDraftEditor.tsx` — Client component: view/edit/resolve AI draft; Accept, Edit & Accept, Reject buttons
-- `components/portfolio/AiNarrativePanel.tsx` — Generate button + inline AiDraftEditor; teacher/admin sees generate flow or resolved draft; parent sees accepted text only; wired into IntellectualArc, ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc
+- `components/portfolio/AiNarrativePanel.tsx` — Generate button + inline AiDraftEditor; teacher/admin sees generate flow or resolved draft; parent sees accepted text only; wired into IntellectualArc ×2 (math_scores, english_scores), ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc
 - `components/shared/UploadButton.tsx` — Client component: hidden file input, XHR upload with progress bar, onSuccess/onError callbacks; wired into PhotoGallery, HandwritingSamples, ParentUploads
 - `components/shared/InviteParentButton.tsx` — Client component: modal with email input, POSTs to invite-parent route; shown below HeroSection for admin/teacher only
 - `app/api/dashboard/students/[studentId]/invite-parent/route.ts` — POST: inserts pending parent_students row, calls Clerk createOrganizationInvitation with role 'org:parent'
@@ -150,7 +154,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Split `page.css` (639 lines) into 4 partials under app/styles/
   - [x] Unify CSS color variables — single canonical :root in globals.css; landing and portfolio :root blocks removed; --lapis* aliases kept for landing CSS compatibility
   - [x] Clerk org setup — sign-in/sign-up pages, OrgPickerScreen for no-org users, role fallback via school_members table
-  - [ ] Set up Jest + basic tests (two-school fixture required)
+  - [x] Set up Vitest + basic tests — mappers, validation, soft-delete route (53 tests; husky pre-commit hook enforces vitest run)
   - [ ] Set up GitHub Actions CI (lint + typecheck + test + build)
   - [ ] Add Sentry error tracking
   - [x] Audit package.json for phantom dependencies
@@ -165,6 +169,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Dynamic `/admin` — admin-only school settings overview; teacher/parent redirected
 - [x] Sprint 3: Expand to full 12 sections — COMPLETE
   - [x] ScopeAndSequence, HandwritingSamples, PhotoGallery, TeacherNotes, ParentUploads, BookshelfAnimation components wired with real data
+  - [x] BookshelfAnimation removed from portfolio and demo renders — duplicate of The Canon; component file kept but not rendered
   - [x] `supabase/migrations/0004_sprint3_tables.sql` — 5 new tables with RLS (apply to live DB)
   - [x] Seed updated with demo data for all Sprint 3 tables
   - [x] SideNav expanded to all 13 sections; Sprint 3 sections in DemoPortfolio
@@ -174,7 +179,8 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] `POST /api/ai/draft` — generate narrative draft via Claude Haiku; store in ai_drafts; sectionTypes: academic_scores, immersion, reading_bookshelf, writing, virtue_badges
   - [x] `PATCH /api/ai/drafts/[draftId]` — accept/reject/edit a draft
   - [x] `components/shared/AiDraftEditor.tsx` — three-mode UI (view / edit / resolved)
-  - [x] Wire AiNarrativePanel into 5 sections: IntellectualArc, ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc; studentFirstName in all contexts
+  - [x] Wire AiNarrativePanel into 5 sections: IntellectualArc (split — see below), ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc; studentFirstName in all contexts
+  - [x] IntellectualArc split into Mathematics and English Language Arts sub-sections — each has independent score rows (SubjectScoreRows) and AiNarrativePanel keyed to `math_scores` / `english_scores` section types; `academic_scores` type retired from this section
   - [x] `POST /api/dashboard/students/[studentId]/uploads` — multipart upload to Supabase Storage (portfolio-assets); photos, handwriting, parent uploads
   - [x] `components/shared/UploadButton.tsx` — XHR upload with progress; wired into PhotoGallery, HandwritingSamples, ParentUploads
   - [x] Parent invite flow: `0005_parent_students.sql` (pending/active table with email+user_id indexes, RLS), `POST /api/dashboard/students/[studentId]/invite-parent` (Clerk org invite + DB row), `components/shared/InviteParentButton.tsx` (modal with email input, success/error states), `enforceParentAccess()` in portfolio page (email→userId linking on first visit) — COMPLETE
@@ -183,6 +189,15 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [ ] Writing/rhetoric critique generation
   - [ ] Test score extraction
 - [ ] Sprint 5 (V2): School-wide analysis, State of the Union, multi-school theming
+
+## Tayler's Pending Feedback Items
+Items raised by Tayler after reviewing the live portfolio. Not yet scheduled to a sprint — address before the next stakeholder review.
+
+- [ ] **Book database** — The Canon and reading list need a searchable book database so teachers can look up titles rather than typing them manually; consider Open Library API or a curated seed table
+- [ ] **Replace Lexile metric** — Tayler wants Lexile removed or deprioritised; find a better reading-level indicator that fits the classical/humanities framing (e.g. Fountas & Pinnell level, or a narrative description)
+- [ ] **Dynamic MAP percentile curves from NWEA 2025 norms** — The current Lexile bar chart is static; replace or supplement with real NWEA 2025 RIT-to-percentile norm curves so percentile context is accurate per grade and season
+- [ ] **Scope and sequence from Lobel team** — ScopeAndSequence section currently shows placeholder/seed data; Lobel team to supply actual curriculum scope and sequence; build import or admin UI once format is confirmed
+- [ ] **Load real Athena data** — Demo student currently uses hardcoded seed data; once DB is live, seed Athena's real assessment scores, readings, and samples so the demo portfolio reflects genuine student work
 
 ## Environment Variables
 ```
