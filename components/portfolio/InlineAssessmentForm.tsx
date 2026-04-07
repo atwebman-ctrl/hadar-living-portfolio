@@ -10,6 +10,7 @@
 // ============================================================
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import AssessmentForm from './AssessmentForm'
 
 interface Props {
@@ -51,6 +52,7 @@ export default function InlineAssessmentForm({
   defaultType = 'maps_math',
   label = 'Add Assessment',
 }: Props) {
+  const router = useRouter()
   const [open,   setOpen]   = useState(false)
   const [status, setStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
 
@@ -71,6 +73,7 @@ export default function InlineAssessmentForm({
             studentId={studentId}
             defaultType={defaultType}
             onStatus={handleStatus}
+            onSuccess={router.refresh}
           />
         </div>
       )}

@@ -9,6 +9,7 @@
 // ============================================================
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import ReadingForm from './ReadingForm'
 import BookCatalogManager from './BookCatalogManager'
 
@@ -56,6 +57,7 @@ const statusBar = (type: 'success' | 'error'): React.CSSProperties => ({
 // ── Component ─────────────────────────────────────────────────
 
 export default function InlineReadingForm({ studentId }: Props) {
+  const router = useRouter()
   const [open,        setOpen]        = useState(false)
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [status,      setStatus]      = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
@@ -76,7 +78,7 @@ export default function InlineReadingForm({ studentId }: Props) {
       {open && (
         <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--parchment)', border: '1px solid var(--rule)' }}>
           {status && <div style={statusBar(status.type)}>{status.msg}</div>}
-          <ReadingForm studentId={studentId} onStatus={setStatus} />
+          <ReadingForm studentId={studentId} onStatus={setStatus} onSuccess={router.refresh} />
         </div>
       )}
 

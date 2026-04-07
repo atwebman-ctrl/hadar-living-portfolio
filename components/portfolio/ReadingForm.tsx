@@ -42,8 +42,9 @@ const submitBtnStyle: React.CSSProperties = {
 }
 
 interface Props {
-  studentId: string
-  onStatus: (s: { type: 'success' | 'error'; msg: string } | null) => void
+  studentId:  string
+  onStatus:   (s: { type: 'success' | 'error'; msg: string } | null) => void
+  onSuccess?: () => void
 }
 
 interface Fields {
@@ -56,7 +57,7 @@ interface Fields {
 
 const blank: Fields = { title: '', author: '', whyChosen: '', completed: false, academicYear: '' }
 
-export default function ReadingForm({ studentId, onStatus }: Props) {
+export default function ReadingForm({ studentId, onStatus, onSuccess }: Props) {
   const [fields,     setFields]     = useState<Fields>(blank)
   const [saving,     setSaving]     = useState(false)
   const [showPicker, setShowPicker] = useState(false)
@@ -87,6 +88,7 @@ export default function ReadingForm({ studentId, onStatus }: Props) {
       } else {
         onStatus({ type: 'success', msg: 'Book added to reading list.' })
         setFields(blank)
+        onSuccess?.()
       }
     } catch {
       onStatus({ type: 'error', msg: 'Network error.' })

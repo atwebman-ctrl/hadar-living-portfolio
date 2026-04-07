@@ -10,6 +10,7 @@
 // ============================================================
 
 import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import type { BookCatalogEntry } from '@/lib/types'
 
 // ── Shared style tokens ────────────────────────────────────────
@@ -56,6 +57,7 @@ const blank: Fields = { title: '', author: '', gradeLevel: '' }
 // ── Component ─────────────────────────────────────────────────
 
 export default function BookCatalogManager() {
+  const router = useRouter()
   const [fields,  setFields]  = useState<Fields>(blank)
   const [saving,  setSaving]  = useState(false)
   const [books,   setBooks]   = useState<BookCatalogEntry[]>([])
@@ -97,6 +99,7 @@ export default function BookCatalogManager() {
         setStatus({ type: 'success', msg: `"${fields.title}" added to catalog.` })
         setFields(blank)
         loadCatalog()
+        router.refresh()
       }
     } catch {
       setStatus({ type: 'error', msg: 'Network error.' })
