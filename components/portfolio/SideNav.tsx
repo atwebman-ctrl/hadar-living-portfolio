@@ -15,7 +15,6 @@ const navItems = [
   { href: '#photos',         label: 'Photo Gallery' },
   { href: '#teacher-notes',  label: 'Teacher Notes' },
   { href: '#parent-uploads', label: 'Parent Uploads' },
-  { href: '#bookshelf-anim', label: 'Bookshelf' },
 ]
 
 interface SideNavProps {

@@ -137,18 +137,24 @@ function SubjectHeading({ title, tag }: { title: string; tag: string }) {
 // ── Component ─────────────────────────────────────────────────
 
 export default function IntellectualArc({ assessments, studentId, studentName, role, existingMathDraft, existingEnglishDraft, gradeLevel, academicYear }: Props) {
-  const hasData = !!assessments && assessments.length > 0
+  // Compute subject arrays unconditionally so each can fall back independently.
+  const mathAssessments    = assessments?.filter((a) => a.assessmentType === 'maps_math')    ?? []
+  const englishAssessments = assessments?.filter((a) => a.assessmentType === 'maps_english') ?? []
 
-  const mathAssessments    = hasData ? assessments!.filter((a) => a.assessmentType === 'maps_math')    : []
-  const englishAssessments = hasData ? assessments!.filter((a) => a.assessmentType === 'maps_english') : []
+  // Per-subject flags: only true if that subject has actual MAPS scores.
+  // This ensures demo fallbacks show for real students missing one or both subjects.
+  const hasMathData    = mathAssessments.length > 0
+  const hasEnglishData = englishAssessments.length > 0
+  // Used for Lexile (which lives on the overall assessments array, not MAPS).
+  const hasAnyData     = !!assessments && assessments.length > 0
 
-  const mathRows    = hasData ? toDisplayRows(mathAssessments)    : DEMO_MATH_ROWS
-  const englishRows = hasData ? toDisplayRows(englishAssessments) : DEMO_ENGLISH_ROWS
+  const mathRows    = hasMathData    ? toDisplayRows(mathAssessments)    : DEMO_MATH_ROWS
+  const englishRows = hasEnglishData ? toDisplayRows(englishAssessments) : DEMO_ENGLISH_ROWS
 
   // Math percentile delta for callout (DB newest-first)
   const mathPcts = mathRows.filter((r) => r.percentile != null).map((r) => r.percentile as number)
-  const firstPct = mathPcts.length >= 2 ? mathPcts[mathPcts.length - 1] : (hasData ? null : 76)
-  const lastPct  = mathPcts.length >= 2 ? mathPcts[0]                   : (hasData ? null : 95)
+  const firstPct = mathPcts.length >= 2 ? mathPcts[mathPcts.length - 1] : (hasMathData ? null : 76)
+  const lastPct  = mathPcts.length >= 2 ? mathPcts[0]                   : (hasMathData ? null : 95)
   const deltaNum = firstPct != null && lastPct != null ? lastPct - firstPct : null
   const deltaText = deltaNum != null ? (deltaNum >= 0 ? '+' : '') + deltaNum : '+19'
 
@@ -157,17 +163,17 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
   const mathContext    = canGenerate ? buildSubjectContext(mathRows, 'Mathematics', studentName ?? null) : null
   const englishContext = canGenerate ? buildSubjectContext(englishRows, 'English Language Arts', studentName ?? null) : null
 
-  // Percentile chart student scores
+  // Percentile chart student scores — fall back to demo when no subject-specific data
   const gradeNum = gradeLevel ? parseGradeNumber(gradeLevel) : null
-  const mathScores = (hasData && gradeNum !== null && academicYear)
+  const mathScores = (hasMathData && gradeNum !== null && academicYear)
     ? toStudentScorePoints(mathAssessments, gradeNum, academicYear)
     : DEMO_MATH_SCORES
-  const readingScores = (hasData && gradeNum !== null && academicYear)
+  const readingScores = (hasEnglishData && gradeNum !== null && academicYear)
     ? toStudentScorePoints(englishAssessments, gradeNum, academicYear)
     : DEMO_READING_SCORES
 
   // Lexile
-  const studentLexileRow = hasData ? buildStudentLexileRow(assessments!) : DEMO_STUDENT_LEXILE
+  const studentLexileRow = hasAnyData ? buildStudentLexileRow(assessments!) : DEMO_STUDENT_LEXILE
   const lexileRows = studentLexileRow
     ? [...LEXILE_BENCHMARKS.slice(0, 3), studentLexileRow, LEXILE_BENCHMARKS[3]]
     : LEXILE_BENCHMARKS
@@ -216,7 +222,7 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
       <div className="chart-wrap reveal">
         <div className="chart-title">Lexile Reading Level vs. Grade Benchmarks</div>
         <p style={{ marginBottom: 8, fontStyle: 'italic', fontSize: '.85rem', color: 'var(--ink-light)' }}>
-          {hasData
+          {hasAnyData
             ? 'Reading level compared to national grade-level benchmarks.'
             : 'At age 8, Athena reads at the same level as college-entry seniors. Her current range ' +
               '(1150–1300L) aligns with 11th–12th grade readiness benchmarks.'}
@@ -232,7 +238,7 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
             </div>
           ))}
         </div>
-        {!hasData && (
+        {!hasAnyData && (
           <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--rule)', fontFamily: "'DM Mono',monospace", fontSize: 10, color: 'var(--ink-light)' }}>
             Currently reading: <em style={{ fontStyle: 'normal', color: 'var(--ink)' }}>{DEMO_BOOKS}</em>
           </div>
