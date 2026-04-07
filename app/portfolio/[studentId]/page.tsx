@@ -32,7 +32,6 @@ import HandwritingSamples from '@/components/portfolio/HandwritingSamples'
 import PhotoGallery from '@/components/portfolio/PhotoGallery'
 import TeacherNotes from '@/components/portfolio/TeacherNotes'
 import ParentUploads from '@/components/portfolio/ParentUploads'
-import BookshelfAnimation from '@/components/portfolio/BookshelfAnimation'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 import InviteParentButton from '@/components/shared/InviteParentButton'
 import TeacherDataPanel from '@/components/portfolio/TeacherDataPanel'
@@ -80,7 +79,8 @@ export default async function PortfolioPage({ params }: Props) {
           studentId={studentId}
           studentName={portfolio.student.firstName}
           role={role}
-          existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'academic_scores')}
+          existingMathDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'math_scores')}
+          existingEnglishDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'english_scores')}
         />
         <ImmersionEngine
           assessments={portfolio.assessments}
@@ -138,7 +138,6 @@ export default async function PortfolioPage({ params }: Props) {
           academicYear={portfolio.student.academicYear}
           gradeLevel={portfolio.student.gradeLevel}
         />
-        <BookshelfAnimation readings={portfolio.readings} />
         <PortfolioFooter />
       </div>
     </>
