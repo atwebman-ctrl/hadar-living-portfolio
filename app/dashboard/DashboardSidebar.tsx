@@ -54,9 +54,9 @@ export default function DashboardSidebar({ activeView, onViewChange, role }: Pro
 
       <div className="db-sidebar-quote">
         <p className="db-sidebar-quote-text">
-          &ldquo;The knowledge of today is the ink of tomorrow&apos;s history.&rdquo;
+          &ldquo;Man is wise only while in search of wisdom.&rdquo;
         </p>
-        <p className="db-sidebar-quote-attr">— Hadar Academy Charter</p>
+        <p className="db-sidebar-quote-attr">— Hadar Academy</p>
       </div>
     </aside>
   )
