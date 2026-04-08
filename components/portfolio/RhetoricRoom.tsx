@@ -124,27 +124,25 @@ function EmbedVideoCard({ video }: { video: StudentVideo }) {
 // ── Component ─────────────────────────────────────────────────
 
 export default function RhetoricRoom({ videos, studentVideos, studentId, role }: Props) {
-  const canEdit    = (role === 'admin' || role === 'teacher') && !!studentId
-  const hasEmbeds  = !!studentVideos && studentVideos.length > 0
+  const canEdit   = (role === 'admin' || role === 'teacher') && !!studentId
+  const hasEmbeds = !!studentVideos && studentVideos.length > 0
 
   return (
     <section id="rhetoric">
       <SectionHeader />
 
       {hasEmbeds ? (
-        <RealVideos videos={studentVideos!} />
+        <RealVideos videos={studentVideos!} canEdit={canEdit} studentId={studentId} />
       ) : (
-        <PlaceholderVideos legacyVideos={videos} />
+        <PlaceholderVideos legacyVideos={videos} canEdit={canEdit} studentId={studentId} />
       )}
-
-      {canEdit && <InlineVideoForm studentId={studentId!} />}
     </section>
   )
 }
 
 // ── Real video grid ───────────────────────────────────────────
 
-function RealVideos({ videos }: { videos: StudentVideo[] }) {
+function RealVideos({ videos, canEdit, studentId }: { videos: StudentVideo[]; canEdit: boolean; studentId?: string }) {
   const [then, now, ...rest] = videos
   const gridVideos = rest.slice(0, 2)
 
@@ -177,13 +175,15 @@ function RealVideos({ videos }: { videos: StudentVideo[] }) {
           {gridVideos.map((v) => <EmbedVideoCard key={v.id} video={v} />)}
         </div>
       )}
+
+      {canEdit && <InlineVideoForm studentId={studentId!} />}
     </>
   )
 }
 
 // ── Placeholder (no student_videos yet) ──────────────────────
 
-function PlaceholderVideos({ legacyVideos }: { legacyVideos?: Video[] }) {
+function PlaceholderVideos({ legacyVideos, canEdit, studentId }: { legacyVideos?: Video[]; canEdit: boolean; studentId?: string }) {
   // If there are legacy Video rows (old table), render those titles in the grid.
   if (legacyVideos && legacyVideos.length > 0) {
     const sorted = [...legacyVideos].sort((a, b) =>
@@ -214,11 +214,12 @@ function PlaceholderVideos({ legacyVideos }: { legacyVideos?: Video[] }) {
             ))}
           </div>
         )}
+        {canEdit && <InlineVideoForm studentId={studentId!} />}
       </>
     )
   }
 
-  // No data — show demo placeholders
+  // No data — show demo placeholders + form above the achievement banner
   return (
     <>
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '.5rem', maxWidth: 560 }}>
@@ -243,6 +244,9 @@ function PlaceholderVideos({ legacyVideos }: { legacyVideos?: Video[] }) {
         <VideoCard grade="Hebrew Fluency · Grade 3" type="Immersion" captionLine1="Conversational Hebrew"
           captionLine2="classroom moment" footer="AVANT Listening: Level 7 · Advanced tier" />
       </div>
+
+      {canEdit && <InlineVideoForm studentId={studentId!} />}
+
       <div className="achievement-banner reveal">
         <div className="achievement-medal">BRZ<br />LEVEL</div>
         <div className="achievement-text">
