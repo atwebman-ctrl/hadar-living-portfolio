@@ -66,7 +66,7 @@ export default async function PortfolioPage({ params }: Props) {
       <RevealObserver />
       <SideNav schoolName={portfolio.school.name} studentName={studentName} />
       <div className="main">
-        <HeroSection student={portfolio.student} school={portfolio.school} />
+        <HeroSection student={portfolio.student} school={portfolio.school} assessments={portfolio.assessments} />
         {(role === 'admin' || role === 'teacher') && (
           <div style={{ padding: '1rem 2rem 0', display: 'flex', justifyContent: 'flex-end' }}>
             <InviteParentButton studentId={studentId} />
