@@ -1,85 +1,56 @@
-/* app/dashboard/dashboard.css — Scholastic Archive skin */
+/* app/dashboard/dashboard.css — Classical Academy flat layout */
 
-/* ── Page: wood desk + dark overlay ──────────────────────── */
+/* ── Page ────────────────────────────────────────────────── */
 .db-page {
   min-height: 100vh;
-  background:
-    radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.40) 100%),
-    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-    url('/images/wood-table.jpeg') center / cover fixed;
+  background: #F5F0E3;
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 2.5rem 2rem 4rem;
-  box-sizing: border-box;
+  flex-direction: column;
   position: relative;
 }
 
-
-
-/* ── Book outer: navy binding ────────────────────────────── */
-.db-book {
-  position: relative;
-  width: 100%;
-  max-width: 72rem;
-  background: url('/images/navy-blue-texture.jpeg') center / cover;
-  padding: 8px;
-  box-shadow:
-    0 20px 80px rgba(0,0,0,0.80),
-    0 6px 22px  rgba(0,0,0,0.50),
-    inset 0 0 0 1px rgba(184,160,80,0.25);
-  z-index: 1;
-}
-
-/* ── Book interior: parchment page ───────────────────────── */
-.db-book-inner {
-  background: url('/images/parchant-paper-background.jpeg') center / cover;
-  position: relative;
-  overflow: hidden;
-  min-height: 60vh;
-  box-shadow:
-    inset 0 8px 28px rgba(0,0,0,0.22),
-    inset 0 -4px 16px rgba(0,0,0,0.12),
-    inset 6px 0 18px rgba(0,0,0,0.10),
-    inset -6px 0 18px rgba(0,0,0,0.10);
-}
-
-/* ── Header: inside parchment ────────────────────────────── */
+/* ── Header ──────────────────────────────────────────────── */
 .db-header {
-  background: rgba(255,252,245,0.35) !important;
-  border-bottom: 2px solid #B8A050 !important;
-  position: relative;
-  z-index: 2;
+  background: #1E3A5F !important;
+  border-bottom: 1px solid rgba(184,160,80,0.3) !important;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-/* ── Two-column inner layout ─────────────────────────────── */
+/* ── Two-column layout ───────────────────────────────────── */
 .db-inner-layout {
   display: flex;
-  position: relative;
+  flex: 1;
+  align-items: stretch;
 }
 
 /* ── Sidebar ─────────────────────────────────────────────── */
 .db-sidebar {
   width: 200px;
   min-width: 200px;
-  border-right: 1px solid rgba(184,160,80,0.35);
+  background: #1E3A5F;
+  border-right: 1px solid rgba(184,160,80,0.2);
   padding: 1.5rem 1rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0;
-  position: relative;
-  z-index: 1;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .db-sidebar-heading {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-weight: 700;
   font-size: 0.9rem;
-  color: #2c1f0e;
+  color: #F5EFE0;
   margin: 0 0 0.85rem;
   letter-spacing: 0.02em;
   padding-bottom: 0.65rem;
-  border-bottom: 1px solid rgba(184,160,80,0.35);
+  border-bottom: 1px solid rgba(184,160,80,0.3);
 }
 
 .db-nav-item {
@@ -89,16 +60,22 @@
   padding: 0.45rem 0.6rem;
   font-family: 'EB Garamond', Georgia, serif;
   font-size: 0.875rem;
-  color: #5a4a3a;
-  cursor: default;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
   border-left: 2px solid transparent;
   margin-bottom: 0.1rem;
+  border-radius: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.db-nav-item:hover {
+  background: rgba(255,255,255,0.07);
+  color: #F5EFE0;
 }
 
 .db-nav-item--active {
   border-left-color: #B8A050;
-  background: rgba(184,160,80,0.10);
-  color: #2c1f0e;
+  background: rgba(184,160,80,0.12);
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -117,11 +94,11 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-style: italic;
   font-size: 0.75rem;
-  color: #6b5228;
+  color: rgba(245,239,224,0.8);
   margin: 0 0 0.35rem;
   line-height: 1.55;
-  background: rgba(184,160,80,0.10);
-  border: 1px solid rgba(184,160,80,0.30);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(184,160,80,0.25);
   padding: 0.65rem 0.7rem;
 }
 
@@ -129,30 +106,20 @@
   font-family: 'DM Mono', monospace;
   font-size: 0.58rem;
   letter-spacing: 0.06em;
-  color: #8a7558;
+  color: rgba(245,239,224,0.45);
   margin: 0;
   padding-left: 0.1rem;
 }
 
-/* ── Content area (right of sidebar) ────────────────────── */
+/* ── Content area ────────────────────────────────────────── */
 .db-content-area {
   flex: 1;
   position: relative;
   min-width: 0;
+  background: #F5F0E3;
 }
 
-/* ── Watermark overlays ──────────────────────────────────── */
-.db-compass {
-  position: absolute;
-  top: 1.25rem;
-  right: 2rem;
-  width: 130px;
-  opacity: 0.18;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ── Main content area ───────────────────────────────────── */
+/* ── Main content ────────────────────────────────────────── */
 .db-main {
   position: relative;
   z-index: 1;
@@ -211,7 +178,7 @@
   text-transform: uppercase;
   padding: 0.25rem 0.75rem;
   border: 1px solid rgba(184,160,80,0.55);
-  background: rgba(255,252,245,0.7);
+  background: rgba(255,252,245,0.8);
   color: #5a4a3a;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
@@ -234,14 +201,14 @@
   font-style: italic;
   font-size: 1rem;
   color: #2c1f0e;
-  background: rgba(255,252,245,0.7);
-  border: 1px solid rgba(184,160,80,0.6);
+  background: #FDFBF7;
+  border: 1px solid rgba(139,115,85,0.3);
   outline: none;
   box-sizing: border-box;
 }
-.db-search::placeholder     { color: #8a7558; font-style: italic; }
-.db-search:focus            { border-color: #B8A050; background: rgba(255,252,245,0.9); }
-.db-no-results              { font-family: 'EB Garamond', Georgia, serif; font-style: italic; font-size: 1rem; color: #8a7558; padding: 2rem 0; }
+.db-search::placeholder { color: #8a7558; font-style: italic; }
+.db-search:focus        { border-color: #B8A050; }
+.db-no-results          { font-family: 'EB Garamond', Georgia, serif; font-style: italic; font-size: 1rem; color: #8a7558; padding: 2rem 0; }
 
 /* ── Student grid ────────────────────────────────────────── */
 .student-grid {
@@ -252,48 +219,51 @@
 
 /* ── Student card ────────────────────────────────────────── */
 .db-student-card {
-  background: url('/images/parchmant-paper.jpeg') center / cover !important;
-  border: 1px solid rgba(160,130,80,0.35) !important;
+  background:
+    linear-gradient(rgba(253,251,247,0.2), rgba(253,251,247,0.2)),
+    url('/images/parchmant-paper.jpeg') center / cover !important;
+  border: 1px solid rgba(139,115,85,0.12) !important;
+  border-top: 2px solid #B8A050 !important;
   position: relative !important;
   overflow: visible !important;
   padding: 1.5rem !important;
-  box-shadow:
-    3px 6px 20px rgba(0,0,0,0.22),
-    0 1px 5px rgba(0,0,0,0.14),
-    inset 0 1px 0 rgba(255,255,255,0.4) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
   transition: transform 0.3s ease, box-shadow 0.3s ease !important;
 }
 .db-student-card:hover {
   transform: translateY(-4px) !important;
   box-shadow:
-    4px 12px 32px rgba(0,0,0,0.30),
-    0 2px 8px rgba(0,0,0,0.18),
-    inset 0 1px 0 rgba(255,255,255,0.4) !important;
+    0 8px 24px rgba(0,0,0,0.10),
+    0 2px 6px  rgba(0,0,0,0.06) !important;
 }
-.db-student-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(145deg, rgba(255,252,245,0.25) 0%, transparent 55%);
-  pointer-events: none;
+
+/* ── Edit button — visible only on card hover ────────────── */
+.db-student-card .db-edit-btn {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.db-student-card:hover .db-edit-btn {
+  opacity: 1;
 }
 
 /* ── Add Student button ──────────────────────────────────── */
 .db-add-btn {
-  font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1rem;
-  letter-spacing: 0.04em; color: #F7F4EE; background: #B8A050;
-  border: 1px solid #9a8540; padding: 0.55rem 1.4rem;
-  cursor: pointer; transition: background 0.2s ease;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: #F7F4EE;
+  background: #B8A050;
+  border: 1px solid #9a8540;
+  padding: 0.55rem 1.4rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 .db-add-btn:hover { background: #9a8540; }
 
 /* ── Responsive ──────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .db-page { padding: 0; }
-  .db-book { box-shadow: none; }
+@media (max-width: 768px) {
+  .db-sidebar { display: none; }
 }
-@media (max-width: 768px)  { .db-sidebar { display: none; } }
-@media (max-width: 640px)  {
-  .db-compass, .db-seal { display: none; }
-  .db-registry-title    { font-size: 1.5rem; }
+@media (max-width: 640px) {
+  .db-registry-title { font-size: 1.5rem; }
 }

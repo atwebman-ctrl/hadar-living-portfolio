@@ -41,8 +41,6 @@ export default function DashboardClient({ students, role }: Props) {
         />
 
         <div className="db-content-area">
-          <img src="/images/compass.png" className="db-compass" alt="" aria-hidden="true" />
-
           <main className="db-main">
             {activeView === 'roster'         && <StudentGrid students={students} role={role} />}
             {activeView === 'by-grade'       && <ByGradeView students={students} role={role} />}
