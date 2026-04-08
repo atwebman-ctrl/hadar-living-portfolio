@@ -64,7 +64,7 @@ export default async function PortfolioPage({ params }: Props) {
   return (
     <>
       <RevealObserver />
-      <SideNav schoolName={portfolio.school.name} studentName={studentName} />
+      <SideNav schoolName={portfolio.school.name} studentName={studentName} role={role} />
       <div className="main">
         <HeroSection student={portfolio.student} school={portfolio.school} assessments={portfolio.assessments} />
         {(role === 'admin' || role === 'teacher') && (

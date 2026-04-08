@@ -22,9 +22,11 @@ interface SideNavProps {
   schoolName?: string
   /** Student full name shown below the Portfolio label. */
   studentName?: string
+  /** Viewer role. When 'admin' or 'teacher', shows a back-to-dashboard link. */
+  role?: string
 }
 
-export default function SideNav({ schoolName, studentName }: SideNavProps = {}) {
+export default function SideNav({ schoolName, studentName, role }: SideNavProps = {}) {
   const [active, setActive] = useState('overview')
 
   useEffect(() => {
@@ -65,6 +67,29 @@ export default function SideNav({ schoolName, studentName }: SideNavProps = {}) 
           {label}
         </a>
       ))}
+
+      {(role === 'admin' || role === 'teacher') && (
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', margin: '1rem 1.5rem 0', paddingTop: '0.75rem' }}>
+          <a
+            href="/dashboard"
+            style={{
+              display:        'block',
+              fontFamily:     'var(--font-heading)',
+              fontStyle:      'italic',
+              fontSize:       '0.72rem',
+              color:          'rgba(255,255,255,0.45)',
+              textDecoration: 'none',
+              letterSpacing:  '0.02em',
+              padding:        '0.25rem 0 0.5rem',
+              transition:     'color 0.15s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.75)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.45)')}
+          >
+            ← Back to Dashboard
+          </a>
+        </div>
+      )}
     </nav>
   )
 }
