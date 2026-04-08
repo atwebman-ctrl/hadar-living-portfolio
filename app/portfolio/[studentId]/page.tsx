@@ -135,7 +135,7 @@ export default async function PortfolioPage({ params }: Props) {
           academicYear={portfolio.student.academicYear}
           gradeLevel={portfolio.student.gradeLevel}
         />
-        <TeacherNotes notes={portfolio.teacherNotes} />
+        <TeacherNotes notes={portfolio.teacherNotes} role={role} studentId={studentId} />
         <ParentUploads
           uploads={portfolio.parentUploads}
           uploadEnabled={true}

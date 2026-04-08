@@ -284,6 +284,25 @@ export const UpdateAiDraftSchema = z.object({
 
 export type UpdateAiDraftInput = z.infer<typeof UpdateAiDraftSchema>;
 
+// ── Teacher notes ─────────────────────────────────────────────
+
+const notesCategoryEnum = z.enum([
+  'academic_progress',
+  'social_development',
+  'behavioral',
+  'participation',
+  'general',
+]);
+
+/** Body for POST /api/dashboard/students/[studentId]/teacher-notes */
+export const CreateTeacherNoteBodySchema = z.object({
+  noteText: z.string().min(1, 'Note text cannot be empty'),
+  category: notesCategoryEnum,
+  date:     z.string().date().optional(),
+});
+
+export type CreateTeacherNoteBodyInput = z.infer<typeof CreateTeacherNoteBodySchema>;
+
 // ── School settings (admin only) ──────────────────────────────
 
 export const UpdateSchoolSchema = z.object({

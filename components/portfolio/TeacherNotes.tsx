@@ -1,10 +1,17 @@
-import type { TeacherNote, SectionType } from '@/lib/types'
+import type { TeacherNote, UserRole } from '@/lib/types'
+import InlineTeacherNoteForm from './InlineTeacherNoteForm'
 
 interface Props {
-  notes?: TeacherNote[]
+  notes?:     TeacherNote[]
+  role?:      UserRole
+  studentId?: string
 }
 
-const SECTION_LABELS: Partial<Record<SectionType, string>> = {
+// Maps section_type / category strings to display labels.
+// Covers both legacy SectionType values and new category values
+// added by InlineTeacherNoteForm.
+const SECTION_LABELS: Record<string, string> = {
+  // Legacy section types (pre-existing teacher notes)
   academic_scores:    'Intellectual Arc',
   reading_bookshelf:  'The Canon',
   writing:            'Creative Evolution',
@@ -12,9 +19,15 @@ const SECTION_LABELS: Partial<Record<SectionType, string>> = {
   virtue_badges:      'Character Arc',
   handwriting:        'Handwriting',
   scope_sequence:     'Scope & Sequence',
+  // Inline form categories (0-indexed teacher note categories)
+  academic_progress:  'Academic Progress',
+  social_development: 'Social Development',
+  behavioral:         'Behavioral',
+  participation:      'Participation',
+  general:            'General',
 }
 
-const DEMO_NOTES: Array<{ id: string; section: SectionType; author: string; text: string }> = [
+const DEMO_NOTES: Array<{ id: string; section: string; author: string; text: string }> = [
   {
     id: '1',
     section: 'academic_scores',
@@ -35,23 +48,24 @@ const DEMO_NOTES: Array<{ id: string; section: SectionType; author: string; text
   },
 ]
 
-export default function TeacherNotes({ notes }: Props) {
+export default function TeacherNotes({ notes, role, studentId }: Props) {
   const hasData = !!notes && notes.length > 0
+  const canEdit = (role === 'admin' || role === 'teacher') && !!studentId
 
   const items = hasData
     ? notes!.map((n) => ({
-        id: n.id,
+        id:      n.id,
         section: SECTION_LABELS[n.sectionType] ?? n.sectionType,
-        author: n.authorName,
-        text: n.text,
-        date: new Date(n.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+        author:  n.authorName,
+        text:    n.text,
+        date:    new Date(n.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
       }))
     : DEMO_NOTES.map((n) => ({
-        id: n.id,
+        id:      n.id,
         section: SECTION_LABELS[n.section] ?? n.section,
-        author: n.author,
-        text: n.text,
-        date: null as string | null,
+        author:  n.author,
+        text:    n.text,
+        date:    null as string | null,
       }))
 
   return (
@@ -81,7 +95,7 @@ export default function TeacherNotes({ notes }: Props) {
               )}
             </div>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: '.95rem', color: 'var(--ink)', lineHeight: 1.7, margin: '0 0 .75rem', fontStyle: 'italic' }}>
-              "{n.text}"
+              &ldquo;{n.text}&rdquo;
             </p>
             <footer style={{ fontFamily: 'var(--font-mono)', fontSize: '.65rem', letterSpacing: '.08em', color: 'var(--ink-light)', textTransform: 'uppercase' }}>
               — {n.author}
@@ -89,6 +103,8 @@ export default function TeacherNotes({ notes }: Props) {
           </blockquote>
         ))}
       </div>
+
+      {canEdit && <InlineTeacherNoteForm studentId={studentId!} />}
     </section>
   )
 }
