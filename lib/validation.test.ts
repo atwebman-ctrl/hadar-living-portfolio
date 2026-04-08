@@ -19,7 +19,7 @@ describe('CreateStudentSchema', () => {
   const validInput = {
     firstName:    'Ayala',
     lastName:     'Cohen',
-    gradeLevel:   '4th Grade',
+    gradeLevel:   '4',
     academicYear: '2025-2026',
   }
 

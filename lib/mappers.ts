@@ -35,7 +35,8 @@ export function mapStudent(row: Row): Student {
     schoolId: row.school_id as string,
     firstName: row.first_name as string,
     lastName: row.last_name as string,
-    gradeLevel: row.grade_level as string,
+    // Prefer new constrained column; fall back to legacy free-text value
+    gradeLevel: (row.grade_level as string | null) ?? (row.grade_level_legacy as string | null) ?? '',
     academicYear: row.academic_year as string,
     parentUserIds: (row.parent_user_ids as string[]) ?? [],
     profilePhotoPath: (row.profile_photo_path as string) ?? null,

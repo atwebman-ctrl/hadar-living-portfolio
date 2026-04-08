@@ -6,6 +6,7 @@
 // ============================================================
 
 import { useState } from 'react'
+import { TERM_OPTIONS } from '@/lib/constants'
 
 const ASSESSMENT_TYPES = [
   { value: 'maps_math',       label: 'MAP Math' },
@@ -152,7 +153,12 @@ export default function AssessmentForm({ studentId, onStatus, defaultType = 'map
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <label style={labelStyle}>Term</label>
-          <input type="text" value={fields.term} onChange={set('term')} style={inputStyle} placeholder="e.g. Fall 2025" required />
+          <select value={fields.term} onChange={set('term')} style={inputStyle} required>
+            <option value="">Select term…</option>
+            {TERM_OPTIONS.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <label style={labelStyle}>Academic Year</label>

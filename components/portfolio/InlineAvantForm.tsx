@@ -11,6 +11,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { TERM_OPTIONS } from '@/lib/constants'
 
 interface Props {
   studentId: string
@@ -177,14 +178,17 @@ export default function InlineAvantForm({ studentId }: Props) {
             </div>
             <div style={fieldWrap}>
               <span style={lbl}>Term</span>
-              <input
+              <select
                 style={inputStyle}
-                type="text"
                 required
                 value={form.term}
-                placeholder="e.g. Spring 2026"
                 onChange={(e) => update('term', e.target.value)}
-              />
+              >
+                <option value="">Select term…</option>
+                {TERM_OPTIONS.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -196,6 +200,8 @@ export default function InlineAvantForm({ studentId }: Props) {
               required
               value={form.academicYear}
               placeholder="e.g. 2025-2026"
+              pattern="\d{4}-\d{4}"
+              title="Format: YYYY-YYYY"
               onChange={(e) => update('academicYear', e.target.value)}
             />
           </div>

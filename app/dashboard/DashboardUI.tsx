@@ -8,6 +8,7 @@
 import Link from 'next/link'
 import { OrganizationSwitcher } from '@clerk/nextjs'
 import type { Student } from '@/lib/types'
+import { formatGrade } from '@/lib/gradeLevel'
 import DeleteStudentButton from '@/components/dashboard/DeleteStudentButton'
 
 // Archival palette constants (referenced in inline styles)
@@ -140,7 +141,7 @@ export function StudentCard({ student, role }: { student: Student; role: string 
           )}
         </div>
         <dl style={{ margin: 0 }}>
-          <MetaRow label="Grade" value={student.gradeLevel} />
+          <MetaRow label="Grade" value={formatGrade(student.gradeLevel)} />
           <MetaRow label="Year"  value={student.academicYear} />
         </dl>
         <p

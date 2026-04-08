@@ -12,6 +12,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { BookCatalogEntry } from '@/lib/types'
+import { GRADE_SELECT_OPTIONS } from '@/lib/constants'
 
 // ── Shared style tokens ────────────────────────────────────────
 
@@ -75,7 +76,7 @@ export default function BookCatalogManager() {
   useEffect(() => { loadCatalog() }, [loadCatalog])
 
   const set = (k: keyof Fields) =>
-    (e: React.ChangeEvent<HTMLInputElement>) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
       setFields((f) => ({ ...f, [k]: e.target.value }))
 
   async function handleSubmit(e: React.FormEvent) {
@@ -142,7 +143,12 @@ export default function BookCatalogManager() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <label style={monoLabel}>Grade Level</label>
-            <input type="text" value={fields.gradeLevel} onChange={set('gradeLevel')} style={input} placeholder="e.g. 3rd Grade" required />
+            <select value={fields.gradeLevel} onChange={set('gradeLevel')} style={input} required>
+              <option value="">Select grade…</option>
+              {GRADE_SELECT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
           </div>
         </div>
         <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>

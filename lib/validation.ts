@@ -20,10 +20,16 @@ const nonEmptyString = z.string().min(1, "Cannot be empty");
 
 // ── Students ──────────────────────────────────────────────────
 
+const gradeLevelEnum = z.enum([
+  'pre-k','k',
+  '1','2','3','4','5','6',
+  '7','8','9','10','11','12',
+]);
+
 export const CreateStudentSchema = z.object({
   firstName:        nonEmptyString,
   lastName:         nonEmptyString,
-  gradeLevel:       nonEmptyString,
+  gradeLevel:       gradeLevelEnum,
   academicYear,
   parentUserIds:    z.array(z.string()).default([]),
   profilePhotoPath: z.string().nullable().optional(),

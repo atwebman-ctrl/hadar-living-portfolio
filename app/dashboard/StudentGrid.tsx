@@ -9,6 +9,7 @@
 
 import { useState, useMemo } from 'react'
 import type { Student } from '@/lib/types'
+import { formatGrade, sortGrades } from '@/lib/gradeLevel'
 import { StudentCard, EmptyState } from './DashboardUI'
 
 interface Props { students: Student[]; role: string }
@@ -18,8 +19,8 @@ export default function StudentGrid({ students, role }: Props) {
   const [gradeFilter, setGradeFilter] = useState('All')
 
   const grades = useMemo(() => {
-    const set = new Set(students.map((s) => s.gradeLevel))
-    return Array.from(set).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    const set = new Set(students.map((s) => s.gradeLevel).filter(Boolean))
+    return sortGrades(Array.from(set))
   }, [students])
 
   const filtered = useMemo(() => {
@@ -52,7 +53,7 @@ export default function StudentGrid({ students, role }: Props) {
             onClick={() => setGradeFilter(g)}
             className={`db-pill${gradeFilter === g ? ' db-pill--active' : ''}`}
           >
-            {g}
+            {g === 'All' ? 'All' : formatGrade(g)}
           </button>
         ))}
       </div>

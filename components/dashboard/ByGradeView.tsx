@@ -8,6 +8,7 @@
 
 import { useState } from 'react'
 import type { Student } from '@/lib/types'
+import { formatGrade, sortGrades } from '@/lib/gradeLevel'
 import { StudentCard } from '@/app/dashboard/DashboardUI'
 
 const INK   = '#2c1f0e'
@@ -26,9 +27,7 @@ function groupByGrade(students: Student[]): Record<string, Student[]> {
 
 export default function ByGradeView({ students, role }: Props) {
   const grouped = groupByGrade(students)
-  const grades  = Object.keys(grouped).sort((a, b) =>
-    a.localeCompare(b, undefined, { numeric: true })
-  )
+  const grades  = sortGrades(Object.keys(grouped))
   const [open, setOpen] = useState<Set<string>>(() => new Set(grades))
 
   const toggle = (grade: string) =>
@@ -72,7 +71,7 @@ export default function ByGradeView({ students, role }: Props) {
               style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', cursor: 'pointer', borderLeft: `3px solid ${GOLD}`, paddingLeft: '0.75rem', marginBottom: isOpen ? '1rem' : 0 }}
             >
               <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, fontSize: '1.2rem', color: INK }}>
-                {grade}
+                {formatGrade(grade)}
               </span>
               <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.6rem', letterSpacing: '0.08em', color: FAINT }}>
                 — {list.length} scholar{list.length !== 1 ? 's' : ''}

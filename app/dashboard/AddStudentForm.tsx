@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { GRADE_SELECT_OPTIONS } from '@/lib/constants'
 
 // Shared style tokens
 const S = {
@@ -34,7 +35,7 @@ export default function AddStudentForm() {
   const [fields, setFields] = useState<Fields>(EMPTY)
 
   const handleClose = () => { setOpen(false); setApiError(null); setFields(EMPTY) }
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setFields((prev) => ({ ...prev, [e.target.name]: e.target.value }))
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,8 +109,14 @@ export default function AddStudentForm() {
               </div>
 
               <Field label="Grade Level" htmlFor="gradeLevel">
-                <input id="gradeLevel" name="gradeLevel" type="text" required placeholder="e.g. 3rd Grade"
-                  value={fields.gradeLevel} onChange={handleChange} style={S.input} />
+                <select id="gradeLevel" name="gradeLevel" required
+                  value={fields.gradeLevel} onChange={handleChange}
+                  style={{ ...S.input, appearance: 'auto' }}>
+                  <option value="">Select grade…</option>
+                  {GRADE_SELECT_OPTIONS.map(({ value, label }) => (
+                    <option key={value} value={value}>{label}</option>
+                  ))}
+                </select>
               </Field>
 
               <Field label="Academic Year" htmlFor="academicYear">

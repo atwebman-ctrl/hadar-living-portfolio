@@ -11,6 +11,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { GRADE_SELECT_OPTIONS, TERM_OPTIONS } from '@/lib/constants'
 
 interface Props {
   studentId: string
@@ -136,15 +137,23 @@ export default function InlineVideoForm({ studentId }: Props) {
           <div style={twoCol}>
             <div style={field}>
               <span style={label}>Grade Level</span>
-              <input style={input} type="text" value={form.gradeLevel} required
-                placeholder="e.g. Grade 3"
-                onChange={(e) => update('gradeLevel', e.target.value)} />
+              <select style={input} value={form.gradeLevel} required
+                onChange={(e) => update('gradeLevel', e.target.value)}>
+                <option value="">Select grade…</option>
+                {GRADE_SELECT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
             </div>
             <div style={field}>
               <span style={label}>Term</span>
-              <input style={input} type="text" value={form.term} required
-                placeholder="e.g. Spring 2026"
-                onChange={(e) => update('term', e.target.value)} />
+              <select style={input} value={form.term} required
+                onChange={(e) => update('term', e.target.value)}>
+                <option value="">Select term…</option>
+                {TERM_OPTIONS.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
             </div>
           </div>
 
