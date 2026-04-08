@@ -1,14 +1,11 @@
 // ============================================================
 // app/dashboard/page.tsx
 //
-// Server component. Lists all students for the authenticated school.
+// Server component. Fetches students + derives auth context,
+// then hands everything to DashboardClient for rendering.
 // Auth: Clerk session required. Role: admin or teacher.
-// school_id is derived server-side from the Clerk org — never from
-// the client or from any request parameter.
-//
-// Parents are redirected to their child's portfolio. If the
-// parent_students link hasn't been established yet (first visit
-// before opening the portfolio link), a pending screen is shown.
+// school_id is derived server-side from the Clerk org.
+// Parents are redirected to their child's portfolio.
 // ============================================================
 
 export const dynamic = 'force-dynamic'
@@ -19,14 +16,8 @@ import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
 import type { Student } from '@/lib/types'
-import AddStudentForm from './AddStudentForm'
-import {
-  OrgPickerScreen,
-  ParentPendingScreen,
-  PageHeader,
-  StudentCard,
-  EmptyState,
-} from './DashboardUI'
+import { OrgPickerScreen, ParentPendingScreen } from './DashboardUI'
+import DashboardClient from './DashboardClient'
 import './dashboard.css'
 
 export default async function DashboardPage() {
@@ -37,6 +28,7 @@ export default async function DashboardPage() {
 
   const ctx = await getAuthContext().catch(() => redirect('/sign-in'))
 
+  // ── Parent: redirect to portfolio or show pending screen ──
   if (ctx.role === 'parent') {
     const clerk = await clerkClient()
     const clerkUser = await clerk.users.getUser(ctx.userId).catch(() => null)
@@ -72,12 +64,13 @@ export default async function DashboardPage() {
 
   if (ctx.role !== 'admin' && ctx.role !== 'teacher') redirect('/')
 
+  // ── Fetch students for this school ────────────────────────
   const { data, error } = await supabaseAdmin
     .from('students')
     .select('*')
     .eq('school_id', ctx.schoolId)
     .is('archived_at', null)
-    .order('last_name', { ascending: true })
+    .order('last_name',  { ascending: true })
     .order('first_name', { ascending: true })
 
   if (error) console.error('[Dashboard] Failed to fetch students', error)
@@ -87,51 +80,12 @@ export default async function DashboardPage() {
   )
 
   return (
-    <>
-      {/* Ambient desk props — candles fixed to viewport edges */}
-      <img src="/images/candle.png" className="db-candle db-candle-left"  alt="" aria-hidden="true" />
-      <img src="/images/candle.png" className="db-candle db-candle-right" alt="" aria-hidden="true" />
-
-      <div className="db-page">
-        <div className="db-book">
-
-          {/* Corner ornaments on the binding */}
-          <img src="/images/ornamant-edge-dashboard.png" className="db-corner db-corner-tl" alt="" aria-hidden="true" />
-          <img src="/images/ornamant-edge-dashboard.png" className="db-corner db-corner-tr" alt="" aria-hidden="true" />
-          <img src="/images/ornamant-edge-dashboard.png" className="db-corner db-corner-br" alt="" aria-hidden="true" />
-          <img src="/images/ornamant-edge-dashboard.png" className="db-corner db-corner-bl" alt="" aria-hidden="true" />
-
-          <div className="db-book-inner">
-            {/* Watermark overlays — parchment page decorations */}
-            <img src="/images/compass.png"          className="db-compass" alt="" aria-hidden="true" />
-            <img src="/images/star-of-david-seal.png" className="db-seal" alt="" aria-hidden="true" />
-
-            <PageHeader role={ctx.role}>
-              <AddStudentForm />
-            </PageHeader>
-
-            <main className="db-main">
-              <div className="db-official-badge">⊙ Official Record</div>
-              <h2 className="db-registry-title">Registry of Advanced Scholars</h2>
-              <div className="db-registry-rule" />
-              <p className="db-registry-sub">
-                Student records, academic progress, and portfolio archives for the current academic cycle.
-              </p>
-
-              {students.length === 0 ? (
-                <EmptyState />
-              ) : (
-                <div className="student-grid" style={{ display: 'grid', gap: '1.5rem' }}>
-                  {students.map((s) => (
-                    <StudentCard key={s.id} student={s} role={ctx.role} />
-                  ))}
-                </div>
-              )}
-            </main>
-          </div>
-
+    <div className="db-page">
+      <div className="db-book">
+        <div className="db-book-inner">
+          <DashboardClient students={students} role={ctx.role} />
         </div>
       </div>
-    </>
+    </div>
   )
 }

@@ -44,9 +44,6 @@ export default function DeleteStudentButton({ studentId }: { studentId: string }
     return (
       <div
         style={{
-          marginTop: '0.75rem',
-          paddingTop: '0.75rem',
-          borderTop: '1px solid var(--rule)',
           display: 'flex',
           gap: '0.5rem',
           alignItems: 'center',
@@ -105,7 +102,6 @@ export default function DeleteStudentButton({ studentId }: { studentId: string }
 
   return (
     <div
-      style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--rule)' }}
       onClick={(e) => e.preventDefault()}
     >
       {error && (

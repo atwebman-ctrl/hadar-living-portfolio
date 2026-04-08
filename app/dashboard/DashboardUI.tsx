@@ -61,7 +61,6 @@ export function PageHeader({
     <header
       className="db-header"
       style={{
-        // db-header class supplies background texture; inline values for layout
         padding: '1.5rem 2rem',
         display: 'flex',
         alignItems: 'center',
@@ -86,7 +85,7 @@ export function PageHeader({
             fontFamily: "'Cormorant Garamond', 'EB Garamond', Georgia, serif",
             fontStyle:  'italic',
             fontSize:   '1.75rem',
-            color:      '#e8d9b0',
+            color:      INK,
             margin:     0,
           }}
         >
@@ -102,21 +101,19 @@ export function StudentCard({ student, role }: { student: Student; role: string 
   const canArchive = (role === 'admin' || role === 'teacher') && !student.isDemo
   return (
     <article className="db-student-card">
-      {/* Brass clip centered above the card */}
-      <img src="/images/clip.png" className="db-card-clip" alt="" aria-hidden="true" />
-
       <Link href={`/portfolio/${student.id}`} style={{ textDecoration: 'none', display: 'block' }}>
         <div
           style={{
             borderBottom: '1px solid rgba(160,130,80,0.3)',
-            paddingBottom: '0.75rem',
-            marginBottom:  '0.75rem',
+            paddingBottom: '0.85rem',
+            marginBottom:  '0.85rem',
           }}
         >
           <h2
             style={{
               fontFamily: "'Cormorant Garamond', 'EB Garamond', Georgia, serif",
-              fontSize:   '1.25rem',
+              fontWeight: 700,
+              fontSize:   '1.375rem',
               color:      INK,
               margin:     0,
               lineHeight: 1.2,
@@ -148,24 +145,32 @@ export function StudentCard({ student, role }: { student: Student; role: string 
         </dl>
         <p
           style={{
-            marginTop:  '1rem',
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontStyle:  'italic',
-            fontSize:   '0.95rem',
-            color:      GOLD,
+            marginTop:      '1.25rem',
+            fontFamily:     "'Cormorant Garamond', Georgia, serif",
+            fontStyle:      'italic',
+            fontSize:       '1.05rem',
+            color:          GOLD,
+            textDecoration: 'underline',
+            textDecorationColor: 'rgba(184,160,80,0.5)',
+            textUnderlineOffset: '3px',
           }}
         >
           View Portfolio →
         </p>
       </Link>
-      {canArchive && <DeleteStudentButton studentId={student.id} />}
+
+      {canArchive && (
+        <div style={{ position: 'absolute', bottom: '0.65rem', right: '0.75rem', zIndex: 2 }}>
+          <DeleteStudentButton studentId={student.id} />
+        </div>
+      )}
     </article>
   )
 }
 
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.2rem' }}>
+    <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.35rem' }}>
       <dt
         style={{
           fontFamily:    'var(--font-mono)',
@@ -174,7 +179,7 @@ function MetaRow({ label, value }: { label: string; value: string }) {
           textTransform: 'uppercase',
           color:         SEPIA,
           minWidth:      '3.5rem',
-          paddingTop:    '0.1rem',
+          paddingTop:    '0.15rem',
         }}
       >
         {label}
@@ -182,7 +187,7 @@ function MetaRow({ label, value }: { label: string; value: string }) {
       <dd
         style={{
           fontFamily: "'EB Garamond', Georgia, serif",
-          fontSize:   '0.95rem',
+          fontSize:   '1rem',
           color:      INK,
           margin:     0,
         }}

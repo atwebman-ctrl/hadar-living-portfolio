@@ -64,7 +64,7 @@ export default function AddStudentForm() {
     <>
       <button
         onClick={() => setOpen(true)}
-        style={{ ...S.btn, color: 'var(--gold-pale)', background: 'transparent', border: '1px solid var(--gold)' }}
+        className="db-add-btn"
       >
         + Add Student
       </button>
