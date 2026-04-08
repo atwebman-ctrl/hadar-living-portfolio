@@ -315,6 +315,27 @@ export const InviteParentSchema = z.object({
 
 export type InviteParentInput = z.infer<typeof InviteParentSchema>;
 
+// ── Student videos (0008 migration) ──────────────────────────
+
+const studentVideoCategoryEnum = z.enum([
+  'hebrew_speaking',
+  'poetry_recitation',
+  'socratic_reflection',
+  'immersion',
+  'other',
+]);
+
+/** Body for POST /api/dashboard/students/[studentId]/videos */
+export const CreateStudentVideoBodySchema = z.object({
+  title:      nonEmptyString,
+  videoUrl:   z.string().url('Must be a valid URL (https://...)'),
+  gradeLevel: nonEmptyString,
+  term:       nonEmptyString,
+  category:   studentVideoCategoryEnum,
+});
+
+export type CreateStudentVideoBodyInput = z.infer<typeof CreateStudentVideoBodySchema>;
+
 // ── Book catalog ──────────────────────────────────────────────
 
 export const CreateBookCatalogSchema = z.object({

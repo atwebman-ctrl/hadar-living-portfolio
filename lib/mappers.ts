@@ -24,6 +24,7 @@ import type {
   SubjectProgress,
   SectionType,
   ThemeConfig,
+  StudentVideo,
 } from "./types";
 
 type Row = Record<string, unknown>;
@@ -219,6 +220,20 @@ export function mapScopeAndSequence(row: Row): SubjectProgress {
     unit:          (row.unit as string) ?? null,
     completionPct: row.completion_pct as number,
     notes:         (row.notes as string) ?? null,
+  };
+}
+
+export function mapStudentVideo(row: Row): StudentVideo {
+  return {
+    id:         row.id as string,
+    schoolId:   row.school_id as string,
+    studentId:  row.student_id as string,
+    title:      row.title as string,
+    videoUrl:   row.video_url as string,
+    gradeLevel: row.grade_level as string,
+    term:       row.term as string,
+    category:   row.category as StudentVideo['category'],
+    createdAt:  row.created_at as string,
   };
 }
 

@@ -103,7 +103,12 @@ export default async function PortfolioPage({ params }: Props) {
           role={role}
           existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'writing')}
         />
-        <RhetoricRoom videos={portfolio.videos} />
+        <RhetoricRoom
+          videos={portfolio.videos}
+          studentVideos={portfolio.studentVideos}
+          studentId={studentId}
+          role={role}
+        />
         <CharacterArc
           characterAwards={portfolio.characterAwards}
           studentId={studentId}

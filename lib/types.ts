@@ -268,6 +268,28 @@ export interface PortfolioData {
   scopeAndSequence: SubjectProgress[];
   teacherNotes: TeacherNote[];
   aiDrafts: AiDraft[];  // only accepted drafts in parent view
+  studentVideos: StudentVideo[];
+}
+
+// ── Student videos (0008 migration) ──────────────────────────
+
+export type StudentVideoCategory =
+  | 'hebrew_speaking'
+  | 'poetry_recitation'
+  | 'socratic_reflection'
+  | 'immersion'
+  | 'other';
+
+export interface StudentVideo {
+  id: string;
+  schoolId: string;
+  studentId: string;
+  title: string;
+  videoUrl: string;
+  gradeLevel: string;
+  term: string;
+  category: StudentVideoCategory;
+  createdAt: string;
 }
 
 // ── Book catalog ──────────────────────────────────────────────

@@ -29,6 +29,7 @@ import {
   mapTeacherNote,
   mapScopeAndSequence,
   mapAiDraft,
+  mapStudentVideo,
 } from "./mappers";
 
 // Wraps a Supabase query and returns an empty array on error instead
@@ -80,6 +81,7 @@ export async function getStudentPortfolio(
     teacherNoteRows,
     scopeRows,
     aiDraftRows,
+    studentVideoRows,
   ] = await Promise.all([
     safeQuery(() =>
       supabaseAdmin
@@ -172,6 +174,15 @@ export async function getStudentPortfolio(
         .eq("school_id", schoolId)
         .eq("status", "accepted")
     ),
+    // student_videos: 0008 migration — safeQuery returns [] until migration lands.
+    safeQuery(() =>
+      supabaseAdmin
+        .from("student_videos")
+        .select("*")
+        .eq("student_id", studentId)
+        .eq("school_id", schoolId)
+        .order("created_at", { ascending: true })
+    ),
   ]);
 
   type Row = Record<string, unknown>;
@@ -191,5 +202,6 @@ export async function getStudentPortfolio(
     scopeAndSequence: scopeRows.map((r) => mapScopeAndSequence(r as Row)),
     teacherNotes: teacherNoteRows.map((r) => mapTeacherNote(r as Row)),
     aiDrafts: aiDraftRows.map((r) => mapAiDraft(r as Row)),
+    studentVideos: studentVideoRows.map((r) => mapStudentVideo(r as Row)),
   };
 }
