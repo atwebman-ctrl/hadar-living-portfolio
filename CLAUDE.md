@@ -43,6 +43,9 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - All chart components accept typed `data` prop — no inline data
 
 ### Data
+- **Grade levels are a closed enum** — always `GRADE_LEVELS` from `lib/gradeLevel.ts` ('pre-k','k','1'…'12'). DB column is `grade_level text CHECK (...)`. Zod schema uses `z.enum([...GRADE_LEVELS])`. All UI dropdowns use `GRADE_SELECT_OPTIONS`. Never accept free-text grade input.
+- **Term fields are always `<select>` dropdowns** — import `TERM_OPTIONS` from `lib/constants.ts`; never free-text. All inline forms (InlineAssessmentForm, InlineAvantForm, InlineVideoForm, InlineWritingForm, InlineCharacterForm, AssessmentForm) use this.
+- **Academic year fields use `pattern="\d{4}-\d{4}"`** — enforced on all forms via HTML pattern attribute.
 - **Zod v4 strict UUID validation** — `z.string().uuid()` in Zod v4 enforces RFC 4122 (version nibble 1–5, variant nibble 8/9/a/b). All fixed/seed UUIDs must be real v4 UUIDs. The Hadar school UUID is `a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d`.
 
 ### Tooling
@@ -100,13 +103,21 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `lib/supabaseAdmin.ts` — Server-side admin client (service role key — API routes only)
 - `lib/getStudentPortfolio.ts` — Single data-fetch entry point
 - `lib/auth.ts` — Clerk helpers: getSchoolId(), getRole(), getAuthContext(), requireRole()
-- `lib/validation.ts` — Zod schemas for all API route inputs
+- `lib/validation.ts` — Zod schemas for all API route inputs; `gradeLevel` uses `z.enum([...GRADE_LEVELS])` — must match `lib/gradeLevel.ts`
+- `lib/gradeLevel.ts` — `GRADE_LEVELS` const array, `GradeLevel` type, `formatGrade()`, `sortGrades()`, `GRADE_SELECT_OPTIONS`; single source of truth for grade enum
+- `lib/constants.ts` — Re-exports `GRADE_SELECT_OPTIONS` from `lib/gradeLevel`; defines `TERM_OPTIONS` ('Fall 2024'–'Spring 2026') and `TermOption` type; **all forms import from here — never hardcode term strings**
 - `proxy.ts` — Clerk middleware (Next.js 16); protects /dashboard, /admin, /portfolio; userId-only check (org not required) so OrgPickerScreen handles no-org case
-- `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies, 0004 Sprint 3 tables, 0005 parent_students, 0006 student archived_at, 0007 book_catalog
+- `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies, 0004 Sprint 3 tables, 0005 parent_students, 0006 student archived_at, 0007 book_catalog, 0010 grade_level_enum (renames old column to grade_level_legacy, adds constrained grade_level text column)
 - `design-reference/` — Target aesthetic HTML files (landing.html, hadar-portfolio.html)
 - `app/dashboard/page.tsx` — Teacher/admin student list; parent redirect (OR filter on parent_clerk_user_id + invited_email); server component
 - `app/dashboard/DashboardUI.tsx` — Presentational sub-components: OrgPickerScreen, ParentPendingScreen, PageHeader, StudentCard, EmptyState
-- `app/dashboard/AddStudentForm.tsx` — Client component modal form; POSTs to /api/dashboard/students
+- `app/dashboard/AddStudentForm.tsx` — Client component modal form; POSTs to /api/dashboard/students; gradeLevel is a `<select>` using `GRADE_SELECT_OPTIONS`
+- `app/dashboard/DashboardClient.tsx` — `'use client'` wrapper; owns `activeView: DashboardView` state; renders sidebar + conditional view components
+- `app/dashboard/DashboardSidebar.tsx` — Sidebar nav (Student Rosters, By Grade, Year in Review, Settings); Settings admin-only
+- `app/dashboard/StudentGrid.tsx` — Grade filter pills + search; groups/sorts via `formatGrade`/`sortGrades`
+- `components/dashboard/ByGradeView.tsx` — Collapsible per-grade sections; sorted with `sortGrades()`
+- `components/dashboard/YearInReviewView.tsx` — Placeholder
+- `components/dashboard/SettingsView.tsx` — Admin-only placeholder
 - `app/not-found.tsx` — Styled 404 page using design system tokens
 - `app/admin/page.tsx` — Admin-only school settings overview; Sprint 3 placeholders for Teachers + Theme
 - `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio; passes school.name + student name to SideNav
