@@ -1,0 +1,213 @@
+/* ============================================================
+   BookSplash.css — 3D book-opening splash animation
+   All colour values via :root tokens in globals.css.
+   ============================================================ */
+
+/* ── Overlay ─────────────────────────────────────────────── */
+.bs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--navy-deep);
+  transition: background-color 0.8s ease, opacity 0.6s ease;
+  pointer-events: all;
+}
+
+/* Phase: parchment fills as book reveals inside */
+.bs-opened {
+  background-color: var(--parchment);
+}
+
+/* Phase: fade out to reveal landing content */
+.bs-fading {
+  background-color: var(--parchment);
+  opacity: 0;
+}
+
+/* ── 3D Scene container ──────────────────────────────────── */
+.bs-scene {
+  perspective: 1400px;
+  perspective-origin: 55% 48%;
+}
+
+/* ── Book wrapper ─────────────────────────────────────────── */
+.bs-book {
+  position: relative;
+  width: 280px;
+  height: 396px;
+  transform: rotateX(5deg);
+  transform-style: preserve-3d;
+  transition: opacity 0.5s ease;
+}
+
+.bs-opened .bs-book,
+.bs-fading  .bs-book {
+  opacity: 0;
+}
+
+/* ── Inside page (parchment — always under the cover) ────── */
+.bs-inside {
+  position: absolute;
+  inset: 0;
+  background-color: var(--parchment);
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(248,241,212,0.9) 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 80%, rgba(196,154,42,0.06) 0%, transparent 45%);
+  border-left: 6px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bs-inside-frame {
+  position: relative;
+  width: calc(100% - 32px);
+  height: calc(100% - 32px);
+  border: 1px solid rgba(196, 154, 42, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.bs-inside-heb {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 2.2rem;
+  color: var(--gold);
+  direction: rtl;
+  margin: 0;
+  letter-spacing: 0.08em;
+}
+
+.bs-inside-welcome {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0;
+}
+
+/* ── Cover (navy — rotates open on Y axis) ───────────────── */
+.bs-cover {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform: rotateY(0deg);
+  transition: transform 1.5s cubic-bezier(0.42, 0, 0.2, 1);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background-color: var(--navy-deep);
+  border: 2px solid var(--gold);
+}
+
+.bs-cover--open {
+  transform: rotateY(-170deg);
+}
+
+/* Cover inner frame */
+.bs-cover-frame {
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(196, 154, 42, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+/* Cover typography */
+.bs-cover-heb {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.4rem;
+  color: var(--gold-pale);
+  direction: rtl;
+  margin: 0;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+.bs-cover-name {
+  font-family: var(--font-cinzel), var(--font-playfair), Georgia, serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gold-pale);
+  margin: 0;
+  letter-spacing: 0.18em;
+  text-align: center;
+  line-height: 1;
+  /* subtle gold shimmer */
+  background: linear-gradient(
+    90deg,
+    var(--gold-pale) 0%,
+    var(--gold-bright) 48%,
+    var(--gold-pale) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: bs-shimmer 3s linear infinite;
+}
+
+.bs-cover-sub {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin: 0;
+  text-align: center;
+}
+
+.bs-cover-rule {
+  width: 56px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.65;
+}
+
+.bs-cover-tagline {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin: 0;
+  opacity: 0.75;
+}
+
+/* ── Corner gem ornaments ────────────────────────────────── */
+.bs-corner-gem {
+  position: absolute;
+  font-size: 7px;
+  color: var(--gold);
+  opacity: 0.9;
+  line-height: 1;
+}
+.bs-corner-gem.tl { top: 6px;    left: 6px;   }
+.bs-corner-gem.tr { top: 6px;    right: 6px;  }
+.bs-corner-gem.bl { bottom: 6px; left: 6px;   }
+.bs-corner-gem.br { bottom: 6px; right: 6px;  }
+
+/* ── Shimmer keyframe ─────────────────────────────────────── */
+@keyframes bs-shimmer {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ── Accessibility: reduced motion ───────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .bs-overlay,
+  .bs-book,
+  .bs-cover,
+  .bs-cover-name {
+    transition: none;
+    animation: none;
+  }
+}
