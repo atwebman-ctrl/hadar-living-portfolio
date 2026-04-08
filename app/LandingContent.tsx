@@ -1,14 +1,79 @@
+'use client'
+
 // ============================================================
 // app/LandingContent.tsx
-// Static landing page markup — extracted from page.tsx so
-// LandingShell can render it independently of the splash state.
+// Landing page markup — rendered inside LandingShell so the
+// splash state is managed separately. 'use client' is required
+// because the embedded Clerk <SignIn> component is client-only.
 // ============================================================
 
-import Link from 'next/link';
-import './styles/landing-layout.css';
-import './styles/landing-left-panel.css';
-import './styles/landing-right-panel.css';
-import './styles/landing-mobile.css';
+import Link from 'next/link'
+import { SignIn } from '@clerk/nextjs'
+import './styles/landing-layout.css'
+import './styles/landing-left-panel.css'
+import './styles/landing-right-panel.css'
+import './styles/landing-mobile.css'
+
+// Clerk appearance overrides — strip Clerk's own card chrome so
+// the component sits cleanly inside our .signin-card wrapper.
+const clerkAppearance = {
+  elements: {
+    rootBox:        { width: '100%' },
+    card:           { boxShadow: 'none', background: 'transparent', border: 'none', padding: 0, margin: 0, gap: 0 },
+    headerTitle:    { display: 'none' },
+    headerSubtitle: { display: 'none' },
+    header:         { display: 'none' },
+    footer:         { display: 'none' },
+    socialButtonsBlockButton: {
+      border:      '1px solid var(--lapis)',
+      background:  'transparent',
+      color:       'var(--lapis)',
+      borderRadius: 0,
+    },
+    formFieldLabel: {
+      fontFamily:    "'DM Mono', monospace",
+      fontSize:      '0.62rem',
+      letterSpacing: '0.1em',
+      textTransform: 'uppercase' as const,
+      color:         'var(--lapis)',
+    },
+    formFieldInput: {
+      background:  'rgba(255,255,255,0.07)',
+      border:      '1px solid rgba(255,255,255,0.15)',
+      borderRadius: 0,
+      color:       '#fff',
+      fontFamily:  "'EB Garamond', Georgia, serif",
+      fontSize:    '0.95rem',
+    },
+    formButtonPrimary: {
+      background:   'transparent',
+      border:       '1px solid var(--gold)',
+      borderRadius: 0,
+      color:        'var(--gold)',
+      fontFamily:   "'DM Mono', monospace",
+      fontSize:     '0.65rem',
+      letterSpacing:'0.12em',
+      textTransform:'uppercase' as const,
+      boxShadow:    'none',
+    },
+    dividerLine:   { background: 'rgba(255,255,255,0.15)' },
+    dividerText:   { color: 'rgba(255,255,255,0.4)', fontFamily: "'DM Mono', monospace", fontSize: '0.6rem' },
+    identityPreviewText:   { color: '#fff' },
+    identityPreviewEditButton: { color: 'var(--gold)' },
+    alternativeMethodsBlockButton: {
+      border:       '1px solid rgba(255,255,255,0.2)',
+      borderRadius: 0,
+      color:        'rgba(255,255,255,0.75)',
+    },
+    formResendCodeLink: { color: 'var(--gold)' },
+    otpCodeFieldInput: {
+      border:       '1px solid rgba(255,255,255,0.2)',
+      borderRadius: 0,
+      color:        '#fff',
+      background:   'rgba(255,255,255,0.07)',
+    },
+  },
+}
 
 export default function LandingContent() {
   return (
@@ -75,22 +140,11 @@ export default function LandingContent() {
           <span className="card-corner bl">✦</span>
           <span className="card-corner br">✦</span>
 
-          <div className="input-group">
-            <label className="input-label">Email address</label>
-            <input type="email" className="input-field" placeholder="your@email.com" />
-          </div>
-          <div className="input-group">
-            <label className="input-label">Password</label>
-            <input type="password" className="input-field" placeholder="············" />
-          </div>
-
-          <button className="signin-btn">
-            <span className="btn-corner tl">✦</span>
-            <span className="btn-corner tr">✦</span>
-            <span className="btn-corner bl">✦</span>
-            <span className="btn-corner br">✦</span>
-            Enter the Portfolio
-          </button>
+          {/* Clerk sign-in — card chrome suppressed via appearance prop */}
+          <SignIn
+            routing="hash"
+            appearance={clerkAppearance}
+          />
 
           <div className="signin-divider">
             <div className="signin-divider-line" />
@@ -101,10 +155,6 @@ export default function LandingContent() {
           <Link href="/demo" className="demo-btn">
             View sample portfolio — Athena L.
           </Link>
-
-          <div className="signin-footer">
-            First time? <a href="#">Request access</a> &nbsp;·&nbsp; <a href="#">Forgot password</a>
-          </div>
         </div>
 
         <div className="pull-quote" style={{ position: 'relative', zIndex: 1 }}>
@@ -117,5 +167,5 @@ export default function LandingContent() {
       </div>
 
     </div>
-  );
+  )
 }
