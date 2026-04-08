@@ -32,6 +32,16 @@ import {
   mapStudentVideo,
 } from "./mappers";
 
+const STORAGE_BUCKET = 'portfolio-assets'
+
+// Compute the public URL for a storage path. Synchronous — no network
+// call. Requires the portfolio-assets bucket to be set to public in
+// the Supabase dashboard (Storage → Policies → Public bucket).
+function storagePublicUrl(path: string | null): string | null {
+  if (!path) return null
+  return supabaseAdmin.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl
+}
+
 // Wraps a Supabase query and returns an empty array on error instead
 // of throwing, so a missing Sprint-3 table doesn't crash the whole fetch.
 async function safeQuery<T>(
@@ -193,11 +203,20 @@ export async function getStudentPortfolio(
     assessments: assessmentRows.map((r) => mapAssessment(r as Row)),
     readings: readingRows.map((r) => mapReading(r as Row)),
     writingSamples: writingSampleRows.map((r) => mapWritingSample(r as Row)),
-    handwritingSamples: handwritingRows.map((r) => mapHandwritingSample(r as Row)),
+    handwritingSamples: handwritingRows.map((r) => {
+      const s = mapHandwritingSample(r as Row)
+      return { ...s, publicUrl: storagePublicUrl(s.imagePath) }
+    }),
     videos: videoRows.map((r) => mapVideo(r as Row)),
     characterAwards: characterAwardRows.map((r) => mapCharacterAward(r as Row)),
-    photos: photoRows.map((r) => mapPhoto(r as Row)),
-    parentUploads: parentUploadRows.map((r) => mapParentUpload(r as Row)),
+    photos: photoRows.map((r) => {
+      const p = mapPhoto(r as Row)
+      return { ...p, publicUrl: storagePublicUrl(p.storagePath) }
+    }),
+    parentUploads: parentUploadRows.map((r) => {
+      const u = mapParentUpload(r as Row)
+      return { ...u, publicUrl: storagePublicUrl(u.storagePath) }
+    }),
     teachers: [],
     scopeAndSequence: scopeRows.map((r) => mapScopeAndSequence(r as Row)),
     teacherNotes: teacherNoteRows.map((r) => mapTeacherNote(r as Row)),

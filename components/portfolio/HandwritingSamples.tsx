@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import type { HandwritingSample } from '@/lib/types'
 import UploadButton from '@/components/shared/UploadButton'
 
@@ -14,13 +13,12 @@ interface Props {
 
 // Demo fallback — three placeholder samples
 const DEMO_SAMPLES = [
-  { id: '1', term: 'Fall 2025',   gradeLabel: 'Grade 3', notes: 'Cursive introduction — consistent letter height observed.' },
-  { id: '2', term: 'Winter 2026', gradeLabel: 'Grade 3', notes: 'Improved spacing and word separation.' },
-  { id: '3', term: 'Spring 2026', gradeLabel: 'Grade 3', notes: null },
+  { id: '1', term: 'Fall 2025',   gradeLabel: 'Grade 3', notes: 'Cursive introduction — consistent letter height observed.', imageUrl: null },
+  { id: '2', term: 'Winter 2026', gradeLabel: 'Grade 3', notes: 'Improved spacing and word separation.',                    imageUrl: null },
+  { id: '3', term: 'Spring 2026', gradeLabel: 'Grade 3', notes: null,                                                       imageUrl: null },
 ]
 
 export default function HandwritingSamples({ samples, uploadEnabled, studentId, academicYear = '', gradeLevel = '' }: Props) {
-  const router  = useRouter()
   const hasData = !!samples && samples.length > 0
 
   return (
@@ -45,7 +43,6 @@ export default function HandwritingSamples({ samples, uploadEnabled, studentId, 
             gradeLevel={gradeLevel}
             accept="image/*"
             label="Upload Handwriting Sample"
-            onSuccess={() => router.refresh()}
           />
         </div>
       )}
@@ -57,7 +54,7 @@ export default function HandwritingSamples({ samples, uploadEnabled, studentId, 
                 key={s.id}
                 label={`${s.term} · ${s.academicYear}`}
                 notes={s.teacherNotes}
-                hasImage
+                imageUrl={s.publicUrl}
               />
             ))
           : DEMO_SAMPLES.map((s) => (
@@ -65,7 +62,7 @@ export default function HandwritingSamples({ samples, uploadEnabled, studentId, 
                 key={s.id}
                 label={`${s.term} · ${s.gradeLabel}`}
                 notes={s.notes}
-                hasImage={false}
+                imageUrl={s.imageUrl}
               />
             ))}
       </div>
@@ -73,28 +70,30 @@ export default function HandwritingSamples({ samples, uploadEnabled, studentId, 
   )
 }
 
-function SampleCard({ label, notes, hasImage }: { label: string; notes: string | null; hasImage: boolean }) {
+function SampleCard({ label, notes, imageUrl }: { label: string; notes: string | null; imageUrl: string | null }) {
   return (
     <div style={{ border: '1px solid var(--rule)', background: 'var(--parchment)' }}>
       {/* Image area */}
-      <div style={{
-        height: 180,
-        background: 'var(--cream-dark)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderBottom: '1px solid var(--rule)',
-      }}>
-        {hasImage ? (
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '.65rem', color: 'var(--ink-faint)', letterSpacing: '.1em', textTransform: 'uppercase' }}>
-            Image
-          </span>
-        ) : (
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={`Handwriting sample — ${label}`}
+          style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block', borderBottom: '1px solid var(--rule)' }}
+        />
+      ) : (
+        <div style={{
+          height: 180,
+          background: 'var(--cream-dark)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderBottom: '1px solid var(--rule)',
+        }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '.65rem', color: 'var(--ink-faint)', letterSpacing: '.1em', textTransform: 'uppercase' }}>
             Placeholder
           </span>
-        )}
-      </div>
+        </div>
+      )}
       {/* Metadata */}
       <div style={{ padding: '.75rem 1rem' }}>
         <p style={{ fontFamily: 'var(--font-mono)', fontSize: '.65rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--gold)', margin: '0 0 .35rem' }}>

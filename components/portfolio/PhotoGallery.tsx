@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import type { Photo } from '@/lib/types'
 import UploadButton from '@/components/shared/UploadButton'
 
@@ -13,19 +12,24 @@ interface Props {
 }
 
 const DEMO_PHOTOS = [
-  { id: '1', caption: 'Science fair project — life cycle diagram', gradeLevel: 'Grade 3', academicYear: '2025–26' },
-  { id: '2', caption: 'Purim play — Queen Esther costume',         gradeLevel: 'Grade 3', academicYear: '2025–26' },
-  { id: '3', caption: 'Classroom Shabbat celebration',             gradeLevel: 'Grade 3', academicYear: '2025–26' },
-  { id: '4', caption: 'Art exhibition — watercolor landscape',     gradeLevel: 'Grade 3', academicYear: '2025–26' },
-  { id: '5', caption: 'Field trip — natural history museum',       gradeLevel: 'Grade 3', academicYear: '2025–26' },
-  { id: '6', caption: 'Poetry recitation — school assembly',       gradeLevel: 'Grade 3', academicYear: '2025–26' },
+  { id: '1', caption: 'Science fair project — life cycle diagram', gradeLevel: 'Grade 3', academicYear: '2025–26', publicUrl: null },
+  { id: '2', caption: 'Purim play — Queen Esther costume',         gradeLevel: 'Grade 3', academicYear: '2025–26', publicUrl: null },
+  { id: '3', caption: 'Classroom Shabbat celebration',             gradeLevel: 'Grade 3', academicYear: '2025–26', publicUrl: null },
+  { id: '4', caption: 'Art exhibition — watercolor landscape',     gradeLevel: 'Grade 3', academicYear: '2025–26', publicUrl: null },
+  { id: '5', caption: 'Field trip — natural history museum',       gradeLevel: 'Grade 3', academicYear: '2025–26', publicUrl: null },
+  { id: '6', caption: 'Poetry recitation — school assembly',       gradeLevel: 'Grade 3', academicYear: '2025–26', publicUrl: null },
 ]
 
 export default function PhotoGallery({ photos, uploadEnabled, studentId, academicYear = '', gradeLevel = '' }: Props) {
-  const router  = useRouter()
   const hasData = !!photos && photos.length > 0
   const items   = hasData
-    ? photos!.map((p) => ({ id: p.id, caption: p.caption ?? '', gradeLevel: p.gradeLevel, academicYear: p.academicYear }))
+    ? photos!.map((p) => ({
+        id:          p.id,
+        caption:     p.caption ?? '',
+        gradeLevel:  p.gradeLevel,
+        academicYear:p.academicYear,
+        publicUrl:   p.publicUrl,
+      }))
     : DEMO_PHOTOS
 
   return (
@@ -50,7 +54,6 @@ export default function PhotoGallery({ photos, uploadEnabled, studentId, academi
             gradeLevel={gradeLevel}
             accept="image/*"
             label="Upload Photo"
-            onSuccess={() => router.refresh()}
           />
         </div>
       )}
@@ -58,19 +61,27 @@ export default function PhotoGallery({ photos, uploadEnabled, studentId, academi
       <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
         {items.map((p) => (
           <figure key={p.id} style={{ margin: 0, border: '1px solid var(--rule)', background: 'var(--parchment)' }}>
-            {/* Image placeholder */}
-            <div style={{
-              height: 160,
-              background: 'var(--cream-dark)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderBottom: '1px solid var(--rule)',
-            }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '.6rem', color: 'var(--ink-faint)', letterSpacing: '.1em', textTransform: 'uppercase' }}>
-                Photo
-              </span>
-            </div>
+            {/* Image area */}
+            {p.publicUrl ? (
+              <img
+                src={p.publicUrl}
+                alt={p.caption || 'Portfolio photo'}
+                style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }}
+              />
+            ) : (
+              <div style={{
+                height: 160,
+                background: 'var(--cream-dark)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderBottom: '1px solid var(--rule)',
+              }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '.6rem', color: 'var(--ink-faint)', letterSpacing: '.1em', textTransform: 'uppercase' }}>
+                  Photo
+                </span>
+              </div>
+            )}
             {/* Caption */}
             {p.caption && (
               <figcaption style={{ padding: '.6rem .75rem' }}>

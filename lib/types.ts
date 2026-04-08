@@ -142,6 +142,7 @@ export interface HandwritingSample {
   term: string;
   academicYear: string;
   createdAt: string;
+  publicUrl: string | null;
 }
 
 export interface Video {
@@ -181,6 +182,7 @@ export interface Photo {
   gradeLevel: string;
   academicYear: string;
   createdAt: string;
+  publicUrl: string | null;
 }
 
 export interface ParentUpload {
@@ -196,6 +198,7 @@ export interface ParentUpload {
   academicYear: string;
   uploadedBy: string;  // Clerk user ID of the parent
   createdAt: string;
+  publicUrl: string | null;
 }
 
 export interface Teacher {

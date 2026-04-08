@@ -118,15 +118,16 @@ export function mapWritingSample(row: Row): WritingSample {
 
 export function mapHandwritingSample(row: Row): HandwritingSample {
   return {
-    id: row.id as string,
-    schoolId: row.school_id as string,
-    studentId: row.student_id as string,
-    imagePath: row.image_path as string,
-    ocrText: (row.ocr_text as string) ?? null,
+    id:           row.id as string,
+    schoolId:     row.school_id as string,
+    studentId:    row.student_id as string,
+    imagePath:    row.image_path as string,
+    ocrText:      (row.ocr_text as string) ?? null,
     teacherNotes: (row.teacher_notes as string) ?? null,
-    term: row.term as string,
+    term:         row.term as string,
     academicYear: row.academic_year as string,
-    createdAt: row.created_at as string,
+    createdAt:    row.created_at as string,
+    publicUrl:    null, // set post-mapping in getStudentPortfolio
   };
 }
 
@@ -163,32 +164,34 @@ export function mapCharacterAward(row: Row): CharacterAward {
 
 export function mapPhoto(row: Row): Photo {
   return {
-    id: row.id as string,
-    schoolId: row.school_id as string,
-    studentId: row.student_id as string,
+    id:          row.id as string,
+    schoolId:    row.school_id as string,
+    studentId:   row.student_id as string,
     storagePath: row.storage_path as string,
-    caption: (row.caption as string) ?? null,
-    dateTaken: (row.date_taken as string) ?? null,
-    gradeLevel: row.grade_level as string,
-    academicYear: row.academic_year as string,
-    createdAt: row.created_at as string,
+    caption:     (row.caption as string) ?? null,
+    dateTaken:   (row.date_taken as string) ?? null,
+    gradeLevel:  row.grade_level as string,
+    academicYear:row.academic_year as string,
+    createdAt:   row.created_at as string,
+    publicUrl:   null, // set post-mapping in getStudentPortfolio
   };
 }
 
 export function mapParentUpload(row: Row): ParentUpload {
   return {
-    id: row.id as string,
-    schoolId: row.school_id as string,
-    studentId: row.student_id as string,
-    uploadType: row.upload_type as string,
-    title: row.title as string,
+    id:          row.id as string,
+    schoolId:    row.school_id as string,
+    studentId:   row.student_id as string,
+    uploadType:  row.upload_type as string,
+    title:       row.title as string,
     storagePath: row.storage_path as string,
     description: (row.description as string) ?? null,
-    date: (row.date as string) ?? null,
-    gradeLevel: row.grade_level as string,
-    academicYear: row.academic_year as string,
-    uploadedBy: row.uploaded_by as string,
-    createdAt: row.created_at as string,
+    date:        (row.date as string) ?? null,
+    gradeLevel:  row.grade_level as string,
+    academicYear:row.academic_year as string,
+    uploadedBy:  row.uploaded_by as string,
+    createdAt:   row.created_at as string,
+    publicUrl:   null, // set post-mapping in getStudentPortfolio
   };
 }
 

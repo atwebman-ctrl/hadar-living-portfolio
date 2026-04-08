@@ -20,6 +20,7 @@
 // ============================================================
 
 import { useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export type UploadType = 'photo' | 'handwriting' | 'parent_upload'
 
@@ -58,6 +59,7 @@ export default function UploadButton({
   onSuccess,
   onError,
 }: Props) {
+  const router          = useRouter()
   const inputRef        = useRef<HTMLInputElement>(null)
   const [status,  setStatus]  = useState<Status>('idle')
   const [progress, setProgress] = useState(0)
@@ -128,6 +130,7 @@ export default function UploadButton({
 
     setProgress(100)
     setStatus('success')
+    router.refresh()
     onSuccess?.(result.body)
   }
 
