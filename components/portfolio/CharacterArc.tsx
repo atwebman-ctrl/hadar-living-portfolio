@@ -1,5 +1,6 @@
 import type { CharacterAward, AiDraft, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
+import InlineCharacterForm from '@/components/portfolio/InlineCharacterForm'
 
 interface Props {
   characterAwards?: CharacterAward[]
@@ -148,6 +149,11 @@ export default function CharacterArc({ characterAwards, studentId, studentName, 
           existingDraft={existingDraft}
           draftContext={draftContext ?? {}}
         />
+      )}
+
+      {/* Inline data entry — admin/teacher only */}
+      {(role === 'admin' || role === 'teacher') && studentId && (
+        <InlineCharacterForm studentId={studentId} />
       )}
     </section>
   )

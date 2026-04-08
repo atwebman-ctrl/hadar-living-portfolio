@@ -199,6 +199,20 @@ export const CreateCharacterAwardSchema = z.object({
 
 export type CreateCharacterAwardInput = z.infer<typeof CreateCharacterAwardSchema>;
 
+/**
+ * Body for POST /api/dashboard/students/[studentId]/character-awards.
+ * Simplified form: awardName fills all three virtue columns server-side.
+ * award_date is derived from term + academicYear in the route handler.
+ */
+export const CreateCharacterAwardBodySchema = z.object({
+  awardName:    nonEmptyString,
+  description:  z.string().nullable().optional(),
+  term:         nonEmptyString,
+  academicYear,
+});
+
+export type CreateCharacterAwardBodyInput = z.infer<typeof CreateCharacterAwardBodySchema>;
+
 // ── Photos ────────────────────────────────────────────────────
 
 export const CreatePhotoSchema = z.object({
