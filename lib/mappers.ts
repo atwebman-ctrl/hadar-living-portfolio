@@ -96,18 +96,23 @@ export function mapReading(row: Row): Reading {
 
 export function mapWritingSample(row: Row): WritingSample {
   return {
-    id: row.id as string,
-    schoolId: row.school_id as string,
-    studentId: row.student_id as string,
-    language: row.language as WritingSample["language"],
-    gradeLevel: row.grade_level as string,
-    title: row.title as string,
-    body: (row.body as string) ?? null,
-    storagePath: (row.storage_path as string) ?? null,
-    imagePath: (row.image_path as string) ?? null,
-    ocrText: (row.ocr_text as string) ?? null,
-    academicYear: row.academic_year as string,
-    createdAt: row.created_at as string,
+    id:             row.id as string,
+    schoolId:       row.school_id as string,
+    studentId:      row.student_id as string,
+    language:       row.language as WritingSample["language"],
+    gradeLevel:     row.grade_level as string,
+    title:          row.title as string,
+    body:           (row.body as string) ?? null,
+    storagePath:    (row.storage_path as string) ?? null,
+    imagePath:      (row.image_path as string) ?? null,
+    ocrText:        (row.ocr_text as string) ?? null,
+    academicYear:   row.academic_year as string,
+    createdAt:      row.created_at as string,
+    genre:          (row.genre as string) ?? null,
+    excerpt:        (row.excerpt as string) ?? null,
+    teacherComments:(row.teacher_comments as string) ?? null,
+    term:           (row.term as string) ?? null,
+    filePath:       (row.file_path as string) ?? null,
   };
 }
 

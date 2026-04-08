@@ -1,23 +1,29 @@
 // ============================================================
-// app/api/dashboard/students/[studentId]/videos/route.ts
+// app/api/dashboard/students/[studentId]/writing-samples/route.ts
 //
-// POST /api/dashboard/students/[studentId]/videos
-//   Add a YouTube/Vimeo video link to a student's portfolio.
+// POST /api/dashboard/students/[studentId]/writing-samples
+//   Add a writing sample via the inline Creative Evolution form.
+//
+// Body fields (0009 columns):
+//   title, genre, excerpt (optional), teacherComments (optional),
+//   term, academicYear
+//
+// Server-side: language defaults to 'english'; grade_level is
+// looked up from the student record so the form doesn't need it.
+// school_id and student_id are always taken from auth/URL.
 //
 // Auth: Clerk session required. Role: admin or teacher.
-// school_id derived server-side — never from client input.
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth'
 import {
   validate,
-  CreateStudentVideoBodySchema,
-  type CreateStudentVideoBodyInput,
+  CreateWritingSampleBodySchema,
+  type CreateWritingSampleBodyInput,
   ValidationError,
-} from '@/lib/validationExtended'
+} from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
-import { mapStudentVideo } from '@/lib/mappers'
 import { authErrorResponse } from '@/lib/apiHelpers'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
@@ -36,10 +42,10 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     )
   }
 
-  // 2. Validate body
-  let input: CreateStudentVideoBodyInput
+  // 2. Validate
+  let input: CreateWritingSampleBodyInput
   try {
-    input = validate(CreateStudentVideoBodySchema, body)
+    input = validate(CreateWritingSampleBodySchema, body)
   } catch (err) {
     if (err instanceof ValidationError) {
       return NextResponse.json(
@@ -61,15 +67,15 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   if (ctx.role !== 'admin' && ctx.role !== 'teacher') {
     return NextResponse.json(
-      { error: 'Only admins and teachers can add videos.', code: 'FORBIDDEN' },
+      { error: 'Only admins and teachers can add writing samples.', code: 'FORBIDDEN' },
       { status: 403 },
     )
   }
 
-  // 4. Verify student belongs to the authenticated school
+  // 4. Verify student belongs to this school + fetch grade_level
   const { data: student, error: studentError } = await supabaseAdmin
     .from('students')
-    .select('id')
+    .select('id, grade_level')
     .eq('id', studentId)
     .eq('school_id', ctx.schoolId)
     .single()
@@ -81,31 +87,31 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     )
   }
 
-  // 5. Insert — school_id and student_id from server only
+  // 5. Insert — server-only fields: school_id, student_id, language, grade_level
   const { data, error: dbError } = await supabaseAdmin
-    .from('student_videos')
+    .from('writing_samples')
     .insert({
-      school_id:   ctx.schoolId,
-      student_id:  studentId,
-      title:       input.title,
-      video_url:   input.videoUrl,
-      grade_level: input.gradeLevel,
-      term:        input.term,
-      category:    input.category,
+      school_id:        ctx.schoolId,
+      student_id:       studentId,
+      language:         'english',
+      grade_level:      (student as { grade_level: string }).grade_level,
+      title:            input.title,
+      genre:            input.genre,
+      excerpt:          input.excerpt ?? null,
+      teacher_comments: input.teacherComments ?? null,
+      term:             input.term,
+      academic_year:    input.academicYear,
     })
     .select()
     .single()
 
   if (dbError || !data) {
-    console.error('[POST /api/dashboard/students/:id/videos]', dbError)
+    console.error('[POST /api/dashboard/students/:id/writing-samples]', dbError)
     return NextResponse.json(
-      { error: 'Failed to save video.', code: 'DB_ERROR' },
+      { error: 'Failed to save writing sample.', code: 'DB_ERROR' },
       { status: 500 },
     )
   }
 
-  return NextResponse.json(
-    mapStudentVideo(data as Record<string, unknown>),
-    { status: 201 },
-  )
+  return NextResponse.json(data, { status: 201 })
 }

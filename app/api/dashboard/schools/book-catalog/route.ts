@@ -14,7 +14,7 @@ import {
   CreateBookCatalogSchema,
   ValidationError,
   type CreateBookCatalogInput,
-} from '@/lib/validation'
+} from '@/lib/validationExtended'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { authErrorResponse } from '@/lib/apiHelpers'
 import type { BookCatalogEntry } from '@/lib/types'

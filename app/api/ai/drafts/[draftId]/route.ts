@@ -29,7 +29,7 @@ import {
   UpdateAiDraftSchema,
   type UpdateAiDraftInput,
   ValidationError,
-} from '@/lib/validation'
+} from '@/lib/validationExtended'
 import { authErrorResponse } from '@/lib/apiHelpers'
 
 type RouteContext = { params: Promise<{ draftId: string }> }

@@ -24,7 +24,7 @@ import {
   CreateAiDraftRequestSchema,
   type CreateAiDraftRequestInput,
   ValidationError,
-} from '@/lib/validation'
+} from '@/lib/validationExtended'
 import { authErrorResponse } from '@/lib/apiHelpers'
 
 // ── Prompt construction ───────────────────────────────────────

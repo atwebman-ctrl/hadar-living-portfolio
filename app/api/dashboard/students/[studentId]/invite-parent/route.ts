@@ -29,7 +29,7 @@ import {
   InviteParentSchema,
   ValidationError,
   type InviteParentInput,
-} from '@/lib/validation'
+} from '@/lib/validationExtended'
 import { authErrorResponse } from '@/lib/apiHelpers'
 
 type RouteContext = { params: Promise<{ studentId: string }> }

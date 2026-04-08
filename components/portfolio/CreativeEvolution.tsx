@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { WritingSample, AiDraft, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
+import InlineWritingForm from '@/components/portfolio/InlineWritingForm'
 
 interface Props {
   writingSamples?: WritingSample[]
@@ -135,6 +136,10 @@ export default function CreativeEvolution({ writingSamples, studentId, studentNa
           existingDraft={existingDraft}
           draftContext={draftContext ?? {}}
         />
+      )}
+
+      {(role === 'admin' || role === 'teacher') && studentId && (
+        <InlineWritingForm studentId={studentId} />
       )}
     </section>
   )

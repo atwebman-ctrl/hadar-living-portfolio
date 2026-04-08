@@ -124,6 +124,12 @@ export interface WritingSample {
   ocrText: string | null;    // AI-extracted transcription
   academicYear: string;
   createdAt: string;
+  // 0009 columns — nullable on rows pre-dating the migration
+  genre: string | null;
+  excerpt: string | null;
+  teacherComments: string | null;
+  term: string | null;
+  filePath: string | null;
 }
 
 export interface HandwritingSample {
