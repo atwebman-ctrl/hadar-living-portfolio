@@ -1,6 +1,7 @@
 import type { Assessment, AiDraft, UserRole } from '@/lib/types'
 import AvantChart, { type AvantDataPoint } from '@/components/charts/AvantChart'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
+import InlineAvantForm from '@/components/portfolio/InlineAvantForm'
 
 interface Props {
   assessments?:  Assessment[]
@@ -218,6 +219,10 @@ export default function ImmersionEngine({ assessments, studentId, studentName, r
         <BenchCard title="Reading — vs. national averages"   rows={readingRows} />
         <BenchCard title="Listening — vs. national averages" rows={listeningRows} />
       </div>
+
+      {(role === 'admin' || role === 'teacher') && studentId && (
+        <InlineAvantForm studentId={studentId} />
+      )}
     </section>
   )
 }
