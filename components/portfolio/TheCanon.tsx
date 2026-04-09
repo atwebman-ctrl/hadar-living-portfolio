@@ -7,6 +7,7 @@ import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import InlineReadingForm from '@/components/portfolio/InlineReadingForm'
 import BookDetail from '@/components/portfolio/BookDetail'
 import ReadingForm from '@/components/portfolio/ReadingForm'
+import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
 
 interface Props {
   readings?:      Reading[]
@@ -51,21 +52,6 @@ function toFields(r: Reading) {
     curriculumConnection: r.curriculumConnection ?? '', studentRating: r.studentRating ?? 0,
     whyChosen: r.whyChosen ?? '', keyQuote: r.keyQuote ?? '', teacherNotes: r.teacherNotes ?? '',
   }
-}
-
-// ── Modal overlay styles ──────────────────────────────────────
-
-const OVERLAY: React.CSSProperties = {
-  position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
-  zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
-}
-const MODAL: React.CSSProperties = {
-  background: 'var(--cream)', border: '1px solid var(--navy)',
-  width: '100%', maxWidth: 580, maxHeight: '88vh', display: 'flex', flexDirection: 'column',
-}
-const MODAL_HEADER: React.CSSProperties = {
-  background: 'var(--navy)', padding: '0.6rem 1.25rem',
-  display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0,
 }
 
 // ── Component ─────────────────────────────────────────────────
@@ -151,8 +137,8 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
 
       {/* ── Edit modal ─────────────────────────────────────── */}
       {editingReading && studentId && (
-        <div style={OVERLAY} onClick={() => setEditingReading(null)}>
-          <div style={MODAL} onClick={(e) => e.stopPropagation()}>
+        <div style={MODAL_OVERLAY} onClick={() => setEditingReading(null)}>
+          <div style={modalPanel(580)} onClick={(e) => e.stopPropagation()}>
             <div style={MODAL_HEADER}>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)' }}>
                 Edit Book

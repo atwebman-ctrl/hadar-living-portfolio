@@ -91,13 +91,14 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `components/portfolio/SubjectScoreRows.tsx` — Compact RIT/percentile score table; accepts `ScoreDisplayRow[]`; used by IntellectualArc for Math and ELA sub-sections
 - `components/portfolio/InlineAssessmentForm.tsx` — Inline data-entry form inside IntellectualArc; replaces TeacherDataPanel for assessment scores; POSTs to assessments API; calls `router.refresh()` on save
 - `components/portfolio/InlineReadingForm.tsx` — Inline data-entry form inside TheCanon; replaces TeacherDataPanel for reading list; "Add from catalog" opens BookCatalogPicker; calls `router.refresh()` on save
-- `components/portfolio/AssessmentForm.tsx` — Legacy TeacherDataPanel sub-form (retained but no longer rendered in main portfolio flow)
-- `components/portfolio/ReadingForm.tsx` — Legacy TeacherDataPanel sub-form (retained but no longer rendered in main portfolio flow)
-- `components/portfolio/TeacherDataPanel.tsx` — ⚠️ REMOVED from portfolio/demo renders; replaced by inline forms. Component file kept for reference but not used
+- `components/portfolio/ReadingForm.tsx` — Enhanced book intake form; used in edit-book modal inside TheCanon; 3 grouped sections (Book Info / Reading Details / Reflections); supports both POST (add) and PATCH (edit) modes via optional `readingId` + `initial` props
+- ~~`components/portfolio/TeacherDataPanel.tsx`~~ — Deleted (replaced by InlineAssessmentForm + InlineReadingForm)
+- `components/portfolio/BookDetail.tsx` — Accordion detail panel for a book entry in TheCanon; shows cover thumbnail (Open Library API) + all reading fields; hover-reveal Edit/Delete buttons for admin/teacher
+- `components/portfolio/StarRating.tsx` — 5-star click-to-rate input; gold filled vs outline; click same star again to clear; used in ReadingForm
 - `components/portfolio/BookCatalogPicker.tsx` — Modal overlay; fetches school book catalog, live search, auto-fills ReadingForm/InlineReadingForm title+author on selection
 - `components/portfolio/BookCatalogManager.tsx` — Book Catalog tab content; add-book form (title, author, gradeLevel) + paginated catalog list; school-scoped, no props needed
 - `components/splash/BookSplash.tsx` — Full-screen 3D CSS book-opening splash animation (navy cover → parchment reveal → fade); sessionStorage-gated (plays once per browser session); 9 unit tests
-- `components/charts/` — MapsChart (kept for compat, not rendered), AvantChart, MapPercentileChart
+- `components/charts/` — AvantChart, MapPercentileChart
 - `components/charts/MapPercentileChart.tsx` — NWEA MAP percentile band chart; 5 stacked teal area fills (p5/p25/p50/p75/p95); student dots navy/gold (latest); auto-scales grade range and y-axis; subject='math'|'reading'
 - `lib/nweaNorms.ts` — NWEA MAP Growth 2025 norm lookup (K–8, Math + Reading, fall/winter/spring); `getPercentileBands(subject, gradeRange)` returns p5–p95 via z-scores
 - `lib/types.ts` — Shared TypeScript types (all domain models; includes `BookCatalogEntry`)
@@ -106,6 +107,8 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `lib/supabaseAdmin.ts` — Server-side admin client (service role key — API routes only)
 - `lib/getStudentPortfolio.ts` — Single data-fetch entry point
 - `lib/auth.ts` — Clerk helpers: getSchoolId(), getRole(), getAuthContext(), requireRole()
+- `lib/utils.ts` — Shared utilities: `ordinal(n)` (1→"1st"), `latestAssessment(assessments, type)` (most recent by academicYear)
+- `lib/modalStyles.ts` — Shared modal style constants: `MODAL_OVERLAY`, `MODAL_HEADER`, `modalPanel(maxWidth, maxHeight)`
 - `lib/validation.ts` — Zod schemas for all API route inputs; `gradeLevel` uses `z.enum([...GRADE_LEVELS])` — must match `lib/gradeLevel.ts`
 - `lib/gradeLevel.ts` — `GRADE_LEVELS` const array, `GradeLevel` type, `formatGrade()`, `sortGrades()`, `GRADE_SELECT_OPTIONS`; single source of truth for grade enum
 - `lib/constants.ts` — Re-exports `GRADE_SELECT_OPTIONS` from `lib/gradeLevel`; defines `TERM_OPTIONS` ('Fall 2024'–'Spring 2026') and `TermOption` type; **all forms import from here — never hardcode term strings**
@@ -194,7 +197,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Dynamic `/admin` — admin-only school settings overview; teacher/parent redirected
 - [x] Sprint 3: Expand to full 12 sections — COMPLETE
   - [x] ScopeAndSequence, HandwritingSamples, PhotoGallery, TeacherNotes, ParentUploads, BookshelfAnimation components wired with real data
-  - [x] BookshelfAnimation removed from portfolio and demo renders — duplicate of The Canon; component file kept but not rendered
+  - [x] BookshelfAnimation removed from portfolio and demo renders — deleted (duplicate of The Canon)
   - [x] `supabase/migrations/0004_sprint3_tables.sql` — 5 new tables with RLS (apply to live DB)
   - [x] Seed updated with demo data for all Sprint 3 tables
   - [x] SideNav expanded to all 13 sections; Sprint 3 sections in DemoPortfolio
@@ -223,7 +226,7 @@ Items raised by Tayler after reviewing the live portfolio. Not yet scheduled to 
 - [x] **Book database** — `supabase/migrations/0007_book_catalog.sql`; `GET/POST /api/dashboard/schools/book-catalog`; `BookCatalogPicker` modal in ReadingForm auto-fills title+author; `BookCatalogManager` tab in TeacherDataPanel for adding/viewing catalog entries
 - [x] **Dynamic MAP percentile curves from NWEA 2025 norms** — `lib/nweaNorms.ts` (K–8 fall means + SDs, winter/spring offsets, z-score bands); `MapPercentileChart.tsx` (5 stacked teal area fills, student dots in navy/gold); replaces per-subject MapsChart in IntellectualArc; grade derived from student gradeLevel + academicYear offset
 - [x] **Book-opening splash animation** — `components/splash/BookSplash.tsx` + `BookSplash.css`; full-screen 3D CSS animation (navy illuminated-manuscript cover → rotateY open → parchment fill → fade); `app/LandingShell.tsx` checks `sessionStorage.splash_played` — plays once per session, skipped on repeat visits; 9 unit tests
-- [x] **Bookshelf nav link** — Confirmed removed: `SideNav.tsx` `navItems` array contains no `#bookshelf` entry. `BookshelfAnimation.tsx` component file retained for reference but not rendered anywhere.
+- [x] **Bookshelf nav link** — Removed: `SideNav.tsx` contains no `#bookshelf` entry. `BookshelfAnimation.tsx` deleted.
 - [ ] **Replace Lexile metric** — ⏳ BLOCKED: pending Karissa's input on preferred reading-level framework (Fountas & Pinnell, DRA, or narrative description). Lexile bar chart remains in place until decision.
 - [ ] **Scope and sequence from Lobel team** — ⏳ BLOCKED: Lobel team has not yet supplied curriculum scope and sequence content. ScopeAndSequence section shows placeholder/seed data. Build import or admin UI once format is confirmed.
 - [ ] **Load real Athena data** — Demo student currently uses hardcoded seed data; once DB is live, seed Athena's real assessment scores, readings, and samples so the demo portfolio reflects genuine student work

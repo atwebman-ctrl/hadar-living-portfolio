@@ -1,4 +1,5 @@
 import type { Student, SchoolConfig, Assessment } from '@/lib/types'
+import { ordinal, latestAssessment } from '@/lib/utils'
 
 interface Props {
   student?:      Student
@@ -39,41 +40,29 @@ function shortTerm(term: string): string {
   return `${mon[season] ?? season} '${year.slice(2)}`
 }
 
-function latest(assessments: Assessment[], type: Assessment['assessmentType']): Assessment | null {
-  return assessments
-    .filter((a) => a.assessmentType === type)
-    .sort((a, b) => b.academicYear.localeCompare(a.academicYear))[0] ?? null
-}
-
-function ordinal(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd']
-  const v = n % 100
-  return n + (s[(v - 20) % 10] ?? s[v] ?? s[0])
-}
-
 // ── Metric derivation ─────────────────────────────────────────
 
 interface Metric { lbl: string; val: string; gold: boolean; ctx: string }
 
 function deriveMetrics(assessments: Assessment[]): Metric[] {
-  const math = latest(assessments, 'maps_math')
+  const math = latestAssessment(assessments, 'maps_math')
   const mathMetric: Metric = math?.percentile != null
     ? { lbl: `Math — ${shortTerm(math.term)}`, val: ordinal(Math.round(math.percentile)), gold: math.percentile >= 90, ctx: math.ritScore != null ? `Percentile · RIT ${math.ritScore}` : 'Percentile' }
     : { lbl: 'Math', val: '—', gold: false, ctx: 'No data yet' }
 
-  const eng = latest(assessments, 'maps_english')
+  const eng = latestAssessment(assessments, 'maps_english')
   const engMetric: Metric = eng?.percentile != null
     ? { lbl: `English — ${shortTerm(eng.term)}`, val: ordinal(Math.round(eng.percentile)), gold: eng.percentile >= 90, ctx: eng.ritScore != null ? `Percentile · RIT ${eng.ritScore}` : 'Percentile' }
     : { lbl: 'English', val: '—', gold: false, ctx: 'No data yet' }
 
-  const lex = latest(assessments, 'lexile')
+  const lex = latestAssessment(assessments, 'lexile')
   const lexMetric: Metric = lex?.lexileValue
     ? { lbl: 'Reading Level', val: lex.lexileValue, gold: false, ctx: 'Lexile measure' }
     : { lbl: 'Reading Level', val: '—', gold: false, ctx: 'No data yet' }
 
   const avantTypes = ['avant_speaking', 'avant_reading', 'avant_listening', 'avant_writing'] as const
   const avantScores = avantTypes
-    .map((t) => latest(assessments, t))
+    .map((t) => latestAssessment(assessments, t))
     .filter((a): a is Assessment => a != null && a.score != null)
     .map((a) => a.score as number)
   const hebMetric: Metric = avantScores.length > 0

@@ -26,13 +26,6 @@ const lbl: React.CSSProperties = {
   textTransform: 'uppercase', color: 'var(--ink-light)', display: 'block', marginBottom: '0.25rem',
 }
 const grid2: React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }
-const sectionHead: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)', fontSize: '0.58rem', letterSpacing: '0.14em',
-  textTransform: 'uppercase', color: 'var(--ink-faint)',
-  borderBottom: '1px solid var(--rule)', paddingBottom: '0.35rem',
-  marginBottom: '0.75rem', marginTop: '1.25rem',
-}
-
 function Field({ label, children, wide }: { label: string; children: React.ReactNode; wide?: boolean }) {
   return (
     <div style={wide ? { gridColumn: '1 / -1', display: 'flex', flexDirection: 'column' } : { display: 'flex', flexDirection: 'column' }}>
@@ -140,7 +133,7 @@ export default function ReadingForm({ studentId, readingId, initial, onStatus, o
 
       <form onSubmit={handleSubmit}>
         {/* ── 1. Book info ─────────────────────────────────── */}
-        <p style={sectionHead}>Book Info</p>
+        <p className="form-section-head">Book Info</p>
         <div style={grid2}>
           <Field label="Title" wide>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -162,7 +155,7 @@ export default function ReadingForm({ studentId, readingId, initial, onStatus, o
         </div>
 
         {/* ── 2. Reading details ───────────────────────────── */}
-        <p style={sectionHead}>Reading Details</p>
+        <p className="form-section-head">Reading Details</p>
         <div style={grid2}>
           <Field label="Difficulty Level">
             <select value={fields.readingDifficulty} onChange={set('readingDifficulty')} style={inp}>
@@ -190,7 +183,7 @@ export default function ReadingForm({ studentId, readingId, initial, onStatus, o
         </div>
 
         {/* ── 3. Reflections ──────────────────────────────── */}
-        <p style={sectionHead}>Reflections</p>
+        <p className="form-section-head">Reflections</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <Field label="Why Chosen" wide>
             <textarea value={fields.whyChosen} onChange={set('whyChosen')} style={{ ...inp, resize: 'vertical', minHeight: '3.5rem' }} placeholder="Reason this book was selected…" />

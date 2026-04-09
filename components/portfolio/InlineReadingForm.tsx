@@ -12,6 +12,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ReadingForm from './ReadingForm'
 import BookCatalogManager from './BookCatalogManager'
+import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
 
 interface Props {
   studentId: string
@@ -30,21 +31,6 @@ const monoBtn = (variant: 'primary' | 'ghost'): React.CSSProperties => ({
   color:         variant === 'primary' ? 'var(--navy)' : 'var(--ink-light)',
   border:        variant === 'primary' ? '1px solid var(--navy)' : '1px solid var(--rule)',
 })
-
-const overlay: React.CSSProperties = {
-  position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
-  zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
-}
-
-const modalPanel: React.CSSProperties = {
-  background: 'var(--cream)', border: '1px solid var(--navy)',
-  width: '100%', maxWidth: 540, maxHeight: '85vh', display: 'flex', flexDirection: 'column',
-}
-
-const modalHeader: React.CSSProperties = {
-  background: 'var(--navy)', padding: '0.6rem 1.25rem',
-  display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0,
-}
 
 const statusBar = (type: 'success' | 'error'): React.CSSProperties => ({
   padding: '0.4rem 0.75rem', marginBottom: '0.75rem',
@@ -84,9 +70,9 @@ export default function InlineReadingForm({ studentId }: Props) {
 
       {/* Book catalog manager modal */}
       {catalogOpen && (
-        <div style={overlay} onClick={() => setCatalogOpen(false)}>
-          <div style={modalPanel} onClick={(e) => e.stopPropagation()}>
-            <div style={modalHeader}>
+        <div style={MODAL_OVERLAY} onClick={() => setCatalogOpen(false)}>
+          <div style={modalPanel(540, '85vh')} onClick={(e) => e.stopPropagation()}>
+            <div style={MODAL_HEADER}>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)' }}>
                 Book Catalog
               </span>

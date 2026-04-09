@@ -39,29 +39,9 @@ export default async function FullPortfolioPage({ params }: Props) {
         role={role}
       />
       {/* Back to overview */}
-      <div style={{
-        position:   'fixed',
-        top:        '1rem',
-        right:      '1.5rem',
-        zIndex:     100,
-      }}>
-        <a
-          href={`/portfolio/${studentId}`}
-          style={{
-            fontFamily:     'var(--font-mono)',
-            fontSize:       '0.65rem',
-            letterSpacing:  '0.08em',
-            textTransform:  'uppercase',
-            color:          'var(--ink-mid)',
-            textDecoration: 'none',
-            background:     'var(--cream)',
-            padding:        '0.35rem 0.7rem',
-            border:         '1px solid var(--rule)',
-          }}
-        >
-          ← Overview
-        </a>
-      </div>
+      <a href={`/portfolio/${studentId}`} className="overview-btn">
+        ← Overview
+      </a>
       <PortfolioClient portfolio={portfolio} studentId={studentId} role={role} />
     </>
   )

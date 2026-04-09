@@ -10,6 +10,7 @@
 
 import Link from 'next/link'
 import type { PortfolioData, Assessment } from '@/lib/types'
+import { ordinal, latestAssessment } from '@/lib/utils'
 
 interface Props {
   portfolio:    PortfolioData
@@ -18,17 +19,6 @@ interface Props {
 }
 
 // ── Helpers ───────────────────────────────────────────────────
-
-function latestA(assessments: Assessment[], type: string): Assessment | null {
-  return assessments
-    .filter((a) => a.assessmentType === type)
-    .sort((a, b) => b.academicYear.localeCompare(a.academicYear))[0] ?? null
-}
-
-function ord(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd'], v = n % 100
-  return n + (s[(v - 20) % 10] ?? s[v] ?? s[0])
-}
 
 function shortDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
@@ -49,15 +39,15 @@ interface CardDef {
 const SECTIONS: CardDef[] = [
   { num: 1, title: 'Intellectual Arc',   slug: 'intellectual-arc',   cta: 'See scores',
     build: (p) => {
-      const m = latestA(p.assessments, 'maps_math'), e = latestA(p.assessments, 'maps_english')
+      const m = latestAssessment(p.assessments, 'maps_math'), e = latestAssessment(p.assessments, 'maps_english')
       if (!m && !e) return { text: '', hasData: false }
-      const fmt = (a: Assessment | null) => a?.percentile != null ? ord(Math.round(a.percentile)) : '—'
+      const fmt = (a: Assessment | null) => a?.percentile != null ? ordinal(Math.round(a.percentile)) : '—'
       return { text: `Math: ${fmt(m)} · English: ${fmt(e)}`, hasData: true }
     } },
   { num: 2, title: 'Immersion Engine',   slug: 'immersion-engine',   cta: 'See scores',
     build: (p) => {
       const scores = (['avant_speaking','avant_reading','avant_listening','avant_writing'] as const)
-        .map((t) => latestA(p.assessments, t)).filter((a): a is Assessment => a?.score != null).map((a) => a.score!)
+        .map((t) => latestAssessment(p.assessments, t)).filter((a): a is Assessment => a?.score != null).map((a) => a.score!)
       if (!scores.length) return { text: '', hasData: false }
       return { text: `Hebrew: ${(scores.reduce((s,n) => s+n,0)/scores.length).toFixed(2)} composite`, hasData: true }
     } },

@@ -50,13 +50,12 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
 
   return (
     <div className="main">
-      <HeroSection student={student} school={school} assessments={assessments} />
-
-      {(role === 'admin' || role === 'teacher') && (
-        <div style={{ padding: '1rem 2rem 0', display: 'flex', justifyContent: 'flex-end' }}>
-          <InviteParentButton studentId={studentId} />
-        </div>
-      )}
+      <HeroSection
+        student={student}
+        school={school}
+        assessments={assessments}
+        inviteButton={(role === 'admin' || role === 'teacher') ? <InviteParentButton studentId={studentId} /> : undefined}
+      />
 
       <YearSelector years={years} selectedYear={selectedYear} onChange={setSelectedYear} />
 

@@ -173,19 +173,7 @@ export default function SectionDetailClient({
     <div className="main">
       {/* Back link */}
       <div style={{ padding: '1.5rem 2.5rem 0' }}>
-        <a
-          href={`/portfolio/${studentId}`}
-          style={{
-            fontFamily:     'var(--font-mono)',
-            fontSize:       '0.68rem',
-            letterSpacing:  '0.08em',
-            textTransform:  'uppercase',
-            color:          'var(--ink-mid)',
-            textDecoration: 'none',
-          }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--navy)')}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--ink-mid)')}
-        >
+        <a href={`/portfolio/${studentId}`} className="back-link">
           ← Back to Overview
         </a>
       </div>
