@@ -38,7 +38,7 @@ export default function StudentGrid({ students, role }: Props) {
     <>
       {/* Registry heading */}
       <div className="db-official-badge">⊙ Official Record</div>
-      <h2 className="db-registry-title">Registry of Advanced Scholars</h2>
+      <h2 className="db-registry-title">Student Registry</h2>
       <div className="db-registry-rule" />
       <p className="db-registry-sub">
         Student records, academic progress, and portfolio archives for the current academic cycle.

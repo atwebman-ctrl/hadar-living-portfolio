@@ -185,6 +185,10 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   if (input.parentUserIds !== undefined)    updates.parent_user_ids    = input.parentUserIds
   if (input.profilePhotoPath !== undefined) updates.profile_photo_path = input.profilePhotoPath
   if (input.summary !== undefined)          updates.summary            = input.summary
+  // 0011 profile fields
+  if (input.gender !== undefined)           updates.gender             = input.gender
+  if (input.dateOfBirth !== undefined)      updates.date_of_birth      = input.dateOfBirth
+  if (input.enrollmentStatus !== undefined) updates.enrollment_status  = input.enrollmentStatus
 
   // 5. Update — scoped to both studentId AND school_id
   const { data, error: dbError } = await supabaseAdmin

@@ -45,6 +45,10 @@ export function mapStudent(row: Row): Student {
     archivedAt: (row.archived_at as string) ?? null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
+    // 0011 profile fields — nullable on pre-migration rows
+    gender:           (row.gender as 'boy' | 'girl') ?? null,
+    dateOfBirth:      (row.date_of_birth as string) ?? null,
+    enrollmentStatus: (row.enrollment_status as Student['enrollmentStatus']) ?? 'active',
   };
 }
 

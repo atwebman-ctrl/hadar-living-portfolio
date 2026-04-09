@@ -77,6 +77,10 @@ export interface Student {
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  // 0011 profile fields
+  gender: 'boy' | 'girl' | null;
+  dateOfBirth: string | null;   // ISO date YYYY-MM-DD; never store age directly
+  enrollmentStatus: 'active' | 'withdrawn' | 'graduated' | 'transferred';
 }
 
 // ── Content tables ───────────────────────────────────────────

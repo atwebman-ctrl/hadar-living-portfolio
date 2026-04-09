@@ -11,7 +11,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { TERM_OPTIONS } from '@/lib/constants'
+import { TERM_OPTIONS, ACADEMIC_YEAR_OPTIONS } from '@/lib/constants'
 
 interface Props {
   studentId: string
@@ -194,16 +194,17 @@ export default function InlineAvantForm({ studentId }: Props) {
 
           <div style={fieldWrap}>
             <span style={lbl}>Academic Year</span>
-            <input
+            <select
               style={inputStyle}
-              type="text"
               required
               value={form.academicYear}
-              placeholder="e.g. 2025-2026"
-              pattern="\d{4}-\d{4}"
-              title="Format: YYYY-YYYY"
               onChange={(e) => update('academicYear', e.target.value)}
-            />
+            >
+              <option value="">Select year…</option>
+              {ACADEMIC_YEAR_OPTIONS.map((y) => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
           </div>
 
           <button style={submitBtn} type="submit" disabled={saving}>

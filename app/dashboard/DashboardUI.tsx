@@ -10,12 +10,23 @@ import { OrganizationSwitcher } from '@clerk/nextjs'
 import type { Student } from '@/lib/types'
 import { formatGrade } from '@/lib/gradeLevel'
 import DeleteStudentButton from '@/components/dashboard/DeleteStudentButton'
+import EditStudentForm from '@/components/dashboard/EditStudentForm'
 
 // Archival palette constants (referenced in inline styles)
 const GOLD   = '#B8A050'
 const INK    = '#2c1f0e'
 const SEPIA  = '#5a4a3a'
 const FAINT  = '#8a7558'
+
+function calcAge(dob: string | null): number | null {
+  if (!dob) return null
+  const born  = new Date(dob)
+  const today = new Date()
+  let age = today.getFullYear() - born.getFullYear()
+  const m = today.getMonth() - born.getMonth()
+  if (m < 0 || (m === 0 && today.getDate() < born.getDate())) age--
+  return age
+}
 
 export function OrgPickerScreen() {
   return (
@@ -86,7 +97,7 @@ export function PageHeader({
             fontFamily: "'Cormorant Garamond', 'EB Garamond', Georgia, serif",
             fontStyle:  'italic',
             fontSize:   '1.75rem',
-            color:      INK,
+            color:      '#F5EFE0',
             margin:     0,
           }}
         >
@@ -99,7 +110,9 @@ export function PageHeader({
 }
 
 export function StudentCard({ student, role }: { student: Student; role: string }) {
-  const canArchive = (role === 'admin' || role === 'teacher') && !student.isDemo
+  const canEdit    = role === 'admin' || role === 'teacher'
+  const canArchive = canEdit && !student.isDemo
+  const age = calcAge(student.dateOfBirth)
   return (
     <article className="db-student-card">
       <Link href={`/portfolio/${student.id}`} style={{ textDecoration: 'none', display: 'block' }}>
@@ -110,18 +123,38 @@ export function StudentCard({ student, role }: { student: Student; role: string 
             marginBottom:  '0.85rem',
           }}
         >
-          <h2
-            style={{
-              fontFamily: "'Cormorant Garamond', 'EB Garamond', Georgia, serif",
-              fontWeight: 700,
-              fontSize:   '1.375rem',
-              color:      INK,
-              margin:     0,
-              lineHeight: 1.2,
-            }}
-          >
-            {student.firstName} {student.lastName}
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
+            <h2
+              style={{
+                fontFamily: "'Cormorant Garamond', 'EB Garamond', Georgia, serif",
+                fontWeight: 700,
+                fontSize:   '1.375rem',
+                color:      INK,
+                margin:     0,
+                lineHeight: 1.2,
+              }}
+            >
+              {student.firstName} {student.lastName}
+            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+              {student.enrollmentStatus !== 'active' && (
+                <span style={{
+                  fontFamily:    'var(--font-mono)',
+                  fontSize:      '0.55rem',
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color:         '#92400e',
+                  background:    'rgba(251,191,36,0.15)',
+                  border:        '1px solid rgba(146,64,14,0.25)',
+                  padding:       '0.15rem 0.45rem',
+                  whiteSpace:    'nowrap',
+                }}>
+                  {student.enrollmentStatus}
+                </span>
+              )}
+              {canEdit && <EditStudentForm student={student} />}
+            </div>
+          </div>
           {student.isDemo && (
             <span
               style={{
@@ -143,6 +176,8 @@ export function StudentCard({ student, role }: { student: Student; role: string 
         <dl style={{ margin: 0 }}>
           <MetaRow label="Grade" value={formatGrade(student.gradeLevel)} />
           <MetaRow label="Year"  value={student.academicYear} />
+          {student.gender        && <MetaRow label="Gender" value={student.gender === 'boy' ? 'Boy' : 'Girl'} />}
+          {age !== null          && <MetaRow label="Age"    value={`Age ${age}`} />}
         </dl>
         <p
           style={{

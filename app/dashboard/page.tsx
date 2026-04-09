@@ -81,11 +81,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="db-page">
-      <div className="db-book">
-        <div className="db-book-inner">
-          <DashboardClient students={students} role={ctx.role} />
-        </div>
-      </div>
+      <DashboardClient students={students} role={ctx.role} />
     </div>
   )
 }

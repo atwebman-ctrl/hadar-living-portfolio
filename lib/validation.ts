@@ -35,6 +35,10 @@ export const CreateStudentSchema = z.object({
   profilePhotoPath: z.string().nullable().optional(),
   summary:          z.string().nullable().optional(),
   isDemo:           z.boolean().default(false),
+  // 0011 profile fields
+  gender:           z.enum(['boy', 'girl']).nullable().optional(),
+  dateOfBirth:      z.string().date().nullable().optional(),
+  enrollmentStatus: z.enum(['active', 'withdrawn', 'graduated', 'transferred']).default('active').optional(),
 });
 
 export const UpdateStudentSchema = CreateStudentSchema.partial();

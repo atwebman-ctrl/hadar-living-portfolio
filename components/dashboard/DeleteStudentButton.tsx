@@ -120,10 +120,10 @@ export default function DeleteStudentButton({ studentId }: { studentId: string }
         onClick={() => setConfirming(true)}
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.6rem',
+          fontSize: '10px',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          color: 'var(--ink-faint)',
+          color: 'rgba(139,115,85,0.3)',
           background: 'none',
           border: 'none',
           padding: 0,

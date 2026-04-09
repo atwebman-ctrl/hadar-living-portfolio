@@ -7,6 +7,7 @@
 
 import { useState } from 'react'
 import BookCatalogPicker from './BookCatalogPicker'
+import { ACADEMIC_YEAR_OPTIONS } from '@/lib/constants'
 
 const inputStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
@@ -98,7 +99,7 @@ export default function ReadingForm({ studentId, onStatus, onSuccess }: Props) {
   }
 
   const set = (k: keyof Omit<Fields, 'completed'>) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setFields((f) => ({ ...f, [k]: e.target.value }))
 
   return (
@@ -130,7 +131,12 @@ export default function ReadingForm({ studentId, onStatus, onSuccess }: Props) {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <label style={labelStyle}>Academic Year</label>
-          <input type="text" value={fields.academicYear} onChange={set('academicYear')} style={inputStyle} placeholder="e.g. 2025-2026" pattern="\d{4}-\d{4}" title="Format: YYYY-YYYY" required />
+          <select value={fields.academicYear} onChange={set('academicYear')} style={inputStyle} required>
+            <option value="">Select year…</option>
+            {ACADEMIC_YEAR_OPTIONS.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gridColumn: '1 / -1' }}>
           <label style={labelStyle}>Why Chosen</label>

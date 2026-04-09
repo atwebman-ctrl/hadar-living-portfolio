@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { GRADE_SELECT_OPTIONS } from '@/lib/constants'
+import { GRADE_SELECT_OPTIONS, ACADEMIC_YEAR_OPTIONS, GENDER_OPTIONS, ENROLLMENT_STATUS_OPTIONS } from '@/lib/constants'
 
 // Shared style tokens
 const S = {
@@ -24,8 +24,14 @@ const S = {
   } as React.CSSProperties,
 }
 
-type Fields = { firstName: string; lastName: string; gradeLevel: string; academicYear: string }
-const EMPTY: Fields = { firstName: '', lastName: '', gradeLevel: '', academicYear: '' }
+type Fields = {
+  firstName: string; lastName: string; gradeLevel: string; academicYear: string
+  gender: string; dateOfBirth: string; enrollmentStatus: string
+}
+const EMPTY: Fields = {
+  firstName: '', lastName: '', gradeLevel: '', academicYear: '',
+  gender: '', dateOfBirth: '', enrollmentStatus: 'active',
+}
 
 export default function AddStudentForm() {
   const router = useRouter()
@@ -120,9 +126,41 @@ export default function AddStudentForm() {
               </Field>
 
               <Field label="Academic Year" htmlFor="academicYear">
-                <input id="academicYear" name="academicYear" type="text" required
-                  placeholder="e.g. 2025-2026" pattern="\d{4}-\d{4}" title="Format: YYYY-YYYY"
-                  value={fields.academicYear} onChange={handleChange} style={S.input} />
+                <select id="academicYear" name="academicYear" required
+                  value={fields.academicYear} onChange={handleChange}
+                  style={{ ...S.input, appearance: 'auto' }}>
+                  <option value="">Select year…</option>
+                  {ACADEMIC_YEAR_OPTIONS.map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </Field>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>
+                <Field label="Gender" htmlFor="gender">
+                  <select id="gender" name="gender"
+                    value={fields.gender} onChange={handleChange}
+                    style={{ ...S.input, appearance: 'auto' }}>
+                    <option value="">Select…</option>
+                    {GENDER_OPTIONS.map(({ value, label }) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="Date of Birth" htmlFor="dateOfBirth">
+                  <input id="dateOfBirth" name="dateOfBirth" type="date"
+                    value={fields.dateOfBirth} onChange={handleChange} style={S.input} />
+                </Field>
+              </div>
+
+              <Field label="Enrollment Status" htmlFor="enrollmentStatus">
+                <select id="enrollmentStatus" name="enrollmentStatus"
+                  value={fields.enrollmentStatus} onChange={handleChange}
+                  style={{ ...S.input, appearance: 'auto' }}>
+                  {ENROLLMENT_STATUS_OPTIONS.map(({ value, label }) => (
+                    <option key={value} value={value}>{label}</option>
+                  ))}
+                </select>
               </Field>
 
               {apiError && (
