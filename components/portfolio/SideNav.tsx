@@ -1,8 +1,32 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+// ============================================================
+// components/portfolio/SideNav.tsx
+//
+// Portfolio sidebar navigation. When studentId is provided,
+// renders route-based links to hub / section detail / full
+// pages, with usePathname for active detection.
+// When no studentId (demo), falls back to anchor links.
+// ============================================================
 
-const navItems = [
+import { usePathname } from 'next/navigation'
+
+const SECTION_ITEMS = [
+  { slug: 'intellectual-arc',  label: 'Intellectual Arc' },
+  { slug: 'immersion-engine',  label: 'Immersion Engine' },
+  { slug: 'the-canon',         label: 'The Canon' },
+  { slug: 'creative-evolution',label: 'Creative Evolution' },
+  { slug: 'rhetoric-room',     label: 'Rhetoric Room' },
+  { slug: 'character-arc',     label: 'Character Arc' },
+  { slug: 'scope-and-sequence',label: 'Scope & Sequence' },
+  { slug: 'handwriting',       label: 'Handwriting' },
+  { slug: 'photo-gallery',     label: 'Photo Gallery' },
+  { slug: 'teacher-notes',     label: 'Teacher Notes' },
+  { slug: 'parent-uploads',    label: 'Parent Uploads' },
+]
+
+// Anchor fallback for demo page (no studentId)
+const ANCHOR_ITEMS = [
   { href: '#overview',       label: 'Overview' },
   { href: '#academics',      label: 'Intellectual Arc' },
   { href: '#hebrew',         label: 'Immersion Engine' },
@@ -24,24 +48,29 @@ interface SideNavProps {
   studentName?: string
   /** Viewer role. When 'admin' or 'teacher', shows a back-to-dashboard link. */
   role?: string
+  /** When provided, renders route-based links instead of anchor links. */
+  studentId?: string
+  /** Active slug override (passed from section page for immediate highlight). */
+  activeSlug?: string
 }
 
-export default function SideNav({ schoolName, studentName, role }: SideNavProps = {}) {
-  const [active, setActive] = useState('overview')
+export default function SideNav({
+  schoolName,
+  studentName,
+  role,
+  studentId,
+  activeSlug,
+}: SideNavProps = {}) {
+  const pathname = usePathname()
 
-  useEffect(() => {
-    const ids = navItems.map(n => n.href.slice(1))
-    const handler = () => {
-      let current = ids[0]
-      ids.forEach(id => {
-        const el = document.getElementById(id)
-        if (el && el.getBoundingClientRect().top < 120) current = id
-      })
-      setActive(current)
-    }
-    window.addEventListener('scroll', handler, { passive: true })
-    return () => window.removeEventListener('scroll', handler)
-  }, [])
+  // Determine active item from current path
+  const isHub     = !!studentId && pathname === `/portfolio/${studentId}`
+  const isFull    = !!studentId && pathname === `/portfolio/${studentId}/full`
+  const activeSection = activeSlug ?? (
+    studentId
+      ? SECTION_ITEMS.find((s) => pathname.includes(`/section/${s.slug}`))?.slug
+      : null
+  )
 
   return (
     <nav className="sidenav">
@@ -52,21 +81,52 @@ export default function SideNav({ schoolName, studentName, role }: SideNavProps 
         )}
       </div>
       <div className="nav-label">Portfolio</div>
+
       {studentName && (
-        <div className="sidenav-student-name" style={{ padding: '0 1.5rem 1rem', fontFamily: 'var(--font-heading)', fontSize: '13px', color: 'white', lineHeight: 1.3 }}>
+        <div
+          className="sidenav-student-name"
+          style={{ padding: '0 1.5rem 1rem', fontFamily: 'var(--font-heading)', fontSize: '13px', color: 'white', lineHeight: 1.3 }}
+        >
           {studentName}
         </div>
       )}
-      {navItems.map(({ href, label }) => (
-        <a
-          key={href}
-          href={href}
-          className={active === href.slice(1) ? 'active' : ''}
-          onClick={() => setActive(href.slice(1))}
-        >
-          {label}
-        </a>
-      ))}
+
+      {studentId ? (
+        // ── Route-based nav ──────────────────────────────────
+        <>
+          <a
+            href={`/portfolio/${studentId}`}
+            className={isHub ? 'active' : ''}
+          >
+            Overview
+          </a>
+
+          {SECTION_ITEMS.map(({ slug, label }) => (
+            <a
+              key={slug}
+              href={`/portfolio/${studentId}/section/${slug}`}
+              className={activeSection === slug ? 'active' : ''}
+            >
+              {label}
+            </a>
+          ))}
+
+          <a
+            href={`/portfolio/${studentId}/full`}
+            className={isFull ? 'active' : ''}
+            style={{ opacity: 0.65, fontSize: '0.78rem' }}
+          >
+            Full Portfolio
+          </a>
+        </>
+      ) : (
+        // ── Anchor fallback (demo page) ───────────────────────
+        <>
+          {ANCHOR_ITEMS.map(({ href, label }) => (
+            <a key={href} href={href}>{label}</a>
+          ))}
+        </>
+      )}
 
       {(role === 'admin' || role === 'teacher') && (
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', margin: '1rem 1.5rem 0', paddingTop: '0.75rem' }}>
@@ -90,6 +150,7 @@ export default function SideNav({ schoolName, studentName, role }: SideNavProps 
           </a>
         </div>
       )}
+
     </nav>
   )
 }
