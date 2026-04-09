@@ -42,7 +42,7 @@ export default function PhotoGallery({ photos, uploadEnabled, studentId, academi
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
         {hasData
           ? `${items.length} photo${items.length !== 1 ? 's' : ''} — moments from the academic year.`
-          : 'Six photographs from the 2025–26 academic year — celebrations, projects, and school events.'}
+          : 'Photographs from the academic year — celebrations, projects, and school events.'}
       </p>
 
       {uploadEnabled && studentId && (
