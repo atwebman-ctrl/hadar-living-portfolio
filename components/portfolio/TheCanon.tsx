@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import type { Reading, AiDraft, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import InlineReadingForm from '@/components/portfolio/InlineReadingForm'
@@ -27,7 +30,7 @@ const SPINE_PALETTE = [
 // Heights alternate slightly so the shelf looks natural
 const SPINE_HEIGHTS = [160, 150, 155, 148, 158, 144, 152, 162, 156, 145]
 
-// ── Demo fallback data ────────────────────────────────────────────────────────
+// ── Demo fallback data ────────────────────────────────────────
 
 const DEMO_BOOKS = [
   { title: 'Alice in Wonderland',          done: true  },
@@ -56,9 +59,93 @@ function buildDraftContext(readings: Reading[], studentFirstName: string | null)
   }
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// ── Book detail panel ─────────────────────────────────────────
+
+function BookDetail({ reading, spineColor }: { reading: Reading; spineColor: string }) {
+  return (
+    <div style={{
+      borderLeft:     `3px solid ${spineColor}`,
+      background:     'var(--cream)',
+      borderTop:      '1px solid var(--rule)',
+      borderRight:    '1px solid var(--rule)',
+      borderBottom:   '1px solid var(--rule)',
+      padding:        '1.1rem 1.4rem',
+      marginTop:      '1rem',
+      display:        'grid',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+      gap:            '0.75rem 1.5rem',
+    }}>
+      {reading.author && (
+        <DetailField label="Author" value={reading.author} />
+      )}
+      <DetailField label="Academic Year" value={reading.academicYear} />
+      <DetailField
+        label="Status"
+        value={reading.completed ? 'Completed' : 'In Progress'}
+        valueStyle={{ color: reading.completed ? '#2E4A3B' : '#8B4A2D' }}
+      />
+      {reading.pageCount != null && (
+        <DetailField label="Pages" value={String(reading.pageCount)} />
+      )}
+      {reading.whyChosen && (
+        <DetailField
+          label="Why Chosen"
+          value={reading.whyChosen}
+          wide
+        />
+      )}
+      {reading.valuesSkills && (
+        <DetailField
+          label="Values & Skills"
+          value={reading.valuesSkills}
+          wide
+        />
+      )}
+    </div>
+  )
+}
+
+function DetailField({
+  label,
+  value,
+  wide,
+  valueStyle,
+}: {
+  label: string
+  value: string
+  wide?: boolean
+  valueStyle?: React.CSSProperties
+}) {
+  return (
+    <div style={wide ? { gridColumn: '1 / -1' } : undefined}>
+      <div style={{
+        fontFamily:    'var(--font-mono)',
+        fontSize:      '0.58rem',
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+        color:         'var(--ink-faint)',
+        marginBottom:  '0.2rem',
+      }}>
+        {label}
+      </div>
+      <div style={{
+        fontFamily:  'var(--font-body)',
+        fontSize:    '0.82rem',
+        color:       'var(--ink-dark)',
+        lineHeight:  1.45,
+        ...valueStyle,
+      }}>
+        {value}
+      </div>
+    </div>
+  )
+}
+
+// ── Component ─────────────────────────────────────────────────
 
 export default function TheCanon({ readings, studentId, studentName, role, existingDraft }: Props) {
+  const [openId, setOpenId] = useState<string | null>(null)
+
   const hasData = !!readings && readings.length > 0
 
   const books = hasData
@@ -74,6 +161,14 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
     ? buildDraftContext(readings!, studentName ?? null)
     : null
 
+  const openReading = hasData && openId
+    ? readings!.find((r) => r.id === openId) ?? null
+    : null
+
+  const openIndex = hasData && openId
+    ? readings!.findIndex((r) => r.id === openId)
+    : -1
+
   return (
     <section id="canon">
       <div className="section-header reveal">
@@ -88,13 +183,31 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
       <div className="bookshelf reveal">
         <div className="books-row">
           {books.map((b, i) => {
-            const palette = SPINE_PALETTE[i % SPINE_PALETTE.length]
-            const h = SPINE_HEIGHTS[i % SPINE_HEIGHTS.length]
+            const palette  = SPINE_PALETTE[i % SPINE_PALETTE.length]
+            const h        = SPINE_HEIGHTS[i % SPINE_HEIGHTS.length]
+            const readingId = hasData ? readings![i]?.id : null
+            const isOpen   = readingId !== null && openId === readingId
             return (
               <div
                 key={`${b.title}-${i}`}
                 className={`book ${b.done ? 'done' : 'pending'}`}
-                style={{ background: palette.color, color: palette.text, height: h, width: 36 }}
+                style={{
+                  background: palette.color,
+                  color:      palette.text,
+                  height:     h,
+                  width:      36,
+                  cursor:     hasData ? 'pointer' : 'default',
+                  outline:    isOpen ? `2px solid #B8A050` : 'none',
+                  outlineOffset: '2px',
+                  transition: 'outline 0.15s ease, opacity 0.15s ease',
+                }}
+                onClick={() => {
+                  if (!readingId) return
+                  setOpenId(openId === readingId ? null : readingId)
+                }}
+                title={hasData ? `${b.title} — click for details` : undefined}
+                role={hasData ? 'button' : undefined}
+                aria-expanded={isOpen}
               >
                 <span className="book-title">{b.title}</span>
                 <span className="book-done">{b.done ? '\u2713' : '\u2026'}</span>
@@ -102,9 +215,20 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
             )
           })}
         </div>
+
+        {/* Accordion detail panel */}
+        {openReading && openIndex >= 0 && (
+          <BookDetail
+            reading={openReading}
+            spineColor={SPINE_PALETTE[openIndex % SPINE_PALETTE.length].color}
+          />
+        )}
       </div>
+
       <div style={{ marginTop: '1rem', fontFamily: "'DM Mono',monospace", fontSize: 9, color: 'var(--ink-faint)', letterSpacing: '.06em' }}>
-        Hover to browse\u00a0·\u00a0Faded spine = upcoming
+        {hasData
+          ? 'Click a spine to see details\u00a0·\u00a0Faded spine\u00a0=\u00a0upcoming'
+          : 'Hover to browse\u00a0·\u00a0Faded spine\u00a0=\u00a0upcoming'}
       </div>
 
       {/* AI narrative panel */}
