@@ -262,3 +262,13 @@
   transition: background 0.2s ease;
 }
 .hub-full-btn:hover { background: #9a8540; }
+
+/* ── Book detail actions (edit/delete, hover-reveal) ────────── */
+.book-detail-actions {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  position: absolute;
+  top: 0.7rem;
+  right: 0.9rem;
+}
+.book-detail-panel:hover .book-detail-actions { opacity: 1; }

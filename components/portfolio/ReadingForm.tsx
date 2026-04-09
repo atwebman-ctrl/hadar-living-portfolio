@@ -67,17 +67,20 @@ const blank: Fields = {
 }
 
 interface Props {
-  studentId: string
-  onStatus:  (s: { type: 'success' | 'error'; msg: string } | null) => void
+  studentId:  string
+  readingId?: string        // if set → edit mode (PATCH instead of POST)
+  initial?:   Partial<Fields>
+  onStatus:   (s: { type: 'success' | 'error'; msg: string } | null) => void
   onSuccess?: () => void
 }
 
 // ── Component ─────────────────────────────────────────────────
 
-export default function ReadingForm({ studentId, onStatus, onSuccess }: Props) {
-  const [fields,      setFields]      = useState<Fields>(blank)
+export default function ReadingForm({ studentId, readingId, initial, onStatus, onSuccess }: Props) {
+  const [fields,      setFields]      = useState<Fields>(initial ? { ...blank, ...initial } : blank)
   const [saving,      setSaving]      = useState(false)
   const [showPicker,  setShowPicker]  = useState(false)
+  const isEdit = !!readingId
 
   const set = (k: keyof Fields) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -106,15 +109,20 @@ export default function ReadingForm({ studentId, onStatus, onSuccess }: Props) {
         dateStarted:  fields.dateStarted  || null,
         dateFinished: fields.dateFinished || null,
       }
-      const res = await fetch(`/api/dashboard/students/${studentId}/readings`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      const url = isEdit
+        ? `/api/dashboard/students/${studentId}/readings/${readingId}`
+        : `/api/dashboard/students/${studentId}/readings`
+      const res = await fetch(url, {
+        method: isEdit ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
         onStatus({ type: 'error', msg: (data as { error?: string }).error ?? 'Failed to save.' })
       } else {
-        onStatus({ type: 'success', msg: 'Book added to reading list.' })
-        setFields(blank)
+        onStatus({ type: 'success', msg: isEdit ? 'Book updated.' : 'Book added to reading list.' })
+        if (!isEdit) setFields(blank)
         onSuccess?.()
       }
     } catch {
@@ -197,7 +205,7 @@ export default function ReadingForm({ studentId, onStatus, onSuccess }: Props) {
 
         <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'flex-end' }}>
           <button type="submit" disabled={saving} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold-pale)', background: 'var(--navy)', border: '1px solid var(--gold)', padding: '0.5rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>
-            {saving ? 'Saving…' : 'Add to Reading List'}
+            {saving ? 'Saving…' : isEdit ? 'Save Changes' : 'Add to Reading List'}
           </button>
         </div>
       </form>
