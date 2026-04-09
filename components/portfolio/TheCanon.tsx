@@ -59,48 +59,80 @@ function buildDraftContext(readings: Reading[], studentFirstName: string | null)
   }
 }
 
+// ── Book cover image ──────────────────────────────────────────
+
+function BookCoverImage({ title }: { title: string }) {
+  const [failed, setFailed] = useState(false)
+  const src = `https://covers.openlibrary.org/b/title/${encodeURIComponent(title)}-M.jpg`
+
+  if (failed) {
+    return (
+      <div style={{
+        width: 60, height: 80, flexShrink: 0,
+        background: 'var(--rule)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: '1.4rem',
+      }}>
+        📖
+      </div>
+    )
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt=""
+      width={60}
+      height={80}
+      onError={() => setFailed(true)}
+      style={{ width: 60, height: 80, objectFit: 'cover', flexShrink: 0, display: 'block' }}
+    />
+  )
+}
+
 // ── Book detail panel ─────────────────────────────────────────
 
 function BookDetail({ reading, spineColor }: { reading: Reading; spineColor: string }) {
   return (
     <div style={{
-      borderLeft:     `3px solid ${spineColor}`,
-      background:     'var(--cream)',
-      borderTop:      '1px solid var(--rule)',
-      borderRight:    '1px solid var(--rule)',
-      borderBottom:   '1px solid var(--rule)',
-      padding:        '1.1rem 1.4rem',
-      marginTop:      '1rem',
-      display:        'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-      gap:            '0.75rem 1.5rem',
+      borderLeft:   `3px solid ${spineColor}`,
+      background:   'var(--cream)',
+      borderTop:    '1px solid var(--rule)',
+      borderRight:  '1px solid var(--rule)',
+      borderBottom: '1px solid var(--rule)',
+      padding:      '1.1rem 1.4rem',
+      marginTop:    '1rem',
+      display:      'flex',
+      gap:          '1.25rem',
+      alignItems:   'flex-start',
     }}>
-      {reading.author && (
-        <DetailField label="Author" value={reading.author} />
-      )}
-      <DetailField label="Academic Year" value={reading.academicYear} />
-      <DetailField
-        label="Status"
-        value={reading.completed ? 'Completed' : 'In Progress'}
-        valueStyle={{ color: reading.completed ? '#2E4A3B' : '#8B4A2D' }}
-      />
-      {reading.pageCount != null && (
-        <DetailField label="Pages" value={String(reading.pageCount)} />
-      )}
-      {reading.whyChosen && (
+      <BookCoverImage title={reading.title} />
+      <div style={{
+        display:             'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+        gap:                 '0.75rem 1.5rem',
+        flex:                1,
+      }}>
+        {reading.author && (
+          <DetailField label="Author" value={reading.author} />
+        )}
+        <DetailField label="Academic Year" value={reading.academicYear} />
         <DetailField
-          label="Why Chosen"
-          value={reading.whyChosen}
-          wide
+          label="Status"
+          value={reading.completed ? 'Completed' : 'In Progress'}
+          valueStyle={{ color: reading.completed ? '#2E4A3B' : '#8B4A2D' }}
         />
-      )}
-      {reading.valuesSkills && (
-        <DetailField
-          label="Values & Skills"
-          value={reading.valuesSkills}
-          wide
-        />
-      )}
+        {reading.pageCount != null && (
+          <DetailField label="Pages" value={String(reading.pageCount)} />
+        )}
+        {reading.whyChosen && (
+          <DetailField label="Why Chosen" value={reading.whyChosen} wide />
+        )}
+        {reading.valuesSkills && (
+          <DetailField label="Values & Skills" value={reading.valuesSkills} wide />
+        )}
+      </div>
     </div>
   )
 }
