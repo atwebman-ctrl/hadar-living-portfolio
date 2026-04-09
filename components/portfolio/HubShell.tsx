@@ -33,23 +33,21 @@ export default function HubShell({ portfolio, studentId, role }: Props) {
     return Array.from(set).sort().reverse()
   }, [portfolio])
 
+  const canInvite = role === 'admin' || role === 'teacher'
+
   return (
     <div className="main">
       <HeroSection
         student={portfolio.student}
         school={portfolio.school}
         assessments={portfolio.assessments}
+        compact
+        inviteButton={canInvite ? <InviteParentButton studentId={studentId} /> : undefined}
       />
-
-      {(role === 'admin' || role === 'teacher') && (
-        <div style={{ padding: '1rem 2rem 0', display: 'flex', justifyContent: 'flex-end' }}>
-          <InviteParentButton studentId={studentId} />
-        </div>
-      )}
 
       <YearSelector years={years} selectedYear={selectedYear} onChange={setSelectedYear} />
 
-      <PortfolioHub portfolio={portfolio} studentId={studentId} />
+      <PortfolioHub portfolio={portfolio} studentId={studentId} selectedYear={selectedYear} />
     </div>
   )
 }

@@ -173,3 +173,92 @@
   }
   .main { margin-left: 0; padding-top: 44px; }
 }
+
+/* ── Hub overview ──────────────────────────────────────────── */
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.1rem;
+}
+@media (max-width: 900px) { .hub-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .hub-grid { grid-template-columns: 1fr; } }
+
+.hub-card {
+  background: url('/images/parchmant-paper.jpeg') center/cover no-repeat;
+  border-top: 1px solid rgba(184,160,80,0.3);
+  padding: 1.1rem 1.2rem 1rem;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  min-height: 118px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.hub-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
+
+.hub-card-num {
+  position: absolute;
+  top: 0.7rem; right: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(139,115,85,0.4);
+  letter-spacing: 0.06em;
+}
+.hub-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 0 1.5rem 0 0;
+  line-height: 1.2;
+}
+.hub-card-stat {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: #6B5B3E;
+  margin: 8px 0 0;
+  flex: 1;
+  line-height: 1.4;
+}
+.hub-card-cta {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 13px;
+  color: #B8A050;
+  margin-top: 0.6rem;
+  text-decoration: none;
+}
+.hub-card:hover .hub-card-cta { text-decoration: underline; }
+
+/* Hero compact variant */
+.hero.compact { padding: 1.75rem 3rem 1.5rem; }
+.hero.compact h1 { font-size: 2.4rem; margin-bottom: 0.2rem; }
+.hero.compact .hero-sub { margin-bottom: 1.25rem; }
+.hero.compact .hero-metrics { max-width: 640px; }
+.hero-initials {
+  width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #C8A84B 0%, #9A7E30 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-weight: 600;
+  color: white; letter-spacing: 0.04em;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Full portfolio CTA button */
+.hub-full-btn {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 1.1rem;
+  letter-spacing: 0.03em;
+  color: #F7F4EE;
+  background: #B8A050;
+  border: 1px solid #9a8540;
+  padding: 12px 32px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+.hub-full-btn:hover { background: #9a8540; }
