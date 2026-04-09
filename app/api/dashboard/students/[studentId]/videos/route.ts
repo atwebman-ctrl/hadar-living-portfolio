@@ -92,6 +92,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       grade_level: input.gradeLevel,
       term:        input.term,
       category:    input.category,
+      created_by:  ctx.userId,
+      updated_by:  ctx.userId,
     })
     .select()
     .single()

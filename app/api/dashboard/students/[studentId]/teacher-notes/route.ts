@@ -101,6 +101,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     section_type: input.category,
     author_name:  authorName,
     text:         input.noteText,
+    created_by:   ctx.userId,
+    updated_by:   ctx.userId,
   }
 
   // Override created_at with the submitted date when provided

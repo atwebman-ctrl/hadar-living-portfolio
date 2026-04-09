@@ -120,6 +120,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       virtue_hebrew:         input.awardName,
       award_date:            awardDate,
       description:           input.description ?? null,
+      created_by:            ctx.userId,
+      updated_by:            ctx.userId,
     })
     .select()
     .single()

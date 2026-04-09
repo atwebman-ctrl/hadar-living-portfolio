@@ -45,7 +45,8 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 ### Data
 - **Grade levels are a closed enum** — always `GRADE_LEVELS` from `lib/gradeLevel.ts` ('pre-k','k','1'…'12'). DB column is `grade_level text CHECK (...)`. Zod schema uses `z.enum([...GRADE_LEVELS])`. All UI dropdowns use `GRADE_SELECT_OPTIONS`. Never accept free-text grade input.
 - **Term fields are always `<select>` dropdowns** — import `TERM_OPTIONS` from `lib/constants.ts`; never free-text. All inline forms (InlineAssessmentForm, InlineAvantForm, InlineVideoForm, InlineWritingForm, InlineCharacterForm, AssessmentForm) use this.
-- **Academic year fields use `pattern="\d{4}-\d{4}"`** — enforced on all forms via HTML pattern attribute.
+- **Academic year fields are always `<select>` dropdowns** — import `ACADEMIC_YEAR_OPTIONS` from `lib/constants.ts`. No pattern attribute needed; dropdown enforces format.
+- **Student profile fields (0011)** — `gender` ('boy'|'girl', nullable), `date_of_birth` (date, nullable; age always computed never stored), `enrollment_status` ('active'|'withdrawn'|'graduated'|'transferred', default 'active'). Constants: `GENDER_OPTIONS`, `ENROLLMENT_STATUS_OPTIONS` in `lib/constants.ts`. Enrollment status badge on card only when NOT 'active'.
 - **Zod v4 strict UUID validation** — `z.string().uuid()` in Zod v4 enforces RFC 4122 (version nibble 1–5, variant nibble 8/9/a/b). All fixed/seed UUIDs must be real v4 UUIDs. The Hadar school UUID is `a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d`.
 
 ### Tooling
@@ -65,6 +66,8 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 9. Validate all API inputs with Zod — no unvalidated data hits Supabase
 10. Run `npx tsc --noEmit` and `npx next build` before every push — never push a broken build
 11. Run `npx vitest run` before every commit — the husky pre-commit hook enforces this automatically
+12. **Audit columns** — every INSERT into assessments, readings, writing_samples, student_videos, teacher_notes, character_awards must include `created_by: ctx.userId` and `updated_by: ctx.userId`. Every UPDATE must refresh `updated_by` and `updated_at`.
+13. **Soft delete** — the 6 tables above have `deleted_at`. All SELECT queries in `getStudentPortfolio.ts` must include `.is('deleted_at', null)`. Use `update({ deleted_at: new Date().toISOString() })` — never hard-delete these rows.
 
 ## Key Files
 
@@ -107,7 +110,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `lib/gradeLevel.ts` — `GRADE_LEVELS` const array, `GradeLevel` type, `formatGrade()`, `sortGrades()`, `GRADE_SELECT_OPTIONS`; single source of truth for grade enum
 - `lib/constants.ts` — Re-exports `GRADE_SELECT_OPTIONS` from `lib/gradeLevel`; defines `TERM_OPTIONS` ('Fall 2024'–'Spring 2026') and `TermOption` type; **all forms import from here — never hardcode term strings**
 - `proxy.ts` — Clerk middleware (Next.js 16); protects /dashboard, /admin, /portfolio; userId-only check (org not required) so OrgPickerScreen handles no-org case
-- `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies, 0004 Sprint 3 tables, 0005 parent_students, 0006 student archived_at, 0007 book_catalog, 0010 grade_level_enum (renames old column to grade_level_legacy, adds constrained grade_level text column)
+- `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies, 0004 Sprint 3 tables, 0005 parent_students, 0006 student archived_at, 0007 book_catalog, 0010 grade_level_enum, 0011 student_profile_fields (gender, date_of_birth, enrollment_status), 0012 data_foundation (audit columns, soft delete, academic_years, enrollment_records, class_assignments)
 - `design-reference/` — Target aesthetic HTML files (landing.html, hadar-portfolio.html)
 - `app/dashboard/page.tsx` — Teacher/admin student list; parent redirect (OR filter on parent_clerk_user_id + invited_email); server component
 - `app/dashboard/DashboardUI.tsx` — Presentational sub-components: OrgPickerScreen, ParentPendingScreen, PageHeader, StudentCard, EmptyState
@@ -132,6 +135,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `components/shared/InviteParentButton.tsx` — Client component: modal with email input, POSTs to invite-parent route; shown below HeroSection for admin/teacher only
 - `app/api/dashboard/students/[studentId]/invite-parent/route.ts` — POST: inserts pending parent_students row, calls Clerk createOrganizationInvitation with role 'org:parent'
 - `supabase/migrations/0005_parent_students.sql` — parent_students table: invited_email, nullable parent_clerk_user_id, status (pending/active), RLS; apply before testing invite flow
+- `supabase/migrations/0012_data_foundation.sql` — audit columns (created_by, updated_by, updated_at) + soft delete (deleted_at) on 6 content tables; academic_years table (canonical year registry per school); enrollment_records table (enrollment history per student); class_assignments table (student ↔ teacher per year)
 
 ### Does NOT exist yet (do not reference as if it does)
 - `components/theme/ThemeProvider.tsx` — School theme context

@@ -98,6 +98,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       why_chosen:   input.whyChosen ?? null,
       values_skills: input.valuesSkills ?? null,
       page_count:   input.pageCount ?? null,
+      created_by:   ctx.userId,
+      updated_by:   ctx.userId,
     })
     .select()
     .single()

@@ -99,6 +99,7 @@ export async function getStudentPortfolio(
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
+        .is("deleted_at", null)
         .order("academic_year", { ascending: false })
     ),
     safeQuery(() =>
@@ -107,6 +108,7 @@ export async function getStudentPortfolio(
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
+        .is("deleted_at", null)
         .order("sort_order", { ascending: true })
     ),
     safeQuery(() =>
@@ -115,6 +117,7 @@ export async function getStudentPortfolio(
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
     ),
     safeQuery(() =>
@@ -139,6 +142,7 @@ export async function getStudentPortfolio(
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
+        .is("deleted_at", null)
         .order("award_date", { ascending: false })
     ),
     safeQuery(() =>
@@ -164,6 +168,7 @@ export async function getStudentPortfolio(
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
     ),
     // scope_and_sequence: Sprint 3 table — safeQuery returns [] until migration lands.
@@ -191,6 +196,7 @@ export async function getStudentPortfolio(
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
+        .is("deleted_at", null)
         .order("created_at", { ascending: true })
     ),
   ]);

@@ -101,6 +101,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       teacher_comments: input.teacherComments ?? null,
       term:             input.term,
       academic_year:    input.academicYear,
+      created_by:       ctx.userId,
+      updated_by:       ctx.userId,
     })
     .select()
     .single()
