@@ -114,24 +114,29 @@ function BookDetail({ reading, spineColor }: { reading: Reading; spineColor: str
         gap:                 '0.75rem 1.5rem',
         flex:                1,
       }}>
-        {reading.author && (
-          <DetailField label="Author" value={reading.author} />
-        )}
+        {reading.author && <DetailField label="Author" value={reading.author} />}
         <DetailField label="Academic Year" value={reading.academicYear} />
         <DetailField
           label="Status"
           value={reading.completed ? 'Completed' : 'In Progress'}
           valueStyle={{ color: reading.completed ? '#2E4A3B' : '#8B4A2D' }}
         />
-        {reading.pageCount != null && (
-          <DetailField label="Pages" value={String(reading.pageCount)} />
+        {reading.readingDifficulty && (
+          <DetailField label="Difficulty" value={reading.readingDifficulty.replace('_', ' ')} />
         )}
-        {reading.whyChosen && (
-          <DetailField label="Why Chosen" value={reading.whyChosen} wide />
+        {reading.curriculumConnection && (
+          <DetailField label="Connection" value={reading.curriculumConnection.replace(/_/g, ' ')} />
         )}
-        {reading.valuesSkills && (
-          <DetailField label="Values & Skills" value={reading.valuesSkills} wide />
+        {reading.dateStarted && <DetailField label="Started" value={reading.dateStarted} />}
+        {reading.dateFinished && <DetailField label="Finished" value={reading.dateFinished} />}
+        {reading.studentRating != null && (
+          <DetailField label="Rating" value={'★'.repeat(reading.studentRating) + '☆'.repeat(5 - reading.studentRating)} />
         )}
+        {reading.pageCount != null && <DetailField label="Pages" value={String(reading.pageCount)} />}
+        {reading.whyChosen && <DetailField label="Why Chosen" value={reading.whyChosen} wide />}
+        {reading.keyQuote && <DetailField label="Key Quote" value={`"${reading.keyQuote}"`} wide />}
+        {reading.teacherNotes && <DetailField label="Teacher Notes" value={reading.teacherNotes} wide />}
+        {reading.valuesSkills && <DetailField label="Values & Skills" value={reading.valuesSkills} wide />}
       </div>
     </div>
   )

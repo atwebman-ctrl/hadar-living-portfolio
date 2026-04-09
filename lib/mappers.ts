@@ -95,6 +95,13 @@ export function mapReading(row: Row): Reading {
     whyChosen: (row.why_chosen as string) ?? null,
     valuesSkills: (row.values_skills as string) ?? null,
     pageCount: (row.page_count as number) ?? null,
+    teacherNotes: (row.teacher_notes as string) ?? null,
+    readingDifficulty: (row.reading_difficulty as Reading['readingDifficulty']) ?? null,
+    studentRating: (row.student_rating as number) ?? null,
+    dateStarted: (row.date_started as string) ?? null,
+    dateFinished: (row.date_finished as string) ?? null,
+    keyQuote: (row.key_quote as string) ?? null,
+    curriculumConnection: (row.curriculum_connection as Reading['curriculumConnection']) ?? null,
     createdAt: row.created_at as string,
   };
 }

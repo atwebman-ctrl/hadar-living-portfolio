@@ -2,66 +2,86 @@
 
 // ============================================================
 // components/portfolio/ReadingForm.tsx
-// Sub-form for TeacherDataPanel — reading list entry.
+// Enhanced book intake form with 4 grouped sections.
 // ============================================================
 
 import { useState } from 'react'
 import BookCatalogPicker from './BookCatalogPicker'
-import { ACADEMIC_YEAR_OPTIONS } from '@/lib/constants'
+import StarRating from './StarRating'
+import {
+  ACADEMIC_YEAR_OPTIONS,
+  READING_DIFFICULTY_OPTIONS,
+  CURRICULUM_CONNECTION_OPTIONS,
+} from '@/lib/constants'
 
-const inputStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-body)',
-  fontSize: '0.875rem',
-  color: 'var(--ink)',
-  background: 'var(--cream)',
-  border: '1px solid var(--rule)',
-  padding: '0.4rem 0.6rem',
-  width: '100%',
-  boxSizing: 'border-box',
-  outline: 'none',
+// ── Shared styles ─────────────────────────────────────────────
+
+const inp: React.CSSProperties = {
+  fontFamily: 'var(--font-body)', fontSize: '0.875rem', color: 'var(--ink)',
+  background: 'var(--cream)', border: '1px solid var(--rule)',
+  padding: '0.4rem 0.6rem', width: '100%', boxSizing: 'border-box', outline: 'none',
+}
+const lbl: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em',
+  textTransform: 'uppercase', color: 'var(--ink-light)', display: 'block', marginBottom: '0.25rem',
+}
+const grid2: React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }
+const sectionHead: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)', fontSize: '0.58rem', letterSpacing: '0.14em',
+  textTransform: 'uppercase', color: 'var(--ink-faint)',
+  borderBottom: '1px solid var(--rule)', paddingBottom: '0.35rem',
+  marginBottom: '0.75rem', marginTop: '1.25rem',
 }
 
-const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)',
-  fontSize: '0.6rem',
-  letterSpacing: '0.1em',
-  textTransform: 'uppercase',
-  color: 'var(--ink-light)',
-  display: 'block',
-  marginBottom: '0.25rem',
+function Field({ label, children, wide }: { label: string; children: React.ReactNode; wide?: boolean }) {
+  return (
+    <div style={wide ? { gridColumn: '1 / -1', display: 'flex', flexDirection: 'column' } : { display: 'flex', flexDirection: 'column' }}>
+      <label style={lbl}>{label}</label>
+      {children}
+    </div>
+  )
 }
 
-const submitBtnStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)',
-  fontSize: '0.6rem',
-  letterSpacing: '0.1em',
-  textTransform: 'uppercase',
-  color: 'var(--gold-pale)',
-  background: 'var(--navy)',
-  border: '1px solid var(--gold)',
-  padding: '0.5rem 1.25rem',
+// ── Types ─────────────────────────────────────────────────────
+
+interface Fields {
+  title:                string
+  author:               string
+  academicYear:         string
+  completed:            boolean
+  readingDifficulty:    string
+  dateStarted:          string
+  dateFinished:         string
+  curriculumConnection: string
+  studentRating:        number
+  whyChosen:            string
+  keyQuote:             string
+  teacherNotes:         string
+}
+
+const blank: Fields = {
+  title: '', author: '', academicYear: '', completed: false,
+  readingDifficulty: '', dateStarted: '', dateFinished: '',
+  curriculumConnection: '', studentRating: 0,
+  whyChosen: '', keyQuote: '', teacherNotes: '',
 }
 
 interface Props {
-  studentId:  string
-  onStatus:   (s: { type: 'success' | 'error'; msg: string } | null) => void
+  studentId: string
+  onStatus:  (s: { type: 'success' | 'error'; msg: string } | null) => void
   onSuccess?: () => void
 }
 
-interface Fields {
-  title: string
-  author: string
-  whyChosen: string
-  completed: boolean
-  academicYear: string
-}
-
-const blank: Fields = { title: '', author: '', whyChosen: '', completed: false, academicYear: '' }
+// ── Component ─────────────────────────────────────────────────
 
 export default function ReadingForm({ studentId, onStatus, onSuccess }: Props) {
-  const [fields,     setFields]     = useState<Fields>(blank)
-  const [saving,     setSaving]     = useState(false)
-  const [showPicker, setShowPicker] = useState(false)
+  const [fields,      setFields]      = useState<Fields>(blank)
+  const [saving,      setSaving]      = useState(false)
+  const [showPicker,  setShowPicker]  = useState(false)
+
+  const set = (k: keyof Fields) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+      setFields((f) => ({ ...f, [k]: e.target.value }))
 
   function handleCatalogSelect(book: { title: string; author: string }) {
     setFields((f) => ({ ...f, title: book.title, author: book.author }))
@@ -72,20 +92,26 @@ export default function ReadingForm({ studentId, onStatus, onSuccess }: Props) {
     setSaving(true)
     onStatus(null)
     try {
+      const body: Record<string, unknown> = {
+        title:        fields.title,
+        author:       fields.author   || null,
+        academicYear: fields.academicYear,
+        completed:    fields.completed,
+        whyChosen:    fields.whyChosen || null,
+        teacherNotes: fields.teacherNotes || null,
+        keyQuote:     fields.keyQuote  || null,
+        readingDifficulty:    fields.readingDifficulty    || null,
+        curriculumConnection: fields.curriculumConnection || null,
+        studentRating: fields.studentRating > 0 ? fields.studentRating : null,
+        dateStarted:  fields.dateStarted  || null,
+        dateFinished: fields.dateFinished || null,
+      }
       const res = await fetch(`/api/dashboard/students/${studentId}/readings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: fields.title,
-          author: fields.author || null,
-          whyChosen: fields.whyChosen || null,
-          completed: fields.completed,
-          academicYear: fields.academicYear,
-        }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
       })
-      const body = await res.json().catch(() => ({}))
+      const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        onStatus({ type: 'error', msg: (body as { error?: string }).error ?? 'Failed to save.' })
+        onStatus({ type: 'error', msg: (data as { error?: string }).error ?? 'Failed to save.' })
       } else {
         onStatus({ type: 'success', msg: 'Book added to reading list.' })
         setFields(blank)
@@ -98,69 +124,83 @@ export default function ReadingForm({ studentId, onStatus, onSuccess }: Props) {
     }
   }
 
-  const set = (k: keyof Omit<Fields, 'completed'>) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-      setFields((f) => ({ ...f, [k]: e.target.value }))
-
   return (
     <>
       {showPicker && (
-        <BookCatalogPicker
-          onSelect={handleCatalogSelect}
-          onClose={() => setShowPicker(false)}
-        />
+        <BookCatalogPicker onSelect={handleCatalogSelect} onClose={() => setShowPicker(false)} />
       )}
-    <form onSubmit={handleSubmit}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gridColumn: '1 / -1' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.25rem' }}>
-            <label style={{ ...labelStyle, marginBottom: 0 }}>Title</label>
-            <button
-              type="button"
-              onClick={() => setShowPicker(true)}
-              style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--navy)', background: 'none', border: '1px solid var(--navy)', padding: '2px 8px', cursor: 'pointer' }}
-            >
-              Add from catalog
-            </button>
+
+      <form onSubmit={handleSubmit}>
+        {/* ── 1. Book info ─────────────────────────────────── */}
+        <p style={sectionHead}>Book Info</p>
+        <div style={grid2}>
+          <Field label="Title" wide>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <input type="text" value={fields.title} onChange={set('title')} style={{ ...inp, flex: 1 }} placeholder="Book title" required />
+              <button type="button" onClick={() => setShowPicker(true)} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--navy)', background: 'none', border: '1px solid var(--navy)', padding: '0.38rem 0.6rem', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }}>
+                From catalog
+              </button>
+            </div>
+          </Field>
+          <Field label="Author">
+            <input type="text" value={fields.author} onChange={set('author')} style={inp} placeholder="Author name" />
+          </Field>
+          <Field label="Academic Year">
+            <select value={fields.academicYear} onChange={set('academicYear')} style={inp} required>
+              <option value="">Select year…</option>
+              {ACADEMIC_YEAR_OPTIONS.map((y) => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </Field>
+        </div>
+
+        {/* ── 2. Reading details ───────────────────────────── */}
+        <p style={sectionHead}>Reading Details</p>
+        <div style={grid2}>
+          <Field label="Difficulty Level">
+            <select value={fields.readingDifficulty} onChange={set('readingDifficulty')} style={inp}>
+              <option value="">Select…</option>
+              {READING_DIFFICULTY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </Field>
+          <Field label="Curriculum Connection">
+            <select value={fields.curriculumConnection} onChange={set('curriculumConnection')} style={inp}>
+              <option value="">Select…</option>
+              {CURRICULUM_CONNECTION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </Field>
+          <Field label="Date Started">
+            <input type="date" value={fields.dateStarted} onChange={set('dateStarted')} style={inp} />
+          </Field>
+          <Field label="Date Finished">
+            <input type="date" value={fields.dateFinished} onChange={set('dateFinished')} style={inp} />
+          </Field>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <input type="checkbox" id="rf-completed" checked={fields.completed} onChange={(e) => setFields((f) => ({ ...f, completed: e.target.checked }))} style={{ accentColor: 'var(--navy)', width: '1rem', height: '1rem' }} />
+            <label htmlFor="rf-completed" style={{ ...lbl, margin: 0, cursor: 'pointer' }}>Completed</label>
           </div>
-          <input type="text" value={fields.title} onChange={set('title')} style={inputStyle} placeholder="Book title" required />
+          <StarRating label="Student Rating" value={fields.studentRating} onChange={(n) => setFields((f) => ({ ...f, studentRating: n }))} />
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>Author</label>
-          <input type="text" value={fields.author} onChange={set('author')} style={inputStyle} placeholder="Author name" />
+
+        {/* ── 3. Reflections ──────────────────────────────── */}
+        <p style={sectionHead}>Reflections</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <Field label="Why Chosen" wide>
+            <textarea value={fields.whyChosen} onChange={set('whyChosen')} style={{ ...inp, resize: 'vertical', minHeight: '3.5rem' }} placeholder="Reason this book was selected…" />
+          </Field>
+          <Field label="Key Quote" wide>
+            <textarea value={fields.keyQuote} onChange={set('keyQuote')} style={{ ...inp, resize: 'vertical', minHeight: '3.5rem' }} placeholder="A memorable quote or passage the student connected with…" />
+          </Field>
+          <Field label="Teacher Notes" wide>
+            <textarea value={fields.teacherNotes} onChange={set('teacherNotes')} style={{ ...inp, resize: 'vertical', minHeight: '3.5rem' }} placeholder="Notes about this student's experience with the book…" />
+          </Field>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>Academic Year</label>
-          <select value={fields.academicYear} onChange={set('academicYear')} style={inputStyle} required>
-            <option value="">Select year…</option>
-            {ACADEMIC_YEAR_OPTIONS.map((y) => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
+
+        <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'flex-end' }}>
+          <button type="submit" disabled={saving} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold-pale)', background: 'var(--navy)', border: '1px solid var(--gold)', padding: '0.5rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+            {saving ? 'Saving…' : 'Add to Reading List'}
+          </button>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gridColumn: '1 / -1' }}>
-          <label style={labelStyle}>Why Chosen</label>
-          <textarea value={fields.whyChosen} onChange={set('whyChosen')} style={{ ...inputStyle, resize: 'vertical', minHeight: '4rem' }} placeholder="Reason this book was selected…" />
-        </div>
-        <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <input
-            type="checkbox"
-            id="reading-completed"
-            checked={fields.completed}
-            onChange={(e) => setFields((f) => ({ ...f, completed: e.target.checked }))}
-            style={{ accentColor: 'var(--navy)', width: '1rem', height: '1rem' }}
-          />
-          <label htmlFor="reading-completed" style={{ ...labelStyle, margin: 0, cursor: 'pointer' }}>
-            Completed
-          </label>
-        </div>
-      </div>
-      <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
-        <button type="submit" disabled={saving} style={{ ...submitBtnStyle, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>
-          {saving ? 'Saving…' : 'Add to Reading List'}
-        </button>
-      </div>
-    </form>
+      </form>
     </>
   )
 }

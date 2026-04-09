@@ -112,6 +112,14 @@ export interface Reading {
   whyChosen: string | null;
   valuesSkills: string | null;
   pageCount: number | null;
+  // 0013 enhanced reading fields
+  teacherNotes: string | null;
+  readingDifficulty: 'below_level' | 'on_level' | 'above_level' | 'stretch' | null;
+  studentRating: number | null;        // 1–5
+  dateStarted: string | null;          // ISO date YYYY-MM-DD
+  dateFinished: string | null;         // ISO date YYYY-MM-DD
+  keyQuote: string | null;
+  curriculumConnection: 'torah_studies' | 'history' | 'science' | 'literature' | 'free_choice' | 'class_read_aloud' | null;
   createdAt: string;
 }
 

@@ -45,3 +45,25 @@ export const ENROLLMENT_STATUS_OPTIONS = [
   { value: 'graduated',   label: 'Graduated'   },
   { value: 'transferred', label: 'Transferred' },
 ] as const
+
+/** Reading difficulty options (matches DB check constraint). */
+export const READING_DIFFICULTY_OPTIONS = [
+  { value: 'below_level', label: 'Below Level' },
+  { value: 'on_level',    label: 'On Level'    },
+  { value: 'above_level', label: 'Above Level' },
+  { value: 'stretch',     label: 'Stretch'     },
+] as const
+
+export type ReadingDifficulty = typeof READING_DIFFICULTY_OPTIONS[number]['value']
+
+/** Curriculum connection options (matches DB check constraint). */
+export const CURRICULUM_CONNECTION_OPTIONS = [
+  { value: 'torah_studies',    label: 'Torah Studies'    },
+  { value: 'history',          label: 'History'          },
+  { value: 'science',          label: 'Science'          },
+  { value: 'literature',       label: 'Literature'       },
+  { value: 'free_choice',      label: 'Free Choice'      },
+  { value: 'class_read_aloud', label: 'Class Read-Aloud' },
+] as const
+
+export type CurriculumConnection = typeof CURRICULUM_CONNECTION_OPTIONS[number]['value']

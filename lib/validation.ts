@@ -110,16 +110,27 @@ export type UpdateAssessmentInput     = z.infer<typeof UpdateAssessmentSchema>;
 
 // ── Readings ──────────────────────────────────────────────────
 
+const readingDifficultyEnum = z.enum(['below_level','on_level','above_level','stretch'])
+const curriculumConnectionEnum = z.enum(['torah_studies','history','science','literature','free_choice','class_read_aloud'])
+
 export const CreateReadingSchema = z.object({
-  studentId:    uuid,
-  title:        nonEmptyString,
-  author:       z.string().nullable().optional(),
+  studentId:            uuid,
+  title:                nonEmptyString,
+  author:               z.string().nullable().optional(),
   academicYear,
-  completed:    z.boolean().default(false),
-  sortOrder:    z.number().int().default(0),
-  whyChosen:    z.string().nullable().optional(),
-  valuesSkills: z.string().nullable().optional(),
-  pageCount:    z.number().int().positive().nullable().optional(),
+  completed:            z.boolean().default(false),
+  sortOrder:            z.number().int().default(0),
+  whyChosen:            z.string().nullable().optional(),
+  valuesSkills:         z.string().nullable().optional(),
+  pageCount:            z.number().int().positive().nullable().optional(),
+  // 0013 enhanced fields
+  teacherNotes:         z.string().nullable().optional(),
+  readingDifficulty:    readingDifficultyEnum.nullable().optional(),
+  studentRating:        z.number().int().min(1).max(5).nullable().optional(),
+  dateStarted:          z.string().nullable().optional(),
+  dateFinished:         z.string().nullable().optional(),
+  keyQuote:             z.string().nullable().optional(),
+  curriculumConnection: curriculumConnectionEnum.nullable().optional(),
 });
 
 export const UpdateReadingSchema = CreateReadingSchema.omit({ studentId: true }).partial();

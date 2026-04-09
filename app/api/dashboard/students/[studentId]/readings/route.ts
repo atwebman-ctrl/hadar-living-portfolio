@@ -88,18 +88,25 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   const { data, error: dbError } = await supabaseAdmin
     .from('readings')
     .insert({
-      school_id:    ctx.schoolId,
-      student_id:   studentId,
-      title:        input.title,
-      author:       input.author ?? null,
-      academic_year: input.academicYear,
-      completed:    input.completed,
-      sort_order:   input.sortOrder,
-      why_chosen:   input.whyChosen ?? null,
-      values_skills: input.valuesSkills ?? null,
-      page_count:   input.pageCount ?? null,
-      created_by:   ctx.userId,
-      updated_by:   ctx.userId,
+      school_id:             ctx.schoolId,
+      student_id:            studentId,
+      title:                 input.title,
+      author:                input.author ?? null,
+      academic_year:         input.academicYear,
+      completed:             input.completed,
+      sort_order:            input.sortOrder,
+      why_chosen:            input.whyChosen ?? null,
+      values_skills:         input.valuesSkills ?? null,
+      page_count:            input.pageCount ?? null,
+      teacher_notes:         input.teacherNotes ?? null,
+      reading_difficulty:    input.readingDifficulty ?? null,
+      student_rating:        input.studentRating ?? null,
+      date_started:          input.dateStarted ?? null,
+      date_finished:         input.dateFinished ?? null,
+      key_quote:             input.keyQuote ?? null,
+      curriculum_connection: input.curriculumConnection ?? null,
+      created_by:            ctx.userId,
+      updated_by:            ctx.userId,
     })
     .select()
     .single()
