@@ -65,22 +65,22 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   const { data, error: dbError } = await supabaseAdmin
     .from('readings')
     .update({
-      ...(input.title        !== undefined && { title:                 input.title }),
-      ...(input.author       !== undefined && { author:               input.author }),
-      ...(input.academicYear !== undefined && { academic_year:        input.academicYear }),
-      ...(input.completed    !== undefined && { completed:            input.completed }),
-      ...(input.whyChosen    !== undefined && { why_chosen:           input.whyChosen }),
-      ...(input.valuesSkills !== undefined && { values_skills:        input.valuesSkills }),
-      ...(input.pageCount    !== undefined && { page_count:           input.pageCount }),
-      ...(input.teacherNotes !== undefined && { teacher_notes:        input.teacherNotes }),
-      ...(input.readingDifficulty    !== undefined && { reading_difficulty:    input.readingDifficulty }),
-      ...(input.studentRating        !== undefined && { student_rating:        input.studentRating }),
-      ...(input.dateStarted          !== undefined && { date_started:          input.dateStarted }),
-      ...(input.dateFinished         !== undefined && { date_finished:         input.dateFinished }),
-      ...(input.keyQuote             !== undefined && { key_quote:             input.keyQuote }),
-      ...(input.curriculumConnection !== undefined && { curriculum_connection: input.curriculumConnection }),
-      updated_by: ctx.userId,
-      updated_at: new Date().toISOString(),
+      title:                 input.title                 ?? undefined,
+      author:                input.author                ?? null,
+      academic_year:         input.academicYear          ?? undefined,
+      completed:             input.completed             ?? undefined,
+      why_chosen:            input.whyChosen             ?? null,
+      values_skills:         input.valuesSkills          ?? null,
+      page_count:            input.pageCount             ?? null,
+      teacher_notes:         input.teacherNotes          ?? null,
+      reading_difficulty:    input.readingDifficulty     ?? null,
+      student_rating:        input.studentRating         ?? null,
+      date_started:          input.dateStarted           ?? null,
+      date_finished:         input.dateFinished          ?? null,
+      key_quote:             input.keyQuote              ?? null,
+      curriculum_connection: input.curriculumConnection  ?? null,
+      updated_by:            ctx.userId,
+      updated_at:            new Date().toISOString(),
     })
     .eq('id', readingId)
     .select()
