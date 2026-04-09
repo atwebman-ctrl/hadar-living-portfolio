@@ -20,21 +20,8 @@ import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { getStudentPortfolio } from '@/lib/getStudentPortfolio'
 import SideNav from '@/components/portfolio/SideNav'
-import HeroSection from '@/components/portfolio/HeroSection'
-import IntellectualArc from '@/components/portfolio/IntellectualArc'
-import ImmersionEngine from '@/components/portfolio/ImmersionEngine'
-import TheCanon from '@/components/portfolio/TheCanon'
-import CreativeEvolution from '@/components/portfolio/CreativeEvolution'
-import RhetoricRoom from '@/components/portfolio/RhetoricRoom'
-import CharacterArc from '@/components/portfolio/CharacterArc'
-import ScopeAndSequence from '@/components/portfolio/ScopeAndSequence'
-import HandwritingSamples from '@/components/portfolio/HandwritingSamples'
-import PhotoGallery from '@/components/portfolio/PhotoGallery'
-import TeacherNotes from '@/components/portfolio/TeacherNotes'
-import ParentUploads from '@/components/portfolio/ParentUploads'
-import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
-import InviteParentButton from '@/components/shared/InviteParentButton'
 import RevealObserver from '@/components/portfolio/RevealObserver'
+import PortfolioClient from '@/components/portfolio/PortfolioClient'
 // Shared portfolio stylesheet — also consumed by /demo
 import '../../demo/portfolio.css'
 
@@ -65,86 +52,7 @@ export default async function PortfolioPage({ params }: Props) {
     <>
       <RevealObserver />
       <SideNav schoolName={portfolio.school.name} studentName={studentName} role={role} />
-      <div className="main">
-        <HeroSection student={portfolio.student} school={portfolio.school} assessments={portfolio.assessments} />
-        {(role === 'admin' || role === 'teacher') && (
-          <div style={{ padding: '1rem 2rem 0', display: 'flex', justifyContent: 'flex-end' }}>
-            <InviteParentButton studentId={studentId} />
-          </div>
-        )}
-        <IntellectualArc
-          assessments={portfolio.assessments}
-          studentId={studentId}
-          studentName={portfolio.student.firstName}
-          role={role}
-          gradeLevel={portfolio.student.gradeLevel}
-          academicYear={portfolio.student.academicYear}
-          existingMathDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'math_scores')}
-          existingEnglishDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'english_scores')}
-        />
-        <ImmersionEngine
-          assessments={portfolio.assessments}
-          studentId={studentId}
-          studentName={portfolio.student.firstName}
-          role={role}
-          existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'immersion')}
-        />
-        <TheCanon
-          readings={portfolio.readings}
-          studentId={studentId}
-          studentName={portfolio.student.firstName}
-          role={role}
-          existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'reading_bookshelf')}
-        />
-        <CreativeEvolution
-          writingSamples={portfolio.writingSamples}
-          studentId={studentId}
-          studentName={portfolio.student.firstName}
-          role={role}
-          existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'writing')}
-        />
-        <RhetoricRoom
-          videos={portfolio.videos}
-          studentVideos={portfolio.studentVideos}
-          studentId={studentId}
-          role={role}
-        />
-        <CharacterArc
-          characterAwards={portfolio.characterAwards}
-          studentId={studentId}
-          studentName={portfolio.student.firstName}
-          role={role}
-          existingDraft={portfolio.aiDrafts.find((d) => d.sectionType === 'virtue_badges')}
-        />
-        {/* Sprint 3 sections — all wired to real PortfolioData */}
-        <ScopeAndSequence
-          gradeLevel={portfolio.student.gradeLevel}
-          subjects={portfolio.scopeAndSequence}
-        />
-        <HandwritingSamples
-          samples={portfolio.handwritingSamples}
-          uploadEnabled={role !== 'parent'}
-          studentId={studentId}
-          academicYear={portfolio.student.academicYear}
-          gradeLevel={portfolio.student.gradeLevel}
-        />
-        <PhotoGallery
-          photos={portfolio.photos}
-          uploadEnabled={role !== 'parent'}
-          studentId={studentId}
-          academicYear={portfolio.student.academicYear}
-          gradeLevel={portfolio.student.gradeLevel}
-        />
-        <TeacherNotes notes={portfolio.teacherNotes} role={role} studentId={studentId} />
-        <ParentUploads
-          uploads={portfolio.parentUploads}
-          uploadEnabled={true}
-          studentId={studentId}
-          academicYear={portfolio.student.academicYear}
-          gradeLevel={portfolio.student.gradeLevel}
-        />
-        <PortfolioFooter />
-      </div>
+      <PortfolioClient portfolio={portfolio} studentId={studentId} role={role} />
     </>
   )
 }

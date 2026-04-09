@@ -3,6 +3,7 @@ import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import SubjectScoreRows, { type ScoreDisplayRow } from '@/components/portfolio/SubjectScoreRows'
 import MapPercentileChart, { type StudentScorePoint } from '@/components/charts/MapPercentileChart'
 import InlineAssessmentForm from '@/components/portfolio/InlineAssessmentForm'
+import IntellectualArcAllYears from '@/components/portfolio/IntellectualArcAllYears'
 
 interface Props {
   assessments?:          Assessment[]
@@ -15,6 +16,10 @@ interface Props {
   gradeLevel?:           string
   /** Student's current academic year, e.g. "2025-2026" */
   academicYear?:         string
+  /** The student's active year — used as default-open in YearGroup */
+  currentYear?:          string
+  /** 'all' = trajectory view; any year string = filter to that year */
+  selectedYear?:         string
 }
 
 // ── Demo fallback data ────────────────────────────────────────
@@ -137,10 +142,38 @@ function SubjectHeading({ title, tag }: { title: string; tag: string }) {
 
 // ── Component ─────────────────────────────────────────────────
 
-export default function IntellectualArc({ assessments, studentId, studentName, role, existingMathDraft, existingEnglishDraft, gradeLevel, academicYear }: Props) {
+export default function IntellectualArc({ assessments, studentId, studentName, role, existingMathDraft, existingEnglishDraft, gradeLevel, academicYear, currentYear, selectedYear }: Props) {
+  // When showing all years and there is real data, delegate to the trajectory view.
+  const allMath    = assessments?.filter((a) => a.assessmentType === 'maps_math')    ?? []
+  const allEnglish = assessments?.filter((a) => a.assessmentType === 'maps_english') ?? []
+
+  if (selectedYear === 'all' && (allMath.length > 0 || allEnglish.length > 0)) {
+    return (
+      <section id="academics">
+        <div className="section-header reveal">
+          <span className="section-num">01</span>
+          <h2 className="section-title">The Intellectual Arc</h2>
+          <div className="section-rule" />
+        </div>
+        <IntellectualArcAllYears
+          mathAssessments={allMath}
+          englishAssessments={allEnglish}
+          currentYear={currentYear ?? academicYear ?? ''}
+          studentId={studentId}
+          role={role}
+        />
+      </section>
+    )
+  }
+
+  // Filter to selected year when not 'all'. Falls back to all data when selectedYear is undefined.
+  const visibleAssessments = (selectedYear && selectedYear !== 'all')
+    ? assessments?.filter((a) => a.academicYear === selectedYear)
+    : assessments
+
   // Compute subject arrays unconditionally so each can fall back independently.
-  const mathAssessments    = assessments?.filter((a) => a.assessmentType === 'maps_math')    ?? []
-  const englishAssessments = assessments?.filter((a) => a.assessmentType === 'maps_english') ?? []
+  const mathAssessments    = visibleAssessments?.filter((a) => a.assessmentType === 'maps_math')    ?? []
+  const englishAssessments = visibleAssessments?.filter((a) => a.assessmentType === 'maps_english') ?? []
 
   // Per-subject flags: only true if that subject has actual MAPS scores.
   // This ensures demo fallbacks show for real students missing one or both subjects.
