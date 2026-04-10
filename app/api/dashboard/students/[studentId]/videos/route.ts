@@ -85,15 +85,16 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   const { data, error: dbError } = await supabaseAdmin
     .from('student_videos')
     .insert({
-      school_id:   ctx.schoolId,
-      student_id:  studentId,
-      title:       input.title,
-      video_url:   input.videoUrl,
-      grade_level: input.gradeLevel,
-      term:        input.term,
-      category:    input.category,
-      created_by:  ctx.userId,
-      updated_by:  ctx.userId,
+      school_id:          ctx.schoolId,
+      student_id:         studentId,
+      title:              input.title,
+      video_url:          input.videoUrl          ?? null,
+      video_storage_path: input.videoStoragePath  ?? null,
+      grade_level:        input.gradeLevel,
+      term:               input.term,
+      category:           input.category,
+      created_by:         ctx.userId,
+      updated_by:         ctx.userId,
     })
     .select()
     .single()

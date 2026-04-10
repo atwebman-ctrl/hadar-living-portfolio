@@ -227,6 +227,9 @@ export async function getStudentPortfolio(
     scopeAndSequence: scopeRows.map((r) => mapScopeAndSequence(r as Row)),
     teacherNotes: teacherNoteRows.map((r) => mapTeacherNote(r as Row)),
     aiDrafts: aiDraftRows.map((r) => mapAiDraft(r as Row)),
-    studentVideos: studentVideoRows.map((r) => mapStudentVideo(r as Row)),
+    studentVideos: studentVideoRows.map((r) => {
+      const v = mapStudentVideo(r as Row)
+      return { ...v, videoPublicUrl: storagePublicUrl(v.videoStoragePath) }
+    }),
   };
 }

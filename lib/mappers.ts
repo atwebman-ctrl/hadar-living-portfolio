@@ -245,15 +245,17 @@ export function mapScopeAndSequence(row: Row): SubjectProgress {
 
 export function mapStudentVideo(row: Row): StudentVideo {
   return {
-    id:         row.id as string,
-    schoolId:   row.school_id as string,
-    studentId:  row.student_id as string,
-    title:      row.title as string,
-    videoUrl:   row.video_url as string,
-    gradeLevel: row.grade_level as string,
-    term:       row.term as string,
-    category:   row.category as StudentVideo['category'],
-    createdAt:  row.created_at as string,
+    id:               row.id as string,
+    schoolId:         row.school_id as string,
+    studentId:        row.student_id as string,
+    title:            row.title as string,
+    videoUrl:         (row.video_url as string | null) ?? null,
+    videoStoragePath: (row.video_storage_path as string | null) ?? null,
+    videoPublicUrl:   null, // populated by getStudentPortfolio after storage URL resolution
+    gradeLevel:       row.grade_level as string,
+    term:             row.term as string,
+    category:         row.category as StudentVideo['category'],
+    createdAt:        row.created_at as string,
   };
 }
 

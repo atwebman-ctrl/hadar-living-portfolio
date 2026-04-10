@@ -24,7 +24,7 @@ import { authErrorResponse } from '@/lib/apiHelpers'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
 
-const ALLOWED_TYPES = ['photo', 'handwriting', 'parent_upload'] as const
+const ALLOWED_TYPES = ['photo', 'handwriting', 'parent_upload', 'video'] as const
 type UploadType = typeof ALLOWED_TYPES[number]
 
 const BUCKET = 'portfolio-assets'
@@ -164,6 +164,12 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   }
   if (type === 'handwriting') {
     return insertHandwriting({ schoolId: ctx.schoolId, studentId, path, formData, academicYear, userId: ctx.userId })
+  }
+  if (type === 'video') {
+    // Storage-only: the student_videos DB row is created by the videos API route
+    // after the user completes the form with title/grade/term/category.
+    console.log('[POST uploads] video stored at', path)
+    return NextResponse.json({ storagePath: path }, { status: 200 })
   }
   return insertParentUpload({ schoolId: ctx.schoolId, studentId, path, formData, academicYear, gradeLevel, uploadedBy: ctx.userId })
 }

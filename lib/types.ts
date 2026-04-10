@@ -306,7 +306,9 @@ export interface StudentVideo {
   schoolId: string;
   studentId: string;
   title: string;
-  videoUrl: string;
+  videoUrl: string | null;          // YouTube/Vimeo link (nullable since 0014)
+  videoStoragePath: string | null;  // Supabase storage path (0014)
+  videoPublicUrl: string | null;    // Resolved public URL for storage-backed videos
   gradeLevel: string;
   term: string;
   category: StudentVideoCategory;

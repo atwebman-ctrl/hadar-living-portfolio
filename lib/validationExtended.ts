@@ -134,12 +134,16 @@ const studentVideoCategoryEnum = z.enum([
 
 /** Body for POST /api/dashboard/students/[studentId]/videos */
 export const CreateStudentVideoBodySchema = z.object({
-  title:      nonEmptyString,
-  videoUrl:   z.string().url("Must be a valid URL (https://...)"),
-  gradeLevel: nonEmptyString,
-  term:       nonEmptyString,
-  category:   studentVideoCategoryEnum,
-});
+  title:            nonEmptyString,
+  videoUrl:         z.string().url("Must be a valid URL (https://...)").optional(),
+  videoStoragePath: z.string().min(1).optional(),
+  gradeLevel:       nonEmptyString,
+  term:             nonEmptyString,
+  category:         studentVideoCategoryEnum,
+}).refine(
+  (d) => d.videoUrl || d.videoStoragePath,
+  { message: 'Either a YouTube/Vimeo URL or an uploaded video file is required.' }
+);
 
 export type CreateStudentVideoBodyInput = z.infer<typeof CreateStudentVideoBodySchema>;
 

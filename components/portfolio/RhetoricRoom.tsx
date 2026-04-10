@@ -94,7 +94,9 @@ function VideoCard({ grade, type, captionLine1, captionLine2, footer }: {
 }
 
 function EmbedVideoCard({ video }: { video: StudentVideo }) {
-  const embedUrl = getEmbedUrl(video.videoUrl)
+  const embedUrl = video.videoUrl ? getEmbedUrl(video.videoUrl) : null
+  const nativeUrl = video.videoPublicUrl ?? null
+
   return (
     <div className="video-card">
       <div className="video-header">
@@ -110,9 +112,18 @@ function EmbedVideoCard({ video }: { video: StudentVideo }) {
             allowFullScreen
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
           />
+        ) : nativeUrl ? (
+          <video
+            controls
+            preload="metadata"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: '#000' }}
+          >
+            <source src={nativeUrl} />
+            Your browser does not support HTML5 video.
+          </video>
         ) : (
           <div className="video-caption" style={{ padding: '1rem' }}>
-            Video unavailable — unsupported URL format
+            Video unavailable
           </div>
         )}
       </div>
