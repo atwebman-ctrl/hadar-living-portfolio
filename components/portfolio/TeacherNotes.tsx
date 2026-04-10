@@ -56,11 +56,14 @@ const DEMO_NOTES: TeacherNote[] = [
 ]
 
 export default function TeacherNotes({ notes, role, studentId }: Props) {
-  const hasData = !!notes && notes.length > 0
-  const canEdit = (role === 'admin' || role === 'teacher') && !!studentId
+  const isDemo   = !studentId
+  const hasData  = !!notes && notes.length > 0
+  const canEdit  = (role === 'admin' || role === 'teacher') && !!studentId
   const isParent = role === 'parent'
 
-  const allNotes = hasData ? notes! : DEMO_NOTES
+  // Demo route: no studentId → show sample notes.
+  // Real route with no notes yet → show empty state (not demo data).
+  const allNotes = isDemo ? DEMO_NOTES : (notes ?? [])
 
   // Parents only see notes marked visible_to_parents = true
   const visibleNotes = isParent
@@ -68,13 +71,13 @@ export default function TeacherNotes({ notes, role, studentId }: Props) {
     : allNotes
 
   const items = visibleNotes.map((n) => ({
-    id:              n.id,
-    section:         SECTION_LABELS[n.sectionCategory] ?? SECTION_LABELS[n.sectionType] ?? n.sectionCategory,
-    author:          n.authorName,
-    text:            n.text,
-    highlightQuote:  n.highlightQuote,
+    id:               n.id,
+    section:          SECTION_LABELS[n.sectionCategory] ?? SECTION_LABELS[n.sectionType] ?? n.sectionCategory,
+    author:           n.authorName,
+    text:             n.text,
+    highlightQuote:   n.highlightQuote,
     visibleToParents: n.visibleToParents,
-    date:            n.createdAt
+    date:             n.createdAt
       ? new Date(n.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
       : null,
     term: n.term ?? null,
@@ -90,9 +93,16 @@ export default function TeacherNotes({ notes, role, studentId }: Props) {
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
         {hasData
           ? `${items.length} teacher narrative${items.length !== 1 ? 's' : ''} — section-by-section observations from the instructional team.`
-          : 'Three teacher narratives — qualitative observations from the instructional team, written for parents and the lasting record.'}
+          : isDemo
+            ? 'Three teacher narratives — qualitative observations from the instructional team, written for parents and the lasting record.'
+            : null}
       </p>
 
+      {!isDemo && !hasData ? (
+        <p className="reveal" style={{ fontFamily: 'var(--font-body)', fontSize: '.9rem', color: 'var(--ink-faint)', fontStyle: 'italic', margin: '0 0 1.5rem' }}>
+          No teacher narratives yet.
+        </p>
+      ) : (
       <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {items.map((n) => (
           <blockquote key={n.id} style={{ margin: 0, background: 'var(--parchment)', border: '1px solid var(--rule)', borderLeft: '3px solid var(--gold)', padding: '1.25rem 1.5rem' }}>
@@ -140,6 +150,7 @@ export default function TeacherNotes({ notes, role, studentId }: Props) {
           </blockquote>
         ))}
       </div>
+      )}
 
       {canEdit && <InlineTeacherNoteForm studentId={studentId!} />}
     </section>
