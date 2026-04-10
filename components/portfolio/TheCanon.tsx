@@ -7,6 +7,7 @@ import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import InlineReadingForm from '@/components/portfolio/InlineReadingForm'
 import BookDetail from '@/components/portfolio/BookDetail'
 import ReadingForm from '@/components/portfolio/ReadingForm'
+import ClassBookshelf from '@/components/portfolio/ClassBookshelf'
 import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
 
 interface Props {
@@ -58,6 +59,7 @@ function toFields(r: Reading) {
 
 export default function TheCanon({ readings, studentId, studentName, role, existingDraft }: Props) {
   const router = useRouter()
+  const [tab,            setTab]            = useState<'my-books' | 'class'>('my-books')
   const [openId,         setOpenId]         = useState<string | null>(null)
   const [editingReading, setEditingReading] = useState<Reading | null>(null)
   const [editStatus,     setEditStatus]     = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
@@ -90,50 +92,69 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
         <h2 className="section-title">The Canon</h2>
         <div className="section-rule" />
       </div>
-      <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
-        {description}
-      </p>
 
-      <div className="bookshelf reveal">
-        <div className="books-row">
-          {books.map((b, i) => {
-            const palette   = SPINE_PALETTE[i % SPINE_PALETTE.length]
-            const readingId = hasData ? readings![i]?.id : null
-            const isOpen    = readingId !== null && openId === readingId
-            return (
-              <div key={`${b.title}-${i}`} className={`book ${b.done ? 'done' : 'pending'}`}
-                style={{ background: palette.color, color: palette.text, height: SPINE_HEIGHTS[i % SPINE_HEIGHTS.length], width: 36, cursor: hasData ? 'pointer' : 'default', outline: isOpen ? '2px solid #B8A050' : 'none', outlineOffset: '2px', transition: 'outline 0.15s ease' }}
-                onClick={() => { if (!readingId) return; setOpenId(openId === readingId ? null : readingId) }}
-                title={hasData ? `${b.title} — click for details` : undefined}
-                role={hasData ? 'button' : undefined} aria-expanded={isOpen}
-              >
-                <span className="book-title">{b.title}</span>
-                <span className="book-done">{b.done ? '\u2713' : '\u2026'}</span>
-              </div>
-            )
-          })}
+      {/* ── Tabs (only in live mode) ──────────────────────── */}
+      {studentId && (
+        <div className="flip-tabs" style={{ marginBottom: '1.5rem' }}>
+          <button className={`flip-tab${tab === 'my-books' ? ' active' : ''}`} onClick={() => setTab('my-books')}>
+            My Books
+          </button>
+          <button className={`flip-tab${tab === 'class' ? ' active' : ''}`} onClick={() => setTab('class')}>
+            Class Bookshelf
+          </button>
         </div>
-
-        {openReading && openIndex >= 0 && (
-          <BookDetail
-            reading={openReading}
-            spineColor={SPINE_PALETTE[openIndex % SPINE_PALETTE.length].color}
-            canEdit={canEdit}
-            onEdit={() => { setEditingReading(openReading); setEditStatus(null) }}
-            onDelete={handleDelete}
-          />
-        )}
-      </div>
-
-      <div style={{ marginTop: '1rem', fontFamily: "'DM Mono',monospace", fontSize: 9, color: 'var(--ink-faint)', letterSpacing: '.06em' }}>
-        {hasData ? 'Click a spine to see details\u00a0·\u00a0Faded spine\u00a0=\u00a0upcoming' : 'Hover to browse\u00a0·\u00a0Faded spine\u00a0=\u00a0upcoming'}
-      </div>
-
-      {studentId && role && (draftContext || role === 'parent') && (
-        <AiNarrativePanel studentId={studentId} role={role} sectionType="reading_bookshelf"
-          existingDraft={existingDraft} draftContext={draftContext ?? {}} />
       )}
-      {studentId && role && role !== 'parent' && <InlineReadingForm studentId={studentId} />}
+
+      {/* ── My Books tab ─────────────────────────────────── */}
+      {tab === 'my-books' && (
+        <>
+          <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
+            {description}
+          </p>
+          <div className="bookshelf reveal">
+            <div className="books-row">
+              {books.map((b, i) => {
+                const palette   = SPINE_PALETTE[i % SPINE_PALETTE.length]
+                const readingId = hasData ? readings![i]?.id : null
+                const isOpen    = readingId !== null && openId === readingId
+                return (
+                  <div key={`${b.title}-${i}`} className={`book ${b.done ? 'done' : 'pending'}`}
+                    style={{ background: palette.color, color: palette.text, height: SPINE_HEIGHTS[i % SPINE_HEIGHTS.length], width: 36, cursor: hasData ? 'pointer' : 'default', outline: isOpen ? '2px solid #B8A050' : 'none', outlineOffset: '2px', transition: 'outline 0.15s ease' }}
+                    onClick={() => { if (!readingId) return; setOpenId(openId === readingId ? null : readingId) }}
+                    title={hasData ? `${b.title} — click for details` : undefined}
+                    role={hasData ? 'button' : undefined} aria-expanded={isOpen}
+                  >
+                    <span className="book-title">{b.title}</span>
+                    <span className="book-done">{b.done ? '\u2713' : '\u2026'}</span>
+                  </div>
+                )
+              })}
+            </div>
+            {openReading && openIndex >= 0 && (
+              <BookDetail
+                reading={openReading}
+                spineColor={SPINE_PALETTE[openIndex % SPINE_PALETTE.length].color}
+                canEdit={canEdit}
+                onEdit={() => { setEditingReading(openReading); setEditStatus(null) }}
+                onDelete={handleDelete}
+              />
+            )}
+          </div>
+          <div style={{ marginTop: '1rem', fontFamily: "'DM Mono',monospace", fontSize: 9, color: 'var(--ink-faint)', letterSpacing: '.06em' }}>
+            {hasData ? 'Click a spine to see details\u00a0·\u00a0Faded spine\u00a0=\u00a0upcoming' : 'Hover to browse\u00a0·\u00a0Faded spine\u00a0=\u00a0upcoming'}
+          </div>
+          {studentId && role && (draftContext || role === 'parent') && (
+            <AiNarrativePanel studentId={studentId} role={role} sectionType="reading_bookshelf"
+              existingDraft={existingDraft} draftContext={draftContext ?? {}} />
+          )}
+          {studentId && role && role !== 'parent' && <InlineReadingForm studentId={studentId} />}
+        </>
+      )}
+
+      {/* ── Class Bookshelf tab ───────────────────────────── */}
+      {tab === 'class' && studentId && (
+        <ClassBookshelf studentId={studentId} />
+      )}
 
       {/* ── Edit modal ─────────────────────────────────────── */}
       {editingReading && studentId && (
