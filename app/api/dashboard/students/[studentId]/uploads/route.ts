@@ -254,11 +254,11 @@ async function insertParentUpload(args: {
   const title       = (formData.get('title')              as string | null) ?? 'Untitled'
   const description = (formData.get('description')        as string | null) || null
   const date        = (formData.get('date')               as string | null) || null
-  const subType     = (formData.get('parent_upload_type') as string | null) || 'other'
+  const category    = (formData.get('parent_upload_type') as string | null) || 'other'
 
   const { data, error } = await supabaseAdmin
     .from('parent_uploads')
-    .insert({ school_id: schoolId, student_id: studentId, upload_type: subType, title, storage_path: path, description, date, grade_level: gradeLevel, academic_year: academicYear, uploaded_by: uploadedBy })
+    .insert({ school_id: schoolId, student_id: studentId, upload_type: category, category, title, storage_path: path, description, date, grade_level: gradeLevel, academic_year: academicYear, uploaded_by: uploadedBy })
     .select()
     .single()
 

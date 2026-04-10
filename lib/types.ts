@@ -201,7 +201,8 @@ export interface ParentUpload {
   id: string;
   schoolId: string;
   studentId: string;
-  uploadType: string;  // e.g. "art" | "story" | "poem" | "recording"
+  uploadType: string;  // legacy field; new rows use category
+  category: string | null;  // art_craft | home_project | recording | certificate | photo | other
   title: string;
   storagePath: string;
   description: string | null;

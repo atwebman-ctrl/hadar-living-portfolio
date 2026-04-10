@@ -1,7 +1,7 @@
 'use client'
 
 import type { ParentUpload } from '@/lib/types'
-import UploadButton from '@/components/shared/UploadButton'
+import ParentUploadForm from './ParentUploadForm'
 
 interface Props {
   uploads?:       ParentUpload[]
@@ -11,22 +11,14 @@ interface Props {
   gradeLevel?:    string
 }
 
-const TYPE_ICONS: Record<string, string> = {
-  art:       '🖼',
-  story:     '📖',
-  poem:      '✍',
-  recording: '🎙',
-  other:     '📎',
+// ── Helpers ───────────────────────────────────────────────────
+
+/** Returns true if the storage path has an image file extension. */
+function isImagePath(path: string | null): boolean {
+  if (!path) return false
+  const ext = path.split('?')[0].split('.').pop()?.toLowerCase() ?? ''
+  return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'].includes(ext)
 }
-
-// Upload types that are typically images — show an inline preview
-const IMAGE_TYPES = new Set(['art'])
-
-const DEMO_UPLOADS = [
-  { id: '1', uploadType: 'art',       title: 'Mosaic — Jerusalem skyline',     date: 'Jan 2026', gradeLevel: 'Grade 3', description: 'Mixed-media mosaic created for the Hanukkah art show.', publicUrl: null },
-  { id: '2', uploadType: 'story',     title: 'The Lost Compass',               date: 'Oct 2025', gradeLevel: 'Grade 3', description: 'Original short story written over a weekend.',         publicUrl: null },
-  { id: '3', uploadType: 'recording', title: 'Shabbat candle blessing — home', date: 'Nov 2025', gradeLevel: 'Grade 3', description: null,                                                   publicUrl: null },
-]
 
 function fmtDate(iso: string | null): string | null {
   if (!iso) return null
@@ -34,17 +26,73 @@ function fmtDate(iso: string | null): string | null {
   return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 }
 
-export default function ParentUploads({ uploads, uploadEnabled, studentId, academicYear = '', gradeLevel = '' }: Props) {
+// ── Category display ──────────────────────────────────────────
+
+const CATEGORY_LABELS: Record<string, string> = {
+  art_craft:    'Art / Craft',
+  home_project: 'Home Project',
+  recording:    'Recording',
+  certificate:  'Certificate',
+  photo:        'Photo',
+  other:        'Other',
+  // legacy upload_type values
+  art:          'Art',
+  story:        'Story',
+  poem:         'Poem',
+}
+
+const CATEGORY_ICONS: Record<string, string> = {
+  art_craft:    '🎨',
+  home_project: '🏡',
+  recording:    '🎙',
+  certificate:  '🏅',
+  photo:        '📷',
+  other:        '📎',
+  art:          '🖼',
+  story:        '📖',
+  poem:         '✍',
+}
+
+// ── Demo data ─────────────────────────────────────────────────
+
+const DEMO_UPLOADS = [
+  {
+    id: '1', category: 'art_craft', title: 'Mosaic — Jerusalem skyline',
+    date: 'Jan 2026', gradeLevel: 'Grade 3',
+    description: 'Mixed-media mosaic created for the Hanukkah art show.',
+    publicUrl: null, storagePath: null,
+  },
+  {
+    id: '2', category: 'home_project', title: 'The Lost Compass',
+    date: 'Oct 2025', gradeLevel: 'Grade 3',
+    description: 'Original short story written over a weekend.',
+    publicUrl: null, storagePath: null,
+  },
+  {
+    id: '3', category: 'recording', title: 'Shabbat candle blessing — home',
+    date: 'Nov 2025', gradeLevel: 'Grade 3',
+    description: null, publicUrl: null, storagePath: null,
+  },
+]
+
+// ── Component ─────────────────────────────────────────────────
+
+export default function ParentUploads({
+  uploads, uploadEnabled, studentId, academicYear = '', gradeLevel = '',
+}: Props) {
   const hasData = !!uploads && uploads.length > 0
-  const items   = hasData
+  const isDemo  = !studentId
+
+  const rawItems = hasData
     ? uploads!.map((u) => ({
         id:          u.id,
-        uploadType:  u.uploadType,
+        category:    u.category ?? u.uploadType,
         title:       u.title,
         date:        fmtDate(u.date),
         gradeLevel:  u.gradeLevel,
         description: u.description,
         publicUrl:   u.publicUrl,
+        storagePath: u.storagePath,
       }))
     : DEMO_UPLOADS
 
@@ -57,30 +105,33 @@ export default function ParentUploads({ uploads, uploadEnabled, studentId, acade
       </div>
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
         {hasData
-          ? `${items.length} artifact${items.length !== 1 ? 's' : ''} submitted by parents — home projects, recordings, and creative work.`
-          : 'Three artifacts submitted by parents — work created at home that complements the classroom portfolio.'}
+          ? `${rawItems.length} artifact${rawItems.length !== 1 ? 's' : ''} submitted by parents — home projects, recordings, and creative work.`
+          : isDemo
+            ? 'Three artifacts submitted by parents — work created at home that complements the classroom portfolio.'
+            : null}
       </p>
 
+      {!hasData && !isDemo && (
+        <p className="reveal" style={{ fontFamily: 'var(--font-body)', fontSize: '.9rem', color: 'var(--ink-faint)', fontStyle: 'italic', margin: '0 0 1.5rem' }}>
+          No uploads yet.
+        </p>
+      )}
+
       {uploadEnabled && studentId && (
-        <div className="reveal" style={{ marginBottom: '1.5rem' }}>
-          <UploadButton
-            studentId={studentId}
-            uploadType="parent_upload"
-            academicYear={academicYear}
-            gradeLevel={gradeLevel}
-            accept="image/*,audio/*,video/*,.pdf"
-            label="Upload from Home"
-          />
+        <div className="reveal">
+          <ParentUploadForm studentId={studentId} academicYear={academicYear} gradeLevel={gradeLevel} />
         </div>
       )}
 
       <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-        {items.map((u) => {
-          const icon     = TYPE_ICONS[u.uploadType] ?? TYPE_ICONS.other
-          const showImg  = IMAGE_TYPES.has(u.uploadType) && !!u.publicUrl
+        {rawItems.map((u) => {
+          const cat     = u.category ?? 'other'
+          const icon    = CATEGORY_ICONS[cat] ?? CATEGORY_ICONS.other
+          const label   = CATEGORY_LABELS[cat] ?? cat
+          const showImg = isImagePath(u.storagePath) && !!u.publicUrl
           return (
             <div key={u.id} style={{ background: 'var(--parchment)', border: '1px solid var(--rule)' }}>
-              {/* Inline image preview for art uploads */}
+              {/* Inline image preview for image uploads */}
               {showImg && (
                 <img
                   src={u.publicUrl!}
@@ -89,7 +140,6 @@ export default function ParentUploads({ uploads, uploadEnabled, studentId, acade
                 />
               )}
               <div style={{ display: 'flex', gap: '1rem', padding: '1rem 1.25rem', alignItems: 'flex-start' }}>
-                {/* Type icon */}
                 <div style={{ fontSize: '1.4rem', lineHeight: 1, paddingTop: '.1rem', flexShrink: 0 }} aria-hidden>
                   {icon}
                 </div>
@@ -103,28 +153,16 @@ export default function ParentUploads({ uploads, uploadEnabled, studentId, acade
                     </span>
                   </div>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '.6rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--gold)', display: 'block', marginBottom: u.description ? '.35rem' : 0 }}>
-                    {u.uploadType}
+                    {label}
                   </span>
                   {u.description && (
                     <p style={{ fontFamily: 'var(--font-body)', fontSize: '.85rem', color: 'var(--ink-mid)', margin: '0 0 .5rem', lineHeight: 1.5 }}>
                       {u.description}
                     </p>
                   )}
-                  {/* Download / view link */}
                   {u.publicUrl && !showImg && (
-                    <a
-                      href={u.publicUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        fontFamily:    'var(--font-mono)',
-                        fontSize:      '.6rem',
-                        letterSpacing: '.1em',
-                        textTransform: 'uppercase',
-                        color:         'var(--navy)',
-                        textDecoration:'underline',
-                      }}
-                    >
+                    <a href={u.publicUrl} target="_blank" rel="noopener noreferrer"
+                      style={{ fontFamily: 'var(--font-mono)', fontSize: '.6rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--navy)', textDecoration: 'underline' }}>
                       View / Download ↗
                     </a>
                   )}

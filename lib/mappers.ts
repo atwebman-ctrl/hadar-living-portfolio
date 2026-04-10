@@ -195,6 +195,7 @@ export function mapParentUpload(row: Row): ParentUpload {
     schoolId:    row.school_id as string,
     studentId:   row.student_id as string,
     uploadType:  row.upload_type as string,
+    category:    (row.category as string) ?? null,
     title:       row.title as string,
     storagePath: row.storage_path as string,
     description: (row.description as string) ?? null,
