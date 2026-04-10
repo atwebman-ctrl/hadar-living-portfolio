@@ -156,6 +156,7 @@ export default function SectionDetailClient({
             uploads={portfolio.parentUploads}
             uploadEnabled={true}
             studentId={studentId}
+            role={role}
             academicYear={student.academicYear}
             gradeLevel={student.gradeLevel}
           />

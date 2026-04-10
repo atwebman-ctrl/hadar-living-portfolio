@@ -128,6 +128,7 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
         uploads={portfolio.parentUploads}
         uploadEnabled={true}
         studentId={studentId}
+        role={role}
         academicYear={student.academicYear}
         gradeLevel={student.gradeLevel}
       />

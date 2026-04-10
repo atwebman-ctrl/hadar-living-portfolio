@@ -232,6 +232,24 @@ export const CreateTeacherNoteBodySchema = z.object({
 
 export type CreateTeacherNoteBodyInput = z.infer<typeof CreateTeacherNoteBodySchema>;
 
+// ── Parent uploads ────────────────────────────────────────────
+
+export const PARENT_UPLOAD_CATEGORY_VALUES = [
+  "art_craft", "home_project", "recording",
+  "certificate", "photo", "other",
+] as const;
+
+const parentUploadCategoryEnum = z.enum(PARENT_UPLOAD_CATEGORY_VALUES);
+
+/** Body for PATCH /api/dashboard/students/[studentId]/parent-uploads/[uploadId] */
+export const UpdateParentUploadSchema = z.object({
+  title:       z.string().min(1).optional(),
+  category:    parentUploadCategoryEnum.optional(),
+  description: z.string().nullable().optional(),
+});
+
+export type UpdateParentUploadInput = z.infer<typeof UpdateParentUploadSchema>;
+
 // ── Helper ────────────────────────────────────────────────────
 
 /**
