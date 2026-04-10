@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { TERM_OPTIONS } from '@/lib/constants'
 import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
@@ -34,7 +34,8 @@ const twoCol: React.CSSProperties     = { display: 'grid', gridTemplateColumns: 
 const EMPTY = { caption: '', term: '', category: 'classroom' }
 
 export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }: Props) {
-  const router = useRouter()
+  const router   = useRouter()
+  const inputRef = useRef<HTMLInputElement>(null)
   const [open,      setOpen]      = useState(false)
   const [form,      setForm]      = useState({ ...EMPTY })
   const [pending,   setPending]   = useState<File | null>(null)
@@ -45,6 +46,16 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
     setOpen(false); setForm({ ...EMPTY }); setError(null); setUploading(false); setPending(null)
   }
   function update(k: keyof typeof form, v: string) { setForm((f) => ({ ...f, [k]: v })) }
+
+  // BEFORE: <label style={{...}}><input type="file" .../>{text}</label>
+  // AFTER:  inputRef.current?.click() from a plain div — same pattern as ProfilePhotoUpload.
+  // Input is rendered outside the {open &&} conditional so the ref is always populated.
+  function openPicker(e: React.MouseEvent) {
+    e.stopPropagation()
+    e.preventDefault()
+    console.log('DEBUG openPicker', inputRef.current)
+    inputRef.current?.click()
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -85,6 +96,15 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
 
   return (
     <>
+      {/* Input lives outside the modal conditional so inputRef is always populated */}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+
       <div style={{ marginBottom: '1.5rem' }}>
         <button style={openBtn} onClick={() => setOpen(true)}>+ Upload Photo</button>
       </div>
@@ -124,15 +144,15 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
                 </div>
               </div>
 
-              {/* Label wraps the input directly — browser natively opens file picker on click, no JS needed */}
-              <label
+              {/* Drop zone — plain div calling inputRef.current.click() via openPicker */}
+              <div
+                onClick={openPicker}
                 style={{
-                  display: 'block', marginTop: '0.5rem', padding: '2rem 1rem', textAlign: 'center',
+                  marginTop: '0.5rem', padding: '2rem 1rem', textAlign: 'center',
                   border: `2px dashed ${pending ? 'var(--navy)' : 'var(--rule)'}`,
                   cursor: 'pointer', transition: 'border-color 0.15s',
                 }}
               >
-                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
                 {pending ? (
                   <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--navy)', margin: 0, letterSpacing: '0.08em' }}>
                     ✓ {pending.name} — click to replace
@@ -143,7 +163,7 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
                     <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--ink-faint)', margin: 0, letterSpacing: '0.06em' }}>or click to browse</p>
                   </>
                 )}
-              </label>
+              </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
                 <button
