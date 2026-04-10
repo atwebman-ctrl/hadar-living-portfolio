@@ -40,6 +40,7 @@ interface Props {
   item:      UploadCardItem
   studentId: string
   canEdit:   boolean
+  onExpand?: () => void
 }
 
 // ── Shared styles ─────────────────────────────────────────────
@@ -56,7 +57,7 @@ const actionBtn = (danger?: boolean): React.CSSProperties => ({
 
 // ── Component ─────────────────────────────────────────────────
 
-export default function ParentUploadCard({ item, studentId, canEdit }: Props) {
+export default function ParentUploadCard({ item, studentId, canEdit, onExpand }: Props) {
   const router = useRouter()
   const [hovering,  setHovering]  = useState(false)
   const [confirm,   setConfirm]   = useState(false)
@@ -98,7 +99,12 @@ export default function ParentUploadCard({ item, studentId, canEdit }: Props) {
         onMouseLeave={() => { setHovering(false); setConfirm(false) }}
       >
         {item.showImg && (
-          <img src={item.publicUrl!} alt={item.title} style={{ width: '100%', maxHeight: 260, objectFit: 'cover', display: 'block', borderBottom: '1px solid var(--rule)' }} />
+          <img
+            src={item.publicUrl!}
+            alt={item.title}
+            onClick={onExpand}
+            style={{ width: '100%', maxHeight: 260, objectFit: 'cover', display: 'block', borderBottom: '1px solid var(--rule)', cursor: onExpand ? 'zoom-in' : 'default' }}
+          />
         )}
         <div style={{ display: 'flex', gap: '1rem', padding: '1rem 1.25rem', alignItems: 'flex-start' }}>
           <div style={{ fontSize: '1.4rem', lineHeight: 1, paddingTop: '.1rem', flexShrink: 0 }} aria-hidden>{item.icon}</div>

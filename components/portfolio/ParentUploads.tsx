@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import type { ParentUpload, UserRole } from '@/lib/types'
 import ParentUploadForm from './ParentUploadForm'
 import ParentUploadCard, { type UploadCardItem } from './ParentUploadCard'
+import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 
 interface Props {
   uploads?:       ParentUpload[]
@@ -56,6 +58,7 @@ export default function ParentUploads({
   const hasData = !!uploads && uploads.length > 0
   const isDemo  = !studentId
   const canEdit = (role === 'admin' || role === 'teacher') && !!studentId
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
 
   const items: UploadCardItem[] = hasData
     ? uploads!.map((u) => {
@@ -75,6 +78,20 @@ export default function ParentUploads({
         }
       })
     : DEMO_UPLOADS
+
+  // Only items with a real image participate in lightbox navigation
+  const lightboxItems: LightboxPhoto[] = items
+    .filter((i) => i.showImg && !!i.publicUrl)
+    .map((i) => ({
+      id:        i.id,
+      publicUrl: i.publicUrl!,
+      caption:   i.title,
+      term:      i.date,
+      category:  i.category,
+    }))
+
+  // Map item id → lightbox index for quick lookup
+  const lightboxIdxMap = new Map(lightboxItems.map((li, idx) => [li.id, idx]))
 
   return (
     <section id="parent-uploads">
@@ -104,15 +121,28 @@ export default function ParentUploads({
       )}
 
       <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-        {items.map((item) => (
-          <ParentUploadCard
-            key={item.id}
-            item={item}
-            studentId={studentId ?? ''}
-            canEdit={canEdit && !isDemo}
-          />
-        ))}
+        {items.map((item) => {
+          const lbIdx = lightboxIdxMap.get(item.id)
+          return (
+            <ParentUploadCard
+              key={item.id}
+              item={item}
+              studentId={studentId ?? ''}
+              canEdit={canEdit && !isDemo}
+              onExpand={lbIdx !== undefined ? () => setLightboxIdx(lbIdx) : undefined}
+            />
+          )
+        })}
       </div>
+
+      {lightboxIdx !== null && (
+        <PhotoLightbox
+          photos={lightboxItems}
+          index={lightboxIdx}
+          onClose={() => setLightboxIdx(null)}
+          onNav={setLightboxIdx}
+        />
+      )}
     </section>
   )
 }
