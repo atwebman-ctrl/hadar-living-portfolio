@@ -93,13 +93,14 @@ export async function getStudentPortfolio(
     aiDraftRows,
     studentVideoRows,
   ] = await Promise.all([
+    // deleted_at filter applied in-memory below so the query works both before
+    // and after migration 0012 is applied to production.
     safeQuery(() =>
       supabaseAdmin
         .from("assessments")
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
-        .is("deleted_at", null)
         .order("academic_year", { ascending: false })
     ),
     safeQuery(() =>
@@ -108,7 +109,6 @@ export async function getStudentPortfolio(
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
-        .is("deleted_at", null)
         .order("sort_order", { ascending: true })
     ),
     safeQuery(() =>
@@ -117,7 +117,6 @@ export async function getStudentPortfolio(
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
-        .is("deleted_at", null)
         .order("created_at", { ascending: false })
     ),
     safeQuery(() =>
@@ -142,7 +141,6 @@ export async function getStudentPortfolio(
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
-        .is("deleted_at", null)
         .order("award_date", { ascending: false })
     ),
     safeQuery(() =>
@@ -161,14 +159,13 @@ export async function getStudentPortfolio(
         .eq("school_id", schoolId)
         .order("date", { ascending: false })
     ),
-    // teacher_notes: Sprint 3 table — safeQuery returns [] until migration lands.
+    // teacher_notes: deleted_at filter applied in-memory below.
     safeQuery(() =>
       supabaseAdmin
         .from("teacher_notes")
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
-        .is("deleted_at", null)
         .order("created_at", { ascending: false })
     ),
     // scope_and_sequence: Sprint 3 table — safeQuery returns [] until migration lands.
@@ -189,45 +186,50 @@ export async function getStudentPortfolio(
         .eq("school_id", schoolId)
         .eq("status", "accepted")
     ),
-    // student_videos: 0008 migration — safeQuery returns [] until migration lands.
+    // student_videos: deleted_at filter applied in-memory below.
     safeQuery(() =>
       supabaseAdmin
         .from("student_videos")
         .select("*")
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
-        .is("deleted_at", null)
         .order("created_at", { ascending: true })
     ),
   ]);
 
   type Row = Record<string, unknown>;
 
+  // In-memory soft-delete filter: works before AND after the deleted_at column
+  // migration is applied. When the column doesn't exist, r.deleted_at is
+  // undefined (falsy) so all rows pass. Once the column exists, rows with a
+  // timestamp are excluded and rows with null pass.
+  const notDeleted = (r: unknown) => !(r as Row).deleted_at
+
   return {
     student: mapStudent(studentRow as Row),
     school: mapSchool(schoolRow as Row),
-    assessments: assessmentRows.map((r) => mapAssessment(r as Row)),
-    readings: readingRows.map((r) => mapReading(r as Row)),
-    writingSamples: writingSampleRows.map((r) => mapWritingSample(r as Row)),
-    handwritingSamples: handwritingRows.map((r) => {
+    assessments: assessmentRows.filter(notDeleted).map((r) => mapAssessment(r as Row)),
+    readings: readingRows.filter(notDeleted).map((r) => mapReading(r as Row)),
+    writingSamples: writingSampleRows.filter(notDeleted).map((r) => mapWritingSample(r as Row)),
+    handwritingSamples: handwritingRows.filter(notDeleted).map((r) => {
       const s = mapHandwritingSample(r as Row)
       return { ...s, publicUrl: storagePublicUrl(s.imagePath) }
     }),
     videos: videoRows.map((r) => mapVideo(r as Row)),
-    characterAwards: characterAwardRows.map((r) => mapCharacterAward(r as Row)),
-    photos: photoRows.map((r) => {
+    characterAwards: characterAwardRows.filter(notDeleted).map((r) => mapCharacterAward(r as Row)),
+    photos: photoRows.filter(notDeleted).map((r) => {
       const p = mapPhoto(r as Row)
       return { ...p, publicUrl: storagePublicUrl(p.storagePath) }
     }),
-    parentUploads: parentUploadRows.map((r) => {
+    parentUploads: parentUploadRows.filter(notDeleted).map((r) => {
       const u = mapParentUpload(r as Row)
       return { ...u, publicUrl: storagePublicUrl(u.storagePath) }
     }),
     teachers: [],
     scopeAndSequence: scopeRows.map((r) => mapScopeAndSequence(r as Row)),
-    teacherNotes: teacherNoteRows.map((r) => mapTeacherNote(r as Row)),
+    teacherNotes: teacherNoteRows.filter(notDeleted).map((r) => mapTeacherNote(r as Row)),
     aiDrafts: aiDraftRows.map((r) => mapAiDraft(r as Row)),
-    studentVideos: studentVideoRows.map((r) => {
+    studentVideos: studentVideoRows.filter(notDeleted).map((r) => {
       const v = mapStudentVideo(r as Row)
       return { ...v, videoPublicUrl: storagePublicUrl(v.videoStoragePath) }
     }),

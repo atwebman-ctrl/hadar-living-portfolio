@@ -53,7 +53,7 @@ function groupByYear(assessments: Assessment[]): { year: string; rows: ScoreDisp
     map.set(a.academicYear, bucket)
   }
   return Array.from(map.entries())
-    .sort(([a], [b]) => b.localeCompare(a))          // newest year first
+    .sort(([a], [b]) => (b ?? '').localeCompare(a ?? ''))   // newest year first
     .map(([year, rows]) => ({ year, rows: toDisplayRows(rows) }))
 }
 

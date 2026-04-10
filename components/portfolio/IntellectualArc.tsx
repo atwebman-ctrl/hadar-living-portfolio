@@ -118,11 +118,11 @@ function toStudentScorePoints(
   if (isNaN(curStart)) return []
   return assessments.flatMap((a) => {
     if (!a.ritScore) return []
-    const aStart = parseInt(a.academicYear.split('-')[0], 10)
+    const aStart = parseInt((a.academicYear ?? '').split('-')[0], 10)
     if (isNaN(aStart)) return []
     const grade = currentGradeNum - (curStart - aStart)
     if (grade < 0 || grade > 8) return []
-    const t = a.term.toLowerCase()
+    const t = (a.term ?? '').toLowerCase()
     const season = t.includes('fall') ? 'fall' : t.includes('winter') ? 'winter' : t.includes('spring') ? 'spring' : null
     if (!season) return []
     return [{ grade, season, ritScore: a.ritScore }]

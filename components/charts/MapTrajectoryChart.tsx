@@ -44,9 +44,9 @@ const GOLD = '#B8963E'
 
 // Converts (term, academicYear) to a numeric sort key.
 // Academic year start year × 10 + season ordinal (fall=0, winter=1, spring=2)
-export function termSortKey(term: string, academicYear: string): number {
-  const yearStart = parseInt(academicYear.split('-')[0] ?? '2000', 10)
-  const t = term.toLowerCase()
+export function termSortKey(term: string | null | undefined, academicYear: string | null | undefined): number {
+  const yearStart = parseInt((academicYear ?? '').split('-')[0] ?? '2000', 10)
+  const t = (term ?? '').toLowerCase()
   const season = t.includes('fall') ? 0 : t.includes('winter') ? 1 : t.includes('spring') ? 2 : 3
   return yearStart * 10 + season
 }
