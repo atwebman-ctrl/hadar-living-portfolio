@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { TERM_OPTIONS } from '@/lib/constants'
 import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
@@ -34,8 +34,7 @@ const twoCol: React.CSSProperties     = { display: 'grid', gridTemplateColumns: 
 const EMPTY = { caption: '', term: '', category: 'classroom' }
 
 export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }: Props) {
-  const router   = useRouter()
-  const inputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
   const [open,      setOpen]      = useState(false)
   const [form,      setForm]      = useState({ ...EMPTY })
   const [pending,   setPending]   = useState<File | null>(null)
@@ -47,15 +46,7 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
   }
   function update(k: keyof typeof form, v: string) { setForm((f) => ({ ...f, [k]: v })) }
 
-  function openPicker(e: React.MouseEvent) {
-    e.stopPropagation()
-    e.preventDefault()
-    console.log('openPicker fired', inputRef.current)
-    inputRef.current?.click()
-  }
-
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log('file selected', e.target.files)
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
@@ -133,24 +124,15 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
                 </div>
               </div>
 
-              {/* Hidden file input */}
-              <input
-                ref={inputRef}
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={handleFileChange}
-              />
-
-              {/* Drop zone — plain div, onClick triggers the hidden input */}
-              <div
-                onClick={openPicker}
+              {/* Label wraps the input directly — browser natively opens file picker on click, no JS needed */}
+              <label
                 style={{
-                  marginTop: '0.5rem', padding: '2rem 1rem', textAlign: 'center',
+                  display: 'block', marginTop: '0.5rem', padding: '2rem 1rem', textAlign: 'center',
                   border: `2px dashed ${pending ? 'var(--navy)' : 'var(--rule)'}`,
                   cursor: 'pointer', transition: 'border-color 0.15s',
                 }}
               >
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
                 {pending ? (
                   <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--navy)', margin: 0, letterSpacing: '0.08em' }}>
                     ✓ {pending.name} — click to replace
@@ -161,7 +143,7 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
                     <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--ink-faint)', margin: 0, letterSpacing: '0.06em' }}>or click to browse</p>
                   </>
                 )}
-              </div>
+              </label>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
                 <button
