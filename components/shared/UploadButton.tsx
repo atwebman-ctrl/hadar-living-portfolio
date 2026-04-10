@@ -28,6 +28,7 @@ export interface UploadMetadata {
   caption?:            string
   date_taken?:         string
   term?:               string
+  category?:           string
   title?:              string
   description?:        string
   date?:               string
@@ -94,6 +95,7 @@ export default function UploadButton({
     if (metadata.caption)            form.append('caption',            metadata.caption)
     if (metadata.date_taken)         form.append('date_taken',         metadata.date_taken)
     if (metadata.term)               form.append('term',               metadata.term)
+    if (metadata.category)           form.append('category',           metadata.category)
     if (metadata.title)              form.append('title',              metadata.title)
     if (metadata.description)        form.append('description',        metadata.description)
     if (metadata.date)               form.append('date',               metadata.date)

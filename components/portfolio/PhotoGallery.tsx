@@ -2,9 +2,20 @@
 
 import { useState } from 'react'
 import type { Photo } from '@/lib/types'
-import PhotoUploadModal from './PhotoUploadModal'
+import UploadButton from '@/components/shared/UploadButton'
 import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 import PhotoCard from './PhotoCard'
+import { TERM_OPTIONS } from '@/lib/constants'
+
+const CATEGORIES = [
+  { value: 'classroom',   label: 'Classroom'   },
+  { value: 'field_trip',  label: 'Field Trip'  },
+  { value: 'project',     label: 'Project'     },
+  { value: 'performance', label: 'Performance' },
+  { value: 'celebration', label: 'Celebration' },
+  { value: 'portrait',    label: 'Portrait'    },
+  { value: 'other',       label: 'Other'       },
+]
 
 interface Props {
   photos?:        Photo[]
@@ -23,14 +34,19 @@ const DEMO_PHOTOS: LightboxPhoto[] = [
   { id: '6', caption: 'Poetry recitation — school assembly', term: 'Winter 2026', category: 'performance', publicUrl: '' },
 ]
 
+const sel: React.CSSProperties = { padding: '5px 8px', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.08em', color: 'var(--ink)', background: 'var(--cream)', border: '1px solid var(--rule)', cursor: 'pointer' }
+const inp: React.CSSProperties = { padding: '5px 8px', fontFamily: 'var(--font-body)', fontSize: '0.8rem', color: 'var(--ink)', background: 'var(--cream)', border: '1px solid var(--rule)', width: 200 }
+
 export default function PhotoGallery({
   photos, uploadEnabled, studentId, academicYear = '', gradeLevel = '',
 }: Props) {
-  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
+  const [lightboxIdx,      setLightboxIdx]      = useState<number | null>(null)
+  const [selectedTerm,     setSelectedTerm]     = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('classroom')
+  const [caption,          setCaption]          = useState('')
 
   const hasData = !!photos && photos.length > 0
   const isDemo  = !studentId
-  // uploadEnabled is true only for admin/teacher on real student pages
   const canEdit = !!uploadEnabled && !!studentId
 
   const items: LightboxPhoto[] = hasData
@@ -65,8 +81,38 @@ export default function PhotoGallery({
       )}
 
       {uploadEnabled && studentId && (
-        <div className="reveal">
-          <PhotoUploadModal studentId={studentId} academicYear={academicYear} gradeLevel={gradeLevel} />
+        <div className="reveal" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'flex-end', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-mid)' }}>Caption</span>
+            <input style={inp} type="text" value={caption} placeholder="Optional caption…" onChange={(e) => setCaption(e.target.value)} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-mid)' }}>Term</span>
+            <select style={sel} value={selectedTerm} onChange={(e) => setSelectedTerm(e.target.value)}>
+              <option value="">Select term…</option>
+              {TERM_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-mid)' }}>Category</span>
+            <select style={sel} value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+              {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </select>
+          </div>
+          {selectedTerm ? (
+            <UploadButton
+              studentId={studentId}
+              uploadType="photo"
+              academicYear={academicYear}
+              gradeLevel={gradeLevel}
+              accept="image/*"
+              label="+ Upload Photo"
+              metadata={{ term: selectedTerm, category: selectedCategory, caption: caption || undefined }}
+              onSuccess={() => { setSelectedTerm(''); setCaption('') }}
+            />
+          ) : (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--ink-faint)', letterSpacing: '0.06em' }}>← select a term to upload</span>
+          )}
         </div>
       )}
 
