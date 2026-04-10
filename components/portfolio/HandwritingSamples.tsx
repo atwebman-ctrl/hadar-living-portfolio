@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { HandwritingSample } from '@/lib/types'
 import UploadButton from '@/components/shared/UploadButton'
+import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 import { TERM_OPTIONS } from '@/lib/constants'
 
 interface Props {
@@ -23,6 +24,24 @@ const DEMO_SAMPLES = [
 export default function HandwritingSamples({ samples, uploadEnabled, studentId, academicYear = '', gradeLevel = '' }: Props) {
   const hasData = !!samples && samples.length > 0
   const [selectedTerm, setSelectedTerm] = useState('')
+  const [lightboxIdx,  setLightboxIdx]  = useState<number | null>(null)
+
+  // Build lightbox items from whichever dataset is active (real or demo)
+  const lightboxItems: LightboxPhoto[] = hasData
+    ? samples!.map((s) => ({
+        id:        s.id,
+        publicUrl: s.publicUrl ?? '',
+        caption:   s.teacherNotes ?? null,
+        term:      s.term ?? null,
+        category:  null,
+      }))
+    : DEMO_SAMPLES.map((s) => ({
+        id:        s.id,
+        publicUrl: '',
+        caption:   s.notes,
+        term:      s.term,
+        category:  null,
+      }))
 
   return (
     <section id="handwriting">
@@ -69,36 +88,52 @@ export default function HandwritingSamples({ samples, uploadEnabled, studentId, 
 
       <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1.25rem' }}>
         {hasData
-          ? samples!.map((s) => (
+          ? samples!.map((s, idx) => (
               <SampleCard
                 key={s.id}
                 label={`${s.term} · ${s.academicYear}`}
                 notes={s.teacherNotes}
                 imageUrl={s.publicUrl}
+                onExpand={s.publicUrl ? () => setLightboxIdx(idx) : undefined}
               />
             ))
-          : DEMO_SAMPLES.map((s) => (
+          : DEMO_SAMPLES.map((s, idx) => (
               <SampleCard
                 key={s.id}
                 label={`${s.term} · ${s.gradeLabel}`}
                 notes={s.notes}
                 imageUrl={s.imageUrl}
+                onExpand={s.imageUrl ? () => setLightboxIdx(idx) : undefined}
               />
             ))}
       </div>
+
+      {lightboxIdx !== null && (
+        <PhotoLightbox
+          photos={lightboxItems}
+          index={lightboxIdx}
+          onClose={() => setLightboxIdx(null)}
+          onNav={setLightboxIdx}
+        />
+      )}
     </section>
   )
 }
 
-function SampleCard({ label, notes, imageUrl }: { label: string; notes: string | null; imageUrl: string | null }) {
+function SampleCard({ label, notes, imageUrl, onExpand }: {
+  label:     string
+  notes:     string | null
+  imageUrl:  string | null
+  onExpand?: () => void
+}) {
   return (
     <div style={{ border: '1px solid var(--rule)', background: 'var(--parchment)' }}>
-      {/* Image area */}
       {imageUrl ? (
         <img
           src={imageUrl}
           alt={`Handwriting sample — ${label}`}
-          style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block', borderBottom: '1px solid var(--rule)' }}
+          onClick={onExpand}
+          style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block', borderBottom: '1px solid var(--rule)', cursor: onExpand ? 'zoom-in' : 'default' }}
         />
       ) : (
         <div style={{
@@ -114,7 +149,6 @@ function SampleCard({ label, notes, imageUrl }: { label: string; notes: string |
           </span>
         </div>
       )}
-      {/* Metadata */}
       <div style={{ padding: '.75rem 1rem' }}>
         <p style={{ fontFamily: 'var(--font-mono)', fontSize: '.65rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--gold)', margin: '0 0 .35rem' }}>
           {label}
