@@ -119,11 +119,17 @@ function buildPhotoUrl(path: string | null): string | null {
 export function StudentCard({ student, role }: { student: Student; role: string }) {
   const canEdit    = role === 'admin' || role === 'teacher'
   const canArchive = canEdit && !student.isDemo
-  const age = calcAge(student.dateOfBirth)
-  const initials  = `${student.firstName[0] ?? ''}${student.lastName[0] ?? ''}`.toUpperCase()
-  const photoUrl  = buildPhotoUrl(student.profilePhotoPath ?? null)
+  const age        = calcAge(student.dateOfBirth)
+  const initials   = `${student.firstName[0] ?? ''}${student.lastName[0] ?? ''}`.toUpperCase()
+  const photoUrl   = buildPhotoUrl(student.profilePhotoPath ?? null)
   return (
     <article className="db-student-card">
+
+      {/*
+        Link wraps ONLY the navigable card content.
+        EditStudentForm and DeleteStudentButton are siblings of the Link so
+        their clicks never bubble to it and never trigger navigation.
+      */}
       <Link href={`/portfolio/${student.id}`} style={{ textDecoration: 'none', display: 'block' }}>
         {/* Profile photo / initials circle */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.85rem' }}>
@@ -140,85 +146,42 @@ export function StudentCard({ student, role }: { student: Student; role: string 
           </div>
         </div>
 
-        <div
-          style={{
-            borderBottom: '1px solid rgba(160,130,80,0.3)',
-            paddingBottom: '0.85rem',
-            marginBottom:  '0.85rem',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
-            <h2
-              style={{
-                fontFamily: "'Cormorant Garamond', 'EB Garamond', Georgia, serif",
-                fontWeight: 700,
-                fontSize:   '1.375rem',
-                color:      INK,
-                margin:     0,
-                lineHeight: 1.2,
-              }}
-            >
-              {student.firstName} {student.lastName}
-            </h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-              {student.enrollmentStatus !== 'active' && (
-                <span style={{
-                  fontFamily:    'var(--font-mono)',
-                  fontSize:      '0.55rem',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  color:         '#92400e',
-                  background:    'rgba(251,191,36,0.15)',
-                  border:        '1px solid rgba(146,64,14,0.25)',
-                  padding:       '0.15rem 0.45rem',
-                  whiteSpace:    'nowrap',
-                }}>
-                  {student.enrollmentStatus}
-                </span>
-              )}
-              {canEdit && <EditStudentForm student={student} />}
-            </div>
-          </div>
+        <div style={{ borderBottom: '1px solid rgba(160,130,80,0.3)', paddingBottom: '0.85rem', marginBottom: '0.85rem' }}>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', 'EB Garamond', Georgia, serif", fontWeight: 700, fontSize: '1.375rem', color: INK, margin: 0, lineHeight: 1.2 }}>
+            {student.firstName} {student.lastName}
+          </h2>
+          {student.enrollmentStatus !== 'active' && (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#92400e', background: 'rgba(251,191,36,0.15)', border: '1px solid rgba(146,64,14,0.25)', padding: '0.15rem 0.45rem', whiteSpace: 'nowrap', display: 'inline-block', marginTop: '0.3rem' }}>
+              {student.enrollmentStatus}
+            </span>
+          )}
           {student.isDemo && (
-            <span
-              style={{
-                fontFamily:    'var(--font-mono)',
-                fontSize:      '0.6rem',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color:         FAINT,
-                border:        `1px solid rgba(138,117,88,0.3)`,
-                padding:       '0.1rem 0.4rem',
-                marginTop:     '0.35rem',
-                display:       'inline-block',
-              }}
-            >
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: FAINT, border: `1px solid rgba(138,117,88,0.3)`, padding: '0.1rem 0.4rem', marginTop: '0.35rem', display: 'inline-block' }}>
               Demo
             </span>
           )}
         </div>
+
         <dl style={{ margin: 0 }}>
           <MetaRow label="Grade" value={formatGrade(student.gradeLevel)} />
           <MetaRow label="Year"  value={student.academicYear} />
-          {student.gender        && <MetaRow label="Gender" value={student.gender === 'boy' ? 'Boy' : 'Girl'} />}
-          {age !== null          && <MetaRow label="Age"    value={`Age ${age}`} />}
+          {student.gender && <MetaRow label="Gender" value={student.gender === 'boy' ? 'Boy' : 'Girl'} />}
+          {age !== null   && <MetaRow label="Age"    value={`Age ${age}`} />}
         </dl>
-        <p
-          style={{
-            marginTop:      '1.25rem',
-            fontFamily:     "'Cormorant Garamond', Georgia, serif",
-            fontStyle:      'italic',
-            fontSize:       '1.05rem',
-            color:          GOLD,
-            textDecoration: 'underline',
-            textDecorationColor: 'rgba(184,160,80,0.5)',
-            textUnderlineOffset: '3px',
-          }}
-        >
+
+        <p style={{ marginTop: '1.25rem', fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '1.05rem', color: GOLD, textDecoration: 'underline', textDecorationColor: 'rgba(184,160,80,0.5)', textUnderlineOffset: '3px' }}>
           View Portfolio →
         </p>
       </Link>
 
+      {/* Edit button — outside Link; clicks cannot bubble to the Link */}
+      {canEdit && (
+        <div style={{ position: 'absolute', top: '0.65rem', right: '0.75rem', zIndex: 2 }}>
+          <EditStudentForm student={student} />
+        </div>
+      )}
+
+      {/* Archive button — already outside Link */}
       {canArchive && (
         <div style={{ position: 'absolute', bottom: '0.65rem', right: '0.75rem', zIndex: 2 }}>
           <DeleteStudentButton studentId={student.id} />
