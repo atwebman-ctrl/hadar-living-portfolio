@@ -147,14 +147,6 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
   const allMath    = assessments?.filter((a) => a.assessmentType === 'maps_math')    ?? []
   const allEnglish = assessments?.filter((a) => a.assessmentType === 'maps_english') ?? []
 
-  // DEBUG — remove after diagnosis
-  console.log('[IntellectualArc] selectedYear:', selectedYear)
-  console.log('[IntellectualArc] total assessments received:', assessments?.length ?? 0)
-  console.log('[IntellectualArc] allMath count:', allMath.length, '| years:', [...new Set(allMath.map((a) => a.academicYear))])
-  console.log('[IntellectualArc] allEnglish count:', allEnglish.length, '| years:', [...new Set(allEnglish.map((a) => a.academicYear))])
-  console.log('[IntellectualArc] allMath detail:', allMath.map((a) => ({ term: a.term, year: a.academicYear, rit: a.ritScore, pct: a.percentile })))
-  console.log('[IntellectualArc] allEnglish detail:', allEnglish.map((a) => ({ term: a.term, year: a.academicYear, rit: a.ritScore, pct: a.percentile })))
-
   if (selectedYear === 'all' && (allMath.length > 0 || allEnglish.length > 0)) {
     return (
       <section id="academics">

@@ -77,10 +77,6 @@ export default function IntellectualArcAllYears({
   studentId,
   role,
 }: Props) {
-  // DEBUG — remove after diagnosis
-  console.log('[IntellectualArcAllYears] mathAssessments:', mathAssessments.length, mathAssessments.map((a) => ({ term: a.term, year: a.academicYear, rit: a.ritScore, pct: a.percentile })))
-  console.log('[IntellectualArcAllYears] englishAssessments:', englishAssessments.length, englishAssessments.map((a) => ({ term: a.term, year: a.academicYear, rit: a.ritScore, pct: a.percentile })))
-
   const mathSummary    = trajectorySummary(mathAssessments, 'Math')
   const englishSummary = trajectorySummary(englishAssessments, 'English')
   const mathGroups     = groupByYear(mathAssessments)
