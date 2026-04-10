@@ -208,19 +208,26 @@ export type CreateCharacterAwardBodyInput = z.infer<typeof CreateCharacterAwardB
 
 // ── Teacher notes ─────────────────────────────────────────────
 
-const notesCategoryEnum = z.enum([
-  "academic_progress",
-  "social_development",
-  "behavioral",
-  "participation",
+export const SECTION_CATEGORY_VALUES = [
+  "intellectual_arc",
+  "immersion_engine",
+  "the_canon",
+  "creative_evolution",
+  "rhetoric_room",
+  "character_arc",
   "general",
-]);
+] as const;
+
+const sectionCategoryEnum = z.enum(SECTION_CATEGORY_VALUES);
 
 /** Body for POST /api/dashboard/students/[studentId]/teacher-notes */
 export const CreateTeacherNoteBodySchema = z.object({
-  noteText: z.string().min(1, "Note text cannot be empty"),
-  category: notesCategoryEnum,
-  date:     z.string().date().optional(),
+  noteText:         z.string().min(1, "Note text cannot be empty"),
+  sectionCategory:  sectionCategoryEnum.default("general"),
+  term:             z.string().optional(),
+  date:             z.string().date().optional(),
+  highlightQuote:   z.string().optional(),
+  visibleToParents: z.boolean().default(true),
 });
 
 export type CreateTeacherNoteBodyInput = z.infer<typeof CreateTeacherNoteBodySchema>;

@@ -96,13 +96,18 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   // 6. Insert — school_id and student_id from server only
   const insertRow: Record<string, unknown> = {
-    school_id:    ctx.schoolId,
-    student_id:   studentId,
-    section_type: input.category,
-    author_name:  authorName,
-    text:         input.noteText,
-    created_by:   ctx.userId,
-    updated_by:   ctx.userId,
+    school_id:        ctx.schoolId,
+    student_id:       studentId,
+    // section_type kept for backwards compatibility; section_category is the authoritative new field
+    section_type:     input.sectionCategory,
+    section_category: input.sectionCategory,
+    author_name:      authorName,
+    text:             input.noteText,
+    term:             input.term ?? null,
+    highlight_quote:  input.highlightQuote ?? null,
+    visible_to_parents: input.visibleToParents,
+    created_by:       ctx.userId,
+    updated_by:       ctx.userId,
   }
 
   // Override created_at with the submitted date when provided

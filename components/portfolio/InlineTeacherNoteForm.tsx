@@ -3,27 +3,32 @@
 // ============================================================
 // components/portfolio/InlineTeacherNoteForm.tsx
 //
-// "+ Add Note" button opens a modal popup inside the Teacher
-// Notes section. Visible to admin/teacher only (caller gates).
-// Author name is resolved server-side from the authenticated
-// Clerk user — not entered in the form.
+// "+ Add Note" modal inside Teacher Notes section.
+// Admin/teacher only (caller gates).
+//
+// Three grouped sections:
+//   1. Context   — section category, term, date
+//   2. Narrative — note text, highlight quote
+//   3. Visibility — visible_to_parents toggle
+//
 // POSTs to /api/dashboard/students/[studentId]/teacher-notes
 // and calls router.refresh() on success.
 // ============================================================
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { TERM_OPTIONS } from '@/lib/constants'
 import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
 
-interface Props {
-  studentId: string
-}
+interface Props { studentId: string }
 
-const CATEGORIES = [
-  { value: 'academic_progress',  label: 'Academic Progress' },
-  { value: 'social_development', label: 'Social Development' },
-  { value: 'behavioral',         label: 'Behavioral' },
-  { value: 'participation',      label: 'Participation' },
+const SECTION_CATEGORIES = [
+  { value: 'intellectual_arc',   label: 'Intellectual Arc' },
+  { value: 'immersion_engine',   label: 'Immersion Engine' },
+  { value: 'the_canon',          label: 'The Canon' },
+  { value: 'creative_evolution', label: 'Creative Evolution' },
+  { value: 'rhetoric_room',      label: 'Rhetoric Room' },
+  { value: 'character_arc',      label: 'Character Arc' },
   { value: 'general',            label: 'General' },
 ] as const
 
@@ -33,6 +38,11 @@ const toggleBtn: React.CSSProperties = {
   fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em',
   textTransform: 'uppercase', color: 'var(--navy)', background: 'none',
   border: '1px solid var(--navy)', padding: '4px 12px', cursor: 'pointer',
+}
+const sectionHead: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.14em',
+  textTransform: 'uppercase', color: 'var(--ink-faint)', borderBottom: '1px solid var(--rule)',
+  paddingBottom: '0.35rem', marginBottom: '0.75rem', marginTop: '1.1rem',
 }
 const fieldWrap: React.CSSProperties = {
   display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '0.75rem',
@@ -62,25 +72,32 @@ const statusBar = (type: 'success' | 'error'): React.CSSProperties => ({
 
 // ── Component ─────────────────────────────────────────────────
 
-const EMPTY = { noteText: '', category: 'academic_progress', date: '' }
+const EMPTY = { noteText: '', sectionCategory: 'general', term: '', date: '', highlightQuote: '' }
 
 export default function InlineTeacherNoteForm({ studentId }: Props) {
-  const router   = useRouter()
-  const [open,   setOpen]   = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [status, setStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
-  const [form,   setForm]   = useState({ ...EMPTY })
+  const router = useRouter()
+  const [open,             setOpen]             = useState(false)
+  const [saving,           setSaving]           = useState(false)
+  const [status,           setStatus]           = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
+  const [form,             setForm]             = useState({ ...EMPTY })
+  const [visibleToParents, setVisibleToParents] = useState(true)
 
-  function close() { setOpen(false); setStatus(null) }
+  function close() { setOpen(false); setStatus(null); setForm({ ...EMPTY }); setVisibleToParents(true) }
   function update(key: keyof typeof form, value: string) { setForm((f) => ({ ...f, [key]: value })) }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setSaving(true)
-    setStatus(null)
+    setSaving(true); setStatus(null)
     try {
-      const body: Record<string, string> = { noteText: form.noteText, category: form.category }
-      if (form.date) body.date = form.date
+      const body: Record<string, unknown> = {
+        noteText:         form.noteText,
+        sectionCategory:  form.sectionCategory,
+        visibleToParents,
+      }
+      if (form.term)           body.term           = form.term
+      if (form.date)           body.date           = form.date
+      if (form.highlightQuote) body.highlightQuote = form.highlightQuote
+
       const res  = await fetch(`/api/dashboard/students/${studentId}/teacher-notes`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
       })
@@ -88,9 +105,7 @@ export default function InlineTeacherNoteForm({ studentId }: Props) {
       if (!res.ok) {
         setStatus({ type: 'error', msg: json.error ?? 'Save failed.' })
       } else {
-        setForm({ ...EMPTY })
-        close()
-        router.refresh()
+        close(); router.refresh()
       }
     } catch {
       setStatus({ type: 'error', msg: 'Network error — please try again.' })
@@ -109,7 +124,7 @@ export default function InlineTeacherNoteForm({ studentId }: Props) {
 
       {open && (
         <div style={MODAL_OVERLAY} onClick={close}>
-          <div style={modalPanel(480)} onClick={(e) => e.stopPropagation()}>
+          <div style={modalPanel(520)} onClick={(e) => e.stopPropagation()}>
             <div style={MODAL_HEADER}>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)' }}>
                 Add Teacher Note
@@ -118,24 +133,64 @@ export default function InlineTeacherNoteForm({ studentId }: Props) {
             </div>
             <div style={{ overflowY: 'auto', padding: '1.25rem' }}>
               {status && <div style={statusBar(status.type)}>{status.msg}</div>}
+
               <form onSubmit={handleSubmit}>
-                <div style={fieldWrap}>
-                  <span style={lbl}>Note</span>
-                  <textarea style={{ ...inp, minHeight: '6rem', resize: 'vertical' }} required value={form.noteText} placeholder="Write a narrative observation about this student…" onChange={(e) => update('noteText', e.target.value)} />
-                </div>
+
+                {/* ── Section 1: Context ── */}
+                <div style={sectionHead}>1 — Context</div>
                 <div style={twoCol}>
                   <div style={fieldWrap}>
-                    <span style={lbl}>Category</span>
-                    <select style={inp} value={form.category} onChange={(e) => update('category', e.target.value)}>
-                      {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                    <span style={lbl}>Section</span>
+                    <select style={inp} value={form.sectionCategory} onChange={(e) => update('sectionCategory', e.target.value)}>
+                      {SECTION_CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                     </select>
                   </div>
                   <div style={fieldWrap}>
-                    <span style={lbl}>Date (optional)</span>
-                    <input style={inp} type="date" value={form.date} onChange={(e) => update('date', e.target.value)} />
+                    <span style={lbl}>Term</span>
+                    <select style={inp} value={form.term} onChange={(e) => update('term', e.target.value)}>
+                      <option value="">Select term…</option>
+                      {TERM_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
                   </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                <div style={fieldWrap}>
+                  <span style={lbl}>Date (optional)</span>
+                  <input style={inp} type="date" value={form.date} onChange={(e) => update('date', e.target.value)} />
+                </div>
+
+                {/* ── Section 2: The Narrative ── */}
+                <div style={sectionHead}>2 — The Narrative</div>
+                <div style={fieldWrap}>
+                  <span style={lbl}>Note</span>
+                  <textarea style={{ ...inp, minHeight: '8rem', resize: 'vertical' }} required
+                    value={form.noteText}
+                    placeholder="Write a qualitative observation about this student…"
+                    onChange={(e) => update('noteText', e.target.value)} />
+                </div>
+                <div style={fieldWrap}>
+                  <span style={lbl}>Pull Quote (optional)</span>
+                  <textarea style={{ ...inp, minHeight: '3rem', resize: 'vertical' }}
+                    value={form.highlightQuote}
+                    placeholder="A single sentence to feature on the portfolio summary card…"
+                    onChange={(e) => update('highlightQuote', e.target.value)} />
+                </div>
+
+                {/* ── Section 3: Visibility ── */}
+                <div style={sectionHead}>3 — Visibility</div>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', cursor: 'pointer', marginBottom: '0.5rem' }}>
+                  <input type="checkbox" checked={visibleToParents} onChange={(e) => setVisibleToParents(e.target.checked)}
+                    style={{ marginTop: '3px', accentColor: 'var(--navy)', width: 14, height: 14 }} />
+                  <div>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink)' }}>
+                      Visible to parents
+                    </span>
+                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--ink-faint)', margin: '2px 0 0', letterSpacing: '0.04em' }}>
+                      Uncheck to keep this note internal (visible only to teachers and admin).
+                    </p>
+                  </div>
+                </label>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
                   <button style={{ ...submitBtn, opacity: saving ? 0.6 : 1 }} type="submit" disabled={saving}>
                     {saving ? 'Saving…' : 'Save Note'}
                   </button>

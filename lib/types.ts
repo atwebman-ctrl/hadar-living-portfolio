@@ -267,8 +267,12 @@ export interface TeacherNote {
   schoolId: string;
   studentId: string;
   sectionType: SectionType;
+  sectionCategory: string;
   authorName: string;   // denormalized display name
   text: string;
+  term: string | null;
+  highlightQuote: string | null;
+  visibleToParents: boolean;
   createdAt: string;
 }
 

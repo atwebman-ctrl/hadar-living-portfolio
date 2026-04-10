@@ -224,13 +224,17 @@ export function mapTeacher(row: Row): Teacher {
 
 export function mapTeacherNote(row: Row): TeacherNote {
   return {
-    id: row.id as string,
-    schoolId: row.school_id as string,
-    studentId: row.student_id as string,
-    sectionType: row.section_type as SectionType,
-    authorName: row.author_name as string,
-    text: row.text as string,
-    createdAt: row.created_at as string,
+    id:               row.id as string,
+    schoolId:         row.school_id as string,
+    studentId:        row.student_id as string,
+    sectionType:      row.section_type as SectionType,
+    sectionCategory:  (row.section_category as string) ?? 'general',
+    authorName:       row.author_name as string,
+    text:             row.text as string,
+    term:             (row.term as string) ?? null,
+    highlightQuote:   (row.highlight_quote as string) ?? null,
+    visibleToParents: (row.visible_to_parents as boolean) ?? true,
+    createdAt:        row.created_at as string,
   };
 }
 
