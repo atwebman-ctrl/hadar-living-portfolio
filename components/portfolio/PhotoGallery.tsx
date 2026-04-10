@@ -81,7 +81,9 @@ export default function PhotoGallery({
       )}
 
       {uploadEnabled && studentId && (
-        <div className="reveal" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'flex-end', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div className="reveal" style={{ marginBottom: '1.5rem' }}>
+        <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-faint)', margin: '0 0 0.6rem' }}>Fill in details, then upload:</p>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-mid)' }}>Caption</span>
             <input style={inp} type="text" value={caption} placeholder="Optional caption…" onChange={(e) => setCaption(e.target.value)} />
@@ -111,8 +113,9 @@ export default function PhotoGallery({
               onSuccess={() => { setSelectedTerm(''); setCaption('') }}
             />
           ) : (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--ink-faint)', letterSpacing: '0.06em' }}>← select a term to upload</span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--ink-faint)', letterSpacing: '0.06em' }}>Select a term above to enable upload</span>
           )}
+        </div>
         </div>
       )}
 
