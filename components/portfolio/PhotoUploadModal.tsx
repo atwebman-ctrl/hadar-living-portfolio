@@ -222,8 +222,12 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
                   <button
-                    type="submit"
+                    type="button"
                     disabled={!pending || uploading}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (pending && !uploading) void upload(pending)
+                    }}
                     style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', background: 'var(--navy)', color: 'var(--gold-pale)', border: 'none', padding: '7px 20px', cursor: (!pending || uploading) ? 'not-allowed' : 'pointer', opacity: (!pending || uploading) ? 0.5 : 1 }}
                   >
                     {uploading ? 'Uploading…' : 'Upload Photo'}
