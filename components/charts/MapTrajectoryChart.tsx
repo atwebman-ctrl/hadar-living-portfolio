@@ -51,6 +51,10 @@ function shortLabel(term: string): string {
 // ── Component ─────────────────────────────────────────────────
 
 export default function MapTrajectoryChart({ mathAssessments, englishAssessments }: Props) {
+  // DEBUG — remove after diagnosis
+  console.log('[MapTrajectoryChart] mathAssessments received:', mathAssessments.length, mathAssessments.map((a) => ({ term: a.term, year: a.academicYear, rit: a.ritScore, pct: a.percentile })))
+  console.log('[MapTrajectoryChart] englishAssessments received:', englishAssessments.length, englishAssessments.map((a) => ({ term: a.term, year: a.academicYear, rit: a.ritScore, pct: a.percentile })))
+
   // Build deduplicated, chronologically sorted term list
   const allTerms = Array.from(
     new Map(
@@ -60,6 +64,8 @@ export default function MapTrajectoryChart({ mathAssessments, englishAssessments
       ]),
     ).values(),
   ).sort((a, b) => termSortKey(a.term, a.academicYear) - termSortKey(b.term, b.academicYear))
+
+  console.log('[MapTrajectoryChart] allTerms (sorted):', allTerms.map((t) => `${t.term} / ${t.academicYear}`))
 
   if (allTerms.length === 0) return null
 
@@ -71,10 +77,16 @@ export default function MapTrajectoryChart({ mathAssessments, englishAssessments
       return a?.percentile ?? null
     })
 
+  const mathSeries    = buildSeries(mathAssessments)
+  const englishSeries = buildSeries(englishAssessments)
+  console.log('[MapTrajectoryChart] math series (percentiles by term):', mathSeries)
+  console.log('[MapTrajectoryChart] english series (percentiles by term):', englishSeries)
+  console.log('[MapTrajectoryChart] math non-null points:', mathSeries.filter((v) => v !== null).length, '| english non-null points:', englishSeries.filter((v) => v !== null).length)
+
   const datasets = [
     {
       label:              'Mathematics',
-      data:               buildSeries(mathAssessments),
+      data:               mathSeries,
       borderColor:        NAVY,
       backgroundColor:    NAVY,
       pointBackgroundColor: NAVY,
@@ -87,7 +99,7 @@ export default function MapTrajectoryChart({ mathAssessments, englishAssessments
     },
     {
       label:              'English',
-      data:               buildSeries(englishAssessments),
+      data:               englishSeries,
       borderColor:        GOLD,
       backgroundColor:    GOLD,
       pointBackgroundColor: GOLD,
