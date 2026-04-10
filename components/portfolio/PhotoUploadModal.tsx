@@ -4,8 +4,9 @@
 // components/portfolio/PhotoUploadModal.tsx
 //
 // "Upload Photo" modal for Photo Gallery section.
-// Drag-and-drop zone + caption / term / category metadata.
-// All fields are sent as FormData alongside the file.
+// Drop zone is a <label htmlFor> — browser-native file picker
+// trigger (no JS click() needed). Drag handlers on the label.
+// Drag-leave uses relatedTarget check to avoid child-flicker.
 // ============================================================
 
 import { useState, useRef } from 'react'
@@ -51,15 +52,32 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
   const [open,      setOpen]      = useState(false)
   const [form,      setForm]      = useState({ ...EMPTY })
   const [dragging,  setDragging]  = useState(false)
+  const [pending,   setPending]   = useState<File | null>(null)
   const [progress,  setProgress]  = useState(0)
   const [uploading, setUploading] = useState(false)
   const [error,     setError]     = useState<string | null>(null)
+  // Unique id for label↔input binding
+  const inputId = `photo-upload-input-${studentId}`
 
-  function close() { setOpen(false); setForm({ ...EMPTY }); setError(null); setProgress(0); setUploading(false) }
+  function close() {
+    setOpen(false); setForm({ ...EMPTY }); setError(null)
+    setProgress(0); setUploading(false); setPending(null)
+  }
   function update(k: keyof typeof form, v: string) { setForm((f) => ({ ...f, [k]: v })) }
 
-  async function upload(file: File) {
+  function selectFile(file: File) {
     if (!file.type.startsWith('image/')) { setError('Please select an image file.'); return }
+    setError(null)
+    setPending(file)
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!pending) { setError('Please choose a photo first.'); return }
+    await upload(pending)
+  }
+
+  async function upload(file: File) {
     setUploading(true); setError(null); setProgress(0)
 
     const fd = new FormData()
@@ -86,15 +104,22 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
       xhr.send(fd)
     })
 
-    if (!result.ok) { setError(result.msg ?? 'Upload failed.'); setUploading(false); return }
+    setUploading(false)
+    if (!result.ok) { setError(result.msg ?? 'Upload failed.'); return }
     router.refresh()
     close()
   }
 
+  function onDragOver(e: React.DragEvent) { e.preventDefault(); setDragging(true) }
+  function onDragLeave(e: React.DragEvent) {
+    // Only clear dragging when the cursor leaves the label entirely,
+    // not when it moves onto a child element.
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragging(false)
+  }
   function onDrop(e: React.DragEvent) {
     e.preventDefault(); setDragging(false)
     const file = e.dataTransfer.files[0]
-    if (file) upload(file)
+    if (file) selectFile(file)
   }
 
   return (
@@ -110,56 +135,101 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)' }}>Upload Photo</span>
               <button onClick={close} style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', padding: '0 0.25rem' }} aria-label="Close">✕</button>
             </div>
+
             <div style={{ overflowY: 'auto', padding: '1.25rem' }}>
-              {error && <div style={{ padding: '0.4rem 0.75rem', marginBottom: '0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#991b1b', background: '#fef2f2', border: '1px solid #fecaca' }}>{error}</div>}
-
-              <div style={fieldWrap}>
-                <span style={lbl}>Caption (optional)</span>
-                <input style={inp} type="text" value={form.caption} placeholder="What's happening in this photo?" onChange={(e) => update('caption', e.target.value)} />
-              </div>
-              <div style={twoCol}>
-                <div style={fieldWrap}>
-                  <span style={lbl}>Term</span>
-                  <select style={inp} value={form.term} onChange={(e) => update('term', e.target.value)}>
-                    <option value="">Select term…</option>
-                    {TERM_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
-                  </select>
+              {error && (
+                <div style={{ padding: '0.4rem 0.75rem', marginBottom: '0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#991b1b', background: '#fef2f2', border: '1px solid #fecaca' }}>
+                  {error}
                 </div>
-                <div style={fieldWrap}>
-                  <span style={lbl}>Category</span>
-                  <select style={inp} value={form.category} onChange={(e) => update('category', e.target.value)}>
-                    {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-                  </select>
-                </div>
-              </div>
+              )}
 
-              {/* Drop zone */}
-              <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) upload(f) }} />
-              <div
-                onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={onDrop}
-                onClick={() => !uploading && inputRef.current?.click()}
-                style={{ border: `2px dashed ${dragging ? 'var(--gold)' : 'var(--rule)'}`, padding: '2rem 1rem', textAlign: 'center', cursor: uploading ? 'default' : 'pointer', background: dragging ? 'rgba(196,154,42,0.04)' : 'transparent', marginTop: '0.5rem', transition: 'border-color 0.15s' }}
-              >
-                {uploading ? (
-                  <>
-                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--ink-mid)', margin: '0 0 0.5rem', letterSpacing: '0.08em' }}>Uploading {progress}%…</p>
-                    <div style={{ height: 3, background: 'var(--rule)', borderRadius: 0 }}>
-                      <div style={{ height: '100%', width: `${progress}%`, background: 'var(--gold)', transition: 'width 0.1s linear' }} />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--ink-mid)', margin: '0 0 0.3rem', letterSpacing: '0.08em' }}>
-                      Drop image here
+              <form onSubmit={handleSubmit}>
+                <div style={fieldWrap}>
+                  <span style={lbl}>Caption (optional)</span>
+                  <input style={inp} type="text" value={form.caption} placeholder="What's happening in this photo?" onChange={(e) => update('caption', e.target.value)} />
+                </div>
+                <div style={twoCol}>
+                  <div style={fieldWrap}>
+                    <span style={lbl}>Term</span>
+                    <select style={inp} value={form.term} onChange={(e) => update('term', e.target.value)}>
+                      <option value="">Select term…</option>
+                      {TERM_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div style={fieldWrap}>
+                    <span style={lbl}>Category</span>
+                    <select style={inp} value={form.category} onChange={(e) => update('category', e.target.value)}>
+                      {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Hidden file input — linked to the drop-zone label below */}
+                <input
+                  id={inputId}
+                  ref={inputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  disabled={uploading}
+                  onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) selectFile(f) }}
+                />
+
+                {/*
+                  <label htmlFor={inputId}> is the native trigger — clicking anywhere
+                  inside it opens the file picker without JS. Drag handlers also live here.
+                  onDragLeave uses relatedTarget to avoid flickering on child elements.
+                */}
+                <label
+                  htmlFor={inputId}
+                  onDragOver={onDragOver}
+                  onDragLeave={onDragLeave}
+                  onDrop={onDrop}
+                  style={{
+                    display: 'block', marginTop: '0.5rem',
+                    border: `2px dashed ${dragging ? 'var(--gold)' : pending ? 'var(--navy)' : 'var(--rule)'}`,
+                    padding: '2rem 1rem', textAlign: 'center',
+                    cursor: uploading ? 'default' : 'pointer',
+                    pointerEvents: uploading ? 'none' : 'auto',
+                    background: dragging ? 'rgba(196,154,42,0.04)' : 'transparent',
+                    transition: 'border-color 0.15s',
+                  }}
+                >
+                  {uploading ? (
+                    <>
+                      <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--ink-mid)', margin: '0 0 0.5rem', letterSpacing: '0.08em' }}>
+                        Uploading {progress}%…
+                      </p>
+                      <div style={{ height: 3, background: 'var(--rule)' }}>
+                        <div style={{ height: '100%', width: `${progress}%`, background: 'var(--gold)', transition: 'width 0.1s linear' }} />
+                      </div>
+                    </>
+                  ) : pending ? (
+                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--navy)', margin: 0, letterSpacing: '0.08em' }}>
+                      ✓ {pending.name} — click to replace
                     </p>
-                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--ink-faint)', margin: 0, letterSpacing: '0.06em' }}>
-                      or click to browse
-                    </p>
-                  </>
-                )}
-              </div>
+                  ) : (
+                    <>
+                      <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--ink-mid)', margin: '0 0 0.3rem', letterSpacing: '0.08em' }}>
+                        Drop image here
+                      </p>
+                      <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--ink-faint)', margin: 0, letterSpacing: '0.06em' }}>
+                        or click to browse
+                      </p>
+                    </>
+                  )}
+                </label>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                  <button
+                    type="submit"
+                    disabled={!pending || uploading}
+                    style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', background: 'var(--navy)', color: 'var(--gold-pale)', border: 'none', padding: '7px 20px', cursor: (!pending || uploading) ? 'not-allowed' : 'pointer', opacity: (!pending || uploading) ? 0.5 : 1 }}
+                  >
+                    {uploading ? 'Uploading…' : 'Upload Photo'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
