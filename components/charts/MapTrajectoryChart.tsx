@@ -8,9 +8,13 @@
 // Y axis: percentile (0–100).
 // Two lines: Mathematics (navy) and English Language Arts (gold).
 // Used by IntellectualArcAllYears when selectedYear === 'all'.
+//
+// Uses raw Chart.js (not react-chartjs-2 <Line>) so we have
+// explicit control over instance lifecycle — same pattern as
+// MapPercentileChart. See that file for full rationale.
 // ============================================================
 
-import { Line } from 'react-chartjs-2'
+import { useEffect, useRef } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,18 +28,22 @@ import type { Assessment } from '@/lib/types'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend)
 
+// ── Types ─────────────────────────────────────────────────────
+
 interface Props {
   mathAssessments:    Assessment[]
   englishAssessments: Assessment[]
 }
 
+// ── Constants ─────────────────────────────────────────────────
+
 const NAVY = '#1B3A6B'
 const GOLD = '#B8963E'
 
-// ── Chronological sort key ────────────────────────────────────
-// Converts (term, academicYear) to a numeric key for sorting.
-// Academic year start year × 10 + season ordinal (fall=0, winter=1, spring=2)
+// ── Helpers ───────────────────────────────────────────────────
 
+// Converts (term, academicYear) to a numeric sort key.
+// Academic year start year × 10 + season ordinal (fall=0, winter=1, spring=2)
 export function termSortKey(term: string, academicYear: string): number {
   const yearStart = parseInt(academicYear.split('-')[0] ?? '2000', 10)
   const t = term.toLowerCase()
@@ -51,79 +59,89 @@ function shortLabel(term: string): string {
 // ── Component ─────────────────────────────────────────────────
 
 export default function MapTrajectoryChart({ mathAssessments, englishAssessments }: Props) {
-  // DEBUG — remove after diagnosis
-  console.log('[MapTrajectoryChart] mathAssessments received:', mathAssessments.length, mathAssessments.map((a) => ({ term: a.term, year: a.academicYear, rit: a.ritScore, pct: a.percentile })))
-  console.log('[MapTrajectoryChart] englishAssessments received:', englishAssessments.length, englishAssessments.map((a) => ({ term: a.term, year: a.academicYear, rit: a.ritScore, pct: a.percentile })))
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const chartRef  = useRef<ChartJS | null>(null)
 
-  // Build deduplicated, chronologically sorted term list
-  const allTerms = Array.from(
-    new Map(
-      [...mathAssessments, ...englishAssessments].map((a) => [
-        `${a.term}||${a.academicYear}`,
-        { term: a.term, academicYear: a.academicYear },
-      ]),
-    ).values(),
-  ).sort((a, b) => termSortKey(a.term, a.academicYear) - termSortKey(b.term, b.academicYear))
+  // Stable serialized dep keys — effect only fires when data actually changes.
+  const mathKey    = JSON.stringify(mathAssessments.map((a) => ({ t: a.term, y: a.academicYear, p: a.percentile })))
+  const englishKey = JSON.stringify(englishAssessments.map((a) => ({ t: a.term, y: a.academicYear, p: a.percentile })))
 
-  console.log('[MapTrajectoryChart] allTerms (sorted):', allTerms.map((t) => `${t.term} / ${t.academicYear}`))
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
 
-  if (allTerms.length === 0) return null
+    // Destroy any existing instance before creating a new one.
+    if (chartRef.current) {
+      chartRef.current.destroy()
+      chartRef.current = null
+    }
 
-  const labels = allTerms.map((t) => shortLabel(t.term))
+    // ── Build chart data ───────────────────────────────────────
+    const allTerms = Array.from(
+      new Map(
+        [...mathAssessments, ...englishAssessments].map((a) => [
+          `${a.term}||${a.academicYear}`,
+          { term: a.term, academicYear: a.academicYear },
+        ]),
+      ).values(),
+    ).sort((a, b) => termSortKey(a.term, a.academicYear) - termSortKey(b.term, b.academicYear))
 
-  const buildSeries = (assessments: Assessment[]) =>
-    allTerms.map(({ term, academicYear }) => {
-      const a = assessments.find((x) => x.term === term && x.academicYear === academicYear)
-      return a?.percentile ?? null
-    })
+    if (allTerms.length === 0) return
 
-  const mathSeries    = buildSeries(mathAssessments)
-  const englishSeries = buildSeries(englishAssessments)
-  console.log('[MapTrajectoryChart] math series (percentiles by term):', mathSeries)
-  console.log('[MapTrajectoryChart] english series (percentiles by term):', englishSeries)
-  console.log('[MapTrajectoryChart] math non-null points:', mathSeries.filter((v) => v !== null).length, '| english non-null points:', englishSeries.filter((v) => v !== null).length)
+    const labels = allTerms.map((t) => shortLabel(t.term))
 
-  const datasets = [
-    {
-      label:              'Mathematics',
-      data:               mathSeries,
-      borderColor:        NAVY,
-      backgroundColor:    NAVY,
-      pointBackgroundColor: NAVY,
-      pointBorderColor:   NAVY,
-      borderWidth:        2,
-      pointRadius:        5,
-      pointHoverRadius:   7,
-      spanGaps:           false,
-      tension:            0.2,
-    },
-    {
-      label:              'English',
-      data:               englishSeries,
-      borderColor:        GOLD,
-      backgroundColor:    GOLD,
-      pointBackgroundColor: GOLD,
-      pointBorderColor:   GOLD,
-      borderWidth:        2,
-      pointRadius:        5,
-      pointHoverRadius:   7,
-      spanGaps:           false,
-      tension:            0.2,
-    },
-  ]
+    const buildSeries = (assessments: Assessment[]) =>
+      allTerms.map(({ term, academicYear }) => {
+        const a = assessments.find((x) => x.term === term && x.academicYear === academicYear)
+        return a?.percentile ?? null
+      })
 
-  return (
-    <Line
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      data={{ labels, datasets } as any}
-      options={{
+    const mathSeries    = buildSeries(mathAssessments)
+    const englishSeries = buildSeries(englishAssessments)
+
+    // ── Create instance ────────────────────────────────────────
+    chartRef.current = new ChartJS(canvas, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label:                'Mathematics',
+            data:                 mathSeries,
+            borderColor:          NAVY,
+            backgroundColor:      NAVY,
+            pointBackgroundColor: NAVY,
+            pointBorderColor:     NAVY,
+            borderWidth:          2,
+            pointRadius:          5,
+            pointHoverRadius:     7,
+            spanGaps:             false,
+            tension:              0.2,
+          },
+          {
+            label:                'English',
+            data:                 englishSeries,
+            borderColor:          GOLD,
+            backgroundColor:      GOLD,
+            pointBackgroundColor: GOLD,
+            pointBorderColor:     GOLD,
+            borderWidth:          2,
+            pointRadius:          5,
+            pointHoverRadius:     7,
+            spanGaps:             false,
+            tension:              0.2,
+          },
+        ],
+      },
+      options: {
         responsive:          true,
         maintainAspectRatio: false,
+        animation:           false,
         plugins: {
           legend: {
             display:  true,
             position: 'bottom' as const,
-            labels: { font: { family: 'DM Mono', size: 9 }, boxWidth: 12, color: '#888' },
+            labels:   { font: { family: 'DM Mono', size: 9 }, boxWidth: 12, color: '#888' },
           },
           tooltip: {
             callbacks: {
@@ -155,7 +173,20 @@ export default function MapTrajectoryChart({ mathAssessments, englishAssessments
             },
           },
         },
-      }}
+      },
+    })
+
+    return () => {
+      chartRef.current?.destroy()
+      chartRef.current = null
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mathKey, englishKey])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{ display: 'block', width: '100%', height: '100%' }}
     />
   )
 }
