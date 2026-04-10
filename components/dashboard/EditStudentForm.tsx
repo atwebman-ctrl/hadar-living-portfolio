@@ -76,7 +76,9 @@ export default function EditStudentForm({ student }: Props) {
   const [fields,   setFields]   = useState(() => toFields(student))
 
   const handleOpen  = () => { setFields(toFields(student)); setApiError(null); setOpen(true) }
-  const handleClose = () => { setOpen(false); setApiError(null) }
+  // router.refresh() here covers both Save and Cancel — one refresh on close,
+  // not one per photo upload (ProfilePhotoUpload updates locally instead).
+  const handleClose = () => { setOpen(false); setApiError(null); router.refresh() }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setFields((prev) => ({ ...prev, [e.target.name]: e.target.value }))
 
@@ -100,7 +102,6 @@ export default function EditStudentForm({ student }: Props) {
         throw new Error(data.error ?? 'Failed to update student.')
       }
       handleClose()
-      router.refresh()
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'An unexpected error occurred.')
     } finally {

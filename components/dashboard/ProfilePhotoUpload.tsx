@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 interface Props {
   studentId:        string
@@ -21,13 +20,14 @@ export function buildPhotoUrl(path: string | null): string | null {
 export default function ProfilePhotoUpload({
   studentId, profilePhotoPath, firstName, lastName, size = 72,
 }: Props) {
-  const router   = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
-  const [uploading, setUploading] = useState(false)
-  const [error,     setError]     = useState<string | null>(null)
+  const [uploading,   setUploading]   = useState(false)
+  const [error,       setError]       = useState<string | null>(null)
+  // Local display URL — updated immediately on upload success so the modal
+  // doesn't flash. The parent (EditStudentForm) calls router.refresh() on close.
+  const [displayUrl, setDisplayUrl] = useState<string | null>(() => buildPhotoUrl(profilePhotoPath))
 
   const initials = `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase()
-  const url      = buildPhotoUrl(profilePhotoPath)
   const fontSize = Math.round(size * 0.33)
 
   function openPicker(e: React.MouseEvent) {
@@ -55,7 +55,8 @@ export default function ProfilePhotoUpload({
         const j = await res.json().catch(() => ({}))
         setError((j as { error?: string }).error ?? 'Upload failed.')
       } else {
-        router.refresh()
+        const j = await res.json().catch(() => ({})) as { storagePath?: string }
+        if (j.storagePath) setDisplayUrl(buildPhotoUrl(j.storagePath))
       }
     } catch {
       setError('Network error.')
@@ -85,8 +86,8 @@ export default function ProfilePhotoUpload({
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}
       >
-        {url
-          ? <img src={url} alt={`${firstName} ${lastName}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        {displayUrl
+          ? <img src={displayUrl} alt={`${firstName} ${lastName}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           : <span style={{ fontFamily: 'var(--font-heading)', fontSize: `${fontSize}px`, color: '#fff', fontWeight: 700, userSelect: 'none' }}>{initials}</span>
         }
       </div>
