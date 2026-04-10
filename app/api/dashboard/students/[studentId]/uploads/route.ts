@@ -183,10 +183,12 @@ async function insertPhoto(args: {
   const { schoolId, studentId, path, formData, academicYear, gradeLevel } = args
   const caption   = (formData.get('caption')    as string | null) || null
   const dateTaken = (formData.get('date_taken') as string | null) || null
+  const term      = (formData.get('term')       as string | null) || null
+  const category  = (formData.get('category')   as string | null) || null
 
   const { data, error } = await supabaseAdmin
     .from('photos')
-    .insert({ school_id: schoolId, student_id: studentId, storage_path: path, caption, date_taken: dateTaken, grade_level: gradeLevel, academic_year: academicYear })
+    .insert({ school_id: schoolId, student_id: studentId, storage_path: path, caption, date_taken: dateTaken, term, category, grade_level: gradeLevel, academic_year: academicYear })
     .select()
     .single()
 

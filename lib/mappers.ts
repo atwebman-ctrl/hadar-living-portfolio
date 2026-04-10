@@ -181,6 +181,8 @@ export function mapPhoto(row: Row): Photo {
     studentId:   row.student_id as string,
     storagePath: row.storage_path as string,
     caption:     (row.caption as string) ?? null,
+    term:        (row.term as string) ?? null,
+    category:    (row.category as string) ?? null,
     dateTaken:   (row.date_taken as string) ?? null,
     gradeLevel:  row.grade_level as string,
     academicYear:row.academic_year as string,

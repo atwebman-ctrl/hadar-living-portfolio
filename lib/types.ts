@@ -190,6 +190,8 @@ export interface Photo {
   studentId: string;
   storagePath: string;
   caption: string | null;
+  term: string | null;
+  category: string | null;
   dateTaken: string | null;
   gradeLevel: string;
   academicYear: string;
