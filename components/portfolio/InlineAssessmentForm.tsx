@@ -3,8 +3,7 @@
 // ============================================================
 // components/portfolio/InlineAssessmentForm.tsx
 //
-// Collapsible "Add Assessment" disclosure rendered directly
-// inside each IntellectualArc subject sub-section.
+// "+ Add Assessment" button opens a modal popup.
 // Visible to admin/teacher only (caller is responsible for
 // not rendering this for parents).
 // ============================================================
@@ -12,6 +11,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { TERM_OPTIONS, ACADEMIC_YEAR_OPTIONS } from '@/lib/constants'
+import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
 
 const ASSESSMENT_TYPES = [
   { value: 'maps_math',       label: 'MAP Math' },
@@ -35,18 +35,15 @@ const inp: React.CSSProperties = {
   background: 'var(--cream)', border: '1px solid var(--rule)',
   padding: '0.4rem 0.6rem', width: '100%', boxSizing: 'border-box', outline: 'none',
 }
-
 const lbl: React.CSSProperties = {
   fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em',
   textTransform: 'uppercase', color: 'var(--ink-light)', display: 'block', marginBottom: '0.25rem',
 }
-
 const toggleBtn: React.CSSProperties = {
   fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em',
   textTransform: 'uppercase', color: 'var(--navy)', background: 'none',
   border: '1px solid var(--navy)', padding: '4px 12px', cursor: 'pointer',
 }
-
 const statusBar = (type: 'success' | 'error'): React.CSSProperties => ({
   padding: '0.4rem 0.75rem', marginBottom: '0.75rem',
   fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.06em',
@@ -61,7 +58,6 @@ interface Fields { assessmentType: string; score: string; percentile: string; te
 
 interface Props {
   studentId:    string
-  /** Pre-selects the assessment type dropdown. Defaults to 'maps_math'. */
   defaultType?: string
   label?:       string
 }
@@ -74,6 +70,8 @@ export default function InlineAssessmentForm({ studentId, defaultType = 'maps_ma
   const [status, setStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
   const [fields, setFields] = useState<Fields>(() => ({ assessmentType: defaultType, score: '', percentile: '', term: '', academicYear: '' }))
   const [saving, setSaving] = useState(false)
+
+  function close() { setOpen(false); setStatus(null) }
 
   const set = (k: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setFields((f) => ({ ...f, [k]: e.target.value }))
@@ -97,8 +95,8 @@ export default function InlineAssessmentForm({ studentId, defaultType = 'maps_ma
       if (!res.ok) {
         setStatus({ type: 'error', msg: (body as { error?: string }).error ?? 'Failed to save.' })
       } else {
-        setStatus({ type: 'success', msg: 'Assessment saved.' })
         setFields({ assessmentType: defaultType, score: '', percentile: '', term: '', academicYear: '' })
+        close()
         router.refresh()
       }
     } catch {
@@ -111,55 +109,67 @@ export default function InlineAssessmentForm({ studentId, defaultType = 'maps_ma
   const scoreRange = getScoreRange(fields.assessmentType)
 
   return (
-    <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--rule)', paddingTop: '1rem' }}>
-      <button style={toggleBtn} onClick={() => { setOpen((o) => !o); setStatus(null) }}>
-        {open ? '− ' : '+ '}{label}
-      </button>
+    <>
+      <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--rule)', paddingTop: '1rem' }}>
+        <button style={toggleBtn} onClick={() => { setOpen(true); setStatus(null) }}>
+          + {label}
+        </button>
+      </div>
 
       {open && (
-        <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--parchment)', border: '1px solid var(--rule)' }}>
-          {status && <div style={statusBar(status.type)}>{status.msg}</div>}
-          <form onSubmit={handleSubmit}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gridColumn: '1 / -1' }}>
-                <label style={lbl}>Assessment Type</label>
-                <select value={fields.assessmentType} onChange={set('assessmentType')} style={inp} required>
-                  {ASSESSMENT_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-                </select>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label style={lbl}>
-                  Score{scoreRange && <span style={{ fontWeight: 'normal', letterSpacing: 0, textTransform: 'none' }}> ({scoreRange.hint})</span>}
-                </label>
-                <input type="number" min={scoreRange?.min} max={scoreRange?.max} value={fields.score} onChange={set('score')} style={inp} placeholder={scoreRange ? scoreRange.hint : 'Score'} />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label style={lbl}>Percentile (0–100)</label>
-                <input type="number" min={0} max={100} value={fields.percentile} onChange={set('percentile')} style={inp} placeholder="e.g. 85" />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label style={lbl}>Term</label>
-                <select value={fields.term} onChange={set('term')} style={inp} required>
-                  <option value="">Select term…</option>
-                  {TERM_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label style={lbl}>Academic Year</label>
-                <select value={fields.academicYear} onChange={set('academicYear')} style={inp} required>
-                  <option value="">Select year…</option>
-                  {ACADEMIC_YEAR_OPTIONS.map((y) => <option key={y} value={y}>{y}</option>)}
-                </select>
-              </div>
+        <div style={MODAL_OVERLAY} onClick={close}>
+          <div style={modalPanel(480)} onClick={(e) => e.stopPropagation()}>
+            <div style={MODAL_HEADER}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)' }}>
+                {label}
+              </span>
+              <button onClick={close} style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', padding: '0 0.25rem' }} aria-label="Close">✕</button>
             </div>
-            <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
-              <button type="submit" disabled={saving} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold-pale)', background: 'var(--navy)', border: '1px solid var(--gold)', padding: '0.5rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>
-                {saving ? 'Saving…' : 'Save Assessment'}
-              </button>
+            <div style={{ overflowY: 'auto', padding: '1.25rem' }}>
+              {status && <div style={statusBar(status.type)}>{status.msg}</div>}
+              <form onSubmit={handleSubmit}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gridColumn: '1 / -1' }}>
+                    <label style={lbl}>Assessment Type</label>
+                    <select value={fields.assessmentType} onChange={set('assessmentType')} style={inp} required>
+                      {ASSESSMENT_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                    </select>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <label style={lbl}>
+                      Score{scoreRange && <span style={{ fontWeight: 'normal', letterSpacing: 0, textTransform: 'none' }}> ({scoreRange.hint})</span>}
+                    </label>
+                    <input type="number" min={scoreRange?.min} max={scoreRange?.max} value={fields.score} onChange={set('score')} style={inp} placeholder={scoreRange ? scoreRange.hint : 'Score'} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <label style={lbl}>Percentile (0–100)</label>
+                    <input type="number" min={0} max={100} value={fields.percentile} onChange={set('percentile')} style={inp} placeholder="e.g. 85" />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <label style={lbl}>Term</label>
+                    <select value={fields.term} onChange={set('term')} style={inp} required>
+                      <option value="">Select term…</option>
+                      {TERM_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <label style={lbl}>Academic Year</label>
+                    <select value={fields.academicYear} onChange={set('academicYear')} style={inp} required>
+                      <option value="">Select year…</option>
+                      {ACADEMIC_YEAR_OPTIONS.map((y) => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+                  <button type="submit" disabled={saving} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold-pale)', background: 'var(--navy)', border: '1px solid var(--gold)', padding: '0.5rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+                    {saving ? 'Saving…' : 'Save Assessment'}
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
       )}
-    </div>
+    </>
   )
 }
