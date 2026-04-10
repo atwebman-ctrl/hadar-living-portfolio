@@ -24,7 +24,7 @@ import { authErrorResponse } from '@/lib/apiHelpers'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
 
-const ALLOWED_TYPES = ['photo', 'handwriting', 'parent_upload', 'video'] as const
+const ALLOWED_TYPES = ['photo', 'handwriting', 'parent_upload', 'video', 'profile_photo'] as const
 type UploadType = typeof ALLOWED_TYPES[number]
 
 const BUCKET = 'portfolio-assets'
@@ -40,14 +40,19 @@ function storagePath(schoolId: string, studentId: string, type: UploadType, file
   return `${schoolId}/${studentId}/${type}/${Date.now()}_${sanitizeFilename(filename)}`
 }
 
+function profilePhotoPath(schoolId: string, studentId: string, ext: string) {
+  return `${schoolId}/${studentId}/profile/photo.${ext}`
+}
+
 async function uploadToStorage(
   path: string,
   file: File,
+  upsert = false,
 ): Promise<{ error: string | null }> {
   const buffer = Buffer.from(await file.arrayBuffer())
   const { error } = await supabaseAdmin.storage
     .from(BUCKET)
-    .upload(path, buffer, { contentType: file.type, upsert: false })
+    .upload(path, buffer, { contentType: file.type, upsert })
   return { error: error?.message ?? null }
 }
 
@@ -101,7 +106,13 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   // 3. Role gate
   const isStaff = ctx.role === 'admin' || ctx.role === 'teacher'
-  if (type !== 'parent_upload' && !isStaff) {
+  if ((type === 'profile_photo') && !isStaff) {
+    return NextResponse.json(
+      { error: 'Only admins and teachers can update profile photos.', code: 'FORBIDDEN' },
+      { status: 403 },
+    )
+  }
+  if (type !== 'parent_upload' && type !== 'profile_photo' && !isStaff) {
     return NextResponse.json(
       { error: 'Only admins and teachers can upload photos or handwriting.', code: 'FORBIDDEN' },
       { status: 403 },
@@ -142,7 +153,25 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     }
   }
 
-  // 6. Upload file to storage
+  // 6. Profile photo — fixed path, upsert, update student row, return early
+  if (type === 'profile_photo') {
+    const ext   = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+    const pPath = profilePhotoPath(ctx.schoolId, studentId, ext)
+    const { error: storageErr } = await uploadToStorage(pPath, file, true)
+    if (storageErr) {
+      return NextResponse.json({ error: 'File upload failed.', code: 'STORAGE_ERROR' }, { status: 502 })
+    }
+    const { error: dbErr } = await supabaseAdmin
+      .from('students')
+      .update({ profile_photo_path: pPath, updated_at: new Date().toISOString() })
+      .eq('id', studentId).eq('school_id', ctx.schoolId)
+    if (dbErr) {
+      return NextResponse.json({ error: 'Failed to update student profile.', code: 'DB_ERROR' }, { status: 500 })
+    }
+    return NextResponse.json({ storagePath: pPath }, { status: 200 })
+  }
+
+  // 7. Upload file to storage (timestamped path)
   const path = storagePath(ctx.schoolId, studentId, type, file.name)
   console.log(`[POST uploads] type=${type} path=${path} file=${file.name} size=${file.size}`)
   const { error: storageErr } = await uploadToStorage(path, file)
@@ -155,7 +184,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   }
   console.log('[POST uploads] storage upload OK')
 
-  // 7. Insert DB row
+  // 8. Insert DB row
   const academicYear = (formData.get('academic_year') as string | null) ?? ''
   const gradeLevel   = (formData.get('grade_level')   as string | null) ?? ''
 

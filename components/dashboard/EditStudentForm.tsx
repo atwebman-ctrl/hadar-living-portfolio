@@ -18,6 +18,7 @@ import {
   GENDER_OPTIONS,
   ENROLLMENT_STATUS_OPTIONS,
 } from '@/lib/constants'
+import ProfilePhotoUpload from '@/components/dashboard/ProfilePhotoUpload'
 
 interface Props { student: Student }
 
@@ -148,6 +149,16 @@ export default function EditStudentForm({ student }: Props) {
             </div>
 
             <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
+              {/* Profile photo */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
+                <ProfilePhotoUpload
+                  studentId={student.id}
+                  profilePhotoPath={student.profilePhotoPath ?? null}
+                  firstName={student.firstName}
+                  lastName={student.lastName}
+                />
+              </div>
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>
                 <Field label="First Name" htmlFor="edit-firstName">
                   <input id="edit-firstName" name="firstName" type="text" required autoComplete="given-name"

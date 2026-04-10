@@ -109,13 +109,37 @@ export function PageHeader({
   )
 }
 
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+
+function buildPhotoUrl(path: string | null): string | null {
+  if (!path) return null
+  return `${SUPABASE_URL}/storage/v1/object/public/portfolio-assets/${path}`
+}
+
 export function StudentCard({ student, role }: { student: Student; role: string }) {
   const canEdit    = role === 'admin' || role === 'teacher'
   const canArchive = canEdit && !student.isDemo
   const age = calcAge(student.dateOfBirth)
+  const initials  = `${student.firstName[0] ?? ''}${student.lastName[0] ?? ''}`.toUpperCase()
+  const photoUrl  = buildPhotoUrl(student.profilePhotoPath ?? null)
   return (
     <article className="db-student-card">
       <Link href={`/portfolio/${student.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+        {/* Profile photo / initials circle */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.85rem' }}>
+          <div style={{
+            width: 72, height: 72, borderRadius: '50%', overflow: 'hidden',
+            border: '2px solid rgba(184,160,80,0.3)', flexShrink: 0,
+            background: 'linear-gradient(135deg, #1a3a6b 0%, #C49A2A 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {photoUrl
+              ? <img src={photoUrl} alt={`${student.firstName} ${student.lastName}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              : <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.5rem', color: '#fff', fontWeight: 700, userSelect: 'none' }}>{initials}</span>
+            }
+          </div>
+        </div>
+
         <div
           style={{
             borderBottom: '1px solid rgba(160,130,80,0.3)',

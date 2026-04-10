@@ -74,6 +74,8 @@ function deriveMetrics(assessments: Assessment[]): Metric[] {
 
 // ── Component ─────────────────────────────────────────────────
 
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+
 export default function HeroSection({ student, school, assessments, compact, inviteButton }: Props) {
   const firstName  = student?.firstName    ?? DEMO.firstName
   const lastName   = student?.lastName     ?? DEMO.lastName
@@ -81,15 +83,21 @@ export default function HeroSection({ student, school, assessments, compact, inv
   const summary    = student?.summary      ?? DEMO.summary
   const heroSub    = student ? schoolName  : DEMO.heroSub
   const initials   = `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase()
+  const photoUrl   = student?.profilePhotoPath
+    ? `${SUPABASE_URL}/storage/v1/object/public/portfolio-assets/${student.profilePhotoPath}`
+    : null
 
   const metrics = assessments && assessments.length > 0 ? deriveMetrics(assessments) : DEMO_METRICS
 
   return (
     <div className={`hero${compact ? ' compact' : ''}`} id="overview">
-      {/* Name row: initials circle · name · invite button */}
+      {/* Name row: photo/initials circle · name · invite button */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div className="hero-initials">{initials}</div>
+          {photoUrl
+            ? <img src={photoUrl} alt={`${firstName} ${lastName}`} className="hero-initials" style={{ objectFit: 'cover', display: 'block' }} />
+            : <div className="hero-initials">{initials}</div>
+          }
           <h1 style={{ marginBottom: 0 }}>
             {firstName}<br /><em>{lastName}</em>
           </h1>
