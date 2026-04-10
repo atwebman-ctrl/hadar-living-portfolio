@@ -144,6 +144,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   // 6. Upload file to storage
   const path = storagePath(ctx.schoolId, studentId, type, file.name)
+  console.log(`[POST uploads] type=${type} path=${path} file=${file.name} size=${file.size}`)
   const { error: storageErr } = await uploadToStorage(path, file)
   if (storageErr) {
     console.error('[POST uploads] storage error:', storageErr)
@@ -152,6 +153,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       { status: 502 },
     )
   }
+  console.log('[POST uploads] storage upload OK')
 
   // 7. Insert DB row
   const academicYear = (formData.get('academic_year') as string | null) ?? ''
@@ -161,7 +163,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     return insertPhoto({ schoolId: ctx.schoolId, studentId, path, formData, academicYear, gradeLevel })
   }
   if (type === 'handwriting') {
-    return insertHandwriting({ schoolId: ctx.schoolId, studentId, path, formData, academicYear })
+    return insertHandwriting({ schoolId: ctx.schoolId, studentId, path, formData, academicYear, userId: ctx.userId })
   }
   return insertParentUpload({ schoolId: ctx.schoolId, studentId, path, formData, academicYear, gradeLevel, uploadedBy: ctx.userId })
 }
@@ -191,22 +193,50 @@ async function insertPhoto(args: {
 
 async function insertHandwriting(args: {
   schoolId: string; studentId: string; path: string
-  formData: FormData; academicYear: string
+  formData: FormData; academicYear: string; userId: string
 }) {
-  const { schoolId, studentId, path, formData, academicYear } = args
+  const { schoolId, studentId, path, formData, academicYear, userId } = args
+
+  // DEBUG — log every FormData key/value received
+  const allFields: Record<string, string> = {}
+  formData.forEach((value, key) => {
+    allFields[key] = value instanceof File ? `[File: ${value.name}, ${value.size}b]` : String(value)
+  })
+  console.log('[insertHandwriting] received FormData fields:', JSON.stringify(allFields))
+
   const term         = (formData.get('term')        as string | null) || null
   const teacherNotes = (formData.get('description') as string | null) || null
 
+  if (!term) {
+    console.error('[insertHandwriting] term is missing from FormData — cannot insert (term NOT NULL)')
+    return NextResponse.json({ error: 'A term is required for handwriting samples.', code: 'MISSING_TERM' }, { status: 400 })
+  }
+
+  const payload = {
+    school_id:     schoolId,
+    student_id:    studentId,
+    image_path:    path,
+    ocr_text:      null,
+    teacher_notes: teacherNotes,
+    term,
+    academic_year: academicYear,
+    created_by:    userId,
+    updated_by:    userId,
+  }
+  console.log('[insertHandwriting] INSERT payload:', JSON.stringify(payload))
+
   const { data, error } = await supabaseAdmin
     .from('handwriting_samples')
-    .insert({ school_id: schoolId, student_id: studentId, image_path: path, ocr_text: null, teacher_notes: teacherNotes, term, academic_year: academicYear })
+    .insert(payload)
     .select()
     .single()
 
   if (error || !data) {
-    console.error('[POST uploads] handwriting_samples insert error:', error)
+    console.error('[insertHandwriting] Supabase error:', JSON.stringify(error))
+    console.error('[insertHandwriting] error.code:', error?.code, '| error.message:', error?.message, '| error.details:', error?.details, '| error.hint:', error?.hint)
     return NextResponse.json({ error: 'Failed to save handwriting record.', code: 'DB_ERROR' }, { status: 500 })
   }
+  console.log('[insertHandwriting] INSERT succeeded, id:', (data as Record<string, unknown>).id)
   return NextResponse.json({ record: data, storagePath: path }, { status: 201 })
 }
 

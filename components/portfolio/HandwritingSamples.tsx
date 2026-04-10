@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import type { HandwritingSample } from '@/lib/types'
 import UploadButton from '@/components/shared/UploadButton'
+import { TERM_OPTIONS } from '@/lib/constants'
 
 interface Props {
   samples?:       HandwritingSample[]
@@ -20,6 +22,7 @@ const DEMO_SAMPLES = [
 
 export default function HandwritingSamples({ samples, uploadEnabled, studentId, academicYear = '', gradeLevel = '' }: Props) {
   const hasData = !!samples && samples.length > 0
+  const [selectedTerm, setSelectedTerm] = useState('')
 
   return (
     <section id="handwriting">
@@ -35,7 +38,16 @@ export default function HandwritingSamples({ samples, uploadEnabled, studentId, 
       </p>
 
       {uploadEnabled && studentId && (
-        <div className="reveal" style={{ marginBottom: '1.5rem' }}>
+        <div className="reveal" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <select
+            value={selectedTerm}
+            onChange={(e) => setSelectedTerm(e.target.value)}
+            style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.08em', color: 'var(--ink)', background: 'var(--cream)', border: '1px solid var(--rule)', padding: '0.45rem 0.6rem', cursor: 'pointer' }}
+            aria-label="Select term"
+          >
+            <option value="">Select term…</option>
+            {TERM_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
           <UploadButton
             studentId={studentId}
             uploadType="handwriting"
@@ -43,6 +55,9 @@ export default function HandwritingSamples({ samples, uploadEnabled, studentId, 
             gradeLevel={gradeLevel}
             accept="image/*"
             label="Upload Handwriting Sample"
+            disabled={!selectedTerm}
+            metadata={selectedTerm ? { term: selectedTerm } : undefined}
+            onSuccess={() => setSelectedTerm('')}
           />
         </div>
       )}

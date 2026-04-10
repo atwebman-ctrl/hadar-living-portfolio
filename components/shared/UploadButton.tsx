@@ -41,6 +41,7 @@ interface Props {
   gradeLevel:   string
   label?:       string
   accept?:      string
+  disabled?:    boolean
   metadata?:    UploadMetadata
   onSuccess?:   (data: unknown) => void
   onError?:     (msg: string)   => void
@@ -55,6 +56,7 @@ export default function UploadButton({
   gradeLevel,
   label      = 'Upload File',
   accept     = 'image/*',
+  disabled   = false,
   metadata   = {},
   onSuccess,
   onError,
@@ -66,7 +68,7 @@ export default function UploadButton({
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
   function handleClick() {
-    if (status === 'uploading') return
+    if (status === 'uploading' || disabled) return
     setStatus('idle')
     setErrorMsg(null)
     inputRef.current?.click()
@@ -150,18 +152,18 @@ export default function UploadButton({
       <button
         type="button"
         onClick={handleClick}
-        disabled={isUploading}
+        disabled={isUploading || disabled}
         style={{
           fontFamily:      'var(--font-mono)',
           fontSize:        '0.65rem',
           letterSpacing:   '0.12em',
           textTransform:   'uppercase',
-          color:           isUploading ? 'var(--ink-faint)' : 'var(--gold)',
+          color:           (isUploading || disabled) ? 'var(--ink-faint)' : 'var(--gold)',
           background:      'transparent',
           border:          '1px solid',
-          borderColor:     isUploading ? 'var(--rule)' : 'var(--gold)',
+          borderColor:     (isUploading || disabled) ? 'var(--rule)' : 'var(--gold)',
           padding:         '0.45rem 0.9rem',
-          cursor:          isUploading ? 'default' : 'pointer',
+          cursor:          (isUploading || disabled) ? 'default' : 'pointer',
           transition:      'color 0.15s, border-color 0.15s',
         }}
       >
