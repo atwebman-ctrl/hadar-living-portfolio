@@ -47,9 +47,15 @@ export default function PhotoUploadModal({ studentId, academicYear, gradeLevel }
   }
   function update(k: keyof typeof form, v: string) { setForm((f) => ({ ...f, [k]: v })) }
 
-  function openPicker(e: React.MouseEvent) { e.stopPropagation(); e.preventDefault(); inputRef.current?.click() }
+  function openPicker(e: React.MouseEvent) {
+    e.stopPropagation()
+    e.preventDefault()
+    console.log('openPicker fired', inputRef.current)
+    inputRef.current?.click()
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    console.log('file selected', e.target.files)
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
