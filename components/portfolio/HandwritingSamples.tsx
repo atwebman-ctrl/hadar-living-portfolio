@@ -38,7 +38,7 @@ export default function HandwritingSamples({ samples, uploadEnabled, studentId, 
       </p>
 
       {uploadEnabled && studentId && (
-        <div className="reveal" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <select
             value={selectedTerm}
             onChange={(e) => setSelectedTerm(e.target.value)}
@@ -48,17 +48,22 @@ export default function HandwritingSamples({ samples, uploadEnabled, studentId, 
             <option value="">Select term…</option>
             {TERM_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
-          <UploadButton
-            studentId={studentId}
-            uploadType="handwriting"
-            academicYear={academicYear}
-            gradeLevel={gradeLevel}
-            accept="image/*"
-            label="Upload Handwriting Sample"
-            disabled={!selectedTerm}
-            metadata={selectedTerm ? { term: selectedTerm } : undefined}
-            onSuccess={() => setSelectedTerm('')}
-          />
+          {selectedTerm ? (
+            <UploadButton
+              studentId={studentId}
+              uploadType="handwriting"
+              academicYear={academicYear}
+              gradeLevel={gradeLevel}
+              accept="image/*"
+              label="Upload Handwriting Sample"
+              metadata={{ term: selectedTerm }}
+              onSuccess={() => setSelectedTerm('')}
+            />
+          ) : (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--ink-faint)', letterSpacing: '0.06em' }}>
+              ← select a term to upload
+            </span>
+          )}
         </div>
       )}
 
