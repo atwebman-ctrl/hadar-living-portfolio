@@ -105,25 +105,33 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // 4. Insert — school_id from auth; is_demo always false via API
+  // 4. Insert — school_id from auth; is_demo always false via API.
+  // profile_photo_path and summary are set later via PATCH (edit student form),
+  // so we omit them here. This keeps the INSERT compatible with production tables
+  // that may not yet have those columns (migrations 0011/0019 may not be applied).
+  const insertPayload = {
+    school_id:       ctx.schoolId,
+    first_name:      input.firstName,
+    last_name:       input.lastName,
+    grade_level:     input.gradeLevel,
+    academic_year:   input.academicYear,
+    parent_user_ids: input.parentUserIds ?? [],
+    is_demo:         false,
+  }
+
+  console.log('[POST /api/dashboard/students] inserting:', JSON.stringify(insertPayload))
+
   const { data, error: dbError } = await supabaseAdmin
     .from('students')
-    .insert({
-      school_id:          ctx.schoolId,
-      first_name:         input.firstName,
-      last_name:          input.lastName,
-      grade_level:        input.gradeLevel,
-      academic_year:      input.academicYear,
-      parent_user_ids:    input.parentUserIds,
-      profile_photo_path: input.profilePhotoPath ?? null,
-      summary:            input.summary ?? null,
-      is_demo:            false,
-    })
+    .insert(insertPayload)
     .select()
     .single()
 
   if (dbError || !data) {
-    console.error('[POST /api/dashboard/students]', dbError)
+    console.error('[POST /api/dashboard/students] DB error:', JSON.stringify(dbError))
+    console.error('[POST /api/dashboard/students] error code:', dbError?.code)
+    console.error('[POST /api/dashboard/students] error message:', dbError?.message)
+    console.error('[POST /api/dashboard/students] error details:', dbError?.details)
     return NextResponse.json(
       { error: 'Failed to create student record.', code: 'DB_ERROR' },
       { status: 500 }
