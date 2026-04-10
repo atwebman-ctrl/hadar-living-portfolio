@@ -89,8 +89,22 @@ export default function ProfilePhotoUpload({
 
   const ringColor = dragging ? 'rgba(196,154,42,0.8)' : 'rgba(184,160,80,0.4)'
 
+  // Stop clicks from bubbling to any parent <Link> that would navigate.
+  // Called on the outer wrapper so it catches the circle label, the "Change Photo"
+  // label, and drag events. By the time the click reaches this div, the <label>
+  // has already activated the hidden input, so preventDefault() doesn't break
+  // the file picker.
+  function blockNav(e: React.MouseEvent | React.DragEvent) {
+    e.stopPropagation()
+    e.preventDefault()
+  }
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
+    <div
+      onClick={blockNav}
+      onDragOver={blockNav}
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}
+    >
 
       {/*
         <label htmlFor={inputId}> is the browser-native trigger for the hidden file
