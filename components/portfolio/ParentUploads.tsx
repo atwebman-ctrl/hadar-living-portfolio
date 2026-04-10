@@ -120,7 +120,7 @@ export default function ParentUploads({
         </div>
       )}
 
-      <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+      <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
         {items.map((item) => {
           const lbIdx = lightboxIdxMap.get(item.id)
           return (
