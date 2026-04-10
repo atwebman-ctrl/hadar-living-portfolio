@@ -110,13 +110,17 @@ export async function POST(req: NextRequest) {
   // so we omit them here. This keeps the INSERT compatible with production tables
   // that may not yet have those columns (migrations 0011/0019 may not be applied).
   const insertPayload = {
-    school_id:       ctx.schoolId,
-    first_name:      input.firstName,
-    last_name:       input.lastName,
-    grade_level:     input.gradeLevel,
-    academic_year:   input.academicYear,
-    parent_user_ids: input.parentUserIds ?? [],
-    is_demo:         false,
+    school_id:         ctx.schoolId,
+    first_name:        input.firstName,
+    last_name:         input.lastName,
+    grade_level:       input.gradeLevel,
+    academic_year:     input.academicYear,
+    parent_user_ids:   input.parentUserIds ?? [],
+    is_demo:           false,
+    gender:            input.gender ?? null,
+    date_of_birth:     input.dateOfBirth ?? null,
+    enrollment_status: input.enrollmentStatus ?? 'active',
+    updated_at:        new Date().toISOString(),
   }
 
   console.log('[POST /api/dashboard/students] inserting:', JSON.stringify(insertPayload))
