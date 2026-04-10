@@ -8,7 +8,43 @@
 // back link and a year selector that pushes ?year= to the URL.
 // ============================================================
 
+import { Component, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+
+// ── Error boundary ────────────────────────────────────────────
+
+class SectionErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean; message: string }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props)
+    this.state = { hasError: false, message: '' }
+  }
+  static getDerivedStateFromError(err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    return { hasError: true, message }
+  }
+  componentDidCatch(err: unknown, info: { componentStack?: string }) {
+    console.error('[SectionErrorBoundary] caught error:', err)
+    console.error('[SectionErrorBoundary] component stack:', info?.componentStack)
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '2rem 2.5rem', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: '#991b1b' }}>
+          <strong>Something went wrong loading this section.</strong>
+          {this.state.message && (
+            <pre style={{ marginTop: '0.5rem', whiteSpace: 'pre-wrap', fontSize: '0.7rem', color: '#b91c1c' }}>
+              {this.state.message}
+            </pre>
+          )}
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 import type { UserRole, PortfolioData } from '@/lib/types'
 import YearSelector from '@/components/portfolio/YearSelector'
 import IntellectualArc from '@/components/portfolio/IntellectualArc'
@@ -183,7 +219,9 @@ export default function SectionDetailClient({
         <YearSelector years={years} selectedYear={selectedYear} onChange={handleYearChange} />
       )}
 
-      {renderSection()}
+      <SectionErrorBoundary>
+        {renderSection()}
+      </SectionErrorBoundary>
     </div>
   )
 }

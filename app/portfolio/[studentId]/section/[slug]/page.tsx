@@ -44,7 +44,17 @@ export default async function SectionPage({ params, searchParams }: Props) {
   if (!(VALID_SLUGS as readonly string[]).includes(slug)) notFound()
 
   const { userId, schoolId, role } = await getAuthContext().catch(() => notFound())
-  const portfolio = await getStudentPortfolio(studentId, schoolId).catch(() => notFound())
+
+  let portfolio: Awaited<ReturnType<typeof getStudentPortfolio>> | null = null
+  try {
+    portfolio = await getStudentPortfolio(studentId, schoolId)
+  } catch (err) {
+    console.error('[SectionPage] getStudentPortfolio threw for studentId=%s schoolId=%s', studentId, schoolId)
+    console.error('[SectionPage] error:', err)
+    if (err instanceof Error) console.error('[SectionPage] stack:', err.stack)
+    return notFound()
+  }
+  if (!portfolio) return notFound()
 
   if (role === 'parent') {
     await enforceParentAccess(userId, schoolId, studentId)
