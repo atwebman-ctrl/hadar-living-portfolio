@@ -20,6 +20,7 @@ export const MODAL_HEADER: CSSProperties = {
 /** Returns the modal panel style. Pass maxWidth/maxHeight to override defaults. */
 export function modalPanel(maxWidth = 560, maxHeight = '88vh'): CSSProperties {
   return {
+    position: 'relative', zIndex: 501,
     background: 'var(--cream)', border: '1px solid var(--navy)',
     width: '100%', maxWidth, maxHeight, display: 'flex', flexDirection: 'column',
   }
