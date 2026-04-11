@@ -1,48 +1,35 @@
 import type { Student, SchoolConfig, Assessment } from '@/lib/types'
 import { ordinal, latestAssessment } from '@/lib/utils'
 
-interface Props {
+// ── Types ─────────────────────────────────────────────────────
+
+interface HeroProps {
   student?:      Student
   school?:       SchoolConfig
   assessments?:  Assessment[]
-  /** Show compressed padding for hub overview page */
   compact?:      boolean
-  /** Optional action slot rendered right of the student name (e.g. InviteParentButton) */
   inviteButton?: React.ReactNode
 }
+
+interface Metric { lbl: string; val: string; gold: boolean; ctx: string }
 
 // ── Demo fallbacks ────────────────────────────────────────────
 
 const DEMO = {
-  firstName:    'Athena',
-  lastName:     'Lonsdale',
-  gradeLevel:   'Grade 3',
-  academicYear: '2025–26',
-  schoolName:   'Hadar Jewish Classical Academy',
-  heroSub:      'Age 8\u00a0·\u00a0Enrolled since 1st Grade\u00a0·\u00a0Hadar Jewish Classical Academy',
-  summary:      null as string | null,
+  firstName:  'Athena',
+  lastName:   'Lonsdale',
+  schoolName: 'Hadar Jewish Classical Academy',
+  heroSub:    'Age 8\u00a0·\u00a0Enrolled since 1st Grade\u00a0·\u00a0Hadar Jewish Classical Academy',
+  summary:    null as string | null,
 }
 
-const DEMO_METRICS = [
-  { lbl: "Math — Jan '26",    val: '95th',  gold: true,  ctx: 'Percentile · RIT 219' },
-  { lbl: "English — Jan '26", val: '98th',  gold: true,  ctx: 'Percentile · RIT 229' },
-  { lbl: 'Reading Level',     val: '1225L', gold: false, ctx: 'Upper HS / College Entry' },
-  { lbl: 'Hebrew Composite',  val: '4.75',  gold: false, ctx: 'AVANT composite score' },
-]
-
-// ── Helpers ───────────────────────────────────────────────────
+// ── Metric derivation (shared by StatsBar) ────────────────────
 
 function shortTerm(term: string): string {
-  const parts = term.split(' ')
-  const season = parts[0] ?? ''
-  const year   = parts[1] ?? ''
+  const [season = '', year = ''] = term.split(' ')
   const mon: Record<string, string> = { Fall: 'Sep', Winter: 'Jan', Spring: 'Apr' }
   return `${mon[season] ?? season} '${year.slice(2)}`
 }
-
-// ── Metric derivation ─────────────────────────────────────────
-
-interface Metric { lbl: string; val: string; gold: boolean; ctx: string }
 
 function deriveMetrics(assessments: Assessment[]): Metric[] {
   const math = latestAssessment(assessments, 'maps_math')
@@ -72,54 +59,54 @@ function deriveMetrics(assessments: Assessment[]): Metric[] {
   return [mathMetric, engMetric, lexMetric, hebMetric]
 }
 
-// ── Component ─────────────────────────────────────────────────
+// ── StatsBar — slim ribbon below hero ─────────────────────────
+
+export function StatsBar({ assessments }: { assessments?: Assessment[] }) {
+  if (!assessments || assessments.length === 0) return null
+  const filled = deriveMetrics(assessments).filter((m) => m.val !== '—')
+  if (filled.length === 0) return null
+
+  return (
+    <div className="stats-bar">
+      {filled.map((m) => (
+        <div key={m.lbl} className="stats-bar-cell">
+          <div className="lbl">{m.lbl}</div>
+          <div className={`val${m.gold ? ' gold' : ''}`}>{m.val}</div>
+          <div className="ctx">{m.ctx}</div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ── HeroSection — identity only ───────────────────────────────
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 
-export default function HeroSection({ student, school, assessments, compact, inviteButton }: Props) {
-  const firstName  = student?.firstName    ?? DEMO.firstName
-  const lastName   = student?.lastName     ?? DEMO.lastName
-  const schoolName = school?.name          ?? DEMO.schoolName
-  const summary    = student?.summary      ?? DEMO.summary
-  const heroSub    = student ? schoolName  : DEMO.heroSub
+export default function HeroSection({ student, school, compact, inviteButton }: HeroProps) {
+  const firstName  = student?.firstName ?? DEMO.firstName
+  const lastName   = student?.lastName  ?? DEMO.lastName
+  const schoolName = school?.name       ?? DEMO.schoolName
+  const summary    = student?.summary   ?? DEMO.summary
+  const heroSub    = student ? schoolName : DEMO.heroSub
   const initials   = `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase()
   const photoUrl   = student?.profilePhotoPath
     ? `${SUPABASE_URL}/storage/v1/object/public/portfolio-assets/${student.profilePhotoPath}`
     : null
 
-  const metrics = assessments && assessments.length > 0 ? deriveMetrics(assessments) : DEMO_METRICS
-
   return (
     <div className={`hero${compact ? ' compact' : ''}`} id="overview">
-      {/* Left column: photo · name · school */}
-      <div className="hero-left">
+      <div className="hero-photo">
         {photoUrl
-          ? <img src={photoUrl} alt={`${firstName} ${lastName}`} className="hero-initials" style={{ objectFit: 'cover', display: 'block', marginBottom: '0.75rem' }} />
-          : <div className="hero-initials" style={{ marginBottom: '0.75rem' }}>{initials}</div>
+          ? <img src={photoUrl} alt={`${firstName} ${lastName}`} className="hero-initials" style={{ objectFit: 'cover', display: 'block' }} />
+          : <div className="hero-initials">{initials}</div>
         }
+      </div>
+      <div className="hero-identity">
         <h1>{firstName}<br /><em>{lastName}</em></h1>
         <div className="hero-sub">{heroSub}</div>
-        {summary && (
-          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: '.8rem', color: 'rgba(255,255,255,.55)', margin: '0.75rem 0 0', lineHeight: 1.6 }}>
-            {summary}
-          </p>
-        )}
-        {inviteButton && (
-          <div style={{ marginTop: '0.75rem' }}>{inviteButton}</div>
-        )}
-      </div>
-
-      {/* Right column: 2×2 metric grid */}
-      <div className="hero-right">
-        <div className="hero-metrics">
-          {metrics.map((m) => (
-            <div key={m.lbl} className="hero-metric">
-              <div className="lbl">{m.lbl}</div>
-              <div className={`val${m.gold ? ' gold' : ''}`}>{m.val}</div>
-              <div className="ctx">{m.ctx}</div>
-            </div>
-          ))}
-        </div>
+        {summary && <p className="hero-summary">{summary}</p>}
+        {inviteButton && <div style={{ marginTop: '0.75rem' }}>{inviteButton}</div>}
       </div>
     </div>
   )

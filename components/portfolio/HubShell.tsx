@@ -10,7 +10,7 @@
 
 import { useState, useMemo } from 'react'
 import type { UserRole, PortfolioData } from '@/lib/types'
-import HeroSection from '@/components/portfolio/HeroSection'
+import HeroSection, { StatsBar } from '@/components/portfolio/HeroSection'
 import InviteParentButton from '@/components/shared/InviteParentButton'
 import YearSelector from '@/components/portfolio/YearSelector'
 import PortfolioHub from '@/components/portfolio/PortfolioHub'
@@ -40,10 +40,10 @@ export default function HubShell({ portfolio, studentId, role }: Props) {
       <HeroSection
         student={portfolio.student}
         school={portfolio.school}
-        assessments={portfolio.assessments}
         compact
         inviteButton={canInvite ? <InviteParentButton studentId={studentId} /> : undefined}
       />
+      <StatsBar assessments={portfolio.assessments} />
 
       <YearSelector years={years} selectedYear={selectedYear} onChange={setSelectedYear} />
 
