@@ -19,7 +19,7 @@ import {
 } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
@@ -88,6 +88,8 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
       { status: 403 }
     )
   }
+
+  if (!rateLimit(`${ctx.userId}:student-delete`, 30).ok) return rateLimitResponse()
 
   // Verify student belongs to the authenticated school and is not a demo student.
   const { data: student, error: fetchError } = await supabaseAdmin
@@ -175,6 +177,8 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
       { status: 403 }
     )
   }
+
+  if (!rateLimit(`${ctx.userId}:student-update`, 30).ok) return rateLimitResponse()
 
   // 4. Build the update object — only include fields present in the body.
   // updated_at is set explicitly (no auto-update trigger in the DB schema).

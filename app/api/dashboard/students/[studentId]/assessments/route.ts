@@ -20,7 +20,7 @@ import {
 } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapAssessment } from '@/lib/mappers'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
@@ -74,6 +74,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       { status: 403 }
     )
   }
+
+  if (!rateLimit(`${ctx.userId}:assessments`, 30).ok) return rateLimitResponse()
 
   // 4. Verify the student belongs to the authenticated school.
   // This prevents a teacher at school A from inserting assessments

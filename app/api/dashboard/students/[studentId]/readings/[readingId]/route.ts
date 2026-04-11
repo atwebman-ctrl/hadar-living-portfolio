@@ -13,7 +13,7 @@ import { getAuthContext } from '@/lib/auth'
 import { validate, UpdateReadingSchema, ValidationError } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapReading } from '@/lib/mappers'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string; readingId: string }> }
@@ -58,6 +58,8 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
   if (ctx.role !== 'admin' && ctx.role !== 'teacher')
     return NextResponse.json({ error: 'Forbidden.', code: 'FORBIDDEN' }, { status: 403 })
+
+  if (!rateLimit(`${ctx.userId}:readings-update`, 30).ok) return rateLimitResponse()
 
   const { found } = await resolveAndAuthorize(studentId, readingId, ctx.schoolId)
   if (!found)
@@ -109,6 +111,8 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
 
   if (ctx.role !== 'admin' && ctx.role !== 'teacher')
     return NextResponse.json({ error: 'Forbidden.', code: 'FORBIDDEN' }, { status: 403 })
+
+  if (!rateLimit(`${ctx.userId}:readings-delete`, 30).ok) return rateLimitResponse()
 
   const { found } = await resolveAndAuthorize(studentId, readingId, ctx.schoolId)
   if (!found)

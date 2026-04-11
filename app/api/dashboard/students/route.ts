@@ -18,7 +18,7 @@ import {
 } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 
 // ── GET /api/dashboard/students ───────────────────────────────────────────────
 
@@ -104,6 +104,8 @@ export async function POST(req: NextRequest) {
       { status: 403 }
     )
   }
+
+  if (!rateLimit(`${ctx.userId}:students-create`, 30).ok) return rateLimitResponse()
 
   // 4. Insert — school_id from auth; is_demo always false via API.
   // profile_photo_path and summary are set later via PATCH (edit student form),

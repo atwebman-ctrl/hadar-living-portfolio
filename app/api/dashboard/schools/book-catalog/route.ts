@@ -16,7 +16,7 @@ import {
   type CreateBookCatalogInput,
 } from '@/lib/validationExtended'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import type { BookCatalogEntry } from '@/lib/types'
 
 function mapRow(row: Record<string, unknown>): BookCatalogEntry {
@@ -101,6 +101,8 @@ export async function POST(req: NextRequest) {
       { status: 403 },
     )
   }
+
+  if (!rateLimit(`${ctx.userId}:book-catalog`, 30).ok) return rateLimitResponse()
 
   const { data, error } = await supabaseAdmin
     .from('book_catalog')

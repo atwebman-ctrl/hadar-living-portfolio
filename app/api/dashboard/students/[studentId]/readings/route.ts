@@ -14,7 +14,7 @@ import { getAuthContext } from '@/lib/auth'
 import { validate, CreateReadingSchema, ValidationError } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapReading } from '@/lib/mappers'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
@@ -68,6 +68,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       { status: 403 }
     )
   }
+
+  if (!rateLimit(`${ctx.userId}:readings`, 30).ok) return rateLimitResponse()
 
   // 4. Verify the student belongs to the authenticated school.
   const { data: student, error: studentError } = await supabaseAdmin
