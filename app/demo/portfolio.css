@@ -30,12 +30,11 @@
 }
 .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 320px; height: 320px; border: 1px solid rgba(255,255,255,.06); border-radius: 50%; pointer-events: none; }
 .hero::after  { content: ''; position: absolute; bottom: -80px; right: 60px; width: 200px; height: 200px; border: 1px solid rgba(255,255,255,.04); border-radius: 50%; pointer-events: none; }
+.hero-school-badge { position: absolute; top: 1.25rem; right: 2rem; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); text-transform: uppercase; }
 .hero-photo { flex-shrink: 0; }
 .hero-identity { flex: 1; min-width: 0; }
 .hero h1 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 400; color: white; line-height: 1.1; margin: 0 0 .3rem; }
-.hero h1 em { font-style: italic; color: var(--gold-light); }
-.hero-sub { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,.45); letter-spacing: .08em; margin: 0; }
-.hero-summary { font-family: 'DM Mono', monospace; font-size: .8rem; color: rgba(255,255,255,.55); margin: .6rem 0 0; line-height: 1.6; }
+.hero h1 em { font-style: italic; color: var(--gold-light); }.hero-summary { font-family: 'DM Mono', monospace; font-size: .8rem; color: rgba(255,255,255,.55); margin: .6rem 0 0; line-height: 1.6; }
 .hero.compact h1 { font-size: 1.8rem; }
 
 /* ── STATS BAR — slim ribbon below hero ─────────────────────── */
@@ -44,7 +43,11 @@
   gap: 0;
   padding: 0.75rem 2.5rem;
   background: var(--cream-dark);
+  border-top: 1px solid rgba(0,0,0,0.06);
   border-bottom: 1px solid var(--rule);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  justify-content: space-between;
+  align-items: center;
 }
 .stats-bar-cell { padding: 0.5rem 1.5rem; border-left: 2px solid var(--gold); }
 .stats-bar-cell .lbl { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .12em; color: var(--ink-faint); text-transform: uppercase; margin-bottom: 4px; }
@@ -54,11 +57,11 @@
 
 /* Initials / photo circle */
 .hero-initials {
-  width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0;
+  width: 96px; height: 96px; border-radius: 50%; flex-shrink: 0;
   background: linear-gradient(135deg, #C8A84B 0%, #9A7E30 100%);
   display: flex; align-items: center; justify-content: center;
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem; font-weight: 600;
+  font-size: 2rem; font-weight: 600;
   color: white; letter-spacing: 0.04em;
   border: 1px solid rgba(255,255,255,0.2);
 }

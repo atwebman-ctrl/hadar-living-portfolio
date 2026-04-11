@@ -24,14 +24,16 @@ type SubmitState = 'idle' | 'loading' | 'success' | 'error'
 const S = {
   triggerBtn: {
     fontFamily:    'var(--font-mono)',
-    fontSize:      '0.65rem',
+    fontSize:      '9px',
     letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
-    color:         'var(--gold)',
-    background:    'transparent',
-    border:        '1px solid var(--gold)',
-    padding:       '0.45rem 0.9rem',
+    color:         'var(--gold-light)',
+    background:    'none',
+    border:        'none',
+    padding:       '0',
     cursor:        'pointer',
+    opacity:       0.5,
+    textDecoration: 'none',
   } as React.CSSProperties,
 
   overlay: {
@@ -185,7 +187,13 @@ export default function InviteParentButton({ studentId }: Props) {
 
   return (
     <>
-      <button style={S.triggerBtn} onClick={openModal} type="button">
+      <button
+        style={S.triggerBtn}
+        onClick={openModal}
+        type="button"
+        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = '1' }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.5' }}
+      >
         Invite Parent
       </button>
 
