@@ -4,6 +4,7 @@ import SubjectScoreRows, { type ScoreDisplayRow } from '@/components/portfolio/S
 import MapPercentileChart, { type StudentScorePoint } from '@/components/charts/MapPercentileChart'
 import InlineAssessmentForm from '@/components/portfolio/InlineAssessmentForm'
 import IntellectualArcAllYears from '@/components/portfolio/IntellectualArcAllYears'
+import s from './sections.module.css'
 
 interface Props {
   assessments?:          Assessment[]
@@ -150,10 +151,10 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
   if (selectedYear === 'all' && (allMath.length > 0 || allEnglish.length > 0)) {
     return (
       <section id="academics">
-        <div className="section-header reveal">
-          <span className="section-num">01</span>
-          <h2 className="section-title">The Intellectual Arc</h2>
-          <div className="section-rule" />
+        <div className={`${s.sectionHeader} reveal`}>
+          <span className={s.sectionNum}>01</span>
+          <h2 className={s.sectionTitle}>The Intellectual Arc</h2>
+          <div className={s.sectionRule} />
         </div>
         <IntellectualArcAllYears
           mathAssessments={allMath}
@@ -214,19 +215,19 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
 
   return (
     <section id="academics">
-      <div className="section-header reveal">
-        <span className="section-num">01</span>
-        <h2 className="section-title">The Intellectual Arc</h2>
-        <div className="section-rule" />
+      <div className={`${s.sectionHeader} reveal`}>
+        <span className={s.sectionNum}>01</span>
+        <h2 className={s.sectionTitle}>The Intellectual Arc</h2>
+        <div className={s.sectionRule} />
       </div>
 
       {/* ── Mathematics ──────────────────────────────────────── */}
-      <div className="chart-wrap reveal">
+      <div className={`${s.chartWrap} reveal`}>
         <SubjectHeading title="Mathematics" tag="MAP Assessment" />
         {firstPct != null && lastPct != null && (
-          <div className="callout" style={{ marginBottom: '1rem' }}>
-            <div className="big">{deltaText}</div>
-            <div className="text">
+          <div className={s.callout} style={{ marginBottom: '1rem' }}>
+            <div className={s.calloutBig}>{deltaText}</div>
+            <div className={s.calloutText}>
               <strong>From {firstPct}th to {lastPct}th percentile across recorded sittings.</strong>
             </div>
           </div>
@@ -244,7 +245,7 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
       </div>
 
       {/* ── English Language Arts ────────────────────────────── */}
-      <div className="chart-wrap reveal">
+      <div className={`${s.chartWrap} reveal`}>
         <SubjectHeading title="English Language Arts" tag="MAP Assessment" />
         <SubjectScoreRows rows={englishRows} />
         {studentId && role && (englishContext || role === 'parent') && (
@@ -259,8 +260,8 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
       </div>
 
       {/* ── Lexile chart ─────────────────────────────────────── */}
-      <div className="chart-wrap reveal">
-        <div className="chart-title">Lexile Reading Level vs. Grade Benchmarks</div>
+      <div className={`${s.chartWrap} reveal`}>
+        <div className={s.chartTitle}>Lexile Reading Level vs. Grade Benchmarks</div>
         <p style={{ marginBottom: 8, fontStyle: 'italic', fontSize: '.85rem', color: 'var(--ink-light)' }}>
           {hasAnyData
             ? 'Reading level compared to national grade-level benchmarks.'
@@ -269,12 +270,12 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
         </p>
         <div style={{ marginTop: '1.25rem' }}>
           {lexileRows.map((r) => (
-            <div key={r.lbl} className="lexile-row">
-              <span className="lexile-lbl" style={r.highlight ? { color: 'var(--navy)', fontWeight: 500 } : undefined}>{r.lbl}</span>
-              <div className="lexile-bar-outer" style={r.highlight ? { background: 'rgba(27,58,107,.1)' } : undefined}>
-                <div className="lexile-bar-inner" style={{ width: r.pct, background: r.bg, opacity: r.opacity }} />
+            <div key={r.lbl} className={s.lexileRow}>
+              <span className={s.lexileLbl} style={r.highlight ? { color: 'var(--navy)', fontWeight: 500 } : undefined}>{r.lbl}</span>
+              <div className={s.lexileBarOuter} style={r.highlight ? { background: 'rgba(27,58,107,.1)' } : undefined}>
+                <div className={s.lexileBarInner} style={{ width: r.pct, background: r.bg, opacity: r.opacity }} />
               </div>
-              <span className="lexile-val" style={r.highlight ? { color: 'var(--navy)', fontWeight: 500 } : undefined}>{r.val}</span>
+              <span className={s.lexileVal} style={r.highlight ? { color: 'var(--navy)', fontWeight: 500 } : undefined}>{r.val}</span>
             </div>
           ))}
         </div>

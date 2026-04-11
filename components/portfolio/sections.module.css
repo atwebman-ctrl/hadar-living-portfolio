@@ -1,0 +1,100 @@
+/* ── SECTION HEADER ───────────────────────────────────────────── */
+.sectionHeader { display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 2.5rem; }
+.sectionNum { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .12em; color: var(--gold); text-transform: uppercase; flex-shrink: 0; }
+.sectionTitle { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 400; color: var(--navy); flex: 1; }
+.sectionRule { flex: 1; height: 1px; background: var(--rule); margin-left: 1rem; }
+
+/* ── CALLOUT ──────────────────────────────────────────────────── */
+.callout { background: var(--navy); color: white; padding: 1.5rem 2rem; border-radius: 4px; margin-bottom: 2rem; display: flex; gap: 2rem; align-items: center; }
+.calloutBig { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--gold-light); line-height: 1; flex-shrink: 0; }
+.calloutText { font-size: .9rem; color: rgba(255,255,255,.8); line-height: 1.5; }
+
+/* ── CHARTS ───────────────────────────────────────────────────── */
+.chartWrap { background: var(--white); border: 1px solid var(--rule); border-radius: 4px; padding: 1.5rem; margin-bottom: 1.5rem; }
+.chartTitle { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .1em; color: var(--ink-light); text-transform: uppercase; margin-bottom: 1rem; }
+.legend { display: flex; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.legend span { display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink-mid); }
+.legendDot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── LEXILE BAR ───────────────────────────────────────────────── */
+.lexileRow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.lexileLbl { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink-light); width: 110px; flex-shrink: 0; text-align: right; }
+.lexileBarOuter { flex: 1; height: 6px; background: var(--cream-dark); border-radius: 3px; overflow: hidden; }
+.lexileBarInner { height: 100%; border-radius: 3px; }
+.lexileVal { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink-light); width: 40px; text-align: right; }
+
+/* ── HEBREW BENCHMARK ─────────────────────────────────────────── */
+.benchGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.benchCard { background: var(--white); border: 1px solid var(--rule); border-radius: 4px; padding: 1.25rem 1.5rem; }
+.benchCardSkillName { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 14px; }
+.benchBarRow { margin-bottom: 10px; }
+.benchBarLabel { display: flex; justify-content: space-between; font-family: 'DM Mono', monospace; font-size: 9px; color: var(--ink-faint); margin-bottom: 4px; }
+.benchBarLabelHighlight { display: flex; justify-content: space-between; font-family: 'DM Mono', monospace; font-size: 9px; color: var(--navy); font-weight: 500; margin-bottom: 4px; }
+.benchBarTrack { height: 6px; background: var(--cream-dark); border-radius: 3px; overflow: hidden; }
+.benchBarFill { height: 100%; border-radius: 3px; }
+
+/* ── BOOKSHELF ────────────────────────────────────────────────── */
+.bookshelf { background: var(--cream-dark); border-radius: 4px; padding: 2.5rem 2rem 1rem; position: relative; }
+.bookshelf::after { content: ''; display: block; height: 12px; background: var(--ink-mid); border-radius: 0 0 4px 4px; margin: 1.5rem -2rem -1rem; opacity: .12; }
+.booksRow { display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; }
+.book { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: .4rem .3rem; border-radius: 3px 2px 2px 3px; cursor: default; transition: transform .2s, box-shadow .2s; position: relative; writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); min-width: 28px; font-family: 'DM Mono', monospace; }
+.book:hover { transform: rotate(180deg) translateY(8px); box-shadow: 0 8px 20px rgba(0,0,0,.2); }
+.bookComplete { opacity: 1; }
+.bookPending { opacity: .55; filter: grayscale(.4); }
+.bookTitle { font-size: 9px; letter-spacing: .04em; line-height: 1.2; text-align: center; padding: .5rem .1rem; font-weight: 500; }
+.bookDoneLabel { font-size: 8px; opacity: .7; margin-top: auto; font-weight: 300; }
+.bookDetailActions { opacity: 0; transition: opacity 0.2s ease; position: absolute; top: 0.7rem; right: 0.9rem; }
+.bookDetailPanel:hover .bookDetailActions { opacity: 1; }
+
+/* ── FLIPBOOK ─────────────────────────────────────────────────── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.flipTabs { display: flex; border-bottom: 1px solid var(--rule); }
+.flipTab { padding: 10px 20px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; background: none; border: none; cursor: pointer; color: var(--ink-light); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
+.flipTabActive { color: var(--navy); border-bottom-color: var(--navy); background: var(--white); }
+.flipPane { display: none; padding: 2rem; background: var(--white); border: 1px solid var(--rule); border-top: none; border-radius: 0 0 4px 4px; min-height: 240px; }
+.flipPaneActive { display: block; animation: fadeUp .3s ease; }
+.flipDate { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .1em; color: var(--gold); text-transform: uppercase; margin-bottom: .75rem; }
+.flipText { font-size: .925rem; line-height: 1.8; color: var(--ink-mid); font-style: italic; }
+.flipNote { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-family: 'DM Mono', monospace; font-size: 9px; color: var(--ink-faint); letter-spacing: .06em; }
+.flipGrowth { display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 20px; background: var(--cream-dark); font-size: 9px; font-family: 'DM Mono', monospace; color: var(--teal); font-weight: 500; }
+
+/* ── VIDEO SLOTS ──────────────────────────────────────────────── */
+.videoGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.videoCard { background: var(--white); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+.videoHeader { padding: .75rem 1rem; border-bottom: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; }
+.videoGrade { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-light); }
+.videoType { font-family: 'DM Mono', monospace; font-size: 8px; padding: 3px 8px; border-radius: 20px; background: var(--cream-dark); color: var(--ink-mid); letter-spacing: .06em; text-transform: uppercase; }
+.videoSlot { aspect-ratio: 16/9; background: var(--cream-dark); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; position: relative; overflow: hidden; transition: background .2s; }
+.videoSlot:hover { background: var(--cream); }
+.videoSlot::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0,0,0,.015) 4px, rgba(0,0,0,.015) 8px); }
+.playBtn { width: 48px; height: 48px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .2s; }
+.videoSlot:hover .playBtn { transform: scale(1.08); }
+.videoCaption { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink-light); text-align: center; line-height: 1.5; padding: 0 1.5rem; }
+.videoFooter { padding: .75rem 1rem; border-top: 1px solid var(--rule); font-family: 'DM Mono', monospace; font-size: 9px; color: var(--ink-faint); }
+
+/* ── THEN & NOW ───────────────────────────────────────────────── */
+.thenNow { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: stretch; margin-bottom: 1.5rem; }
+.thenNowDivider { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.thenNowLine { flex: 1; width: 1px; background: var(--rule); }
+.thenNowArrow { font-family: 'DM Mono', monospace; font-size: 20px; color: var(--gold); }
+
+/* ── VIRTUE BADGES & ACHIEVEMENT ─────────────────────────────── */
+.badgesRow { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.badgeCard { display: flex; flex-direction: column; align-items: center; padding: 1.5rem 1rem; gap: .75rem; background: var(--white); border: 1px solid var(--rule); border-radius: 4px; width: 150px; text-align: center; transition: transform .2s, box-shadow .2s; }
+.badgeCard:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(27,58,107,.1); }
+.badgeIcon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.badgeHeb { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--navy); line-height: 1; }
+.badgeEn { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-light); }
+.badgeDate { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--ink-faint); margin-top: -4px; }
+.achievementBanner { background: var(--navy); border-radius: 4px; padding: 2rem 2.5rem; display: flex; align-items: center; gap: 2rem; }
+.achievementMedal { width: 72px; height: 72px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 11px; color: var(--navy); text-align: center; line-height: 1.3; font-weight: 600; flex-shrink: 0; }
+.achievementText h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: white; font-weight: 400; margin-bottom: .3rem; }
+.achievementText p { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,.5); line-height: 1.6; }
+.poemsList { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 1rem; }
+.poemChip { padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,.2); font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(255,255,255,.6); letter-spacing: .04em; }
+
+/* ── RESPONSIVE ───────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .benchGrid, .videoGrid, .thenNow { grid-template-columns: 1fr; }
+  .thenNowDivider { display: none; }
+}

@@ -1,6 +1,7 @@
 import type { Video, StudentVideo } from '@/lib/types'
 import type { UserRole } from '@/lib/types'
 import InlineVideoForm from './InlineVideoForm'
+import s from './sections.module.css'
 
 interface Props {
   videos?:        Video[]         // legacy table — kept for compat
@@ -76,19 +77,19 @@ function VideoCard({ grade, type, captionLine1, captionLine2, footer }: {
   grade: string; type: string; captionLine1: string; captionLine2?: string; footer: string
 }) {
   return (
-    <div className="video-card">
-      <div className="video-header">
-        <span className="video-grade">{grade}</span>
-        <span className="video-type">{type}</span>
+    <div className={s.videoCard}>
+      <div className={s.videoHeader}>
+        <span className={s.videoGrade}>{grade}</span>
+        <span className={s.videoType}>{type}</span>
       </div>
-      <div className="video-slot">
-        <div className="play-btn"><PlayIcon /></div>
-        <div className="video-caption">
+      <div className={s.videoSlot}>
+        <div className={s.playBtn}><PlayIcon /></div>
+        <div className={s.videoCaption}>
           {captionLine1}
           {captionLine2 && <><br />{captionLine2}</>}
         </div>
       </div>
-      <div className="video-footer">{footer}</div>
+      <div className={s.videoFooter}>{footer}</div>
     </div>
   )
 }
@@ -98,12 +99,12 @@ function EmbedVideoCard({ video }: { video: StudentVideo }) {
   const nativeUrl = video.videoPublicUrl ?? null
 
   return (
-    <div className="video-card">
-      <div className="video-header">
-        <span className="video-grade">{video.gradeLevel} · {video.term}</span>
-        <span className="video-type">{CATEGORY_LABELS[video.category] ?? video.category}</span>
+    <div className={s.videoCard}>
+      <div className={s.videoHeader}>
+        <span className={s.videoGrade}>{video.gradeLevel} · {video.term}</span>
+        <span className={s.videoType}>{CATEGORY_LABELS[video.category] ?? video.category}</span>
       </div>
-      <div className="video-slot" style={{ padding: 0 }}>
+      <div className={s.videoSlot} style={{ padding: 0 }}>
         {embedUrl ? (
           <iframe
             src={embedUrl}
@@ -122,12 +123,12 @@ function EmbedVideoCard({ video }: { video: StudentVideo }) {
             Your browser does not support HTML5 video.
           </video>
         ) : (
-          <div className="video-caption" style={{ padding: '1rem' }}>
+          <div className={s.videoCaption} style={{ padding: '1rem' }}>
             Video unavailable
           </div>
         )}
       </div>
-      <div className="video-footer">{video.title}</div>
+      <div className={s.videoFooter}>{video.title}</div>
     </div>
   )
 }
@@ -164,25 +165,25 @@ function RealVideos({ videos, canEdit, studentId }: { videos: StudentVideo[]; ca
       </p>
 
       {then && now && (
-        <div className="then-now reveal">
+        <div className={`${s.thenNow} reveal`}>
           <EmbedVideoCard video={then} />
-          <div className="then-now-divider">
-            <div className="then-now-line" />
-            <div className="then-now-arrow">&rarr;</div>
-            <div className="then-now-line" />
+          <div className={s.thenNowDivider}>
+            <div className={s.thenNowLine} />
+            <div className={s.thenNowArrow}>&rarr;</div>
+            <div className={s.thenNowLine} />
           </div>
           <EmbedVideoCard video={now} />
         </div>
       )}
 
       {then && !now && (
-        <div className="video-grid reveal">
+        <div className={`${s.videoGrid} reveal`}>
           <EmbedVideoCard video={then} />
         </div>
       )}
 
       {gridVideos.length > 0 && (
-        <div className="video-grid reveal">
+        <div className={`${s.videoGrid} reveal`}>
           {gridVideos.map((v) => <EmbedVideoCard key={v.id} video={v} />)}
         </div>
       )}
@@ -207,18 +208,18 @@ function PlaceholderVideos({ legacyVideos, canEdit, studentId }: { legacyVideos?
           {sorted.length} video{sorted.length !== 1 ? 's' : ''} — trace the arc of spoken performance over time.
         </p>
         {then && now && (
-          <div className="then-now reveal">
+          <div className={`${s.thenNow} reveal`}>
             <VideoCard grade={then.academicYear} type={VIDEO_TYPE_LABELS[then.videoType] ?? then.videoType}
               captionLine1={then.title} captionLine2={then.description ?? undefined} footer={fmtDate(then.recordedAt)} />
-            <div className="then-now-divider">
-              <div className="then-now-line" /><div className="then-now-arrow">&rarr;</div><div className="then-now-line" />
+            <div className={s.thenNowDivider}>
+              <div className={s.thenNowLine} /><div className={s.thenNowArrow}>&rarr;</div><div className={s.thenNowLine} />
             </div>
             <VideoCard grade={now.academicYear} type={VIDEO_TYPE_LABELS[now.videoType] ?? now.videoType}
               captionLine1={now.title} captionLine2={now.description ?? undefined} footer={fmtDate(now.recordedAt)} />
           </div>
         )}
         {rest.slice(0, 2).length > 0 && (
-          <div className="video-grid reveal">
+          <div className={`${s.videoGrid} reveal`}>
             {rest.slice(0, 2).map((v) => (
               <VideoCard key={v.id} grade={v.academicYear} type={VIDEO_TYPE_LABELS[v.videoType] ?? v.videoType}
                 captionLine1={v.title} captionLine2={v.description ?? undefined} footer={fmtDate(v.recordedAt)} />
@@ -240,16 +241,16 @@ function PlaceholderVideos({ legacyVideos, canEdit, studentId }: { legacyVideos?
       <p className="reveal" style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, color: 'var(--ink-faint)', letterSpacing: '.06em', marginBottom: '2rem' }}>
         Paste a YouTube or Vimeo link to activate each slot.
       </p>
-      <div className="then-now reveal">
+      <div className={`${s.thenNow} reveal`}>
         <VideoCard grade="Grade 1 · Fall 2023" type="Hebrew Speaking" captionLine1="First-grade Hebrew"
           captionLine2="classroom introduction" footer="Link video · AVANT Speaking: Level 2" />
-        <div className="then-now-divider">
-          <div className="then-now-line" /><div className="then-now-arrow">&rarr;</div><div className="then-now-line" />
+        <div className={s.thenNowDivider}>
+          <div className={s.thenNowLine} /><div className={s.thenNowArrow}>&rarr;</div><div className={s.thenNowLine} />
         </div>
         <VideoCard grade="Grade 3 · Jan 2026" type="Poetry Recitation" captionLine1="Bronze Level Poetry"
           captionLine2="Recitation — school stage" footer="Link video · 10 poems memorized &amp; recited" />
       </div>
-      <div className="video-grid reveal">
+      <div className={`${s.videoGrid} reveal`}>
         <VideoCard grade="Socratic Reflection" type="Self-Assessment" captionLine1="Student explains a Middah"
           captionLine2="or Latin phrase they mastered" footer="Student explains a Middah or Latin phrase they mastered" />
         <VideoCard grade="Hebrew Fluency · Grade 3" type="Immersion" captionLine1="Conversational Hebrew"
@@ -258,16 +259,16 @@ function PlaceholderVideos({ legacyVideos, canEdit, studentId }: { legacyVideos?
 
       {canEdit && <InlineVideoForm studentId={studentId!} />}
 
-      <div className="achievement-banner reveal">
-        <div className="achievement-medal">BRZ<br />LEVEL</div>
-        <div className="achievement-text">
+      <div className={`${s.achievementBanner} reveal`}>
+        <div className={s.achievementMedal}>BRZ<br />LEVEL</div>
+        <div className={s.achievementText}>
           <h3>Bronze Poetry Recitation Shield</h3>
           <p>
             Awarded by Dr. Liliana Worth, Hadar Jewish Classical Academy<br />
             &ldquo;Hard work, determination and consistent effort to perform beautiful recitations of classic poetry.&rdquo;
           </p>
-          <div className="poems-list">
-            {DEMO_POEMS.map((p) => <span key={p} className="poem-chip">{p}</span>)}
+          <div className={s.poemsList}>
+            {DEMO_POEMS.map((p) => <span key={p} className={s.poemChip}>{p}</span>)}
           </div>
         </div>
       </div>
@@ -277,10 +278,10 @@ function PlaceholderVideos({ legacyVideos, canEdit, studentId }: { legacyVideos?
 
 function SectionHeader() {
   return (
-    <div className="section-header reveal">
-      <span className="section-num">05</span>
-      <h2 className="section-title">The Rhetoric Room</h2>
-      <div className="section-rule" />
+    <div className={`${s.sectionHeader} reveal`}>
+      <span className={s.sectionNum}>05</span>
+      <h2 className={s.sectionTitle}>The Rhetoric Room</h2>
+      <div className={s.sectionRule} />
     </div>
   )
 }

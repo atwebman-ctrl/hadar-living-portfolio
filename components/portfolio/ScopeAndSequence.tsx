@@ -1,4 +1,5 @@
 import type { SubjectProgress } from '@/lib/types'
+import s from './sections.module.css'
 
 interface Props {
   gradeLevel?: string
@@ -28,10 +29,10 @@ export default function ScopeAndSequence({ gradeLevel, subjects }: Props) {
 
   return (
     <section id="scope">
-      <div className="section-header reveal">
-        <span className="section-num">07</span>
-        <h2 className="section-title">Scope &amp; Sequence</h2>
-        <div className="section-rule" />
+      <div className={`${s.sectionHeader} reveal`}>
+        <span className={s.sectionNum}>07</span>
+        <h2 className={s.sectionTitle}>Scope &amp; Sequence</h2>
+        <div className={s.sectionRule} />
       </div>
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
         {isDemo

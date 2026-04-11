@@ -1,6 +1,7 @@
 import type { CharacterAward, AiDraft, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import InlineCharacterForm from '@/components/portfolio/InlineCharacterForm'
+import s from './sections.module.css'
 
 interface Props {
   characterAwards?: CharacterAward[]
@@ -101,25 +102,25 @@ export default function CharacterArc({ characterAwards, studentId, studentName, 
 
   return (
     <section id="character">
-      <div className="section-header reveal">
-        <span className="section-num">06</span>
-        <h2 className="section-title">The Character Arc</h2>
-        <div className="section-rule" />
+      <div className={`${s.sectionHeader} reveal`}>
+        <span className={s.sectionNum}>06</span>
+        <h2 className={s.sectionTitle}>The Character Arc</h2>
+        <div className={s.sectionRule} />
       </div>
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
         {introText}
       </p>
 
-      <div className="badges-row reveal">
+      <div className={`${s.badgesRow} reveal`}>
         {badges.map((b) => (
-          <div key={b.id} className="badge-card">
-            <div className="badge-icon" style={{ background: b.iconBg }}>{b.icon}</div>
-            <div className="badge-heb">{b.heb}</div>
-            <div className="badge-en">{b.transliteration}</div>
+          <div key={b.id} className={s.badgeCard}>
+            <div className={s.badgeIcon} style={{ background: b.iconBg }}>{b.icon}</div>
+            <div className={s.badgeHeb}>{b.heb}</div>
+            <div className={s.badgeEn}>{b.transliteration}</div>
             <div style={{ fontSize: '.8rem', color: 'var(--ink-light)', fontStyle: 'italic', lineHeight: 1.4, margin: '.2rem 0' }}>
               {b.english}
             </div>
-            <div className="badge-date">{b.date}</div>
+            <div className={s.badgeDate}>{b.date}</div>
             {b.description && (
               <div style={{ fontSize: '.75rem', color: 'var(--ink-light)', marginTop: '.25rem', lineHeight: 1.4 }}>
                 {b.description}
@@ -129,14 +130,14 @@ export default function CharacterArc({ characterAwards, studentId, studentName, 
         ))}
 
         {/* Placeholder — next virtue to be earned */}
-        <div className="badge-card" style={{ opacity: 0.4, borderStyle: 'dashed' }}>
-          <div className="badge-icon" style={{ background: 'var(--cream-dark)', fontSize: 22 }}>+</div>
-          <div className="badge-heb" style={{ color: 'var(--ink-faint)' }}>???</div>
-          <div className="badge-en">Next Virtue</div>
+        <div className={s.badgeCard} style={{ opacity: 0.4, borderStyle: 'dashed' }}>
+          <div className={s.badgeIcon} style={{ background: 'var(--cream-dark)', fontSize: 22 }}>+</div>
+          <div className={s.badgeHeb} style={{ color: 'var(--ink-faint)' }}>???</div>
+          <div className={s.badgeEn}>Next Virtue</div>
           <div style={{ fontSize: '.8rem', color: 'var(--ink-faint)', fontStyle: 'italic', lineHeight: 1.4, margin: '.2rem 0' }}>
             To be earned
           </div>
-          <div className="badge-date" style={{ color: 'transparent' }}>&mdash;</div>
+          <div className={s.badgeDate} style={{ color: 'transparent' }}>&mdash;</div>
         </div>
       </div>
 

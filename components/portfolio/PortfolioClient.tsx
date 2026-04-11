@@ -26,6 +26,7 @@ import ParentUploads from '@/components/portfolio/ParentUploads'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 import InviteParentButton from '@/components/shared/InviteParentButton'
 import YearSelector from '@/components/portfolio/YearSelector'
+import layoutStyles from '@/components/portfolio/layout.module.css'
 
 interface Props {
   portfolio: PortfolioData
@@ -49,7 +50,7 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
   const { student, school, assessments, aiDrafts } = portfolio
 
   return (
-    <div className="main">
+    <div className={layoutStyles.main}>
       <HeroSection
         student={student}
         school={school}

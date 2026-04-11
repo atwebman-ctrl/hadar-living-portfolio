@@ -1,0 +1,57 @@
+/* ── SIDEBAR NAV ──────────────────────────────────────────────── */
+.sidenav {
+  position: fixed; left: 0; top: 0; bottom: 0;
+  width: 200px; background: var(--navy);
+  padding: 2rem 0; z-index: 100;
+  display: flex; flex-direction: column;
+}
+.logo { padding: 0 1.5rem 2rem; border-bottom: 1px solid rgba(255,255,255,.12); margin-bottom: 1.5rem; }
+.logoMark { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .14em; color: var(--gold-light); text-transform: uppercase; margin-bottom: 5px; }
+.schoolName { font-family: 'Playfair Display', serif; font-size: 13px; color: white; line-height: 1.3; font-weight: 400; }
+.navLink { display: block; padding: 9px 1.5rem; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.55); text-decoration: none; border-left: 2px solid transparent; transition: all .2s; }
+.navLink:hover, .navLinkActive { color: white; border-left-color: var(--gold); background: rgba(255,255,255,.06); }
+.navLabel { padding: 1.5rem 1.5rem .4rem; font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: .15em; color: rgba(255,255,255,.3); text-transform: uppercase; }
+.studentName { padding: 0 1.5rem 1rem; font-family: var(--font-heading); font-size: 13px; color: white; line-height: 1.3; }
+
+/* Collapsible group rows */
+.groupRow { display: flex; align-items: center; }
+.groupLink {
+  flex: 1; display: block; padding: 9px 1.5rem;
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.65);
+  text-decoration: none; border-left: 2px solid transparent;
+  transition: all 0.2s; font-weight: 500;
+}
+.groupLink:hover, .groupLinkActive { color: white; border-left-color: var(--gold); background: rgba(255,255,255,0.06); }
+.chevron {
+  background: none; border: none; cursor: pointer; padding: 9px 12px 9px 4px;
+  color: rgba(255,255,255,0.35); display: flex; align-items: center;
+  transition: color 0.15s ease;
+}
+.chevron:hover { color: rgba(255,255,255,0.65); }
+.subItems a { display: block; padding: 6px 1.5rem 6px 2.25rem; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); text-decoration: none; border-left: 2px solid transparent; transition: all 0.2s; }
+.subItems a:hover, .subItems a.active { color: rgba(255,255,255,0.85); border-left-color: rgba(184,160,80,0.5); background: rgba(255,255,255,0.03); }
+
+/* Legacy flat-nav label (kept for demo page compatibility) */
+.groupLabel {
+  padding: 0.9rem 1.5rem 0.25rem; font-family: 'DM Mono', monospace;
+  font-size: 7.5px; letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.25); text-transform: uppercase;
+}
+
+/* Mobile: collapses to horizontal scrollable top bar */
+@media (max-width: 768px) {
+  .sidenav {
+    top: 0; left: 0; right: 0; bottom: auto;
+    width: 100%; height: auto;
+    flex-direction: row; align-items: center;
+    padding: 0;
+    overflow-x: auto; overflow-y: hidden;
+    scrollbar-width: none;
+    border-bottom: 1px solid rgba(255,255,255,.15);
+  }
+  .sidenav::-webkit-scrollbar { display: none; }
+  .logo, .navLabel, .studentName { display: none; }
+  .navLink { display: inline-block; white-space: nowrap; padding: 13px 14px; border-left: none; border-bottom: 2px solid transparent; }
+  .navLink.navLinkActive, .navLink:hover { border-left-color: transparent; border-bottom-color: var(--gold); }
+}

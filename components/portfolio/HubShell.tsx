@@ -11,6 +11,7 @@
 import { useState, useMemo } from 'react'
 import type { UserRole, PortfolioData } from '@/lib/types'
 import HeroSection, { StatsBar } from '@/components/portfolio/HeroSection'
+import layoutStyles from '@/components/portfolio/layout.module.css'
 import InviteParentButton from '@/components/shared/InviteParentButton'
 import PortfolioHub from '@/components/portfolio/PortfolioHub'
 
@@ -35,7 +36,7 @@ export default function HubShell({ portfolio, studentId, role }: Props) {
   const canInvite = role === 'admin' || role === 'teacher'
 
   return (
-    <div className="main">
+    <div className={layoutStyles.main}>
       <HeroSection
         student={portfolio.student}
         school={portfolio.school}

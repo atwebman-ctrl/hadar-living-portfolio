@@ -1,0 +1,33 @@
+/* ── GROUP PAGE — tab bar ─────────────────────────────────────── */
+.groupTabBar {
+  display: flex;
+  border-bottom: 1px solid var(--rule);
+  padding: 0 2.5rem;
+  margin-top: 0.5rem;
+  gap: 0;
+}
+.groupTab {
+  padding: 10px 20px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-light);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s ease;
+}
+.groupTab:hover { color: var(--navy); }
+.groupTabActive {
+  color: var(--navy);
+  border-bottom-color: var(--gold);
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .groupTabBar { overflow-x: auto; padding: 0 1.5rem; }
+  .groupTab { white-space: nowrap; padding: 10px 14px; }
+}

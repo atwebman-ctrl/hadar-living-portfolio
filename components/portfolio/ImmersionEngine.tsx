@@ -2,6 +2,7 @@ import type { Assessment, AiDraft, UserRole } from '@/lib/types'
 import AvantChart, { type AvantDataPoint } from '@/components/charts/AvantChart'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import InlineAvantForm from '@/components/portfolio/InlineAvantForm'
+import s from './sections.module.css'
 
 interface Props {
   assessments?:  Assessment[]
@@ -128,15 +129,15 @@ function buildDraftContext(assessments: Assessment[], studentFirstName: string |
 
 function BenchCard({ title, rows }: { title: string; rows: BenchRow[] }) {
   return (
-    <div className="bench-card">
-      <div className="skill-name">{title}</div>
+    <div className={s.benchCard}>
+      <div className={s.benchCardSkillName}>{title}</div>
       {rows.map((r) => (
-        <div key={r.lbl} className="bench-bar-row">
-          <div className={`bench-bar-label${r.highlight ? ' athena' : ''}`}>
+        <div key={r.lbl} className={s.benchBarRow}>
+          <div className={r.highlight ? s.benchBarLabelHighlight : s.benchBarLabel}>
             <span>{r.lbl}</span><span>{r.val}</span>
           </div>
-          <div className="bench-bar-track">
-            <div className="bench-bar-fill" style={{ width: r.pct, background: r.bg, opacity: r.opacity }} />
+          <div className={s.benchBarTrack}>
+            <div className={s.benchBarFill} style={{ width: r.pct, background: r.bg, opacity: r.opacity }} />
           </div>
         </div>
       ))}
@@ -174,18 +175,18 @@ export default function ImmersionEngine({ assessments, studentId, studentName, r
 
   return (
     <section id="hebrew">
-      <div className="section-header reveal">
-        <span className="section-num">02</span>
-        <h2 className="section-title">The Immersion Engine</h2>
-        <div className="section-rule" />
+      <div className={`${s.sectionHeader} reveal`}>
+        <span className={s.sectionNum}>02</span>
+        <h2 className={s.sectionTitle}>The Immersion Engine</h2>
+        <div className={s.sectionRule} />
       </div>
 
-      <div className="callout reveal">
-        <div className="big" style={{ fontSize: '1.8rem', lineHeight: 1.1, textAlign: 'center' }}>
+      <div className={`${s.callout} reveal`}>
+        <div className={s.calloutBig} style={{ fontSize: '1.8rem', lineHeight: 1.1, textAlign: 'center' }}>
           {callout.big}<br />
           <span style={{ fontSize: '1rem', color: 'rgba(255,255,255,.5)' }}>{callout.label}</span>
         </div>
-        <div className="text">
+        <div className={s.calloutText}>
           <strong>{callout.text}</strong>
           {callout.detail && <><br />{callout.detail}</>}
         </div>
@@ -202,20 +203,20 @@ export default function ImmersionEngine({ assessments, studentId, studentName, r
         />
       )}
 
-      <div className="chart-wrap reveal">
-        <div className="chart-title">AVANT Hebrew — Four Skills Over Time</div>
-        <div className="legend">
-          <span><span className="legend-dot" style={{ background: '#1B3A6B' }} /> Speaking</span>
-          <span><span className="legend-dot" style={{ background: '#B8963E' }} /> Reading</span>
-          <span><span className="legend-dot" style={{ background: '#2E7D5E' }} /> Listening</span>
-          <span><span className="legend-dot" style={{ background: '#7C3AED' }} /> Writing</span>
+      <div className={`${s.chartWrap} reveal`}>
+        <div className={s.chartTitle}>AVANT Hebrew — Four Skills Over Time</div>
+        <div className={s.legend}>
+          <span><span className={s.legendDot} style={{ background: '#1B3A6B' }} /> Speaking</span>
+          <span><span className={s.legendDot} style={{ background: '#B8963E' }} /> Reading</span>
+          <span><span className={s.legendDot} style={{ background: '#2E7D5E' }} /> Listening</span>
+          <span><span className={s.legendDot} style={{ background: '#7C3AED' }} /> Writing</span>
         </div>
         <div style={{ position: 'relative', height: 260 }}>
           <AvantChart data={avantData ?? undefined} />
         </div>
       </div>
 
-      <div className="bench-grid reveal">
+      <div className={`${s.benchGrid} reveal`}>
         <BenchCard title="Reading — vs. national averages"   rows={readingRows} />
         <BenchCard title="Listening — vs. national averages" rows={listeningRows} />
       </div>
