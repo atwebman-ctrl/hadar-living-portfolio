@@ -20,6 +20,7 @@ import {
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
 import { authErrorResponse } from '@/lib/apiHelpers'
+import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
 
@@ -125,6 +126,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
     )
   }
 
+  revalidatePortfolio(studentId)
   return new NextResponse(null, { status: 204 })
 }
 
@@ -214,5 +216,6 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     )
   }
 
+  revalidatePortfolio(studentId)
   return NextResponse.json(mapStudent(data as Record<string, unknown>))
 }

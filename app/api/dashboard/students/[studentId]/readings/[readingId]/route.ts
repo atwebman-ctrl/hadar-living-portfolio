@@ -14,6 +14,7 @@ import { validate, UpdateReadingSchema, ValidationError } from '@/lib/validation
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapReading } from '@/lib/mappers'
 import { authErrorResponse } from '@/lib/apiHelpers'
+import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string; readingId: string }> }
 
@@ -91,6 +92,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: 'Failed to update reading.', code: 'DB_ERROR' }, { status: 500 })
   }
 
+  revalidatePortfolio(studentId)
   return NextResponse.json(mapReading(data as Record<string, unknown>))
 }
 
@@ -122,5 +124,6 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: 'Failed to delete reading.', code: 'DB_ERROR' }, { status: 500 })
   }
 
+  revalidatePortfolio(studentId)
   return new NextResponse(null, { status: 204 })
 }
