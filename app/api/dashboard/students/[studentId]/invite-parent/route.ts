@@ -31,6 +31,7 @@ import {
   type InviteParentInput,
 } from '@/lib/validationExtended'
 import { authErrorResponse } from '@/lib/apiHelpers'
+import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
 
@@ -152,6 +153,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     )
   }
 
+  revalidatePortfolio(studentId)
   return NextResponse.json(
     { status: 'invited', email: input.email.toLowerCase() },
     { status: 201 },

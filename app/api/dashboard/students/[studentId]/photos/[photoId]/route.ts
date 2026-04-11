@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { authErrorResponse } from '@/lib/apiHelpers'
+import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string; photoId: string }> }
 
@@ -73,6 +74,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     console.error('[PATCH photos/:id]', dbErr)
     return NextResponse.json({ error: 'Failed to update photo.', code: 'DB_ERROR' }, { status: 500 })
   }
+  revalidatePortfolio(studentId)
   return NextResponse.json(data)
 }
 
@@ -95,5 +97,6 @@ export async function DELETE(req: NextRequest, { params }: RouteContext) {
     console.error('[DELETE photos/:id]', dbErr)
     return NextResponse.json({ error: 'Failed to delete photo.', code: 'DB_ERROR' }, { status: 500 })
   }
+  revalidatePortfolio(studentId)
   return new NextResponse(null, { status: 204 })
 }

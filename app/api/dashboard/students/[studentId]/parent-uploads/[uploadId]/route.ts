@@ -15,6 +15,7 @@ import type { UpdateParentUploadInput } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapParentUpload } from '@/lib/mappers'
 import { authErrorResponse } from '@/lib/apiHelpers'
+import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string; uploadId: string }> }
 
@@ -86,6 +87,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: 'Failed to update upload.', code: 'DB_ERROR' }, { status: 500 })
   }
 
+  revalidatePortfolio(studentId)
   return NextResponse.json(mapParentUpload(data as Record<string, unknown>))
 }
 
@@ -111,5 +113,6 @@ export async function DELETE(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: 'Failed to delete upload.', code: 'DB_ERROR' }, { status: 500 })
   }
 
+  revalidatePortfolio(studentId)
   return new NextResponse(null, { status: 204 })
 }

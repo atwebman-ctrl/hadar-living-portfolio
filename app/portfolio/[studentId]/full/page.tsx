@@ -5,8 +5,6 @@
 // Same auth/data logic as the hub page.
 // ============================================================
 
-export const dynamic = 'force-dynamic'
-
 import { notFound } from 'next/navigation'
 import { getAuthContext } from '@/lib/auth'
 import { getStudentPortfolio } from '@/lib/getStudentPortfolio'

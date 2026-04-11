@@ -21,6 +21,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { authErrorResponse } from '@/lib/apiHelpers'
+import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
 
@@ -168,6 +169,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     if (dbErr) {
       return NextResponse.json({ error: 'Failed to update student profile.', code: 'DB_ERROR' }, { status: 500 })
     }
+    revalidatePortfolio(studentId)
     return NextResponse.json({ storagePath: pPath }, { status: 200 })
   }
 
@@ -198,6 +200,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     // Storage-only: the student_videos DB row is created by the videos API route
     // after the user completes the form with title/grade/term/category.
     console.log('[POST uploads] video stored at', path)
+    revalidatePortfolio(studentId)
     return NextResponse.json({ storagePath: path }, { status: 200 })
   }
   return insertParentUpload({ schoolId: ctx.schoolId, studentId, path, formData, academicYear, gradeLevel, uploadedBy: ctx.userId })
@@ -225,6 +228,7 @@ async function insertPhoto(args: {
     console.error('[POST uploads] photos insert error:', error)
     return NextResponse.json({ error: 'Failed to save photo record.', code: 'DB_ERROR' }, { status: 500 })
   }
+  revalidatePortfolio(studentId)
   return NextResponse.json({ record: data, storagePath: path }, { status: 201 })
 }
 
@@ -274,6 +278,7 @@ async function insertHandwriting(args: {
     return NextResponse.json({ error: 'Failed to save handwriting record.', code: 'DB_ERROR' }, { status: 500 })
   }
   console.log('[insertHandwriting] INSERT succeeded, id:', (data as Record<string, unknown>).id)
+  revalidatePortfolio(studentId)
   return NextResponse.json({ record: data, storagePath: path }, { status: 201 })
 }
 
@@ -297,5 +302,6 @@ async function insertParentUpload(args: {
     console.error('[POST uploads] parent_uploads insert error:', error)
     return NextResponse.json({ error: 'Failed to save upload record.', code: 'DB_ERROR' }, { status: 500 })
   }
+  revalidatePortfolio(studentId)
   return NextResponse.json({ record: data, storagePath: path }, { status: 201 })
 }
