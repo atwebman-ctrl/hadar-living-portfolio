@@ -8,8 +8,9 @@
 // between tabs to navigate sub-sections within a group.
 // ============================================================
 
-import { useState, Component, type ReactNode } from 'react'
+import { useState, useMemo, Component, type ReactNode } from 'react'
 import type { UserRole, PortfolioData } from '@/lib/types'
+import YearSelector from '@/components/portfolio/YearSelector'
 import IntellectualArc from '@/components/portfolio/IntellectualArc'
 import ImmersionEngine from '@/components/portfolio/ImmersionEngine'
 import TheCanon from '@/components/portfolio/TheCanon'
@@ -86,10 +87,14 @@ export const GROUP_TITLES: Record<string, string> = {
 
 // ── Section renderer ──────────────────────────────────────────
 
-function RenderSection({ slug, portfolio, studentId, role }: {
-  slug: string; portfolio: PortfolioData; studentId: string; role: UserRole
+const YEAR_FILTER_TABS = new Set(['intellectual-arc', 'the-canon', 'creative-evolution'])
+
+function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
+  slug: string; portfolio: PortfolioData; studentId: string; role: UserRole; selectedYear: string
 }) {
   const { student, assessments, aiDrafts } = portfolio
+  const filtered = <T extends { academicYear?: string | null }>(items: T[]): T[] =>
+    selectedYear === 'all' ? items : items.filter((i) => i.academicYear === selectedYear)
 
   switch (slug) {
     case 'intellectual-arc':
@@ -102,7 +107,7 @@ function RenderSection({ slug, portfolio, studentId, role }: {
           gradeLevel={student.gradeLevel}
           academicYear={student.academicYear}
           currentYear={student.academicYear}
-          selectedYear="all"
+          selectedYear={selectedYear}
           existingMathDraft={aiDrafts.find((d) => d.sectionType === 'math_scores')}
           existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
         />
@@ -122,7 +127,7 @@ function RenderSection({ slug, portfolio, studentId, role }: {
     case 'the-canon':
       return (
         <TheCanon
-          readings={portfolio.readings}
+          readings={filtered(portfolio.readings)}
           studentId={studentId}
           studentName={student.firstName}
           role={role}
@@ -132,7 +137,7 @@ function RenderSection({ slug, portfolio, studentId, role }: {
     case 'creative-evolution':
       return (
         <CreativeEvolution
-          writingSamples={portfolio.writingSamples}
+          writingSamples={filtered(portfolio.writingSamples)}
           studentId={studentId}
           studentName={student.firstName}
           role={role}
@@ -202,7 +207,18 @@ interface Props {
 export default function GroupDetailClient({ portfolio, studentId, role, groupSlug, initialTab }: Props) {
   const tabs  = GROUP_TABS[groupSlug] ?? []
   const title = GROUP_TITLES[groupSlug] ?? groupSlug
-  const [activeTab, setActiveTab] = useState(initialTab ?? tabs[0]?.slug ?? '')
+  const [activeTab,    setActiveTab]    = useState(initialTab ?? tabs[0]?.slug ?? '')
+  const [selectedYear, setSelectedYear] = useState('all')
+
+  const years = useMemo(() => {
+    const set = new Set<string>()
+    portfolio.assessments.forEach((a)    => a.academicYear && set.add(a.academicYear))
+    portfolio.readings.forEach((r)       => r.academicYear && set.add(r.academicYear))
+    portfolio.writingSamples.forEach((w) => w.academicYear && set.add(w.academicYear))
+    return Array.from(set).sort().reverse()
+  }, [portfolio])
+
+  const showYearSelector = YEAR_FILTER_TABS.has(activeTab) && years.length > 0
 
   return (
     <div className="main">
@@ -239,6 +255,11 @@ export default function GroupDetailClient({ portfolio, studentId, role, groupSlu
         ))}
       </div>
 
+      {/* Year selector — only for tabs that benefit from year filtering */}
+      {showYearSelector && (
+        <YearSelector years={years} selectedYear={selectedYear} onChange={setSelectedYear} />
+      )}
+
       {/* Active section */}
       <TabErrorBoundary tabKey={activeTab}>
         <RenderSection
@@ -246,6 +267,7 @@ export default function GroupDetailClient({ portfolio, studentId, role, groupSlu
           portfolio={portfolio}
           studentId={studentId}
           role={role}
+          selectedYear={selectedYear}
         />
       </TabErrorBoundary>
     </div>
