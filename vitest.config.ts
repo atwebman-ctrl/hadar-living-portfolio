@@ -10,5 +10,6 @@ export default defineConfig({
     // React component tests (.test.tsx) use // @vitest-environment jsdom
     // at the top of the file.
     environment: 'node',
+    setupFiles: ['./vitest.setup.ts'],
   },
 })

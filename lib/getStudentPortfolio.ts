@@ -13,6 +13,7 @@
 // teachers: [] is returned directly until that migration lands.
 // ============================================================
 
+import { unstable_cache } from 'next/cache'
 import { supabaseAdmin } from "./supabaseAdmin";
 import type { PortfolioData } from "./types";
 import {
@@ -55,7 +56,9 @@ async function safeQuery<T>(
   return data ?? [];
 }
 
-export async function getStudentPortfolio(
+// Raw fetch — no caching. Use when you need guaranteed fresh data
+// (e.g., in API write handlers immediately after a mutation).
+export async function getStudentPortfolioUncached(
   studentId: string,
   schoolId: string
 ): Promise<PortfolioData> {
@@ -234,4 +237,26 @@ export async function getStudentPortfolio(
       return { ...v, videoPublicUrl: storagePublicUrl(v.videoStoragePath) }
     }),
   };
+}
+
+// ── Cached version (default export) ──────────────────────────
+//
+// Wraps the raw fetch in Next.js unstable_cache with:
+//   - 60 second TTL (revalidate: 60)
+//   - Per-student tag: `portfolio-${studentId}`
+//
+// Call revalidatePortfolio(studentId) from any write route to
+// bust the cache immediately after a mutation.
+//
+// The cache key includes studentId + schoolId so different schools
+// can never see each other's cached data.
+export function getStudentPortfolio(
+  studentId: string,
+  schoolId: string,
+): Promise<PortfolioData> {
+  return unstable_cache(
+    () => getStudentPortfolioUncached(studentId, schoolId),
+    ['portfolio', studentId, schoolId],
+    { revalidate: 60, tags: [`portfolio-${studentId}`] },
+  )()
 }

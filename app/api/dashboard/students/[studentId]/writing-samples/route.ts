@@ -25,6 +25,7 @@ import {
 } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { authErrorResponse } from '@/lib/apiHelpers'
+import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
 
@@ -115,5 +116,6 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     )
   }
 
+  revalidatePortfolio(studentId)
   return NextResponse.json(data, { status: 201 })
 }

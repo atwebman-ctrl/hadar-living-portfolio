@@ -6,8 +6,6 @@
 // enforces parent access, then renders HubShell.
 // ============================================================
 
-export const dynamic = 'force-dynamic'
-
 import { notFound } from 'next/navigation'
 import { getAuthContext } from '@/lib/auth'
 import { getStudentPortfolio } from '@/lib/getStudentPortfolio'
