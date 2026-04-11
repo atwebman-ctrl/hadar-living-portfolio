@@ -91,40 +91,35 @@ export default function HeroSection({ student, school, assessments, compact, inv
 
   return (
     <div className={`hero${compact ? ' compact' : ''}`} id="overview">
-      {/* Name row: photo/initials circle · name · invite button */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {photoUrl
-            ? <img src={photoUrl} alt={`${firstName} ${lastName}`} className="hero-initials" style={{ objectFit: 'cover', display: 'block' }} />
-            : <div className="hero-initials">{initials}</div>
-          }
-          <h1 style={{ marginBottom: 0 }}>
-            {firstName}<br /><em>{lastName}</em>
-          </h1>
-        </div>
+      {/* Left column: photo · name · school */}
+      <div className="hero-left">
+        {photoUrl
+          ? <img src={photoUrl} alt={`${firstName} ${lastName}`} className="hero-initials" style={{ objectFit: 'cover', display: 'block', marginBottom: '0.75rem' }} />
+          : <div className="hero-initials" style={{ marginBottom: '0.75rem' }}>{initials}</div>
+        }
+        <h1>{firstName}<br /><em>{lastName}</em></h1>
+        <div className="hero-sub">{heroSub}</div>
+        {summary && (
+          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: '.8rem', color: 'rgba(255,255,255,.55)', margin: '0.75rem 0 0', lineHeight: 1.6 }}>
+            {summary}
+          </p>
+        )}
         {inviteButton && (
-          <div style={{ paddingTop: '0.4rem', flexShrink: 0 }}>
-            {inviteButton}
-          </div>
+          <div style={{ marginTop: '0.75rem' }}>{inviteButton}</div>
         )}
       </div>
 
-      <div className="hero-sub">{heroSub}</div>
-
-      {summary && (
-        <p style={{ fontFamily: "'DM Mono', monospace", fontSize: '.85rem', color: 'rgba(255,255,255,.6)', marginBottom: '1.25rem', maxWidth: 560, lineHeight: 1.6 }}>
-          {summary}
-        </p>
-      )}
-
-      <div className="hero-metrics">
-        {metrics.map((m) => (
-          <div key={m.lbl} className="hero-metric">
-            <div className="lbl">{m.lbl}</div>
-            <div className={`val${m.gold ? ' gold' : ''}`}>{m.val}</div>
-            <div className="ctx">{m.ctx}</div>
-          </div>
-        ))}
+      {/* Right column: 2×2 metric grid */}
+      <div className="hero-right">
+        <div className="hero-metrics">
+          {metrics.map((m) => (
+            <div key={m.lbl} className="hero-metric">
+              <div className="lbl">{m.lbl}</div>
+              <div className={`val${m.gold ? ' gold' : ''}`}>{m.val}</div>
+              <div className="ctx">{m.ctx}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
