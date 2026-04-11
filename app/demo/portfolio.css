@@ -321,3 +321,223 @@
 }
 
 @media (max-width: 600px) { .hub-grid { grid-template-columns: 1fr; } }
+/* ── ADD THIS CSS to app/demo/portfolio.css ──────────────────
+   Insert right after the existing .hub-full-btn:hover rule
+   (around line 236)
+   ──────────────────────────────────────────────────────────── */
+
+/* Hub group headers */
+.hub-group-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.6rem;
+  padding-left: 2px;
+}
+
+/* Sidebar group headers (legacy flat nav — kept for demo page) */
+.sidenav-group-label {
+  padding: 0.9rem 1.5rem 0.25rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+}
+
+/* ── Hub: 3 group cards ──────────────────────────────────────── */
+.hub-group-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.hub-group-card {
+  border-top: 1px solid rgba(184,160,80,0.3);
+  padding: 1.75rem 2rem 1.5rem;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+.hub-group-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+.hub-group-card-inner { flex: 1; }
+.hub-group-card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+.hub-group-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 0;
+  line-height: 1.2;
+}
+.hub-group-card-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(139,115,85,0.5);
+  letter-spacing: 0.04em;
+}
+.hub-group-card-subtitle {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink-light);
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+}
+.hub-group-card-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.hub-group-card-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(184,160,80,0.35);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #6B5B3E;
+  letter-spacing: 0.03em;
+  background: rgba(184,160,80,0.06);
+}
+.hub-group-card-empty {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--gold);
+  margin: 0;
+}
+.hub-group-card-cta {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 14px;
+  color: #B8A050;
+  flex-shrink: 0;
+  align-self: center;
+  transition: text-decoration 0.15s ease;
+}
+.hub-group-card:hover .hub-group-card-cta { text-decoration: underline; }
+
+/* AI summary */
+.hub-ai-summary {
+  background: var(--navy);
+  color: rgba(255,255,255,0.85);
+  padding: 1.25rem 1.75rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.hub-ai-summary p { margin: 0; }
+.hub-ai-summary-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Group page: tab bar ─────────────────────────────────────── */
+.group-tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--rule);
+  padding: 0 2.5rem;
+  margin-top: 0.5rem;
+  gap: 0;
+}
+.group-tab {
+  padding: 10px 20px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-light);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s ease;
+}
+.group-tab:hover { color: var(--navy); }
+.group-tab.active {
+  color: var(--navy);
+  border-bottom-color: var(--gold);
+  font-weight: 500;
+}
+
+/* ── Sidebar: collapsible group rows with chevron ────────────── */
+.sidenav-group-row {
+  display: flex;
+  align-items: center;
+}
+.sidenav-group-link {
+  flex: 1;
+  display: block;
+  padding: 9px 1.5rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+.sidenav-group-link:hover,
+.sidenav-group-link.active {
+  color: white;
+  border-left-color: var(--gold);
+  background: rgba(255,255,255,0.06);
+}
+.sidenav-chevron {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 9px 12px 9px 4px;
+  color: rgba(255,255,255,0.35);
+  display: flex;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+.sidenav-chevron:hover { color: rgba(255,255,255,0.65); }
+.sidenav-sub-items a {
+  display: block;
+  padding: 6px 1.5rem 6px 2.25rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.2s;
+}
+.sidenav-sub-items a:hover,
+.sidenav-sub-items a.active {
+  color: rgba(255,255,255,0.85);
+  border-left-color: rgba(184,160,80,0.5);
+  background: rgba(255,255,255,0.03);
+}
+
+/* ── Responsive: group cards + tabs ─────────────────────────── */
+@media (max-width: 900px) {
+  .hub-group-card { flex-direction: column; gap: 0.75rem; }
+  .hub-group-card-cta { align-self: flex-start; }
+  .group-tab-bar { overflow-x: auto; padding: 0 1.5rem; }
+  .group-tab { white-space: nowrap; padding: 10px 14px; }
+}

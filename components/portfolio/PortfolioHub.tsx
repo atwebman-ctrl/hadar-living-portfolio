@@ -3,9 +3,8 @@
 // ============================================================
 // components/portfolio/PortfolioHub.tsx
 //
-// Hub overview: 11 section cards in a 3-column grid.
-// Each card links to /portfolio/[studentId]/section/[slug].
-// CSS lives in portfolio.css (.hub-card, .hub-grid, etc.).
+// Hub overview: 3 elegant group cards (Academics, Student Work,
+// Gallery). Each links to /portfolio/[studentId]/group/[slug].
 // ============================================================
 
 import Link from 'next/link'
@@ -18,129 +17,160 @@ interface Props {
   selectedYear: string
 }
 
-// ── Helpers ───────────────────────────────────────────────────
+// ── Summary builders ──────────────────────────────────────────
 
-function shortDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+function buildAcademicsSummary(p: PortfolioData) {
+  const stats: string[] = []
+  let filled = 0
+  const total = 3
+
+  const m = latestAssessment(p.assessments, 'maps_math')
+  const e = latestAssessment(p.assessments, 'maps_english')
+  if (m || e) {
+    const fmt = (a: Assessment | null) =>
+      a?.percentile != null ? ordinal(Math.round(a.percentile)) : '—'
+    stats.push(`Math: ${fmt(m)} · English: ${fmt(e)}`)
+    filled++
+  }
+
+  const avantScores = (
+    ['avant_speaking','avant_reading','avant_listening','avant_writing'] as const
+  ).map((t) => latestAssessment(p.assessments, t))
+   .filter((a): a is Assessment => a?.score != null)
+
+  if (avantScores.length) {
+    const avg = avantScores.map((a) => a.score!).reduce((s,n) => s+n, 0) / avantScores.length
+    stats.push(`Hebrew: ${avg.toFixed(2)} composite`)
+    filled++
+  }
+
+  if (p.scopeAndSequence.length) {
+    stats.push(`${p.scopeAndSequence.length} subject${p.scopeAndSequence.length !== 1 ? 's' : ''} tracked`)
+    filled++
+  }
+
+  return { stats, filled, total }
 }
 
-// ── Section card definitions ──────────────────────────────────
+function buildStudentWorkSummary(p: PortfolioData) {
+  const stats: string[] = []
+  let filled = 0
+  const total = 6
 
-interface CardResult { text: string; hasData: boolean; thumbUrl?: string }
+  if (p.readings.length)           { stats.push(`${p.readings.length} book${p.readings.length !== 1 ? 's' : ''}`);                           filled++ }
+  if (p.writingSamples.length)     { stats.push(`${p.writingSamples.length} writing sample${p.writingSamples.length !== 1 ? 's' : ''}`);       filled++ }
+  const vids = p.studentVideos.length + p.videos.length
+  if (vids)                        { stats.push(`${vids} video${vids !== 1 ? 's' : ''}`);                                                     filled++ }
+  if (p.handwritingSamples.length) { stats.push(`${p.handwritingSamples.length} handwriting sample${p.handwritingSamples.length !== 1 ? 's' : ''}`); filled++ }
+  if (p.teacherNotes.length)       { stats.push(`${p.teacherNotes.length} teacher note${p.teacherNotes.length !== 1 ? 's' : ''}`);             filled++ }
+  if (p.characterAwards.length)    { stats.push(`${p.characterAwards.length} character award${p.characterAwards.length !== 1 ? 's' : ''}`);   filled++ }
 
-interface CardDef {
-  num:   number
-  title: string
-  slug:  string
-  cta:   string
-  build: (p: PortfolioData) => CardResult
+  return { stats, filled, total }
 }
 
-const SECTIONS: CardDef[] = [
-  { num: 1, title: 'Intellectual Arc',   slug: 'intellectual-arc',   cta: 'See scores',
-    build: (p) => {
-      const m = latestAssessment(p.assessments, 'maps_math'), e = latestAssessment(p.assessments, 'maps_english')
-      if (!m && !e) return { text: '', hasData: false }
-      const fmt = (a: Assessment | null) => a?.percentile != null ? ordinal(Math.round(a.percentile)) : '—'
-      return { text: `Math: ${fmt(m)} · English: ${fmt(e)}`, hasData: true }
-    } },
-  { num: 2, title: 'Immersion Engine',   slug: 'immersion-engine',   cta: 'See scores',
-    build: (p) => {
-      const scores = (['avant_speaking','avant_reading','avant_listening','avant_writing'] as const)
-        .map((t) => latestAssessment(p.assessments, t)).filter((a): a is Assessment => a?.score != null).map((a) => a.score!)
-      if (!scores.length) return { text: '', hasData: false }
-      return { text: `Hebrew: ${(scores.reduce((s,n) => s+n,0)/scores.length).toFixed(2)} composite`, hasData: true }
-    } },
-  { num: 3, title: 'The Canon',          slug: 'the-canon',          cta: 'See books',
-    build: (p) => {
-      if (!p.readings.length) return { text: '', hasData: false }
-      const latest = [...p.readings].sort((a,b) => b.createdAt.localeCompare(a.createdAt))[0]
-      return { text: `${p.readings.length} book${p.readings.length !== 1 ? 's' : ''} · latest: ${latest.title}`, hasData: true }
-    } },
-  { num: 4, title: 'Creative Evolution', slug: 'creative-evolution', cta: 'See writing',
-    build: (p) => {
-      if (!p.writingSamples.length) return { text: '', hasData: false }
-      const latest = [...p.writingSamples].sort((a,b) => b.createdAt.localeCompare(a.createdAt))[0]
-      return { text: `${p.writingSamples.length} sample${p.writingSamples.length !== 1 ? 's' : ''} · latest: ${latest.title}`, hasData: true }
-    } },
-  { num: 5, title: 'Rhetoric Room',      slug: 'rhetoric-room',      cta: 'See videos',
-    build: (p) => {
-      const n = p.studentVideos.length + p.videos.length
-      return n > 0 ? { text: `${n} video${n !== 1 ? 's' : ''} archived`, hasData: true } : { text: '', hasData: false }
-    } },
-  { num: 6, title: 'Character Arc',      slug: 'character-arc',      cta: 'See awards',
-    build: (p) => {
-      if (!p.characterAwards.length) return { text: '', hasData: false }
-      const latest = [...p.characterAwards].sort((a,b) => b.awardDate.localeCompare(a.awardDate))[0]
-      return { text: `${p.characterAwards.length} award${p.characterAwards.length !== 1 ? 's' : ''} · latest: ${latest.virtueEnglish}`, hasData: true }
-    } },
-  { num: 7, title: 'Scope & Sequence',   slug: 'scope-and-sequence', cta: 'See curriculum',
-    build: (p) => {
-      if (!p.scopeAndSequence.length) return { text: '', hasData: false }
-      return { text: `${p.scopeAndSequence.length} subject${p.scopeAndSequence.length !== 1 ? 's' : ''} tracked`, hasData: true }
-    } },
-  { num: 8, title: 'Handwriting',        slug: 'handwriting',        cta: 'See samples',
-    build: (p) => {
-      if (!p.handwritingSamples.length) return { text: '', hasData: false }
-      return { text: `${p.handwritingSamples.length} sample${p.handwritingSamples.length !== 1 ? 's' : ''} uploaded`, hasData: true }
-    } },
-  { num: 9, title: 'Photo Gallery',      slug: 'photo-gallery',      cta: 'See photos',
-    build: (p) => {
-      if (!p.photos.length) return { text: '', hasData: false }
-      const thumb = p.photos[0].publicUrl ?? undefined
-      return { text: `${p.photos.length} photo${p.photos.length !== 1 ? 's' : ''}`, hasData: true, thumbUrl: thumb }
-    } },
-  { num: 10, title: 'Teacher Notes',     slug: 'teacher-notes',      cta: 'See notes',
-    build: (p) => {
-      if (!p.teacherNotes.length) return { text: '', hasData: false }
-      const latest = [...p.teacherNotes].sort((a,b) => b.createdAt.localeCompare(a.createdAt))[0]
-      return { text: `${p.teacherNotes.length} note${p.teacherNotes.length !== 1 ? 's' : ''} · latest: ${shortDate(latest.createdAt)}`, hasData: true }
-    } },
-  { num: 11, title: 'Parent Uploads',    slug: 'parent-uploads',     cta: 'See uploads',
-    build: (p) => {
-      if (!p.parentUploads.length) return { text: '', hasData: false }
-      return { text: `${p.parentUploads.length} upload${p.parentUploads.length !== 1 ? 's' : ''}`, hasData: true }
-    } },
-]
+function buildGallerySummary(p: PortfolioData) {
+  const stats: string[] = []
+  let filled = 0
+  const total = 2
 
-// ── Component ─────────────────────────────────────────────────
+  if (p.photos.length)        { stats.push(`${p.photos.length} photo${p.photos.length !== 1 ? 's' : ''}`);                    filled++ }
+  if (p.parentUploads.length) { stats.push(`${p.parentUploads.length} parent upload${p.parentUploads.length !== 1 ? 's' : ''}`); filled++ }
 
-export default function PortfolioHub({ portfolio, studentId, selectedYear }: Props) {
+  const thumbUrl = p.photos[0]?.publicUrl ?? undefined
+  return { stats, filled, total, thumbUrl }
+}
+
+// ── GroupCard ─────────────────────────────────────────────────
+
+interface GroupCardProps {
+  title:     string
+  subtitle:  string
+  groupSlug: string
+  stats:     string[]
+  filled:    number
+  total:     number
+  studentId: string
+  thumbUrl?: string
+}
+
+function GroupCard({ title, subtitle, groupSlug, stats, filled, total, studentId, thumbUrl }: GroupCardProps) {
+  const hasData = filled > 0
+  const bg = thumbUrl
+    ? `linear-gradient(rgba(247,244,238,0.82),rgba(247,244,238,0.82)),url(${thumbUrl}) center/cover no-repeat`
+    : `url('/images/parchmant-paper.jpeg') center/cover no-repeat`
+
+  return (
+    <Link href={`/portfolio/${studentId}/group/${groupSlug}`} style={{ textDecoration: 'none' }}>
+      <div className="hub-group-card reveal" style={{ background: bg }}>
+        <div className="hub-group-card-inner">
+          <div className="hub-group-card-header">
+            <h2 className="hub-group-card-title">{title}</h2>
+            <span className="hub-group-card-count">{filled}/{total}</span>
+          </div>
+          <p className="hub-group-card-subtitle">{subtitle}</p>
+
+          {hasData ? (
+            <div className="hub-group-card-stats">
+              {stats.map((s, i) => (
+                <span key={i} className="hub-group-card-chip">{s}</span>
+              ))}
+            </div>
+          ) : (
+            <p className="hub-group-card-empty">Add first entry →</p>
+          )}
+        </div>
+        <span className="hub-group-card-cta">Explore →</span>
+      </div>
+    </Link>
+  )
+}
+
+// ── Hub ───────────────────────────────────────────────────────
+
+export default function PortfolioHub({ portfolio, studentId }: Props) {
+  const academics = buildAcademicsSummary(portfolio)
+  const work      = buildStudentWorkSummary(portfolio)
+  const gallery   = buildGallerySummary(portfolio)
+
   return (
     <div style={{ padding: '1.5rem 2.5rem 3rem' }}>
-      <div className="hub-grid">
-        {SECTIONS.map((s) => {
-          const { text, hasData, thumbUrl } = s.build(portfolio)
-          const emptyText = selectedYear !== 'all'
-            ? `No entries for ${selectedYear}`
-            : 'Awaiting first entry'
-          const bg = thumbUrl
-            ? `linear-gradient(rgba(247,244,238,0.88),rgba(247,244,238,0.88)),url(${thumbUrl}) center/cover no-repeat`
-            : `url('/images/parchmant-paper.jpeg') center/cover no-repeat`
 
-          return (
-            <Link key={s.slug} href={`/portfolio/${studentId}/section/${s.slug}`} style={{ textDecoration: 'none' }}>
-              <div
-                className="hub-card reveal"
-                style={{
-                  background:  bg,
-                  borderLeft:  hasData ? '3px solid #B8A050' : undefined,
-                  opacity:     hasData ? 1 : 0.7,
-                }}
-              >
-                <span className="hub-card-num">{String(s.num).padStart(2, '0')}</span>
-                <h3 className="hub-card-title">{s.title}</h3>
-                <p className="hub-card-stat">
-                  {hasData
-                    ? text
-                    : <em style={{ color: 'var(--ink-faint)', fontStyle: 'italic', fontSize: '0.75rem' }}>{emptyText}</em>
-                  }
-                </p>
-                <span className="hub-card-cta">{s.cta} →</span>
-              </div>
-            </Link>
-          )
-        })}
+      {portfolio.student.summary && (
+        <div className="hub-ai-summary">
+          <span className="hub-ai-summary-label">Summary</span>
+          <p>{portfolio.student.summary}</p>
+        </div>
+      )}
+
+      <div className="hub-group-grid">
+        <GroupCard
+          title="Academics"
+          subtitle="Test scores, Hebrew immersion, and curriculum progress"
+          groupSlug="academics"
+          stats={academics.stats}
+          filled={academics.filled}
+          total={academics.total}
+          studentId={studentId}
+        />
+        <GroupCard
+          title="Student Work"
+          subtitle="Books, writing, speeches, handwriting, notes, and character"
+          groupSlug="student-work"
+          stats={work.stats}
+          filled={work.filled}
+          total={work.total}
+          studentId={studentId}
+        />
+        <GroupCard
+          title="Gallery"
+          subtitle="Photos and uploads from school and home"
+          groupSlug="gallery"
+          stats={gallery.stats}
+          filled={gallery.filled}
+          total={gallery.total}
+          studentId={studentId}
+          thumbUrl={gallery.thumbUrl}
+        />
       </div>
 
       <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>

@@ -3,27 +3,49 @@
 // ============================================================
 // components/portfolio/SideNav.tsx
 //
-// Portfolio sidebar navigation. When studentId is provided,
-// renders route-based links to hub / section detail / full
-// pages, with usePathname for active detection.
-// When no studentId (demo), falls back to anchor links.
+// Portfolio sidebar navigation with collapsible group sections.
+// Groups match the hub layout: Academics, Student Work, Gallery.
+// Clicking a group header navigates to the group page.
+// Chevron toggles sub-item visibility.
 // ============================================================
 
+import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 
-const SECTION_ITEMS = [
-  { slug: 'intellectual-arc',  label: 'Intellectual Arc' },
-  { slug: 'immersion-engine',  label: 'Immersion Engine' },
-  { slug: 'the-canon',         label: 'The Canon' },
-  { slug: 'creative-evolution',label: 'Creative Evolution' },
-  { slug: 'rhetoric-room',     label: 'Rhetoric Room' },
-  { slug: 'character-arc',     label: 'Character Arc' },
-  { slug: 'scope-and-sequence',label: 'Scope & Sequence' },
-  { slug: 'handwriting',       label: 'Handwriting' },
-  { slug: 'photo-gallery',     label: 'Photo Gallery' },
-  { slug: 'teacher-notes',     label: 'Teacher Notes' },
-  { slug: 'parent-uploads',    label: 'Parent Uploads' },
+const GROUPS = [
+  {
+    slug: 'academics',
+    label: 'Academics',
+    items: [
+      { slug: 'intellectual-arc',   label: 'Intellectual Arc' },
+      { slug: 'immersion-engine',   label: 'Immersion Engine' },
+      { slug: 'scope-and-sequence', label: 'Scope & Sequence' },
+    ],
+  },
+  {
+    slug: 'student-work',
+    label: 'Student Work',
+    items: [
+      { slug: 'the-canon',          label: 'The Canon' },
+      { slug: 'creative-evolution', label: 'Creative Evolution' },
+      { slug: 'rhetoric-room',      label: 'Rhetoric Room' },
+      { slug: 'handwriting',        label: 'Handwriting' },
+      { slug: 'teacher-notes',      label: 'Teacher Notes' },
+      { slug: 'character-arc',      label: 'Character Arc' },
+    ],
+  },
+  {
+    slug: 'gallery',
+    label: 'Gallery',
+    items: [
+      { slug: 'photo-gallery',  label: 'Photo Gallery' },
+      { slug: 'parent-uploads', label: 'Parent Uploads' },
+    ],
+  },
 ]
+
+// Flat list for finding active section
+const ALL_ITEMS = GROUPS.flatMap((g) => g.items)
 
 // Anchor fallback for demo page (no studentId)
 const ANCHOR_ITEMS = [
@@ -42,16 +64,13 @@ const ANCHOR_ITEMS = [
 ]
 
 interface SideNavProps {
-  /** School display name. Defaults to 'Hadar · 2025–26' (demo fallback). */
-  schoolName?: string
-  /** Student full name shown below the Portfolio label. */
+  schoolName?:  string
   studentName?: string
-  /** Viewer role. When 'admin' or 'teacher', shows a back-to-dashboard link. */
-  role?: string
-  /** When provided, renders route-based links instead of anchor links. */
-  studentId?: string
-  /** Active slug override (passed from section page for immediate highlight). */
-  activeSlug?: string
+  role?:        string
+  studentId?:   string
+  activeSlug?:  string
+  /** Active group slug — passed from group page for highlight. */
+  activeGroup?: string
 }
 
 export default function SideNav({
@@ -60,17 +79,41 @@ export default function SideNav({
   role,
   studentId,
   activeSlug,
+  activeGroup,
 }: SideNavProps = {}) {
   const pathname = usePathname()
 
-  // Determine active item from current path
-  const isHub     = !!studentId && pathname === `/portfolio/${studentId}`
-  const isFull    = !!studentId && pathname === `/portfolio/${studentId}/full`
+  const isHub  = !!studentId && pathname === `/portfolio/${studentId}`
+  const isFull = !!studentId && pathname === `/portfolio/${studentId}/full`
+
+  // Determine active section from path or prop
   const activeSection = activeSlug ?? (
     studentId
-      ? SECTION_ITEMS.find((s) => pathname.includes(`/section/${s.slug}`))?.slug
+      ? ALL_ITEMS.find((s) => pathname.includes(`/section/${s.slug}`))?.slug
       : null
   )
+
+  // Determine active group from prop, path, or active section
+  const currentGroup = activeGroup ?? (
+    studentId
+      ? GROUPS.find((g) => pathname.includes(`/group/${g.slug}`))?.slug
+      : null
+  ) ?? (
+    activeSection
+      ? GROUPS.find((g) => g.items.some((i) => i.slug === activeSection))?.slug
+      : null
+  )
+
+  // Track which groups are expanded; start with active group open
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {}
+    if (currentGroup) init[currentGroup] = true
+    return init
+  })
+
+  const toggleGroup = (slug: string) => {
+    setExpanded((prev) => ({ ...prev, [slug]: !prev[slug] }))
+  }
 
   return (
     <nav className="sidenav">
@@ -92,7 +135,6 @@ export default function SideNav({
       )}
 
       {studentId ? (
-        // ── Route-based nav ──────────────────────────────────
         <>
           <a
             href={`/portfolio/${studentId}`}
@@ -101,26 +143,62 @@ export default function SideNav({
             Overview
           </a>
 
-          {SECTION_ITEMS.map(({ slug, label }) => (
-            <a
-              key={slug}
-              href={`/portfolio/${studentId}/section/${slug}`}
-              className={activeSection === slug ? 'active' : ''}
-            >
-              {label}
-            </a>
-          ))}
+          {GROUPS.map((group) => {
+            const isGroupActive = currentGroup === group.slug
+            const isOpen = expanded[group.slug] ?? false
+
+            return (
+              <div key={group.slug}>
+                <div className="sidenav-group-row">
+                  <a
+                    href={`/portfolio/${studentId}/group/${group.slug}`}
+                    className={`sidenav-group-link${isGroupActive ? ' active' : ''}`}
+                  >
+                    {group.label}
+                  </a>
+                  <button
+                    className="sidenav-chevron"
+                    onClick={(e) => { e.preventDefault(); toggleGroup(group.slug) }}
+                    aria-label={`Toggle ${group.label}`}
+                  >
+                    <svg
+                      width="10" height="10" viewBox="0 0 10 10"
+                      style={{
+                        transform:  isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.15s ease',
+                      }}
+                    >
+                      <path d="M3 1 L7 5 L3 9" stroke="currentColor" fill="none" strokeWidth="1.5" />
+                    </svg>
+                  </button>
+                </div>
+
+                {isOpen && (
+                  <div className="sidenav-sub-items">
+                    {group.items.map(({ slug, label }) => (
+                      <a
+                        key={slug}
+                        href={`/portfolio/${studentId}/group/${group.slug}?tab=${slug}`}
+                        className={activeSection === slug ? 'active' : ''}
+                      >
+                        {label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
 
           <a
             href={`/portfolio/${studentId}/full`}
             className={isFull ? 'active' : ''}
-            style={{ opacity: 0.65, fontSize: '0.78rem' }}
+            style={{ opacity: 0.65, fontSize: '0.78rem', marginTop: '0.5rem' }}
           >
             Full Portfolio
           </a>
         </>
       ) : (
-        // ── Anchor fallback (demo page) ───────────────────────
         <>
           {ANCHOR_ITEMS.map(({ href, label }) => (
             <a key={href} href={href}>{label}</a>
@@ -150,7 +228,6 @@ export default function SideNav({
           </a>
         </div>
       )}
-
     </nav>
   )
 }

@@ -1,0 +1,253 @@
+'use client'
+
+// ============================================================
+// components/portfolio/GroupDetailClient.tsx
+//
+// Tabbed view for a group of portfolio sections.
+// Renders sub-section tabs (not scrolling) — user clicks
+// between tabs to navigate sub-sections within a group.
+// ============================================================
+
+import { useState, Component, type ReactNode } from 'react'
+import type { UserRole, PortfolioData } from '@/lib/types'
+import IntellectualArc from '@/components/portfolio/IntellectualArc'
+import ImmersionEngine from '@/components/portfolio/ImmersionEngine'
+import TheCanon from '@/components/portfolio/TheCanon'
+import CreativeEvolution from '@/components/portfolio/CreativeEvolution'
+import RhetoricRoom from '@/components/portfolio/RhetoricRoom'
+import CharacterArc from '@/components/portfolio/CharacterArc'
+import ScopeAndSequence from '@/components/portfolio/ScopeAndSequence'
+import HandwritingSamples from '@/components/portfolio/HandwritingSamples'
+import PhotoGallery from '@/components/portfolio/PhotoGallery'
+import TeacherNotes from '@/components/portfolio/TeacherNotes'
+import ParentUploads from '@/components/portfolio/ParentUploads'
+
+// ── Error boundary ────────────────────────────────────────────
+
+class TabErrorBoundary extends Component<
+  { children: ReactNode; tabKey: string },
+  { hasError: boolean; message: string }
+> {
+  constructor(props: { children: ReactNode; tabKey: string }) {
+    super(props)
+    this.state = { hasError: false, message: '' }
+  }
+  static getDerivedStateFromError(err: unknown) {
+    return { hasError: true, message: err instanceof Error ? err.message : String(err) }
+  }
+  componentDidCatch(err: unknown) { console.error('[TabErrorBoundary]', err) }
+  componentDidUpdate(prev: { tabKey: string }) {
+    if (prev.tabKey !== this.props.tabKey) this.setState({ hasError: false, message: '' })
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '2rem', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: '#991b1b' }}>
+          <strong>Something went wrong loading this section.</strong>
+          {this.state.message && (
+            <pre style={{ marginTop: '0.5rem', whiteSpace: 'pre-wrap', fontSize: '0.7rem' }}>{this.state.message}</pre>
+          )}
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
+// ── Tab definitions per group ─────────────────────────────────
+
+interface TabDef { slug: string; label: string }
+
+export const GROUP_TABS: Record<string, TabDef[]> = {
+  academics: [
+    { slug: 'intellectual-arc',   label: 'Intellectual Arc' },
+    { slug: 'immersion-engine',   label: 'Immersion Engine' },
+    { slug: 'scope-and-sequence', label: 'Scope & Sequence' },
+  ],
+  'student-work': [
+    { slug: 'the-canon',          label: 'The Canon' },
+    { slug: 'creative-evolution', label: 'Creative Evolution' },
+    { slug: 'rhetoric-room',      label: 'Rhetoric Room' },
+    { slug: 'handwriting',        label: 'Handwriting' },
+    { slug: 'teacher-notes',      label: 'Teacher Notes' },
+    { slug: 'character-arc',      label: 'Character Arc' },
+  ],
+  gallery: [
+    { slug: 'photo-gallery',  label: 'Photo Gallery' },
+    { slug: 'parent-uploads', label: 'Parent Uploads' },
+  ],
+}
+
+export const GROUP_TITLES: Record<string, string> = {
+  academics:      'Academics',
+  'student-work': 'Student Work',
+  gallery:        'Gallery',
+}
+
+// ── Section renderer ──────────────────────────────────────────
+
+function RenderSection({ slug, portfolio, studentId, role }: {
+  slug: string; portfolio: PortfolioData; studentId: string; role: UserRole
+}) {
+  const { student, assessments, aiDrafts } = portfolio
+
+  switch (slug) {
+    case 'intellectual-arc':
+      return (
+        <IntellectualArc
+          assessments={assessments}
+          studentId={studentId}
+          studentName={student.firstName}
+          role={role}
+          gradeLevel={student.gradeLevel}
+          academicYear={student.academicYear}
+          currentYear={student.academicYear}
+          selectedYear="all"
+          existingMathDraft={aiDrafts.find((d) => d.sectionType === 'math_scores')}
+          existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
+        />
+      )
+    case 'immersion-engine':
+      return (
+        <ImmersionEngine
+          assessments={assessments}
+          studentId={studentId}
+          studentName={student.firstName}
+          role={role}
+          existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
+        />
+      )
+    case 'scope-and-sequence':
+      return <ScopeAndSequence gradeLevel={student.gradeLevel} subjects={portfolio.scopeAndSequence} />
+    case 'the-canon':
+      return (
+        <TheCanon
+          readings={portfolio.readings}
+          studentId={studentId}
+          studentName={student.firstName}
+          role={role}
+          existingDraft={aiDrafts.find((d) => d.sectionType === 'reading_bookshelf')}
+        />
+      )
+    case 'creative-evolution':
+      return (
+        <CreativeEvolution
+          writingSamples={portfolio.writingSamples}
+          studentId={studentId}
+          studentName={student.firstName}
+          role={role}
+          existingDraft={aiDrafts.find((d) => d.sectionType === 'writing')}
+        />
+      )
+    case 'rhetoric-room':
+      return <RhetoricRoom videos={portfolio.videos} studentVideos={portfolio.studentVideos} studentId={studentId} role={role} />
+    case 'handwriting':
+      return (
+        <HandwritingSamples
+          samples={portfolio.handwritingSamples}
+          uploadEnabled={role !== 'parent'}
+          studentId={studentId}
+          academicYear={student.academicYear}
+          gradeLevel={student.gradeLevel}
+        />
+      )
+    case 'teacher-notes':
+      return <TeacherNotes notes={portfolio.teacherNotes} role={role} studentId={studentId} />
+    case 'character-arc':
+      return (
+        <CharacterArc
+          characterAwards={portfolio.characterAwards}
+          studentId={studentId}
+          studentName={student.firstName}
+          role={role}
+          existingDraft={aiDrafts.find((d) => d.sectionType === 'virtue_badges')}
+        />
+      )
+    case 'photo-gallery':
+      return (
+        <PhotoGallery
+          photos={portfolio.photos}
+          uploadEnabled={role !== 'parent'}
+          studentId={studentId}
+          academicYear={student.academicYear}
+          gradeLevel={student.gradeLevel}
+        />
+      )
+    case 'parent-uploads':
+      return (
+        <ParentUploads
+          uploads={portfolio.parentUploads}
+          uploadEnabled={true}
+          studentId={studentId}
+          role={role}
+          academicYear={student.academicYear}
+          gradeLevel={student.gradeLevel}
+        />
+      )
+    default:
+      return null
+  }
+}
+
+// ── Main component ────────────────────────────────────────────
+
+interface Props {
+  portfolio:   PortfolioData
+  studentId:   string
+  role:        UserRole
+  groupSlug:   string
+  initialTab?: string
+}
+
+export default function GroupDetailClient({ portfolio, studentId, role, groupSlug, initialTab }: Props) {
+  const tabs  = GROUP_TABS[groupSlug] ?? []
+  const title = GROUP_TITLES[groupSlug] ?? groupSlug
+  const [activeTab, setActiveTab] = useState(initialTab ?? tabs[0]?.slug ?? '')
+
+  return (
+    <div className="main">
+      {/* Back link */}
+      <div style={{ padding: '1.5rem 2.5rem 0' }}>
+        <a href={`/portfolio/${studentId}`} className="back-link">
+          ← Back to Overview
+        </a>
+      </div>
+
+      {/* Group title */}
+      <div style={{ padding: '0.5rem 2.5rem 0' }}>
+        <h1 style={{
+          fontFamily: 'var(--font-heading)',
+          fontSize:   '2rem',
+          fontWeight: 400,
+          color:      'var(--navy)',
+          margin:     0,
+        }}>
+          {title}
+        </h1>
+      </div>
+
+      {/* Tab bar */}
+      <div className="group-tab-bar">
+        {tabs.map((tab) => (
+          <button
+            key={tab.slug}
+            className={`group-tab${activeTab === tab.slug ? ' active' : ''}`}
+            onClick={() => setActiveTab(tab.slug)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Active section */}
+      <TabErrorBoundary tabKey={activeTab}>
+        <RenderSection
+          slug={activeTab}
+          portfolio={portfolio}
+          studentId={studentId}
+          role={role}
+        />
+      </TabErrorBoundary>
+    </div>
+  )
+}
