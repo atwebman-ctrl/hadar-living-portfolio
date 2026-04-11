@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string; photoId: string }> }
@@ -46,6 +46,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   const { studentId, photoId } = await params
   const { ctx, res } = await getStaffCtx(req)
   if (!ctx) return res!
+  if (!rateLimit(`${ctx.userId}:photos-update`, 30).ok) return rateLimitResponse()
 
   let body: Record<string, unknown>
   try { body = await req.json() } catch {
@@ -84,6 +85,7 @@ export async function DELETE(req: NextRequest, { params }: RouteContext) {
   const { studentId, photoId } = await params
   const { ctx, res } = await getStaffCtx(req)
   if (!ctx) return res!
+  if (!rateLimit(`${ctx.userId}:photos-delete`, 30).ok) return rateLimitResponse()
 
   if (!await verifyOwnership(photoId, studentId, ctx.schoolId))
     return NextResponse.json({ error: 'Photo not found.', code: 'NOT_FOUND' }, { status: 404 })

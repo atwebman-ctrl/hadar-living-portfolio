@@ -30,7 +30,7 @@ import {
   ValidationError,
   type InviteParentInput,
 } from '@/lib/validationExtended'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
@@ -78,6 +78,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       { status: 403 },
     )
   }
+
+  if (!rateLimit(`${ctx.userId}:invite-parent`, 30).ok) return rateLimitResponse()
 
   // 4. Get Clerk orgId (needed for the invitation API call)
   const { orgId } = await auth()

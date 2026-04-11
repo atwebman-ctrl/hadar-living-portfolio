@@ -25,7 +25,7 @@ import {
   type CreateAiDraftRequestInput,
   ValidationError,
 } from '@/lib/validationExtended'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 
 // ── Prompt construction ───────────────────────────────────────
 
@@ -107,7 +107,11 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // 4. Verify student belongs to this school (school_id isolation)
+  // 4. Rate limit — Claude calls are expensive; cap at 5/min per user
+  const { ok: rlOk } = rateLimit(`${ctx.userId}:ai-draft`, 5)
+  if (!rlOk) return rateLimitResponse()
+
+  // 5. Verify student belongs to this school (school_id isolation)
   const { data: student, error: stuErr } = await supabaseAdmin
     .from('students')
     .select('id, first_name')

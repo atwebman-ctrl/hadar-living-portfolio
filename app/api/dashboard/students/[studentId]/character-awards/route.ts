@@ -22,7 +22,7 @@ import {
 } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapCharacterAward } from '@/lib/mappers'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
@@ -92,6 +92,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       { status: 403 },
     )
   }
+
+  if (!rateLimit(`${ctx.userId}:character-awards`, 30).ok) return rateLimitResponse()
 
   // 4. Verify student belongs to this school
   const { data: student, error: studentError } = await supabaseAdmin

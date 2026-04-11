@@ -20,7 +20,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
@@ -105,7 +105,10 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   }
   const type = uploadType as UploadType
 
-  // 3. Role gate
+  // 3. Rate limit — uploads are expensive; cap at 10/min per user
+  if (!rateLimit(`${ctx.userId}:uploads`, 10).ok) return rateLimitResponse()
+
+  // 4. Role gate
   const isStaff = ctx.role === 'admin' || ctx.role === 'teacher'
   if ((type === 'profile_photo') && !isStaff) {
     return NextResponse.json(

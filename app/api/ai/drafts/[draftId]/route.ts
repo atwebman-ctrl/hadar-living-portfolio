@@ -30,7 +30,7 @@ import {
   type UpdateAiDraftInput,
   ValidationError,
 } from '@/lib/validationExtended'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 
 type RouteContext = { params: Promise<{ draftId: string }> }
 
@@ -76,7 +76,10 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     )
   }
 
-  // 4. Resolve draftId
+  // 4. Rate limit
+  if (!rateLimit(`${ctx.userId}:ai-draft-review`, 30).ok) return rateLimitResponse()
+
+  // 5. Resolve draftId
   const { draftId } = await params
 
   // 5. Verify draft exists and belongs to this school

@@ -8,6 +8,7 @@
 // ============================================================
 
 import { NextResponse } from 'next/server'
+export { rateLimit } from './rateLimit'
 
 /**
  * Maps errors thrown by lib/auth.ts to the correct HTTP status and
@@ -17,6 +18,13 @@ import { NextResponse } from 'next/server'
  *   AUTH_FORBIDDEN | AUTH_INVALID_ROLE  → 403
  *   AUTH_UNAUTHENTICATED | AUTH_NO_ORG | AUTH_NO_SCHOOL → 401
  */
+export function rateLimitResponse(): NextResponse {
+  return NextResponse.json(
+    { error: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' },
+    { status: 429 },
+  )
+}
+
 export function authErrorResponse(err: Error): NextResponse {
   const msg = err.message
   if (msg.startsWith('AUTH_FORBIDDEN') || msg.startsWith('AUTH_INVALID_ROLE')) {

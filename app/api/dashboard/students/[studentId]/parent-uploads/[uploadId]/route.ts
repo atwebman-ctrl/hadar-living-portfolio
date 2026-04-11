@@ -14,7 +14,7 @@ import { validate, UpdateParentUploadSchema, ValidationError } from '@/lib/valid
 import type { UpdateParentUploadInput } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapParentUpload } from '@/lib/mappers'
-import { authErrorResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string; uploadId: string }> }
@@ -65,6 +65,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
   const { ctx, res } = await getCtx(req)
   if (!ctx) return res!
+  if (!rateLimit(`${ctx.userId}:parent-uploads-update`, 30).ok) return rateLimitResponse()
 
   const { found } = await resolveAndAuthorize(uploadId, studentId, ctx.schoolId)
   if (!found)
@@ -98,6 +99,7 @@ export async function DELETE(req: NextRequest, { params }: RouteContext) {
 
   const { ctx, res } = await getCtx(req)
   if (!ctx) return res!
+  if (!rateLimit(`${ctx.userId}:parent-uploads-delete`, 30).ok) return rateLimitResponse()
 
   const { found } = await resolveAndAuthorize(uploadId, studentId, ctx.schoolId)
   if (!found)
