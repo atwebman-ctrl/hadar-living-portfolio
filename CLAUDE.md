@@ -87,6 +87,11 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/globals.css` — Global styles
 - `app/api/demo/auth/route.ts` — Demo password gate API route
 - `components/portfolio/` — Section components (CharacterArc, CreativeEvolution, HeroSection, ImmersionEngine, IntellectualArc, PortfolioFooter, RhetoricRoom, SideNav, TheCanon)
+- `components/portfolio/GroupDetailClient.tsx` — `'use client'` tabbed view for group detail pages (`/group/[groupSlug]`); owns `selectedYear` + `years` state; `YEAR_FILTER_TABS` gates `<YearSelector>` to only intellectual-arc, the-canon, creative-evolution tabs; TheCanon/CreativeEvolution receive filtered data arrays; IntellectualArc receives `selectedYear` prop; `TabErrorBoundary` class resets on tab change
+- `components/portfolio/YearSelector.tsx` — Year-filter pill bar; used in GroupDetailClient and SectionDetailClient (NOT in HubShell — year pills are merged into StatsBar there)
+- `components/portfolio/HeroSection.tsx` — Identity strip (photo, name); exports `StatsBar` named export (metrics ribbon + year pills, `justify-content: space-between`); school name is `.hero-school-badge` (absolutely positioned top-right, DM Mono 9px, 40% white); photo/initials circle is 96px
+- `components/portfolio/HubShell.tsx` — `'use client'` hub wrapper; owns `selectedYear` + `years` state; passes year props to `<StatsBar>` (no standalone YearSelector); renders 3-group `<PortfolioHub>` below
+- `components/portfolio/SideNav.tsx` — Sidebar nav with expandable groups; group headers link to `/group/[slug]`; chevron button independently toggles sub-items; sub-items link to `/group/[slug]?tab=[section-slug]`; accepts `activeGroup` prop
 - `components/portfolio/RevealObserver.tsx` — IntersectionObserver wrapper; fires CSS reveal animations when sections enter viewport. Required on real portfolio pages — sections were invisible without it (bug fixed)
 - `components/portfolio/SubjectScoreRows.tsx` — Compact RIT/percentile score table; accepts `ScoreDisplayRow[]`; used by IntellectualArc for Math and ELA sub-sections
 - `components/portfolio/InlineAssessmentForm.tsx` — Inline data-entry form inside IntellectualArc; replaces TeacherDataPanel for assessment scores; POSTs to assessments API; calls `router.refresh()` on save
@@ -126,7 +131,8 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `components/dashboard/SettingsView.tsx` — Admin-only placeholder
 - `app/not-found.tsx` — Styled 404 page using design system tokens
 - `app/admin/page.tsx` — Admin-only school settings overview; Sprint 3 placeholders for Teachers + Theme
-- `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio; passes school.name + student name to SideNav
+- `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio hub (server component); renders HubShell with 3 group cards
+- `app/portfolio/[studentId]/group/[groupSlug]/page.tsx` — Group detail page (server component); validates slug (academics|student-work|gallery), fetches portfolio, renders GroupDetailClient with `initialTab` from `?tab=` searchParam
 - `app/sign-in/[[...sign-in]]/page.tsx` — Clerk SignIn centered on cream background
 - `app/sign-up/[[...sign-up]]/page.tsx` — Clerk SignUp centered on cream background
 - `app/api/ai/draft/route.ts` — POST: generate AI narrative draft via Claude Haiku; studentFirstName injected into system prompt; stores in ai_drafts; returns { draftId, text, sectionType }
@@ -135,7 +141,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `components/shared/AiDraftEditor.tsx` — Client component: view/edit/resolve AI draft; Accept, Edit & Accept, Reject buttons
 - `components/portfolio/AiNarrativePanel.tsx` — Generate button + inline AiDraftEditor; teacher/admin sees generate flow or resolved draft; parent sees accepted text only; wired into IntellectualArc ×2 (math_scores, english_scores), ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc
 - `components/shared/UploadButton.tsx` — Client component: hidden file input, XHR upload with progress bar, onSuccess/onError callbacks; wired into PhotoGallery, HandwritingSamples, ParentUploads
-- `components/shared/InviteParentButton.tsx` — Client component: modal with email input, POSTs to invite-parent route; shown below HeroSection for admin/teacher only
+- `components/shared/InviteParentButton.tsx` — Client component: modal with email input, POSTs to invite-parent route; shown below HeroSection for admin/teacher only; trigger is text-link style (no border, opacity 0.5, fades to full on hover)
 - `app/api/dashboard/students/[studentId]/invite-parent/route.ts` — POST: inserts pending parent_students row, calls Clerk createOrganizationInvitation with role 'org:parent'
 - `supabase/migrations/0005_parent_students.sql` — parent_students table: invited_email, nullable parent_clerk_user_id, status (pending/active), RLS; apply before testing invite flow
 - `supabase/migrations/0012_data_foundation.sql` — audit columns (created_by, updated_by, updated_at) + soft delete (deleted_at) on 6 content tables; academic_years table (canonical year registry per school); enrollment_records table (enrollment history per student); class_assignments table (student ↔ teacher per year)
@@ -215,6 +221,9 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Parent dashboard redirect: `/dashboard` detects `role=parent`, queries `parent_students` with OR(parent_clerk_user_id, invited_email) fallback, links Clerk user ID on first email-match, redirects to `/portfolio/[studentId]`; shows `ParentPendingScreen` if no row found
   - [x] Fix portfolio sections invisible on real student pages — `RevealObserver.tsx` (IntersectionObserver) was missing from dynamic route; sections now animate in correctly
   - [x] Inline data entry redesign — `TeacherDataPanel` removed from portfolio/demo renders; replaced with `InlineAssessmentForm` (in IntellectualArc) and `InlineReadingForm` (in TheCanon); both call `router.refresh()` on save for instant UI update without full reload
+  - [x] Portfolio hub restructure — 11 flat tiles replaced with 3 group cards (Academics, Student Work, Gallery); tabbed sub-pages via `/portfolio/[studentId]/group/[groupSlug]`; SideNav rewritten with expandable groups + `?tab=` deep-link
+  - [x] Hero refinements — school name badge (absolutely positioned top-right); InviteParentButton text-link style (opacity 0.5); StatsBar border-top + box-shadow; photo 96px; year pills merged into StatsBar (right-aligned, no standalone YearSelector on hub)
+  - [x] Group page year selector — GroupDetailClient owns selectedYear state; YearSelector shown only for intellectual-arc/the-canon/creative-evolution tabs; IntellectualArc gets selectedYear prop; TheCanon/CreativeEvolution get pre-filtered arrays
   - [ ] OCR pipeline for handwriting samples
   - [ ] Writing/rhetoric critique generation
   - [ ] Test score extraction
