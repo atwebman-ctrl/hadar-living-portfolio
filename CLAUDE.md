@@ -54,6 +54,12 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - If using Cursor, run in Claude-only mode (not Auto)
 - Next.js 16 uses `proxy.ts` (not `middleware.ts`) for Clerk middleware
 
+### Branch Workflow
+- All work happens on branches: `aaron/feature-name` or `mijntje/feature-name`
+- PRs required to merge to main; CI must pass before merge
+- Mijntje's PRs require Aaron's approval; Aaron can bypass as repo admin
+- CI runs `npx tsc --noEmit` + `npx vitest run` on every push/PR (`.github/workflows/ci.yml`)
+
 ## Code Hygiene Rules (enforce always)
 1. No file over 300 lines — split into sub-components immediately
 2. `SUPABASE_SERVICE_ROLE_KEY` only in `lib/supabaseAdmin.ts` (its definition) and `app/api/` routes. `supabaseAdmin` may be imported in server-only `lib/` helpers (e.g. `lib/auth.ts`, `lib/getStudentPortfolio.ts`) that are themselves only ever called from `app/api/` routes or server components — never from client components.
@@ -82,7 +88,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/demo/page.tsx` — Demo portfolio (server component, password-gated)
 - `app/demo/DemoPortfolio.tsx` — Demo portfolio client component
 - `app/demo/DemoGate.tsx` — Password form component
-- `app/demo/portfolio.css` — Demo portfolio styles (⚠️ CSS variables not yet unified with landing styles — Sprint 1.5 remaining task)
+- `app/demo/portfolio.css` — Demo portfolio styles (⚠️ CSS variables not yet unified with landing styles — Sprint 1.5 remaining task); contains CSS for: `.hub-group-card`, `.stats-bar` / `.stats-bar-cell`, `.group-tab-bar` / `.group-tab`, `.sidenav-group-row`, `.hero-school-badge`
 - `app/layout.tsx` — Root layout, ClerkProvider, font loading
 - `app/globals.css` — Global styles
 - `app/api/demo/auth/route.ts` — Demo password gate API route
@@ -103,8 +109,9 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `components/portfolio/BookCatalogPicker.tsx` — Modal overlay; fetches school book catalog, live search, auto-fills ReadingForm/InlineReadingForm title+author on selection
 - `components/portfolio/BookCatalogManager.tsx` — Book Catalog tab content; add-book form (title, author, gradeLevel) + paginated catalog list; school-scoped, no props needed
 - `components/splash/BookSplash.tsx` — Full-screen 3D CSS book-opening splash animation (navy cover → parchment reveal → fade); sessionStorage-gated (plays once per browser session); 9 unit tests
-- `components/charts/` — AvantChart, MapPercentileChart
-- `components/charts/MapPercentileChart.tsx` — NWEA MAP percentile band chart; 5 stacked teal area fills (p5/p25/p50/p75/p95); student dots navy/gold (latest); auto-scales grade range and y-axis; subject='math'|'reading'
+- `components/charts/` — AvantChart, MapPercentileChart, MapTrajectoryChart
+- `components/charts/MapPercentileChart.tsx` — NWEA MAP percentile band chart; 5 stacked teal area fills (p5/p25/p50/p75/p95); student dots navy/gold (latest); auto-scales grade range and y-axis; subject='math'|'reading'; requires `LineController` in `Chart.register()` — do not remove
+- `components/charts/MapTrajectoryChart.tsx` — student score trajectory over time; also requires `LineController` in `Chart.register()`
 - `lib/nweaNorms.ts` — NWEA MAP Growth 2025 norm lookup (K–8, Math + Reading, fall/winter/spring); `getPercentileBands(subject, gradeRange)` returns p5–p95 via z-scores
 - `lib/types.ts` — Shared TypeScript types (all domain models; includes `BookCatalogEntry`)
 - `lib/mappers.ts` — Row mappers: Supabase snake_case → camelCase TS
@@ -114,7 +121,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `lib/auth.ts` — Clerk helpers: getSchoolId(), getRole(), getAuthContext(), requireRole()
 - `lib/utils.ts` — Shared utilities: `ordinal(n)` (1→"1st"), `latestAssessment(assessments, type)` (most recent by academicYear)
 - `lib/modalStyles.ts` — Shared modal style constants: `MODAL_OVERLAY`, `MODAL_HEADER`, `modalPanel(maxWidth, maxHeight)`
-- `lib/validation.ts` — Zod schemas for all API route inputs; `gradeLevel` uses `z.enum([...GRADE_LEVELS])` — must match `lib/gradeLevel.ts`
+- `lib/validation.ts` — Zod schemas for all API route inputs; `gradeLevel` uses `z.enum([...GRADE_LEVELS])` — must match `lib/gradeLevel.ts`; `gender` and `dateOfBirth` use `z.preprocess(v => v === '' ? null : v, ...)` to coerce empty string → null (form sends `''` for unselected optional fields)
 - `lib/gradeLevel.ts` — `GRADE_LEVELS` const array, `GradeLevel` type, `formatGrade()`, `sortGrades()`, `GRADE_SELECT_OPTIONS`; single source of truth for grade enum
 - `lib/constants.ts` — Re-exports `GRADE_SELECT_OPTIONS` from `lib/gradeLevel`; defines `TERM_OPTIONS` ('Fall 2024'–'Spring 2026') and `TermOption` type; **all forms import from here — never hardcode term strings**
 - `proxy.ts` — Clerk middleware (Next.js 16); protects /dashboard, /admin, /portfolio; userId-only check (org not required) so OrgPickerScreen handles no-org case
@@ -142,9 +149,11 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `components/portfolio/AiNarrativePanel.tsx` — Generate button + inline AiDraftEditor; teacher/admin sees generate flow or resolved draft; parent sees accepted text only; wired into IntellectualArc ×2 (math_scores, english_scores), ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc
 - `components/shared/UploadButton.tsx` — Client component: hidden file input, XHR upload with progress bar, onSuccess/onError callbacks; wired into PhotoGallery, HandwritingSamples, ParentUploads
 - `components/shared/InviteParentButton.tsx` — Client component: modal with email input, POSTs to invite-parent route; shown below HeroSection for admin/teacher only; trigger is text-link style (no border, opacity 0.5, fades to full on hover)
+- `app/api/dashboard/students/route.ts` — GET/POST students; POST INSERT includes `gender`, `date_of_birth`, `enrollment_status`, `updated_at`; Zod schema uses `z.preprocess` for optional nullable fields
 - `app/api/dashboard/students/[studentId]/invite-parent/route.ts` — POST: inserts pending parent_students row, calls Clerk createOrganizationInvitation with role 'org:parent'
 - `supabase/migrations/0005_parent_students.sql` — parent_students table: invited_email, nullable parent_clerk_user_id, status (pending/active), RLS; apply before testing invite flow
 - `supabase/migrations/0012_data_foundation.sql` — audit columns (created_by, updated_by, updated_at) + soft delete (deleted_at) on 6 content tables; academic_years table (canonical year registry per school); enrollment_records table (enrollment history per student); class_assignments table (student ↔ teacher per year)
+- `.github/workflows/ci.yml` — GitHub Actions CI; triggers on push/PR to main; runs `npm ci` → `npx tsc --noEmit` → `npx vitest run`; `check` job name must match branch protection status check
 
 ### Does NOT exist yet (do not reference as if it does)
 - `components/theme/ThemeProvider.tsx` — School theme context
@@ -167,6 +176,10 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - **Teachers have broad read access within their school** — RLS policies give teachers SELECT on all students in their school. Narrowing to assigned students is deferred to Sprint 3 when a `student_teachers` join table is added.
 - **`ai_drafts` INSERT is service-role only** — No authenticated INSERT policy exists. Only the AI pipeline (via `supabaseAdmin`) creates draft rows. Teachers update (accept/edit/reject); they never insert.
 - **Signin form styles in `landing-mobile.css`** — The form's mobile overrides are tightly coupled to its base styles; co-locating them in the same file keeps the cascade readable. This is intentional, not a mistake.
+- **Portfolio overview: 3 groups, not flat tiles** — Academics (Intellectual Arc, Immersion Engine, Scope & Sequence), Student Work (The Canon, Creative Evolution, Rhetoric Room, Handwriting, Teacher Notes, Character Arc), Gallery (Photo Gallery, Parent Uploads). The 11-tile flat layout is gone; do not revert.
+- **Hero section: identity only** — Photo + name only. School name is `.hero-school-badge` (absolutely positioned top-right). Metrics live in `StatsBar` below the hero, not inside it.
+- **Year selector placement** — Hub overview: year pills merged into `StatsBar` right side. Group pages: standalone `<YearSelector>` rendered by `GroupDetailClient` only for tabs that filter by year. `SectionDetailClient` has its own year selector too. Never add a fourth instance.
+- **Supabase RLS status** — RLS is enabled on all 20 public tables. Policies exist for core tables (0003). Sprint 3+ tables (photos, parent_uploads, handwriting_samples, teacher_notes, scope_and_sequence, book_catalog, student_videos) have RLS enabled but **policies not yet applied to production**. Service role bypasses RLS for all `app/api/` routes. ⚠️ Complete before giving parents direct DB access.
 
 ## Build Sprints (update checkboxes each session)
 - [x] Sprint 1: Landing page, demo portfolio, design system, six-section UI — COMPLETE
@@ -189,7 +202,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [x] Unify CSS color variables — single canonical :root in globals.css; landing and portfolio :root blocks removed; --lapis* aliases kept for landing CSS compatibility
   - [x] Clerk org setup — sign-in/sign-up pages, OrgPickerScreen for no-org users, role fallback via school_members table
   - [x] Set up Vitest + basic tests — mappers, validation, soft-delete route (53 tests; husky pre-commit hook enforces vitest run)
-  - [ ] Set up GitHub Actions CI (lint + typecheck + test + build)
+  - [x] Set up GitHub Actions CI — `.github/workflows/ci.yml`; tsc + vitest on push/PR; branch protection requires `check` job to pass
   - [ ] Add Sentry error tracking
   - [x] Audit package.json for phantom dependencies
   - [x] Remove Hadar-specific strings from reusable components (SideNav now accepts schoolName/studentName props; falls back to "Hadar" for demo)
@@ -228,6 +241,11 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [ ] Writing/rhetoric critique generation
   - [ ] Test score extraction
 - [ ] Sprint 5 (V2): School-wide analysis, State of the Union, multi-school theming
+
+## Bugs Fixed (April 11, 2026)
+- **Chart.js "line is not a registered controller"** — `MapPercentileChart` and `MapTrajectoryChart` were missing `LineController` in `Chart.register()`. Fixed in both. Do not remove `LineController` from registration.
+- **Add Student failing silently** — Zod schema rejected empty-string `gender`/`dateOfBirth` from the form; INSERT was missing `gender`, `date_of_birth`, `enrollment_status`, `updated_at`. Fixed in `lib/validation.ts` (z.preprocess) and `app/api/dashboard/students/route.ts`.
+- **IntellectualArc crash** — `SectionDetailClient` lacked an error boundary. Added `SectionErrorBoundary` class component with `componentDidUpdate` reset on tab/key change; added try-catch logging on the section page.
 
 ## Tayler's Pending Feedback Items
 Items raised by Tayler after reviewing the live portfolio. Not yet scheduled to a sprint — address before the next stakeholder review.
