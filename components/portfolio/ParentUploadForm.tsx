@@ -83,7 +83,7 @@ export default function ParentUploadForm({ studentId, academicYear, gradeLevel }
               <button onClick={close} style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', padding: '0 0.25rem' }} aria-label="Close">✕</button>
             </div>
 
-            <div style={{ overflowY: 'auto', padding: '1.25rem' }}>
+            <div style={{ overflowY: 'auto', padding: '1.25rem', flex: 1, minHeight: 0 }}>
               <div style={fieldWrap}>
                 <span style={lbl}>Title *</span>
                 <input
