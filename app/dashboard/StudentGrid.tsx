@@ -23,9 +23,9 @@ const VIEW_STORAGE_KEY = 'dashboard.viewMode'
 export default function StudentGrid({ students, role }: Props) {
   const [query,       setQuery]       = useState('')
   const [gradeFilter, setGradeFilter] = useState('All')
-  const [viewMode,    setViewMode]    = useState<ViewMode>('grid')
+  const [viewMode,    setViewMode]    = useState<ViewMode>('list')
 
-  // Rehydrate view mode from localStorage after mount (SSR-safe default: grid)
+  // Rehydrate view mode from localStorage after mount (SSR-safe default: list)
   useEffect(() => {
     const stored = window.localStorage.getItem(VIEW_STORAGE_KEY)
     if (stored === 'grid' || stored === 'list') setViewMode(stored)

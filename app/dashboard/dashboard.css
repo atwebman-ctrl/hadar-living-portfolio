@@ -514,7 +514,7 @@
   transition: color 0.15s ease;
 }
 .db-list-th:hover              { color: #2c1f0e; }
-.db-list-th[data-active="true"]{ color: #2c1f0e; }
+.db-list-th[data-active="true"]{ color: #B8A050; font-weight: 600; }
 .db-list-sort {
   font-size: 0.55rem;
   color: #B8A050;
