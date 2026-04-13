@@ -273,6 +273,20 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 ```
 
+## Migration Workflow (Supabase CLI)
+All migrations go through the CLI — never apply SQL manually through the Supabase dashboard. Tracking is automatic.
+
+```bash
+npm run db:new <name>   # Create next numbered migration file in supabase/migrations/
+npm run db:push         # Apply pending migrations to production
+npm run db:status       # List all migrations and their applied status
+npm run db:reset        # Reset local DB and replay all migrations (local only)
+```
+
+- All 14 existing migrations (0001–0014) are tracked and marked as applied.
+- **Docker Desktop is NOT required** for `db:new` or `db:push` — only for `db:pull` and `db:reset` (local dev features we don't use).
+- Migration files live in `supabase/migrations/` and are committed to git like any other code.
+
 ## Verification Commands
 ```bash
 # File hygiene
