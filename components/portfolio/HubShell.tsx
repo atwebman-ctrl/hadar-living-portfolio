@@ -39,6 +39,7 @@ export default function HubShell({ portfolio, studentId, role }: Props) {
     <div className={layoutStyles.main}>
       <HeroSection
         student={portfolio.student}
+        school={portfolio.school}
         compact
         inviteButton={canInvite ? <InviteParentButton studentId={studentId} /> : undefined}
       />

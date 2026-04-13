@@ -224,44 +224,6 @@ export default function PortfolioHub({ portfolio, studentId }: Props) {
           View Full Portfolio →
         </Link>
       </div>
-
-      <div style={{ textAlign: 'center', padding: '4rem 2rem 3rem', opacity: 0.25 }}>
-        {portfolio.school.logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={portfolio.school.logoUrl}
-            alt={portfolio.school.name}
-            style={{ maxHeight: 80, marginBottom: '1rem', opacity: 0.6 }}
-          />
-        ) : (
-          <div style={{
-            width: 72, height: 72, borderRadius: '50%', margin: '0 auto 1rem',
-            border: '1px solid var(--rule)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'var(--font-heading)', fontSize: '1.5rem', color: 'var(--ink-faint)',
-          }}>
-            {portfolio.school.name.charAt(0)}
-          </div>
-        )}
-        <p style={{
-          fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: '1.1rem',
-          fontStyle: 'italic',
-          color: 'var(--ink-faint)',
-          margin: '0 0 0.25rem',
-        }}>
-          {portfolio.school.name}
-        </p>
-        <p style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '8px',
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: 'var(--ink-faint)',
-        }}>
-          Living Portfolio
-        </p>
-      </div>
     </div>
   )
 }

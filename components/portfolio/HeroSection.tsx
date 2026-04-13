@@ -1,5 +1,5 @@
 import type React from 'react'
-import type { Student, Assessment } from '@/lib/types'
+import type { Student, SchoolConfig, Assessment } from '@/lib/types'
 import { ordinal, latestAssessment } from '@/lib/utils'
 import heroStyles from './HeroSection.module.css'
 import sbStyles from './StatsBar.module.css'
@@ -8,6 +8,7 @@ import sbStyles from './StatsBar.module.css'
 
 interface HeroProps {
   student?:      Student
+  school?:       SchoolConfig
   assessments?:  Assessment[]
   compact?:      boolean
   inviteButton?: React.ReactNode
@@ -134,7 +135,7 @@ export function StatsBar({ assessments, years, selectedYear, onYearChange }: Sta
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 
-export default function HeroSection({ student, compact, inviteButton }: HeroProps) {
+export default function HeroSection({ student, school, compact, inviteButton }: HeroProps) {
   const firstName  = student?.firstName ?? DEMO.firstName
   const lastName   = student?.lastName  ?? DEMO.lastName
   const summary    = student?.summary   ?? DEMO.summary
@@ -155,6 +156,42 @@ export default function HeroSection({ student, compact, inviteButton }: HeroProp
         <h1>{firstName}<br /><em>{lastName}</em></h1>
         {summary && <p className={heroStyles.heroSummary}>{summary}</p>}
         {inviteButton && <div style={{ marginTop: '0.75rem' }}>{inviteButton}</div>}
+      </div>
+
+      {/* Right side: school identity */}
+      <div style={{
+        marginLeft: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        opacity: 0.35,
+        flexShrink: 0,
+      }}>
+        {school?.logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={school.logoUrl} alt={school.name} style={{ maxHeight: 56, marginBottom: '0.4rem' }} />
+        ) : (
+          <div style={{
+            width: 48, height: 48, borderRadius: '50%',
+            border: '1px solid rgba(255,255,255,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: 'rgba(255,255,255,0.5)',
+            marginBottom: '0.4rem',
+          }}>
+            {school?.name?.charAt(0) ?? 'H'}
+          </div>
+        )}
+        <span style={{
+          fontFamily: "'Cormorant Garamond', Georgia, serif",
+          fontSize: '0.7rem',
+          fontStyle: 'italic',
+          color: 'rgba(255,255,255,0.35)',
+          textAlign: 'center',
+          maxWidth: 120,
+          lineHeight: 1.3,
+        }}>
+          {school?.name ?? ''}
+        </span>
       </div>
     </div>
   )
