@@ -120,7 +120,7 @@ export default function PhotoGallery({
         </div>
       )}
 
-      <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
         {items.map((p, idx) => (
           <PhotoCard
             key={p.id}

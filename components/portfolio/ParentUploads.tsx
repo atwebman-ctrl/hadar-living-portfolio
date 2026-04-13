@@ -116,12 +116,10 @@ export default function ParentUploads({
       )}
 
       {uploadEnabled && studentId && (
-        <div className="reveal">
-          <ParentUploadForm studentId={studentId} academicYear={academicYear} gradeLevel={gradeLevel} />
-        </div>
+        <ParentUploadForm studentId={studentId} academicYear={academicYear} gradeLevel={gradeLevel} />
       )}
 
-      <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
         {items.map((item) => {
           const lbIdx = lightboxIdxMap.get(item.id)
           return (
