@@ -36,14 +36,6 @@ export default function StudentGrid({ students, role }: Props) {
 
   return (
     <>
-      {/* Registry heading */}
-      <div className="db-official-badge">⊙ Official Record</div>
-      <h2 className="db-registry-title">Student Registry</h2>
-      <div className="db-registry-rule" />
-      <p className="db-registry-sub">
-        Student records, academic progress, and portfolio archives for the current academic cycle.
-      </p>
-
       {/* Grade filter pills */}
       <div className="db-pills">
         {['All', ...grades].map((g) => (

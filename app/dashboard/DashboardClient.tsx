@@ -20,16 +20,17 @@ import YearInReviewView from '@/components/dashboard/YearInReviewView'
 import SettingsView from '@/components/dashboard/SettingsView'
 
 interface Props {
-  students: Student[]
-  role:     string
+  students:   Student[]
+  role:       string
+  schoolName: string
 }
 
-export default function DashboardClient({ students, role }: Props) {
+export default function DashboardClient({ students, role, schoolName }: Props) {
   const [activeView, setActiveView] = useState<DashboardView>('roster')
 
   return (
     <>
-      <PageHeader role={role}>
+      <PageHeader schoolName={schoolName}>
         <AddStudentForm />
       </PageHeader>
 

@@ -63,47 +63,34 @@ export function ParentPendingScreen() {
 }
 
 export function PageHeader({
-  role,
+  schoolName,
   children,
 }: {
-  role: string
-  children: React.ReactNode
+  schoolName: string
+  children:   React.ReactNode
 }) {
   return (
     <header
       className="db-header"
       style={{
-        padding: '1.5rem 2rem',
-        display: 'flex',
-        alignItems: 'center',
+        padding:        '0.9rem 2rem',
+        display:        'flex',
+        alignItems:     'center',
         justifyContent: 'space-between',
       }}
     >
-      <div>
-        <p
-          style={{
-            fontFamily:    'var(--font-mono)',
-            fontSize:      '0.65rem',
-            letterSpacing: '0.14em',
-            color:         GOLD,
-            textTransform: 'uppercase',
-            margin:        '0 0 0.25rem',
-          }}
-        >
-          {role === 'admin' ? 'Admin' : 'Teacher'} Dashboard
-        </p>
-        <h1
-          style={{
-            fontFamily: "'Cormorant Garamond', 'EB Garamond', Georgia, serif",
-            fontStyle:  'italic',
-            fontSize:   '1.75rem',
-            color:      '#F5EFE0',
-            margin:     0,
-          }}
-        >
-          Students
-        </h1>
-      </div>
+      <p
+        style={{
+          fontFamily:    'var(--font-mono)',
+          fontSize:      '0.72rem',
+          letterSpacing: '0.16em',
+          color:         GOLD,
+          textTransform: 'uppercase',
+          margin:        0,
+        }}
+      >
+        {schoolName}
+      </p>
       {children}
     </header>
   )

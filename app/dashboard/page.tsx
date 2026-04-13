@@ -79,9 +79,17 @@ export default async function DashboardPage() {
     mapStudent(row as Record<string, unknown>)
   )
 
+  const { data: schoolRow } = await supabaseAdmin
+    .from('schools')
+    .select('name')
+    .eq('id', ctx.schoolId)
+    .maybeSingle()
+
+  const schoolName = (schoolRow?.name as string | undefined) ?? ''
+
   return (
     <div className="db-page">
-      <DashboardClient students={students} role={ctx.role} />
+      <DashboardClient students={students} role={ctx.role} schoolName={schoolName} />
     </div>
   )
 }
