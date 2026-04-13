@@ -1,6 +1,8 @@
 import type React from 'react'
 import type { Student, SchoolConfig, Assessment } from '@/lib/types'
 import { ordinal, latestAssessment } from '@/lib/utils'
+import heroStyles from './HeroSection.module.css'
+import sbStyles from './StatsBar.module.css'
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -97,13 +99,13 @@ export function StatsBar({ assessments, years, selectedYear, onYearChange }: Sta
   if (filled.length === 0 && !hasYears) return null
 
   return (
-    <div className="stats-bar">
+    <div className={sbStyles.statsBar}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 0, flex: 1 }}>
         {filled.map((m) => (
-          <div key={m.lbl} className="stats-bar-cell">
-            <div className="lbl">{m.lbl}</div>
-            <div className={`val${m.gold ? ' gold' : ''}`}>{m.val}</div>
-            <div className="ctx">{m.ctx}</div>
+          <div key={m.lbl} className={sbStyles.statsBarCell}>
+            <div className={sbStyles.lbl}>{m.lbl}</div>
+            <div className={`${sbStyles.val}${m.gold ? ` ${sbStyles.gold}` : ''}`}>{m.val}</div>
+            <div className={sbStyles.ctx}>{m.ctx}</div>
           </div>
         ))}
       </div>
@@ -143,19 +145,19 @@ export default function HeroSection({ student, school, compact, inviteButton }: 
     : null
 
   return (
-    <div className={`hero${compact ? ' compact' : ''}`} id="overview">
-      <div className="hero-photo">
+    <div className={`${heroStyles.hero}${compact ? ` ${heroStyles.compact}` : ''}`} id="overview">
+      <div className={heroStyles.heroPhoto}>
         {photoUrl
-          ? <img src={photoUrl} alt={`${firstName} ${lastName}`} className="hero-initials" style={{ objectFit: 'cover', display: 'block' }} />
-          : <div className="hero-initials">{initials}</div>
+          ? <img src={photoUrl} alt={`${firstName} ${lastName}`} className={heroStyles.heroInitials} style={{ objectFit: 'cover', display: 'block' }} />
+          : <div className={heroStyles.heroInitials}>{initials}</div>
         }
       </div>
-      <div className="hero-identity">
+      <div className={heroStyles.heroIdentity}>
         <h1>{firstName}<br /><em>{lastName}</em></h1>
-        {summary && <p className="hero-summary">{summary}</p>}
+        {summary && <p className={heroStyles.heroSummary}>{summary}</p>}
         {inviteButton && <div style={{ marginTop: '0.75rem' }}>{inviteButton}</div>}
       </div>
-      <div className="hero-school-badge">{heroSub}</div>
+      <div className={heroStyles.heroSchoolBadge}>{heroSub}</div>
     </div>
   )
 }

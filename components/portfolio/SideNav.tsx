@@ -11,6 +11,7 @@
 
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
+import styles from './SideNav.module.css'
 
 const GROUPS = [
   {
@@ -116,20 +117,17 @@ export default function SideNav({
   }
 
   return (
-    <nav className="sidenav">
-      <div className="logo">
-        <div className="logo-mark">{schoolName ?? 'Hadar · 2025–26'}</div>
+    <nav className={styles.sidenav}>
+      <div className={styles.logo}>
+        <div className={styles.logoMark}>{schoolName ?? 'Hadar · 2025–26'}</div>
         {!schoolName && (
-          <div className="school-name">Jewish Classical Academy</div>
+          <div className={styles.schoolName}>Jewish Classical Academy</div>
         )}
       </div>
-      <div className="nav-label">Portfolio</div>
+      <div className={styles.navLabel}>Portfolio</div>
 
       {studentName && (
-        <div
-          className="sidenav-student-name"
-          style={{ padding: '0 1.5rem 1rem', fontFamily: 'var(--font-heading)', fontSize: '13px', color: 'white', lineHeight: 1.3 }}
-        >
+        <div className={styles.studentName}>
           {studentName}
         </div>
       )}
@@ -138,7 +136,7 @@ export default function SideNav({
         <>
           <a
             href={`/portfolio/${studentId}`}
-            className={isHub ? 'active' : ''}
+            className={`${styles.navLink}${isHub ? ` ${styles.navLinkActive}` : ''}`}
           >
             Overview
           </a>
@@ -149,15 +147,15 @@ export default function SideNav({
 
             return (
               <div key={group.slug}>
-                <div className="sidenav-group-row">
+                <div className={styles.groupRow}>
                   <a
                     href={`/portfolio/${studentId}/group/${group.slug}`}
-                    className={`sidenav-group-link${isGroupActive ? ' active' : ''}`}
+                    className={`${styles.groupLink}${isGroupActive ? ` ${styles.groupLinkActive}` : ''}`}
                   >
                     {group.label}
                   </a>
                   <button
-                    className="sidenav-chevron"
+                    className={styles.chevron}
                     onClick={(e) => { e.preventDefault(); toggleGroup(group.slug) }}
                     aria-label={`Toggle ${group.label}`}
                   >
@@ -174,7 +172,7 @@ export default function SideNav({
                 </div>
 
                 {isOpen && (
-                  <div className="sidenav-sub-items">
+                  <div className={styles.subItems}>
                     {group.items.map(({ slug, label }) => (
                       <a
                         key={slug}
@@ -192,7 +190,7 @@ export default function SideNav({
 
           <a
             href={`/portfolio/${studentId}/full`}
-            className={isFull ? 'active' : ''}
+            className={`${styles.navLink}${isFull ? ` ${styles.navLinkActive}` : ''}`}
             style={{ opacity: 0.65, fontSize: '0.78rem', marginTop: '0.5rem' }}
           >
             Full Portfolio
@@ -201,7 +199,7 @@ export default function SideNav({
       ) : (
         <>
           {ANCHOR_ITEMS.map(({ href, label }) => (
-            <a key={href} href={href}>{label}</a>
+            <a key={href} href={href} className={styles.navLink}>{label}</a>
           ))}
         </>
       )}

@@ -1,0 +1,58 @@
+/* ── HUB OVERVIEW — 3 group cards ────────────────────────────── */
+.hubGroupGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.hubGroupCard {
+  border-top: 1px solid rgba(184,160,80,0.3);
+  padding: 1.75rem 2rem 1.5rem;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+.hubGroupCard:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+.hubGroupCardInner { flex: 1; }
+.hubGroupCardHeader { display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 0.35rem; }
+.hubGroupCardTitle { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600; color: var(--navy); margin: 0; line-height: 1.2; }
+.hubGroupCardCount { font-family: var(--font-mono); font-size: 11px; color: rgba(139,115,85,0.5); letter-spacing: 0.04em; }
+.hubGroupCardSubtitle { font-family: var(--font-body); font-size: 13px; color: var(--ink-light); margin: 0 0 0.75rem; line-height: 1.4; }
+.hubGroupCardStats { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.hubGroupCardChip { display: inline-block; padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(184,160,80,0.35); font-family: var(--font-mono); font-size: 10px; color: #6B5B3E; letter-spacing: 0.03em; background: rgba(184,160,80,0.06); }
+.hubGroupCardEmpty { font-family: var(--font-heading); font-style: italic; font-size: 13px; color: var(--gold); margin: 0; }
+.hubGroupCardCta { font-family: var(--font-heading); font-style: italic; font-size: 14px; color: #B8A050; flex-shrink: 0; align-self: center; transition: text-decoration 0.15s ease; }
+.hubGroupCard:hover .hubGroupCardCta { text-decoration: underline; }
+
+/* Hub group section label */
+.hubGroupLabel {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 0.6rem; padding-left: 2px;
+}
+
+/* AI summary strip */
+.hubAiSummary { background: var(--navy); color: rgba(255,255,255,0.85); padding: 1.25rem 1.75rem; margin-bottom: 1.5rem; font-size: 0.9rem; line-height: 1.6; }
+.hubAiSummary p { margin: 0; }
+.hubAiSummaryLabel { display: block; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+
+/* Full portfolio CTA button */
+.hubFullBtn {
+  display: inline-block;
+  font-family: var(--font-heading); font-style: italic;
+  font-size: 1.1rem; letter-spacing: 0.03em;
+  color: #F7F4EE; background: #B8A050;
+  border: 1px solid #9a8540;
+  padding: 12px 32px; text-decoration: none;
+  transition: background 0.2s ease;
+}
+.hubFullBtn:hover { background: #9a8540; }
+
+@media (max-width: 900px) {
+  .hubGroupCard { flex-direction: column; gap: 0.75rem; }
+  .hubGroupCardCta { align-self: flex-start; }
+}

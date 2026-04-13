@@ -11,6 +11,8 @@
 import { useState, useMemo, Component, type ReactNode } from 'react'
 import type { UserRole, PortfolioData } from '@/lib/types'
 import YearSelector from '@/components/portfolio/YearSelector'
+import layoutStyles from '@/components/portfolio/layout.module.css'
+import groupStyles from '@/components/portfolio/GroupDetail.module.css'
 import IntellectualArc from '@/components/portfolio/IntellectualArc'
 import ImmersionEngine from '@/components/portfolio/ImmersionEngine'
 import TheCanon from '@/components/portfolio/TheCanon'
@@ -221,10 +223,10 @@ export default function GroupDetailClient({ portfolio, studentId, role, groupSlu
   const showYearSelector = YEAR_FILTER_TABS.has(activeTab) && years.length > 0
 
   return (
-    <div className="main">
+    <div className={layoutStyles.main}>
       {/* Back link */}
       <div style={{ padding: '1.5rem 2.5rem 0' }}>
-        <a href={`/portfolio/${studentId}`} className="back-link">
+        <a href={`/portfolio/${studentId}`} className={layoutStyles.backLink}>
           ← Back to Overview
         </a>
       </div>
@@ -243,11 +245,11 @@ export default function GroupDetailClient({ portfolio, studentId, role, groupSlu
       </div>
 
       {/* Tab bar */}
-      <div className="group-tab-bar">
+      <div className={groupStyles.groupTabBar}>
         {tabs.map((tab) => (
           <button
             key={tab.slug}
-            className={`group-tab${activeTab === tab.slug ? ' active' : ''}`}
+            className={`${groupStyles.groupTab}${activeTab === tab.slug ? ` ${groupStyles.groupTabActive}` : ''}`}
             onClick={() => setActiveTab(tab.slug)}
           >
             {tab.label}

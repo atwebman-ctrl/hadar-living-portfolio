@@ -10,6 +10,7 @@
 import Link from 'next/link'
 import type { PortfolioData, Assessment } from '@/lib/types'
 import { ordinal, latestAssessment } from '@/lib/utils'
+import styles from './PortfolioHub.module.css'
 
 interface Props {
   portfolio:    PortfolioData
@@ -101,25 +102,25 @@ function GroupCard({ title, subtitle, groupSlug, stats, filled, total, studentId
 
   return (
     <Link href={`/portfolio/${studentId}/group/${groupSlug}`} style={{ textDecoration: 'none' }}>
-      <div className="hub-group-card reveal" style={{ background: bg }}>
-        <div className="hub-group-card-inner">
-          <div className="hub-group-card-header">
-            <h2 className="hub-group-card-title">{title}</h2>
-            <span className="hub-group-card-count">{filled}/{total}</span>
+      <div className={`${styles.hubGroupCard} reveal`} style={{ background: bg }}>
+        <div className={styles.hubGroupCardInner}>
+          <div className={styles.hubGroupCardHeader}>
+            <h2 className={styles.hubGroupCardTitle}>{title}</h2>
+            <span className={styles.hubGroupCardCount}>{filled}/{total}</span>
           </div>
-          <p className="hub-group-card-subtitle">{subtitle}</p>
+          <p className={styles.hubGroupCardSubtitle}>{subtitle}</p>
 
           {hasData ? (
-            <div className="hub-group-card-stats">
+            <div className={styles.hubGroupCardStats}>
               {stats.map((s, i) => (
-                <span key={i} className="hub-group-card-chip">{s}</span>
+                <span key={i} className={styles.hubGroupCardChip}>{s}</span>
               ))}
             </div>
           ) : (
-            <p className="hub-group-card-empty">Add first entry →</p>
+            <p className={styles.hubGroupCardEmpty}>Add first entry →</p>
           )}
         </div>
-        <span className="hub-group-card-cta">Explore →</span>
+        <span className={styles.hubGroupCardCta}>Explore →</span>
       </div>
     </Link>
   )
@@ -136,13 +137,13 @@ export default function PortfolioHub({ portfolio, studentId }: Props) {
     <div style={{ padding: '1.5rem 2.5rem 3rem' }}>
 
       {portfolio.student.summary && (
-        <div className="hub-ai-summary">
-          <span className="hub-ai-summary-label">Summary</span>
+        <div className={styles.hubAiSummary}>
+          <span className={styles.hubAiSummaryLabel}>Summary</span>
           <p>{portfolio.student.summary}</p>
         </div>
       )}
 
-      <div className="hub-group-grid">
+      <div className={styles.hubGroupGrid}>
         <GroupCard
           title="Academics"
           subtitle="Test scores, Hebrew immersion, and curriculum progress"
@@ -174,7 +175,7 @@ export default function PortfolioHub({ portfolio, studentId }: Props) {
       </div>
 
       <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-        <Link href={`/portfolio/${studentId}/full`} className="hub-full-btn">
+        <Link href={`/portfolio/${studentId}/full`} className={styles.hubFullBtn}>
           View Full Portfolio →
         </Link>
       </div>

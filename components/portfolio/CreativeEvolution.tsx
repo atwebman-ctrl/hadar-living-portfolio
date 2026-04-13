@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { WritingSample, AiDraft, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import InlineWritingForm from '@/components/portfolio/InlineWritingForm'
+import cs from './sections.module.css'
 
 interface Props {
   writingSamples?: WritingSample[]
@@ -94,10 +95,10 @@ export default function CreativeEvolution({ writingSamples, studentId, studentNa
 
   return (
     <section id="writing">
-      <div className="section-header reveal">
-        <span className="section-num">04</span>
-        <h2 className="section-title">Creative Evolution</h2>
-        <div className="section-rule" />
+      <div className={`${cs.sectionHeader} reveal`}>
+        <span className={cs.sectionNum}>04</span>
+        <h2 className={cs.sectionTitle}>Creative Evolution</h2>
+        <div className={cs.sectionRule} />
       </div>
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.5rem', maxWidth: 560 }}>
         {hasData
@@ -106,11 +107,11 @@ export default function CreativeEvolution({ writingSamples, studentId, studentNa
       </p>
 
       <div className="reveal">
-        <div className="flip-tabs">
+        <div className={cs.flipTabs}>
           {samples.map((s) => (
             <button
               key={s.id}
-              className={`flip-tab${activeId === s.id ? ' active' : ''}`}
+              className={`${cs.flipTab}${activeId === s.id ? ` ${cs.flipTabActive}` : ''}`}
               onClick={() => setActiveId(s.id)}
             >
               {s.tab}
@@ -118,11 +119,11 @@ export default function CreativeEvolution({ writingSamples, studentId, studentNa
           ))}
         </div>
         {current && (
-          <div className="flip-pane active">
-            <div className="flip-date">{current.date}</div>
-            <div className="flip-text">{current.text}</div>
-            {current.note && <div className="flip-note">{current.note}</div>}
-            {current.growth && <span className="flip-growth">{current.growth}</span>}
+          <div className={cs.flipPaneActive}>
+            <div className={cs.flipDate}>{current.date}</div>
+            <div className={cs.flipText}>{current.text}</div>
+            {current.note && <div className={cs.flipNote}>{current.note}</div>}
+            {current.growth && <span className={cs.flipGrowth}>{current.growth}</span>}
           </div>
         )}
       </div>

@@ -13,6 +13,7 @@ import MapTrajectoryChart, { termSortKey } from '@/components/charts/MapTrajecto
 import SubjectScoreRows, { type ScoreDisplayRow } from '@/components/portfolio/SubjectScoreRows'
 import YearGroup from '@/components/portfolio/YearGroup'
 import InlineAssessmentForm from '@/components/portfolio/InlineAssessmentForm'
+import s from './sections.module.css'
 
 interface Props {
   mathAssessments:    Assessment[]
@@ -86,7 +87,7 @@ export default function IntellectualArcAllYears({
   return (
     <>
       {/* ── Trajectory chart ──────────────────────────────── */}
-      <div className="chart-wrap reveal">
+      <div className={`${s.chartWrap} reveal`}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', borderBottom: '1px solid var(--rule)', paddingBottom: '0.4rem', marginBottom: '0.75rem' }}>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.05rem', color: 'var(--navy)', margin: 0 }}>Multi-Year Trajectory</h3>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-faint)' }}>MAP Assessments — All Years</span>
@@ -110,7 +111,7 @@ export default function IntellectualArcAllYears({
 
       {/* ── Per-year tables ───────────────────────────────── */}
       {mathGroups.length > 0 && (
-        <div className="chart-wrap reveal">
+        <div className={`${s.chartWrap} reveal`}>
           <SubjectHeading title="Mathematics" tag="MAP — by year" />
           {mathGroups.map(({ year, rows }) => (
             <YearGroup key={year} year={year} defaultOpen={year === currentYear}>
@@ -124,7 +125,7 @@ export default function IntellectualArcAllYears({
       )}
 
       {englishGroups.length > 0 && (
-        <div className="chart-wrap reveal">
+        <div className={`${s.chartWrap} reveal`}>
           <SubjectHeading title="English Language Arts" tag="MAP — by year" />
           {englishGroups.map(({ year, rows }) => (
             <YearGroup key={year} year={year} defaultOpen={year === currentYear}>

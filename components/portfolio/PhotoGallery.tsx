@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { Photo } from '@/lib/types'
 import UploadButton from '@/components/shared/UploadButton'
+import s from './sections.module.css'
 import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 import PhotoCard from './PhotoCard'
 import { TERM_OPTIONS } from '@/lib/constants'
@@ -61,10 +62,10 @@ export default function PhotoGallery({
 
   return (
     <section id="photos">
-      <div className="section-header reveal">
-        <span className="section-num">09</span>
-        <h2 className="section-title">Photo Gallery</h2>
-        <div className="section-rule" />
+      <div className={`${s.sectionHeader} reveal`}>
+        <span className={s.sectionNum}>09</span>
+        <h2 className={s.sectionTitle}>Photo Gallery</h2>
+        <div className={s.sectionRule} />
       </div>
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
         {hasData

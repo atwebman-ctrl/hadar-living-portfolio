@@ -1,5 +1,6 @@
 import type { TeacherNote, UserRole } from '@/lib/types'
 import InlineTeacherNoteForm from './InlineTeacherNoteForm'
+import s from './sections.module.css'
 
 interface Props {
   notes?:     TeacherNote[]
@@ -85,10 +86,10 @@ export default function TeacherNotes({ notes, role, studentId }: Props) {
 
   return (
     <section id="teacher-notes">
-      <div className="section-header reveal">
-        <span className="section-num">10</span>
-        <h2 className="section-title">Teacher Narratives</h2>
-        <div className="section-rule" />
+      <div className={`${s.sectionHeader} reveal`}>
+        <span className={s.sectionNum}>10</span>
+        <h2 className={s.sectionTitle}>Teacher Narratives</h2>
+        <div className={s.sectionRule} />
       </div>
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
         {hasData

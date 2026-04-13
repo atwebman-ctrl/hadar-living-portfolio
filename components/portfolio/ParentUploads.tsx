@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { ParentUpload, UserRole } from '@/lib/types'
 import ParentUploadForm from './ParentUploadForm'
 import ParentUploadCard, { type UploadCardItem } from './ParentUploadCard'
+import s from './sections.module.css'
 import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 
 interface Props {
@@ -95,10 +96,10 @@ export default function ParentUploads({
 
   return (
     <section id="parent-uploads">
-      <div className="section-header reveal">
-        <span className="section-num">11</span>
-        <h2 className="section-title">Parent Uploads</h2>
-        <div className="section-rule" />
+      <div className={`${s.sectionHeader} reveal`}>
+        <span className={s.sectionNum}>11</span>
+        <h2 className={s.sectionTitle}>Parent Uploads</h2>
+        <div className={s.sectionRule} />
       </div>
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
         {hasData

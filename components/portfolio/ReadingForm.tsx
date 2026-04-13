@@ -13,6 +13,7 @@ import {
   READING_DIFFICULTY_OPTIONS,
   CURRICULUM_CONNECTION_OPTIONS,
 } from '@/lib/constants'
+import layoutStyles from '@/components/portfolio/layout.module.css'
 
 // ── Shared styles ─────────────────────────────────────────────
 
@@ -133,7 +134,7 @@ export default function ReadingForm({ studentId, readingId, initial, onStatus, o
 
       <form onSubmit={handleSubmit}>
         {/* ── 1. Book info ─────────────────────────────────── */}
-        <p className="form-section-head">Book Info</p>
+        <p className={layoutStyles.formSectionHead}>Book Info</p>
         <div style={grid2}>
           <Field label="Title" wide>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -155,7 +156,7 @@ export default function ReadingForm({ studentId, readingId, initial, onStatus, o
         </div>
 
         {/* ── 2. Reading details ───────────────────────────── */}
-        <p className="form-section-head">Reading Details</p>
+        <p className={layoutStyles.formSectionHead}>Reading Details</p>
         <div style={grid2}>
           <Field label="Difficulty Level">
             <select value={fields.readingDifficulty} onChange={set('readingDifficulty')} style={inp}>
@@ -183,7 +184,7 @@ export default function ReadingForm({ studentId, readingId, initial, onStatus, o
         </div>
 
         {/* ── 3. Reflections ──────────────────────────────── */}
-        <p className="form-section-head">Reflections</p>
+        <p className={layoutStyles.formSectionHead}>Reflections</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <Field label="Why Chosen" wide>
             <textarea value={fields.whyChosen} onChange={set('whyChosen')} style={{ ...inp, resize: 'vertical', minHeight: '3.5rem' }} placeholder="Reason this book was selected…" />

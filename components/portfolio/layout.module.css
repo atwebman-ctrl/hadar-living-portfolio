@@ -1,0 +1,36 @@
+/* ── LAYOUT — main content area ──────────────────────────────── */
+.main { margin-left: 200px; }
+/* Element selector inside scoped .main — applies to all <section> children */
+.main section { padding: 4rem 4rem; border-bottom: 1px solid var(--rule); }
+.main section:last-child { border-bottom: none; }
+
+/* ── PORTFOLIO FOOTER ─────────────────────────────────────────── */
+.portfolioFooter { background: var(--navy); padding: 2rem 4rem; display: flex; align-items: center; justify-content: space-between; }
+.footerLeft { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,.35); letter-spacing: .08em; }
+.footerRight { font-family: 'Playfair Display', serif; font-size: 12px; color: rgba(255,255,255,.25); font-style: italic; }
+
+/* ── NAVIGATION LINKS ─────────────────────────────────────────── */
+.backLink { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-mid); text-decoration: none; transition: color 0.15s ease; }
+.backLink:hover { color: var(--navy); }
+
+.overviewBtn {
+  position: fixed; top: 1rem; right: 1.5rem; z-index: 100;
+  font-family: var(--font-mono); font-size: 0.65rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-mid); text-decoration: none;
+  background: var(--cream); padding: 0.35rem 0.7rem;
+  border: 1px solid var(--rule); transition: color 0.15s ease;
+}
+.overviewBtn:hover { color: var(--navy); }
+
+/* ── FORM SECTION HEADING ─────────────────────────────────────── */
+.formSectionHead {
+  font-family: var(--font-mono); font-size: 0.58rem;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-faint); border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.35rem; margin-bottom: 0.75rem; margin-top: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .main { margin-left: 0; padding-top: 44px; }
+}

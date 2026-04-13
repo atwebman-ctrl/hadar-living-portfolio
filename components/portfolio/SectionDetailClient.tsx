@@ -58,6 +58,7 @@ import HandwritingSamples from '@/components/portfolio/HandwritingSamples'
 import PhotoGallery from '@/components/portfolio/PhotoGallery'
 import TeacherNotes from '@/components/portfolio/TeacherNotes'
 import ParentUploads from '@/components/portfolio/ParentUploads'
+import layoutStyles from '@/components/portfolio/layout.module.css'
 
 interface Props {
   portfolio:    PortfolioData
@@ -207,10 +208,10 @@ export default function SectionDetailClient({
   const showYearFilter = YEAR_FILTER_SLUGS.includes(slug) && years.length > 1
 
   return (
-    <div className="main">
+    <div className={layoutStyles.main}>
       {/* Back link */}
       <div style={{ padding: '1.5rem 2.5rem 0' }}>
-        <a href={`/portfolio/${studentId}`} className="back-link">
+        <a href={`/portfolio/${studentId}`} className={layoutStyles.backLink}>
           ← Back to Overview
         </a>
       </div>

@@ -11,6 +11,7 @@
 
 import { useEffect, useState } from 'react'
 import { formatGrade } from '@/lib/gradeLevel'
+import s from './sections.module.css'
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -102,8 +103,8 @@ export default function ClassBookshelf({ studentId }: Props) {
 
   return (
     <div>
-      <div className="bookshelf">
-        <div className="books-row">
+      <div className={s.bookshelf}>
+        <div className={s.booksRow}>
           {books.map((book, i) => {
             const ci    = colorIdx(book.primaryStudentId)
             const color = COLORS[ci]
@@ -113,15 +114,15 @@ export default function ClassBookshelf({ studentId }: Props) {
             return (
               <div key={book.title} style={{ position: 'relative' }}>
                 <div
-                  className="book done"
+                  className={`${s.book} ${s.bookComplete}`}
                   style={{ background: color, color: text, height: h, width: 36, cursor: 'pointer',
                     outline: isOpen ? '2px solid #B8A050' : 'none', outlineOffset: '2px', transition: 'outline 0.15s ease' }}
                   onClick={() => setOpenTitle(isOpen ? null : book.title)}
                   title={`${book.title} — click for details`}
                   role="button" aria-expanded={isOpen}
                 >
-                  <span className="book-title">{book.title}</span>
-                  <span className="book-done">✓</span>
+                  <span className={s.bookTitle}>{book.title}</span>
+                  <span className={s.bookDoneLabel}>✓</span>
                 </div>
                 {book.readers.length > 1 && (
                   <div style={{ position: 'absolute', top: -6, right: -6, background: '#B8A050', color: 'white',

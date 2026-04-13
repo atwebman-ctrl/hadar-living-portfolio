@@ -10,6 +10,7 @@
 
 import { useState } from 'react'
 import type { Reading, UserRole } from '@/lib/types'
+import s from './sections.module.css'
 
 // ── Book cover image ──────────────────────────────────────────
 
@@ -75,7 +76,7 @@ export default function BookDetail({ reading, spineColor, canEdit, onEdit, onDel
 
   return (
     <div
-      className="book-detail-panel"
+      className={s.bookDetailPanel}
       style={{ borderTop: '1px solid var(--rule)', borderRight: '1px solid var(--rule)', borderBottom: '1px solid var(--rule)', borderLeft: `3px solid ${spineColor}`, background: 'var(--cream)', padding: '1.1rem 1.4rem', marginTop: '1rem', display: 'flex', gap: '1.25rem', alignItems: 'flex-start', position: 'relative' }}
     >
       <BookCoverImage title={reading.title} />
@@ -98,7 +99,7 @@ export default function BookDetail({ reading, spineColor, canEdit, onEdit, onDel
 
       {/* Edit / Delete — hover-revealed via CSS class */}
       {canEdit && (
-        <div className="book-detail-actions">
+        <div className={s.bookDetailActions}>
           {confirmDelete ? (
             <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.56rem', color: 'var(--ink-mid)' }}>Delete?</span>

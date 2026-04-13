@@ -1,8 +1,10 @@
+import styles from '@/components/portfolio/layout.module.css'
+
 export default function PortfolioFooter() {
   return (
-    <div className="portfolio-footer">
-      <div className="left">Hadar Jewish Classical Academy · Student Living Portfolio · Confidential</div>
-      <div className="right">Torah Im Derech Eretz</div>
+    <div className={styles.portfolioFooter}>
+      <div className={styles.footerLeft}>Hadar Jewish Classical Academy · Student Living Portfolio · Confidential</div>
+      <div className={styles.footerRight}>Torah Im Derech Eretz</div>
     </div>
   )
 }

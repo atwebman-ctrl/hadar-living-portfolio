@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import './portfolio.css'
+import layoutStyles from '@/components/portfolio/layout.module.css'
 import RevealObserver from '@/components/portfolio/RevealObserver'
 import SideNav from '@/components/portfolio/SideNav'
 import HeroSection from '@/components/portfolio/HeroSection'
@@ -44,7 +45,7 @@ export default function DemoPortfolio() {
         ← Return Home
       </Link>
       <SideNav />
-      <div className="main">
+      <div className={layoutStyles.main}>
         <HeroSection />
         <IntellectualArc />
         <ImmersionEngine />

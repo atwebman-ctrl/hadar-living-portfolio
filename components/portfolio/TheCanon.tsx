@@ -9,6 +9,7 @@ import BookDetail from '@/components/portfolio/BookDetail'
 import ReadingForm from '@/components/portfolio/ReadingForm'
 import ClassBookshelf from '@/components/portfolio/ClassBookshelf'
 import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
+import s from './sections.module.css'
 
 interface Props {
   readings?:      Reading[]
@@ -87,19 +88,19 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
 
   return (
     <section id="canon">
-      <div className="section-header reveal">
-        <span className="section-num">03</span>
-        <h2 className="section-title">The Canon</h2>
-        <div className="section-rule" />
+      <div className={`${s.sectionHeader} reveal`}>
+        <span className={s.sectionNum}>03</span>
+        <h2 className={s.sectionTitle}>The Canon</h2>
+        <div className={s.sectionRule} />
       </div>
 
       {/* ── Tabs (only in live mode) ──────────────────────── */}
       {studentId && (
-        <div className="flip-tabs" style={{ marginBottom: '1.5rem' }}>
-          <button className={`flip-tab${tab === 'my-books' ? ' active' : ''}`} onClick={() => setTab('my-books')}>
+        <div className={s.flipTabs} style={{ marginBottom: '1.5rem' }}>
+          <button className={`${s.flipTab}${tab === 'my-books' ? ` ${s.flipTabActive}` : ''}`} onClick={() => setTab('my-books')}>
             My Books
           </button>
-          <button className={`flip-tab${tab === 'class' ? ' active' : ''}`} onClick={() => setTab('class')}>
+          <button className={`${s.flipTab}${tab === 'class' ? ` ${s.flipTabActive}` : ''}`} onClick={() => setTab('class')}>
             Class Bookshelf
           </button>
         </div>
@@ -111,21 +112,21 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
           <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
             {description}
           </p>
-          <div className="bookshelf reveal">
-            <div className="books-row">
+          <div className={`${s.bookshelf} reveal`}>
+            <div className={s.booksRow}>
               {books.map((b, i) => {
                 const palette   = SPINE_PALETTE[i % SPINE_PALETTE.length]
                 const readingId = hasData ? readings![i]?.id : null
                 const isOpen    = readingId !== null && openId === readingId
                 return (
-                  <div key={`${b.title}-${i}`} className={`book ${b.done ? 'done' : 'pending'}`}
+                  <div key={`${b.title}-${i}`} className={`${s.book} ${b.done ? s.bookComplete : s.bookPending}`}
                     style={{ background: palette.color, color: palette.text, height: SPINE_HEIGHTS[i % SPINE_HEIGHTS.length], width: 36, cursor: hasData ? 'pointer' : 'default', outline: isOpen ? '2px solid #B8A050' : 'none', outlineOffset: '2px', transition: 'outline 0.15s ease' }}
                     onClick={() => { if (!readingId) return; setOpenId(openId === readingId ? null : readingId) }}
                     title={hasData ? `${b.title} — click for details` : undefined}
                     role={hasData ? 'button' : undefined} aria-expanded={isOpen}
                   >
-                    <span className="book-title">{b.title}</span>
-                    <span className="book-done">{b.done ? '\u2713' : '\u2026'}</span>
+                    <span className={s.bookTitle}>{b.title}</span>
+                    <span className={s.bookDoneLabel}>{b.done ? '\u2713' : '\u2026'}</span>
                   </div>
                 )
               })}

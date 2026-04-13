@@ -12,6 +12,7 @@ import { enforceParentAccess } from '@/lib/portfolioAuth'
 import SideNav from '@/components/portfolio/SideNav'
 import RevealObserver from '@/components/portfolio/RevealObserver'
 import PortfolioClient from '@/components/portfolio/PortfolioClient'
+import layoutStyles from '@/components/portfolio/layout.module.css'
 import '../../../demo/portfolio.css'
 
 type Props = { params: Promise<{ studentId: string }> }
@@ -37,7 +38,7 @@ export default async function FullPortfolioPage({ params }: Props) {
         role={role}
       />
       {/* Back to overview */}
-      <a href={`/portfolio/${studentId}`} className="overview-btn">
+      <a href={`/portfolio/${studentId}`} className={layoutStyles.overviewBtn}>
         ← Overview
       </a>
       <PortfolioClient portfolio={portfolio} studentId={studentId} role={role} />
