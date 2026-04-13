@@ -122,7 +122,7 @@ export default function LandingContent() {
       {/* ══ RIGHT — PARCHMENT PORTAL ══ */}
       <div className="lp-right">
         <a
-          href="/sign-in"
+          href="/dashboard"
           style={{
             position: 'absolute',
             top: '1.5rem',
