@@ -1,9 +1,14 @@
 import type { Assessment, AiDraft, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
+import AiDraftEditor from '@/components/shared/AiDraftEditor'
 import SubjectScoreRows, { type ScoreDisplayRow } from '@/components/portfolio/SubjectScoreRows'
 import MapPercentileChart, { type StudentScorePoint } from '@/components/charts/MapPercentileChart'
 import InlineAssessmentForm from '@/components/portfolio/InlineAssessmentForm'
 import IntellectualArcAllYears from '@/components/portfolio/IntellectualArcAllYears'
+import {
+  DEMO_MATH_ROWS, DEMO_ENGLISH_ROWS, DEMO_MATH_SCORES, DEMO_READING_SCORES,
+  LEXILE_BENCHMARKS, DEMO_STUDENT_LEXILE, DEMO_BOOKS, DEMO_MATH_NARRATIVE,
+} from './IntellectualArcDemoData'
 import s from './sections.module.css'
 
 interface Props {
@@ -22,53 +27,6 @@ interface Props {
   /** 'all' = trajectory view; any year string = filter to that year */
   selectedYear?:         string
 }
-
-// ── Demo fallback data ────────────────────────────────────────
-
-const DEMO_MATH_ROWS: ScoreDisplayRow[] = [
-  { term: 'Spring 2025', academicYear: '2024-2025', ritScore: 231, score: null, percentile: 95 },
-  { term: 'Fall 2024',   academicYear: '2024-2025', ritScore: 224, score: null, percentile: 90 },
-  { term: 'Spring 2024', academicYear: '2023-2024', ritScore: 215, score: null, percentile: 82 },
-  { term: 'Fall 2023',   academicYear: '2023-2024', ritScore: 208, score: null, percentile: 76 },
-]
-
-const DEMO_ENGLISH_ROWS: ScoreDisplayRow[] = [
-  { term: 'Spring 2025', academicYear: '2024-2025', ritScore: 218, score: null, percentile: 89 },
-  { term: 'Fall 2024',   academicYear: '2024-2025', ritScore: 212, score: null, percentile: 85 },
-  { term: 'Spring 2024', academicYear: '2023-2024', ritScore: 205, score: null, percentile: 78 },
-  { term: 'Fall 2023',   academicYear: '2023-2024', ritScore: 198, score: null, percentile: 72 },
-]
-
-// Demo student scores for the percentile chart (derived from MapsChart DEMO_DATA)
-const DEMO_MATH_SCORES: StudentScorePoint[] = [
-  { grade: 1, season: 'fall',   ritScore: 179 },
-  { grade: 1, season: 'spring', ritScore: 194 },
-  { grade: 2, season: 'fall',   ritScore: 188 },
-  { grade: 2, season: 'winter', ritScore: 199 },
-  { grade: 2, season: 'spring', ritScore: 211 },
-  { grade: 3, season: 'fall',   ritScore: 214 },
-  { grade: 3, season: 'winter', ritScore: 219 },
-]
-
-const DEMO_READING_SCORES: StudentScorePoint[] = [
-  { grade: 1, season: 'fall',   ritScore: 183 },
-  { grade: 1, season: 'spring', ritScore: 193 },
-  { grade: 2, season: 'fall',   ritScore: 216 },
-  { grade: 2, season: 'winter', ritScore: 212 },
-  { grade: 2, season: 'spring', ritScore: 221 },
-  { grade: 3, season: 'fall',   ritScore: 216 },
-  { grade: 3, season: 'winter', ritScore: 229 },
-]
-
-const LEXILE_BENCHMARKS = [
-  { lbl: '3rd Grade avg',  pct: '32%',  bg: 'var(--ink-faint)', opacity: 0.3,  val: '420L',  highlight: false },
-  { lbl: '8th Grade avg',  pct: '61%',  bg: 'var(--navy)',      opacity: 0.4,  val: '1010L', highlight: false },
-  { lbl: '11th Grade avg', pct: '80%',  bg: 'var(--navy)',      opacity: 0.55, val: '1200L', highlight: false },
-  { lbl: 'College-ready',  pct: '100%', bg: 'var(--gold)',      opacity: 0.4,  val: '1300L', highlight: false },
-]
-
-const DEMO_STUDENT_LEXILE = { lbl: 'Athena (age 8)', pct: '90%', bg: 'var(--navy)', opacity: 1, val: '1225L', highlight: true }
-const DEMO_BOOKS = 'Tales from Shakespeare · Great Expectations · The Jungle Book'
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -235,6 +193,15 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
         <SubjectScoreRows rows={mathRows} />
         {studentId && role && (mathContext || role === 'parent') && (
           <AiNarrativePanel studentId={studentId} role={role} sectionType="math_scores" existingDraft={existingMathDraft} draftContext={mathContext ?? {}} />
+        )}
+        {!studentId && (
+          <AiDraftEditor
+            draftId="demo-math"
+            sectionType="math_scores"
+            initialStatus="accepted"
+            initialText={DEMO_MATH_NARRATIVE}
+            initialFinalText={DEMO_MATH_NARRATIVE}
+          />
         )}
         <div style={{ position: 'relative', height: 260, marginTop: '1rem' }}>
           <MapPercentileChart subject="math" studentScores={mathScores} />

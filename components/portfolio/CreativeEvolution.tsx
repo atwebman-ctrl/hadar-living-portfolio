@@ -51,6 +51,14 @@ const DEMO_SAMPLES: Sample[] = [
     note: 'Age 8 · Complex sentence variety, embedded dialogue, cause-and-effect reasoning, ironic ending preserved. Grade 3 English MAPS: 95th–98th percentile.',
     growth: '→ Literary craft emerging',
   },
+  {
+    id: '4',
+    tab: 'Grade 3 · Spring 2026',
+    date: 'March 14, 2026 · Nature Observation — "The Willow by the Pond" · Age 8',
+    text: '"There is a willow tree by the pond behind the school and it is older than any of us, I think. Its branches hang down so low that they touch the water, and when the wind blows they drag across the surface and leave little lines that disappear. Today I watched a red-winged blackbird land on one of the branches and the whole branch bent down, but the bird didn\'t seem to mind. I wondered if the tree could feel the bird the way I feel a hand on my shoulder, or if for the tree a bird was too small to notice, like a gnat is too small for me to notice. Maybe kindness is the same thing — noticing what is small."',
+    note: 'Age 8 · Grade 3 spring · Sustained close observation, analogical reasoning, a first attempt at metaphor without being told to use one. The closing line — unprompted — shows Athena beginning to generalize from the particular to the ethical. Grade 3 English MAPS: 98th percentile.',
+    growth: '→ First philosophical turn',
+  },
 ]
 
 // ── Data transformation ───────────────────────────────────────────────────────

@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Reading, AiDraft, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
+import AiDraftEditor from '@/components/shared/AiDraftEditor'
+import { DEMO_READINGS, DEMO_CANON_NARRATIVE } from './TheCanonDemoData'
 import InlineReadingForm from '@/components/portfolio/InlineReadingForm'
 import BookDetail from '@/components/portfolio/BookDetail'
 import ReadingForm from '@/components/portfolio/ReadingForm'
@@ -27,14 +29,6 @@ const SPINE_PALETTE = [
   { color: '#4A6B8A', text: '#E8EFF5' }, { color: '#8A8074', text: '#F5F3F0' },
 ]
 const SPINE_HEIGHTS = [160, 150, 155, 148, 158, 144, 152, 162, 156, 145]
-
-const DEMO_BOOKS = [
-  { title: 'Alice in Wonderland', done: true }, { title: "Grimm's Fairy Tales", done: true },
-  { title: 'Black Beauty', done: true },        { title: 'The Snow Queen', done: true },
-  { title: 'Charlie & the Choc. Factory', done: true }, { title: 'The Jungle Book', done: true },
-  { title: 'Homer Price', done: true },         { title: 'Tales from Shakespeare', done: true },
-  { title: 'Aladdin & Arabian Nights', done: true }, { title: 'Guns for Gen. Washington', done: false },
-]
 
 function buildDraftContext(readings: Reading[], firstName: string | null) {
   return {
@@ -65,20 +59,22 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
   const [editingReading, setEditingReading] = useState<Reading | null>(null)
   const [editStatus,     setEditStatus]     = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
 
-  const hasData = !!readings && readings.length > 0
-  const canEdit = hasData && !!studentId && !!role && role !== 'parent'
+  const isLive  = !!readings && readings.length > 0
+  const isDemo  = !isLive && !studentId
+  const readingsData = isLive ? readings! : (isDemo ? DEMO_READINGS : [])
+  const canEdit = isLive && !!studentId && !!role && role !== 'parent'
 
-  const books = hasData ? readings!.map((r) => ({ title: r.title, done: r.completed })) : DEMO_BOOKS
+  const books = readingsData.map((r) => ({ title: r.title, done: r.completed }))
   const completedCount = books.filter((b) => b.done).length
-  const description = hasData
-    ? `${completedCount} of ${books.length} title${books.length !== 1 ? 's' : ''} completed.`
-    : "Athena\u2019s Grade 3 reading list. Nine of ten titles completed \u2014 from Lewis Carroll to Charles and Mary Lamb\u2019s Tales from Shakespeare."
+  const description = isDemo
+    ? "Athena\u2019s Grade 3 reading list \u2014 twelve of thirteen titles completed, from Lewis Carroll to C. S. Lewis, with the d\u2019Aulaires\u2019 Greek Myths as the year\u2019s anchor reference text."
+    : `${completedCount} of ${books.length} title${books.length !== 1 ? 's' : ''} completed.`
 
-  const draftContext = (studentId && role && role !== 'parent' && hasData)
+  const draftContext = (studentId && role && role !== 'parent' && isLive)
     ? buildDraftContext(readings!, studentName ?? null) : null
 
-  const openReading = hasData && openId ? readings!.find((r) => r.id === openId) ?? null : null
-  const openIndex   = hasData && openId ? readings!.findIndex((r) => r.id === openId) : -1
+  const openReading = openId ? readingsData.find((r) => r.id === openId) ?? null : null
+  const openIndex   = openId ? readingsData.findIndex((r) => r.id === openId) : -1
 
   async function handleDelete(readingId: string) {
     await fetch(`/api/dashboard/students/${studentId}/readings/${readingId}`, { method: 'DELETE' })
@@ -116,14 +112,15 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
             <div className={s.booksRow}>
               {books.map((b, i) => {
                 const palette   = SPINE_PALETTE[i % SPINE_PALETTE.length]
-                const readingId = hasData ? readings![i]?.id : null
+                const readingId = readingsData[i]?.id ?? null
                 const isOpen    = readingId !== null && openId === readingId
+                const clickable = readingId !== null
                 return (
                   <div key={`${b.title}-${i}`} className={`${s.book} ${b.done ? s.bookComplete : s.bookPending}`}
-                    style={{ background: palette.color, color: palette.text, height: SPINE_HEIGHTS[i % SPINE_HEIGHTS.length], width: 36, cursor: hasData ? 'pointer' : 'default', outline: isOpen ? '2px solid #B8A050' : 'none', outlineOffset: '2px', transition: 'outline 0.15s ease' }}
+                    style={{ background: palette.color, color: palette.text, height: SPINE_HEIGHTS[i % SPINE_HEIGHTS.length], width: 36, cursor: clickable ? 'pointer' : 'default', outline: isOpen ? '2px solid #B8A050' : 'none', outlineOffset: '2px', transition: 'outline 0.15s ease' }}
                     onClick={() => { if (!readingId) return; setOpenId(openId === readingId ? null : readingId) }}
-                    title={hasData ? `${b.title} — click for details` : undefined}
-                    role={hasData ? 'button' : undefined} aria-expanded={isOpen}
+                    title={clickable ? `${b.title} — click for details` : undefined}
+                    role={clickable ? 'button' : undefined} aria-expanded={isOpen}
                   >
                     <span className={s.bookTitle}>{b.title}</span>
                     <span className={s.bookDoneLabel}>{b.done ? '\u2713' : '\u2026'}</span>
@@ -142,11 +139,20 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
             )}
           </div>
           <div style={{ marginTop: '1rem', fontFamily: "'DM Mono',monospace", fontSize: 9, color: 'var(--ink-faint)', letterSpacing: '.06em' }}>
-            {hasData ? 'Click a spine to see details\u00a0·\u00a0Faded spine\u00a0=\u00a0upcoming' : 'Hover to browse\u00a0·\u00a0Faded spine\u00a0=\u00a0upcoming'}
+            {readingsData.length > 0 ? 'Click a spine to see details\u00a0·\u00a0Faded spine\u00a0=\u00a0upcoming' : 'Hover to browse\u00a0·\u00a0Faded spine\u00a0=\u00a0upcoming'}
           </div>
           {studentId && role && (draftContext || role === 'parent') && (
             <AiNarrativePanel studentId={studentId} role={role} sectionType="reading_bookshelf"
               existingDraft={existingDraft} draftContext={draftContext ?? {}} />
+          )}
+          {isDemo && (
+            <AiDraftEditor
+              draftId="demo-canon"
+              sectionType="reading_bookshelf"
+              initialStatus="accepted"
+              initialText={DEMO_CANON_NARRATIVE}
+              initialFinalText={DEMO_CANON_NARRATIVE}
+            />
           )}
           {studentId && role && role !== 'parent' && <InlineReadingForm studentId={studentId} />}
         </>
