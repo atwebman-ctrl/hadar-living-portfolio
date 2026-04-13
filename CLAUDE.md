@@ -287,6 +287,7 @@ npm run db:reset        # Reset local DB and replay all migrations (local only)
 ```
 
 - All 14 existing migrations (0001–0014) are tracked and marked as applied.
+- ⚠️ **0001–0014 may be ghost migrations** — they were retroactively marked applied without necessarily having run their DDL. If a column/constraint/index declared in one of those files is missing in production (e.g. `0014_video_storage_path.sql` claimed to add `student_videos.video_storage_path` but it wasn't actually there), create a new timestamped migration with idempotent DDL (`add column if not exists`, `drop constraint if exists` + `add constraint`, etc.) and push it. **Never edit the historical `00NN_*.sql` files in place** — the migration ledger is immutable once recorded.
 - **Docker Desktop is NOT required** for `db:new` or `db:push` — only for `db:pull` and `db:reset` (local dev features we don't use).
 - Migration files live in `supabase/migrations/` and are committed to git like any other code.
 
