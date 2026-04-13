@@ -13,7 +13,7 @@
 import { useEffect, useState } from 'react'
 import { formatGrade } from '@/lib/gradeLevel'
 import { BookCoverImage } from '@/components/portfolio/BookDetail'
-import { SPINE_PALETTE, SPINE_HEIGHTS, paletteIndexFor } from '@/components/portfolio/spinePalette'
+import { SPINE_PALETTE, SPINE_HEIGHTS } from '@/components/portfolio/spinePalette'
 import s from './sections.module.css'
 
 // ── Types ─────────────────────────────────────────────────────
@@ -103,14 +103,14 @@ export default function ClassBookshelf({ studentId }: Props) {
   const gradeName = formatGrade(data.gradeLevel)
   const openBook  = openTitle ? books.find((b) => b.title === openTitle) ?? null : null
   const openIdx   = openTitle ? books.findIndex((b) => b.title === openTitle) : -1
-  const openSpine = openIdx >= 0 ? SPINE_PALETTE[paletteIndexFor(books[openIdx].primaryStudentId)] : null
+  const openSpine = openIdx >= 0 ? SPINE_PALETTE[openIdx % SPINE_PALETTE.length] : null
 
   return (
     <div>
       <div className={s.bookshelf}>
         <div className={s.booksRow}>
           {books.map((book, i) => {
-            const palette = SPINE_PALETTE[paletteIndexFor(book.primaryStudentId)]
+            const palette = SPINE_PALETTE[i % SPINE_PALETTE.length]
             const height  = SPINE_HEIGHTS[i % SPINE_HEIGHTS.length]
             const isOpen  = openTitle === book.title
             return (
