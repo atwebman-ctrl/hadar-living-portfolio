@@ -11,7 +11,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { TERM_OPTIONS, ACADEMIC_YEAR_OPTIONS } from '@/lib/constants'
-import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
+import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modalStyles'
 
 const ASSESSMENT_TYPES = [
   { value: 'maps_math',       label: 'MAP Math' },
@@ -125,7 +125,7 @@ export default function InlineAssessmentForm({ studentId, defaultType = 'maps_ma
               </span>
               <button onClick={close} style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', padding: '0 0.25rem' }} aria-label="Close">✕</button>
             </div>
-            <div style={{ overflowY: 'auto', padding: '1.25rem' }}>
+            <div style={MODAL_BODY}>
               {status && <div style={statusBar(status.type)}>{status.msg}</div>}
               <form onSubmit={handleSubmit}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>

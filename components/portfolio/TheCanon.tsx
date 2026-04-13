@@ -8,7 +8,7 @@ import InlineReadingForm from '@/components/portfolio/InlineReadingForm'
 import BookDetail from '@/components/portfolio/BookDetail'
 import ReadingForm from '@/components/portfolio/ReadingForm'
 import ClassBookshelf from '@/components/portfolio/ClassBookshelf'
-import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
+import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modalStyles'
 import s from './sections.module.css'
 
 interface Props {
@@ -167,7 +167,7 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
               </span>
               <button onClick={() => setEditingReading(null)} style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', padding: '0 0.25rem' }} aria-label="Close">✕</button>
             </div>
-            <div style={{ overflowY: 'auto', padding: '1.25rem' }}>
+            <div style={MODAL_BODY}>
               {editStatus && (
                 <div style={{ padding: '0.4rem 0.75rem', marginBottom: '0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: editStatus.type === 'success' ? '#166534' : '#991b1b', background: editStatus.type === 'success' ? '#f0fdf4' : '#fef2f2', border: `1px solid ${editStatus.type === 'success' ? '#bbf7d0' : '#fecaca'}` }}>
                   {editStatus.msg}

@@ -11,7 +11,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { TERM_OPTIONS } from '@/lib/constants'
-import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
+import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modalStyles'
 import type { LightboxPhoto } from './PhotoLightbox'
 
 const CATEGORIES = [
@@ -138,7 +138,7 @@ export default function PhotoCard({ photo, studentId, canEdit, onExpand }: Props
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)' }}>Edit Photo</span>
               <button onClick={closeEdit} style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', padding: '0 0.25rem' }} aria-label="Close">✕</button>
             </div>
-            <div style={{ padding: '1.25rem', overflowY: 'auto' }}>
+            <div style={MODAL_BODY}>
               {editErr && <div style={{ padding: '0.4rem 0.75rem', marginBottom: '0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#991b1b', background: '#fef2f2', border: '1px solid #fecaca' }}>{editErr}</div>}
               <form onSubmit={handleSave}>
                 <div style={fld}><span style={lbl}>Caption</span><input style={inp} type="text" value={editForm.caption} placeholder="What's in this photo?" onChange={(e) => setEditForm((f) => ({ ...f, caption: e.target.value }))} /></div>

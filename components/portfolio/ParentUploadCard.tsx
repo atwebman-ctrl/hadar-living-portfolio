@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
+import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modalStyles'
 import { TERM_OPTIONS } from '@/lib/constants'
 
 const CATEGORIES = [
@@ -141,7 +141,7 @@ export default function ParentUploadCard({ item, studentId, canEdit, onExpand }:
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)' }}>Edit Upload</span>
               <button onClick={closeEdit} style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', padding: '0 0.25rem' }} aria-label="Close">✕</button>
             </div>
-            <div style={{ overflowY: 'auto', padding: '1.25rem' }}>
+            <div style={MODAL_BODY}>
               {editErr && <div style={{ padding: '0.4rem 0.75rem', marginBottom: '0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#991b1b', background: '#fef2f2', border: '1px solid #fecaca' }}>{editErr}</div>}
               <form onSubmit={handleSave}>
                 <div style={fld}><span style={lbl}>Title</span><input style={inp} type="text" required value={editForm.title} onChange={(e) => setEditForm((f) => ({ ...f, title: e.target.value }))} /></div>

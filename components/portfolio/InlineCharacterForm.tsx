@@ -12,7 +12,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { TERM_OPTIONS, ACADEMIC_YEAR_OPTIONS } from '@/lib/constants'
-import { MODAL_OVERLAY, MODAL_HEADER, modalPanel } from '@/lib/modalStyles'
+import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modalStyles'
 
 interface Props {
   studentId: string
@@ -105,7 +105,7 @@ export default function InlineCharacterForm({ studentId }: Props) {
               </span>
               <button onClick={close} style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', padding: '0 0.25rem' }} aria-label="Close">✕</button>
             </div>
-            <div style={{ overflowY: 'auto', padding: '1.25rem' }}>
+            <div style={MODAL_BODY}>
               {status && <div style={statusBar(status.type)}>{status.msg}</div>}
               <form onSubmit={handleSubmit}>
                 <div style={fieldWrap}>
