@@ -41,34 +41,39 @@
   color: #ffffff;
 }
 
-/* ── Quote (fixed, bottom-left of viewport) ──────────────── */
+/* ── Quote (fixed watermark, bottom-left of viewport) ────── */
 .db-sidebar-quote {
   position: fixed;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  z-index: 10;
-  max-width: 11rem;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 1;
+  max-width: 14rem;
+  pointer-events: none;
+  opacity: 0.4;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .db-sidebar-quote-text {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-style: italic;
-  font-size: 0.75rem;
-  color: rgba(44,31,14,0.75);
-  margin: 0 0 0.35rem;
-  line-height: 1.55;
-  background: rgba(255,252,245,0.85);
-  border: 1px solid rgba(184,160,80,0.35);
-  padding: 0.65rem 0.7rem;
+  font-size: 12px;
+  color: var(--ink-faint);
+  line-height: 1.4;
+  margin: 0 0 0.2rem;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .db-sidebar-quote-attr {
   font-family: 'DM Mono', monospace;
-  font-size: 0.58rem;
-  letter-spacing: 0.06em;
-  color: rgba(90,74,58,0.65);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
   margin: 0;
-  padding-left: 0.1rem;
+  padding: 0;
 }
 
 /* ── Main content ────────────────────────────────────────── */
