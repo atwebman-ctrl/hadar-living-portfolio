@@ -47,13 +47,12 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
     return Array.from(set).sort().reverse()
   }, [portfolio])
 
-  const { student, school, assessments, aiDrafts } = portfolio
+  const { student, assessments, aiDrafts } = portfolio
 
   return (
     <div className={layoutStyles.main}>
       <HeroSection
         student={student}
-        school={school}
         assessments={assessments}
         inviteButton={(role === 'admin' || role === 'teacher') ? <InviteParentButton studentId={studentId} /> : undefined}
       />

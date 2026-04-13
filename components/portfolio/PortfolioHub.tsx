@@ -81,6 +81,47 @@ function buildGallerySummary(p: PortfolioData) {
   return { stats, filled, total, thumbUrl }
 }
 
+// ── Dynamic subtitle builders ─────────────────────────────────
+
+function academicsSubtitle(p: PortfolioData): string | null {
+  const parts: string[] = []
+  const m = latestAssessment(p.assessments, 'maps_math')
+  if (m?.percentile != null) parts.push(`Math ${ordinal(Math.round(m.percentile))} percentile`)
+  const avantTypes = ['avant_speaking','avant_reading','avant_listening','avant_writing'] as const
+  const scores = avantTypes
+    .map((t) => latestAssessment(p.assessments, t))
+    .filter((a): a is Assessment => a?.score != null)
+    .map((a) => a.score!)
+  if (scores.length) {
+    const avg = scores.reduce((s, n) => s + n, 0) / scores.length
+    parts.push(`Hebrew ${avg.toFixed(2)} composite`)
+  }
+  return parts.length ? `Latest: ${parts.join(' · ')}` : null
+}
+
+function studentWorkSubtitle(p: PortfolioData): string | null {
+  const parts: string[] = []
+  if (p.readings.length) {
+    const latest = [...p.readings].sort((a, b) => {
+      const da = a.dateFinished ?? a.createdAt
+      const db = b.dateFinished ?? b.createdAt
+      return db.localeCompare(da)
+    })[0]
+    if (latest) parts.push(`Latest book: ${latest.title}`)
+  }
+  if (p.teacherNotes.length) {
+    parts.push(`${p.teacherNotes.length} teacher note${p.teacherNotes.length !== 1 ? 's' : ''}`)
+  }
+  return parts.length ? parts.join(' · ') : null
+}
+
+function gallerySubtitle(p: PortfolioData): string | null {
+  const parts: string[] = []
+  if (p.photos.length) parts.push(`${p.photos.length} photo${p.photos.length !== 1 ? 's' : ''}`)
+  if (p.parentUploads.length) parts.push(`${p.parentUploads.length} parent upload${p.parentUploads.length !== 1 ? 's' : ''}`)
+  return parts.length ? parts.join(' · ') : null
+}
+
 // ── GroupCard ─────────────────────────────────────────────────
 
 interface GroupCardProps {
@@ -133,6 +174,10 @@ export default function PortfolioHub({ portfolio, studentId }: Props) {
   const work      = buildStudentWorkSummary(portfolio)
   const gallery   = buildGallerySummary(portfolio)
 
+  const academicsSub = academicsSubtitle(portfolio) ?? 'Test scores, Hebrew immersion, and curriculum progress'
+  const workSub      = studentWorkSubtitle(portfolio) ?? 'Books, writing, speeches, handwriting, notes, and character'
+  const gallerySub   = gallerySubtitle(portfolio) ?? 'Photos and uploads from school and home'
+
   return (
     <div style={{ padding: '1.5rem 2.5rem 3rem' }}>
 
@@ -146,7 +191,7 @@ export default function PortfolioHub({ portfolio, studentId }: Props) {
       <div className={styles.hubGroupGrid}>
         <GroupCard
           title="Academics"
-          subtitle="Test scores, Hebrew immersion, and curriculum progress"
+          subtitle={academicsSub}
           groupSlug="academics"
           stats={academics.stats}
           filled={academics.filled}
@@ -155,7 +200,7 @@ export default function PortfolioHub({ portfolio, studentId }: Props) {
         />
         <GroupCard
           title="Student Work"
-          subtitle="Books, writing, speeches, handwriting, notes, and character"
+          subtitle={workSub}
           groupSlug="student-work"
           stats={work.stats}
           filled={work.filled}
@@ -164,7 +209,7 @@ export default function PortfolioHub({ portfolio, studentId }: Props) {
         />
         <GroupCard
           title="Gallery"
-          subtitle="Photos and uploads from school and home"
+          subtitle={gallerySub}
           groupSlug="gallery"
           stats={gallery.stats}
           filled={gallery.filled}
@@ -178,6 +223,44 @@ export default function PortfolioHub({ portfolio, studentId }: Props) {
         <Link href={`/portfolio/${studentId}/full`} className={styles.hubFullBtn}>
           View Full Portfolio →
         </Link>
+      </div>
+
+      <div style={{ textAlign: 'center', padding: '4rem 2rem 3rem', opacity: 0.25 }}>
+        {portfolio.school.logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={portfolio.school.logoUrl}
+            alt={portfolio.school.name}
+            style={{ maxHeight: 80, marginBottom: '1rem', opacity: 0.6 }}
+          />
+        ) : (
+          <div style={{
+            width: 72, height: 72, borderRadius: '50%', margin: '0 auto 1rem',
+            border: '1px solid var(--rule)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'var(--font-heading)', fontSize: '1.5rem', color: 'var(--ink-faint)',
+          }}>
+            {portfolio.school.name.charAt(0)}
+          </div>
+        )}
+        <p style={{
+          fontFamily: "'Cormorant Garamond', Georgia, serif",
+          fontSize: '1.1rem',
+          fontStyle: 'italic',
+          color: 'var(--ink-faint)',
+          margin: '0 0 0.25rem',
+        }}>
+          {portfolio.school.name}
+        </p>
+        <p style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '8px',
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: 'var(--ink-faint)',
+        }}>
+          Living Portfolio
+        </p>
       </div>
     </div>
   )

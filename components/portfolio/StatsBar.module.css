@@ -11,7 +11,7 @@
   align-items: center;
 }
 .statsBarCell { padding: 0.5rem 1.5rem; border-left: 2px solid var(--gold); }
-.lbl { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .12em; color: var(--ink-faint); text-transform: uppercase; margin-bottom: 4px; }
+.lbl { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .12em; color: var(--ink-faint); text-transform: uppercase; margin-bottom: 4px; }
 .val { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--navy); line-height: 1; margin-bottom: 2px; }
 .gold { color: var(--gold); }
 .ctx { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--ink-faint); }

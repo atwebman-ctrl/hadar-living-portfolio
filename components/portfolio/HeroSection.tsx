@@ -1,5 +1,5 @@
 import type React from 'react'
-import type { Student, SchoolConfig, Assessment } from '@/lib/types'
+import type { Student, Assessment } from '@/lib/types'
 import { ordinal, latestAssessment } from '@/lib/utils'
 import heroStyles from './HeroSection.module.css'
 import sbStyles from './StatsBar.module.css'
@@ -8,7 +8,6 @@ import sbStyles from './StatsBar.module.css'
 
 interface HeroProps {
   student?:      Student
-  school?:       SchoolConfig
   assessments?:  Assessment[]
   compact?:      boolean
   inviteButton?: React.ReactNode
@@ -21,8 +20,6 @@ interface Metric { lbl: string; val: string; gold: boolean; ctx: string }
 const DEMO = {
   firstName:  'Athena',
   lastName:   'Lonsdale',
-  schoolName: 'Hadar Jewish Classical Academy',
-  heroSub:    'Age 8\u00a0·\u00a0Enrolled since 1st Grade\u00a0·\u00a0Hadar Jewish Classical Academy',
   summary:    null as string | null,
 }
 
@@ -31,7 +28,9 @@ const DEMO = {
 function shortTerm(term: string): string {
   const [season = '', year = ''] = term.split(' ')
   const mon: Record<string, string> = { Fall: 'Sep', Winter: 'Jan', Spring: 'Apr' }
-  return `${mon[season] ?? season} '${year.slice(2)}`
+  const monAbbr = mon[season] ?? season
+  const yy = year.length >= 2 ? year.slice(-2) : ''
+  return yy ? `${monAbbr} '${yy}` : monAbbr
 }
 
 function deriveMetrics(assessments: Assessment[]): Metric[] {
@@ -133,12 +132,10 @@ export function StatsBar({ assessments, years, selectedYear, onYearChange }: Sta
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 
-export default function HeroSection({ student, school, compact, inviteButton }: HeroProps) {
+export default function HeroSection({ student, compact, inviteButton }: HeroProps) {
   const firstName  = student?.firstName ?? DEMO.firstName
   const lastName   = student?.lastName  ?? DEMO.lastName
-  const schoolName = school?.name       ?? DEMO.schoolName
   const summary    = student?.summary   ?? DEMO.summary
-  const heroSub    = student ? schoolName : DEMO.heroSub
   const initials   = `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase()
   const photoUrl   = student?.profilePhotoPath
     ? `${SUPABASE_URL}/storage/v1/object/public/portfolio-assets/${student.profilePhotoPath}`
@@ -157,7 +154,6 @@ export default function HeroSection({ student, school, compact, inviteButton }: 
         {summary && <p className={heroStyles.heroSummary}>{summary}</p>}
         {inviteButton && <div style={{ marginTop: '0.75rem' }}>{inviteButton}</div>}
       </div>
-      <div className={heroStyles.heroSchoolBadge}>{heroSub}</div>
     </div>
   )
 }
