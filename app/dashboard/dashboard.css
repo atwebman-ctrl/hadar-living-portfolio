@@ -18,90 +18,47 @@
   z-index: 10;
 }
 
-/* ── Two-column layout ───────────────────────────────────── */
-.db-inner-layout {
-  display: flex;
-  flex: 1;
-  align-items: stretch;
-}
-
-/* ── Sidebar ─────────────────────────────────────────────── */
-.db-sidebar {
-  width: 200px;
-  min-width: 200px;
-  background: #1E3A5F;
-  border-right: 1px solid rgba(184,160,80,0.2);
-  padding: 1.5rem 1rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
-  box-sizing: border-box;
-}
-
-.db-sidebar-heading {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: #F5EFE0;
-  margin: 0 0 0.85rem;
-  letter-spacing: 0.02em;
-  padding-bottom: 0.65rem;
-  border-bottom: 1px solid rgba(184,160,80,0.3);
-}
-
-.db-nav-item {
-  display: flex;
+.db-header-icon-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.45rem 0.6rem;
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 0.875rem;
-  color: rgba(255,255,255,0.7);
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: 1px solid rgba(184,160,80,0.35);
+  color: rgba(245,239,224,0.78);
   cursor: pointer;
-  border-left: 2px solid transparent;
-  margin-bottom: 0.1rem;
-  border-radius: 0;
-  transition: background 0.15s ease, color 0.15s ease;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
-.db-nav-item:hover {
-  background: rgba(255,255,255,0.07);
+.db-header-icon-btn:hover {
+  background: rgba(184,160,80,0.12);
   color: #F5EFE0;
 }
-
-.db-nav-item--active {
-  border-left-color: #B8A050;
-  background: rgba(184,160,80,0.12);
+.db-header-icon-btn[data-active="true"] {
+  background: rgba(184,160,80,0.22);
+  border-color: #B8A050;
   color: #ffffff;
-  font-weight: 600;
 }
 
-.db-nav-icon {
-  font-size: 0.85rem;
-  line-height: 1;
-  opacity: 0.8;
-}
-
+/* ── Quote (fixed, bottom-left of viewport) ──────────────── */
 .db-sidebar-quote {
   position: fixed;
   bottom: 1.5rem;
   left: 1.5rem;
   z-index: 10;
-  width: calc(200px - 3rem);
+  max-width: 11rem;
 }
 
 .db-sidebar-quote-text {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-style: italic;
   font-size: 0.75rem;
-  color: rgba(245,239,224,0.8);
+  color: rgba(44,31,14,0.75);
   margin: 0 0 0.35rem;
   line-height: 1.55;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(184,160,80,0.25);
+  background: rgba(255,252,245,0.85);
+  border: 1px solid rgba(184,160,80,0.35);
   padding: 0.65rem 0.7rem;
 }
 
@@ -109,17 +66,9 @@
   font-family: 'DM Mono', monospace;
   font-size: 0.58rem;
   letter-spacing: 0.06em;
-  color: rgba(245,239,224,0.45);
+  color: rgba(90,74,58,0.65);
   margin: 0;
   padding-left: 0.1rem;
-}
-
-/* ── Content area ────────────────────────────────────────── */
-.db-content-area {
-  flex: 1;
-  position: relative;
-  min-width: 0;
-  background: #F5F0E3;
 }
 
 /* ── Main content ────────────────────────────────────────── */
@@ -127,44 +76,60 @@
   position: relative;
   z-index: 1;
   padding: 2rem;
+  flex: 1;
+  min-width: 0;
 }
 
-/* ── Registry heading ────────────────────────────────────── */
-.db-official-badge {
+/* ── Toolbar (grade pills + search + view toggle) ────────── */
+.db-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.db-toolbar .db-pills {
+  margin-bottom: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.db-toolbar-search {
+  flex: 0 0 auto;
+  width: 250px;
+  max-width: 100%;
+}
+.db-toolbar-search .db-search {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.95rem;
+}
+.db-view-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  border: 1px solid rgba(184,160,80,0.55);
+  background: rgba(255,252,245,0.8);
+}
+.db-view-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  font-family: 'DM Mono', monospace;
-  font-size: 0.58rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #6b5228;
-  background: rgba(184,160,80,0.12);
-  border: 1px solid rgba(184,160,80,0.45);
-  padding: 0.2rem 0.65rem;
-  margin-bottom: 0.6rem;
-}
-.db-registry-title {
-  font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
-  font-style: italic;
-  font-size: 2rem;
-  color: #3d2b1f;
-  margin: 0 0 0.4rem;
-  line-height: 1.15;
-}
-.db-registry-rule {
-  height: 1px;
-  background: rgba(184,160,80,0.45);
-  margin-bottom: 0.65rem;
-  max-width: 520px;
-}
-.db-registry-sub {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 0.95rem;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
   color: #5a4a3a;
-  margin: 0 0 1.25rem;
-  max-width: 500px;
-  line-height: 1.55;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.db-view-btn + .db-view-btn {
+  border-left: 1px solid rgba(184,160,80,0.55);
+}
+.db-view-btn:hover {
+  background: rgba(184,160,80,0.12);
+}
+.db-view-btn[data-active="true"] {
+  background: #B8A050;
+  color: #F7F4EE;
 }
 
 /* ── Grade filter pills ──────────────────────────────────── */
@@ -192,11 +157,7 @@
   border-color: #9a8540;
 }
 
-/* ── Search bar ──────────────────────────────────────────── */
-.db-search-wrap {
-  margin-bottom: 2rem;
-  max-width: 380px;
-}
+/* ── Search input ────────────────────────────────────────── */
 .db-search {
   width: 100%;
   padding: 0.55rem 0.9rem;
@@ -265,9 +226,6 @@
 
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .db-sidebar { display: none; }
   .db-sidebar-quote { display: none; }
-}
-@media (max-width: 640px) {
-  .db-registry-title { font-size: 1.5rem; }
+  .db-toolbar-search { width: 100%; }
 }

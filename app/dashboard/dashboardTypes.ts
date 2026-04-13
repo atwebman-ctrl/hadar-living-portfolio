@@ -1,1 +1,1 @@
-export type DashboardView = 'roster' | 'by-grade' | 'year-in-review' | 'settings'
+export type DashboardView = 'roster' | 'year-in-review' | 'settings'

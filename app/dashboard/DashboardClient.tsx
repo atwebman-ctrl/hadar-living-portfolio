@@ -4,7 +4,7 @@
 // app/dashboard/DashboardClient.tsx
 //
 // Client wrapper for the dashboard. Owns the active-view state
-// and orchestrates sidebar + main content rendering.
+// and renders the header + full-width main content.
 // The server component (page.tsx) fetches data and passes it in.
 // ============================================================
 
@@ -13,9 +13,7 @@ import type { Student } from '@/lib/types'
 import type { DashboardView } from './dashboardTypes'
 import { PageHeader } from './DashboardUI'
 import AddStudentForm from './AddStudentForm'
-import DashboardSidebar from './DashboardSidebar'
 import StudentGrid from './StudentGrid'
-import ByGradeView from '@/components/dashboard/ByGradeView'
 import YearInReviewView from '@/components/dashboard/YearInReviewView'
 import SettingsView from '@/components/dashboard/SettingsView'
 
@@ -30,25 +28,26 @@ export default function DashboardClient({ students, role, schoolName }: Props) {
 
   return (
     <>
-      <PageHeader schoolName={schoolName}>
+      <PageHeader
+        schoolName={schoolName}
+        activeView={activeView}
+        onViewChange={setActiveView}
+        role={role}
+      >
         <AddStudentForm />
       </PageHeader>
 
-      <div className="db-inner-layout">
-        <DashboardSidebar
-          activeView={activeView}
-          onViewChange={setActiveView}
-          role={role}
-        />
+      <main className="db-main">
+        {activeView === 'roster'         && <StudentGrid students={students} role={role} />}
+        {activeView === 'year-in-review' && <YearInReviewView />}
+        {activeView === 'settings'       && <SettingsView role={role} />}
+      </main>
 
-        <div className="db-content-area">
-          <main className="db-main">
-            {activeView === 'roster'         && <StudentGrid students={students} role={role} />}
-            {activeView === 'by-grade'       && <ByGradeView students={students} role={role} />}
-            {activeView === 'year-in-review' && <YearInReviewView />}
-            {activeView === 'settings'       && <SettingsView role={role} />}
-          </main>
-        </div>
+      <div className="db-sidebar-quote">
+        <p className="db-sidebar-quote-text">
+          &ldquo;Man is wise only while in search of wisdom.&rdquo;
+        </p>
+        <p className="db-sidebar-quote-attr">— {schoolName || 'Academy'}</p>
       </div>
     </>
   )
