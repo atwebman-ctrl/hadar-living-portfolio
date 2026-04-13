@@ -88,7 +88,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/demo/page.tsx` — Demo portfolio (server component, password-gated)
 - `app/demo/DemoPortfolio.tsx` — Demo portfolio client component
 - `app/demo/DemoGate.tsx` — Password form component
-- `app/demo/portfolio.css` — Demo portfolio styles (⚠️ CSS variables not yet unified with landing styles — Sprint 1.5 remaining task); contains CSS for: `.hub-group-card`, `.stats-bar` / `.stats-bar-cell`, `.group-tab-bar` / `.group-tab`, `.sidenav-group-row`, `.hero-school-badge`
+- `app/demo/portfolio.css` — Demo portfolio styles (⚠️ CSS variables not yet unified with landing styles — Sprint 1.5 remaining task); contains CSS for: `.hub-group-card`, `.stats-bar` / `.stats-bar-cell`, `.group-tab-bar` / `.group-tab`, `.sidenav-group-row`
 - `app/layout.tsx` — Root layout, ClerkProvider, font loading
 - `app/globals.css` — Global styles
 - `app/api/demo/auth/route.ts` — Demo password gate API route
@@ -97,6 +97,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `components/portfolio/YearSelector.tsx` — Year-filter pill bar; used in GroupDetailClient and SectionDetailClient (NOT in HubShell — year pills are merged into StatsBar there)
 - `components/portfolio/HeroSection.tsx` — Identity strip (photo, name); exports `StatsBar` named export (metrics ribbon + year pills, `justify-content: space-between`); no school badge (sidebar shows school name); photo/initials circle is 96px; padding `1.25rem 2.5rem`
 - `components/portfolio/HubShell.tsx` — `'use client'` hub wrapper; owns `selectedYear` + `years` state; passes year props to `<StatsBar>` (no standalone YearSelector); renders 3-group `<PortfolioHub>` below
+- `components/portfolio/PortfolioHub.tsx` — 3 elegant group cards (Academics, Student Work, Gallery); each links to `/portfolio/[studentId]/group/[slug]`. Subtitle helpers `academicsSubtitle`/`studentWorkSubtitle`/`gallerySubtitle` return dynamic summaries when data exists (latest Math percentile + Hebrew composite / latest book + teacher-note count / photo + parent-upload counts); static copy is the fallback. Below the "View Full Portfolio →" button sits a faded school-branding block that renders `school.logoUrl` if present, otherwise a first-initial circle, followed by the italic school name and "Living Portfolio" caption.
 - `components/portfolio/SideNav.tsx` — Sidebar nav with expandable groups; group headers link to `/group/[slug]`; chevron button independently toggles sub-items; sub-items link to `/group/[slug]?tab=[section-slug]`; accepts `activeGroup` prop
 - `components/portfolio/RevealObserver.tsx` — IntersectionObserver wrapper; fires CSS reveal animations when sections enter viewport. Required on real portfolio pages — sections were invisible without it (bug fixed)
 - `components/portfolio/SubjectScoreRows.tsx` — Compact RIT/percentile score table; accepts `ScoreDisplayRow[]`; used by IntellectualArc for Math and ELA sub-sections
