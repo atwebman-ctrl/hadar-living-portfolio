@@ -169,7 +169,7 @@ export default function HeroSection({ student, school, compact, inviteButton }: 
       }}>
         {school?.logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={school.logoUrl} alt={school.name} style={{ maxHeight: 56, marginBottom: '0.4rem' }} />
+          <img src={school.logoUrl} alt={school.name} style={{ maxHeight: 56, marginBottom: '0.4rem', mixBlendMode: 'screen' }} />
         ) : (
           <div style={{
             width: 48, height: 48, borderRadius: '50%',

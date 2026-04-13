@@ -86,7 +86,7 @@ export function PageHeader({
           <img
             src={schoolLogoUrl}
             alt=""
-            style={{ maxHeight: 28, filter: 'brightness(10)', opacity: 0.9 }}
+            style={{ maxHeight: 28, mixBlendMode: 'screen', opacity: 0.9 }}
           />
         )}
         <span
