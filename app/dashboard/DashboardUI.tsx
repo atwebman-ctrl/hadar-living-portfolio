@@ -164,8 +164,11 @@ export function StudentCard({ student, role }: { student: Student; role: string 
   const photoUrl   = buildPhotoUrl(student.profilePhotoPath ?? null)
 
   const metaParts: string[] = [formatGrade(student.gradeLevel), student.academicYear]
-  if (student.gender === 'boy')  metaParts.push('Boy')
-  if (student.gender === 'girl') metaParts.push('Girl')
+
+  // Future sprint: populate from bulk-fetched assessments.
+  // Only chips with actual numeric values should be pushed here;
+  // empty array → the chip row is skipped entirely below.
+  const statChips: { label: string; value: string }[] = []
 
   return (
     <article className="db-student-card">
@@ -190,15 +193,13 @@ export function StudentCard({ student, role }: { student: Student; role: string 
           </div>
         </div>
 
-        {/*
-          Stat chips — NOTE: assessment data (MAP math, Hebrew composite)
-          is not loaded on the dashboard today; placeholders until a future
-          sprint bulk-fetches latest assessments per student.
-        */}
-        <div className="db-card-chips">
-          <span className="db-card-chip">Math: —</span>
-          <span className="db-card-chip">Heb: —</span>
-        </div>
+        {statChips.length > 0 && (
+          <div className="db-card-chips">
+            {statChips.map((c) => (
+              <span key={c.label} className="db-card-chip">{c.label}: {c.value}</span>
+            ))}
+          </div>
+        )}
 
         <span className="db-card-view">View Portfolio →</span>
       </Link>
