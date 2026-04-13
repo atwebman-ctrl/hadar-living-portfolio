@@ -10,6 +10,7 @@ import InlineReadingForm from '@/components/portfolio/InlineReadingForm'
 import BookDetail from '@/components/portfolio/BookDetail'
 import ReadingForm from '@/components/portfolio/ReadingForm'
 import ClassBookshelf from '@/components/portfolio/ClassBookshelf'
+import { SPINE_PALETTE, SPINE_HEIGHTS } from '@/components/portfolio/spinePalette'
 import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modalStyles'
 import s from './sections.module.css'
 
@@ -20,15 +21,6 @@ interface Props {
   role?:          UserRole
   existingDraft?: AiDraft
 }
-
-const SPINE_PALETTE = [
-  { color: '#1B3A6B', text: '#E8EDF5' }, { color: '#8B4A2D', text: '#F5EDE8' },
-  { color: '#2E4A3B', text: '#E8F0EC' }, { color: '#5E7FA0', text: '#EBF0F5' },
-  { color: '#7B5EA0', text: '#F0EBF5' }, { color: '#4A7A5E', text: '#E8F2ED' },
-  { color: '#A07B3E', text: '#F5EEE0' }, { color: '#6B2D2D', text: '#F5E8E8' },
-  { color: '#4A6B8A', text: '#E8EFF5' }, { color: '#8A8074', text: '#F5F3F0' },
-]
-const SPINE_HEIGHTS = [160, 150, 155, 148, 158, 144, 152, 162, 156, 145]
 
 function buildDraftContext(readings: Reading[], firstName: string | null) {
   return {
@@ -66,9 +58,9 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
 
   const books = readingsData.map((r) => ({ title: r.title, done: r.completed }))
   const completedCount = books.filter((b) => b.done).length
-  const description = isDemo
-    ? "Athena\u2019s Grade 3 reading list \u2014 twelve of thirteen titles completed, from Lewis Carroll to C. S. Lewis, with the d\u2019Aulaires\u2019 Greek Myths as the year\u2019s anchor reference text."
-    : `${completedCount} of ${books.length} title${books.length !== 1 ? 's' : ''} completed.`
+  const description = books.length > 0
+    ? `${completedCount} of ${books.length} title${books.length !== 1 ? 's' : ''} completed.`
+    : 'No readings recorded yet.'
 
   const draftContext = (studentId && role && role !== 'parent' && isLive)
     ? buildDraftContext(readings!, studentName ?? null) : null

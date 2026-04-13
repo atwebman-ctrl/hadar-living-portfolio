@@ -6,59 +6,61 @@
 // Class-wide bookshelf: all books read by students in the same
 // grade_level and academic_year. Deduplicates by title; shows
 // a count badge when multiple students read the same book.
-// Each student gets a consistent spine color via hash.
+// Clicking a spine opens a BookDetail-style panel with cover,
+// author, page count, status, and the list of readers.
 // ============================================================
 
 import { useEffect, useState } from 'react'
 import { formatGrade } from '@/lib/gradeLevel'
+import { BookCoverImage } from '@/components/portfolio/BookDetail'
+import { SPINE_PALETTE, SPINE_HEIGHTS, paletteIndexFor } from '@/components/portfolio/spinePalette'
 import s from './sections.module.css'
 
 // ── Types ─────────────────────────────────────────────────────
 
 interface ClassReading {
   id: string; studentId: string; studentFirstName: string
-  title: string; author: string | null; completed: boolean; studentRating: number | null
+  title: string; author: string | null; completed: boolean
+  studentRating: number | null; pageCount: number | null
 }
 
 interface ApiResponse {
   gradeLevel: string; academicYear: string; studentCount: number; readings: ClassReading[]
 }
 
+interface Reader { studentId: string; name: string; rating: number | null; completed: boolean }
+
 interface BookEntry {
-  title: string; author: string | null; primaryStudentId: string
-  readers: { studentId: string; name: string; rating: number | null }[]
+  title: string; author: string | null; pageCount: number | null
+  primaryStudentId: string; readers: Reader[]; anyCompleted: boolean
 }
 
-// ── Spine palette ─────────────────────────────────────────────
-
-const COLORS = [
-  '#1B3A6B','#8B4A2D','#2E4A3B','#5E7FA0','#7B5EA0',
-  '#4A7A5E','#A07B3E','#6B2D2D','#4A6B8A','#8A8074',
-  '#3D6B5E','#6B5E3D','#5E3D6B','#3D5E6B','#6B3D5E',
-]
-const TEXTS = [
-  '#E8EDF5','#F5EDE8','#E8F0EC','#EBF0F5','#F0EBF5',
-  '#E8F2ED','#F5EEE0','#F5E8E8','#E8EFF5','#F5F3F0',
-  '#ECF0EE','#F0EDEC','#EDEAF0','#EAF0F0','#F0EAF0',
-]
-const HEIGHTS = [160, 150, 155, 148, 158, 144, 152, 162, 156, 145]
-
-function colorIdx(studentId: string): number {
-  let h = 0
-  for (let i = 0; i < studentId.length; i++) h = (h * 31 + studentId.charCodeAt(i)) & 0xffff
-  return h % COLORS.length
-}
+// ── Helpers ───────────────────────────────────────────────────
 
 function deduplicate(readings: ClassReading[]): BookEntry[] {
   const map = new Map<string, BookEntry>()
   for (const r of readings) {
     const key = r.title.toLowerCase().trim()
     if (!map.has(key)) {
-      map.set(key, { title: r.title, author: r.author, primaryStudentId: r.studentId, readers: [] })
+      map.set(key, {
+        title: r.title, author: r.author, pageCount: r.pageCount,
+        primaryStudentId: r.studentId, readers: [], anyCompleted: false,
+      })
     }
-    map.get(key)!.readers.push({ studentId: r.studentId, name: r.studentFirstName, rating: r.studentRating })
+    const entry = map.get(key)!
+    entry.readers.push({ studentId: r.studentId, name: r.studentFirstName, rating: r.studentRating, completed: r.completed })
+    if (r.completed) entry.anyCompleted = true
+    if (r.pageCount != null && entry.pageCount == null) entry.pageCount = r.pageCount
   }
   return Array.from(map.values())
+}
+
+function MiniStars({ value }: { value: number }) {
+  return (
+    <span style={{ color: 'var(--gold)', fontSize: '0.8rem', letterSpacing: '0.05em' }} aria-label={`${value} out of 5 stars`}>
+      {'★'.repeat(value)}<span style={{ opacity: 0.35 }}>{'☆'.repeat(Math.max(0, 5 - value))}</span>
+    </span>
+  )
 }
 
 // ── Component ─────────────────────────────────────────────────
@@ -96,33 +98,33 @@ export default function ClassBookshelf({ studentId }: Props) {
     </div>
   )
 
-  const books      = deduplicate(data.readings)
-  const mostPop    = books.reduce((b, a) => a.readers.length > b.readers.length ? a : b)
-  const gradeName  = formatGrade(data.gradeLevel)
-  const openBook   = openTitle ? books.find((b) => b.title === openTitle) ?? null : null
+  const books     = deduplicate(data.readings)
+  const mostPop   = books.reduce((b, a) => a.readers.length > b.readers.length ? a : b)
+  const gradeName = formatGrade(data.gradeLevel)
+  const openBook  = openTitle ? books.find((b) => b.title === openTitle) ?? null : null
+  const openIdx   = openTitle ? books.findIndex((b) => b.title === openTitle) : -1
+  const openSpine = openIdx >= 0 ? SPINE_PALETTE[paletteIndexFor(books[openIdx].primaryStudentId)] : null
 
   return (
     <div>
       <div className={s.bookshelf}>
         <div className={s.booksRow}>
           {books.map((book, i) => {
-            const ci    = colorIdx(book.primaryStudentId)
-            const color = COLORS[ci]
-            const text  = TEXTS[ci]
-            const h     = HEIGHTS[i % HEIGHTS.length]
-            const isOpen = openTitle === book.title
+            const palette = SPINE_PALETTE[paletteIndexFor(book.primaryStudentId)]
+            const height  = SPINE_HEIGHTS[i % SPINE_HEIGHTS.length]
+            const isOpen  = openTitle === book.title
             return (
               <div key={book.title} style={{ position: 'relative' }}>
                 <div
-                  className={`${s.book} ${s.bookComplete}`}
-                  style={{ background: color, color: text, height: h, width: 36, cursor: 'pointer',
+                  className={`${s.book} ${book.anyCompleted ? s.bookComplete : s.bookPending}`}
+                  style={{ background: palette.color, color: palette.text, height, width: 36, cursor: 'pointer',
                     outline: isOpen ? '2px solid #B8A050' : 'none', outlineOffset: '2px', transition: 'outline 0.15s ease' }}
                   onClick={() => setOpenTitle(isOpen ? null : book.title)}
                   title={`${book.title} — click for details`}
                   role="button" aria-expanded={isOpen}
                 >
                   <span className={s.bookTitle}>{book.title}</span>
-                  <span className={s.bookDoneLabel}>✓</span>
+                  <span className={s.bookDoneLabel}>{book.anyCompleted ? '\u2713' : '\u2026'}</span>
                 </div>
                 {book.readers.length > 1 && (
                   <div style={{ position: 'absolute', top: -6, right: -6, background: '#B8A050', color: 'white',
@@ -136,31 +138,50 @@ export default function ClassBookshelf({ studentId }: Props) {
           })}
         </div>
 
-        {openBook && (
+        {openBook && openSpine && (
           <div style={{ borderTop: '1px solid var(--rule)', borderRight: '1px solid var(--rule)',
-            borderBottom: '1px solid var(--rule)', borderLeft: `3px solid ${COLORS[colorIdx(openBook.primaryStudentId)]}`,
-            background: 'var(--cream)', padding: '1rem 1.25rem', marginTop: '1rem' }}>
-            <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', color: 'var(--navy)', marginBottom: '0.25rem' }}>
-              {openBook.title}
-            </div>
-            {openBook.author && (
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--ink-faint)', marginBottom: '0.75rem' }}>
-                {openBook.author}
+            borderBottom: '1px solid var(--rule)', borderLeft: `3px solid ${openSpine.color}`,
+            background: 'var(--cream)', padding: '1.5rem 1.75rem', marginTop: '1rem',
+            display: 'flex', gap: '1.75rem', alignItems: 'flex-start' }}>
+
+            <BookCoverImage title={openBook.title} />
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, minWidth: 0 }}>
+              <div>
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', color: 'var(--navy)', margin: 0, lineHeight: 1.25 }}>
+                  {openBook.title}
+                </h3>
+                {openBook.author && (
+                  <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', color: 'var(--ink-light)', fontStyle: 'italic', marginTop: '0.25rem' }}>
+                    by {openBook.author}
+                  </div>
+                )}
               </div>
-            )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              {openBook.readers.map((r) => (
-                <div key={r.studentId} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--ink-mid)', minWidth: 90 }}>
-                    {r.name}
-                  </span>
-                  {r.rating != null && (
-                    <span style={{ color: '#B8A050', fontSize: '0.8rem', letterSpacing: 1 }}>
-                      {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
-                    </span>
-                  )}
+
+              <div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.5rem' }}>
+                  Read by {openBook.readers.length} student{openBook.readers.length !== 1 ? 's' : ''}
                 </div>
-              ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  {openBook.readers.map((r) => (
+                    <div key={r.studentId} style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', fontFamily: 'var(--font-body)', fontSize: '0.88rem' }}>
+                      <span style={{ color: 'var(--ink)', minWidth: 110 }}>{r.name}</span>
+                      {r.rating != null && <MiniStars value={r.rating} />}
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.56rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: r.completed ? 'var(--navy)' : 'var(--ink-faint)' }}>
+                        {r.completed ? 'Completed' : 'In Progress'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.08em', color: 'var(--ink-faint)', textTransform: 'uppercase', paddingTop: '0.5rem', borderTop: '1px dotted var(--rule)' }}>
+                {[
+                  openBook.pageCount != null ? `${openBook.pageCount} pages` : null,
+                  openBook.anyCompleted ? 'Completed by class' : 'In Progress',
+                  data.academicYear,
+                ].filter(Boolean).join('  \u00b7  ')}
+              </div>
             </div>
           </div>
         )}

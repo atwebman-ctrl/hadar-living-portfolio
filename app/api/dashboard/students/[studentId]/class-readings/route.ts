@@ -62,7 +62,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
   // 3. Readings for those students in the matching academic_year
   const { data: rows, error: readingsErr } = await supabaseAdmin
     .from('readings')
-    .select('id, student_id, title, author, completed, student_rating, academic_year')
+    .select('id, student_id, title, author, completed, student_rating, page_count, academic_year')
     .eq('school_id', ctx.schoolId)
     .eq('academic_year', academic_year)
     .in('student_id', classmateIds)
@@ -82,6 +82,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
     author:           r.author as string | null,
     completed:        r.completed as boolean,
     studentRating:    r.student_rating as number | null,
+    pageCount:        r.page_count as number | null,
     academicYear:     r.academic_year as string,
   }))
 
