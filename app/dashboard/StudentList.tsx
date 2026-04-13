@@ -79,7 +79,7 @@ export default function StudentList({ students }: Props) {
               <tr key={s.id}>
                 <td className="db-list-col-photo">
                   {photoUrl ? (
-                    <img src={photoUrl} alt="" className="db-list-photo" />
+                    <img src={photoUrl} alt="" className="db-list-photo" width={40} height={40} />
                   ) : (
                     <span className="db-list-photo db-list-photo--empty" aria-hidden="true" />
                   )}
