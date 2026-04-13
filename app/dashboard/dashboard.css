@@ -86,8 +86,11 @@
 }
 
 .db-sidebar-quote {
-  margin-top: auto;
-  padding-top: 1.25rem;
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 10;
+  width: calc(200px - 3rem);
 }
 
 .db-sidebar-quote-text {
@@ -263,6 +266,7 @@
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
   .db-sidebar { display: none; }
+  .db-sidebar-quote { display: none; }
 }
 @media (max-width: 640px) {
   .db-registry-title { font-size: 1.5rem; }
