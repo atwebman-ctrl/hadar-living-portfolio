@@ -81,15 +81,21 @@ export default async function DashboardPage() {
 
   const { data: schoolRow } = await supabaseAdmin
     .from('schools')
-    .select('name')
+    .select('name, logo_url')
     .eq('id', ctx.schoolId)
     .maybeSingle()
 
-  const schoolName = (schoolRow?.name as string | undefined) ?? ''
+  const schoolName    = (schoolRow?.name     as string | undefined) ?? ''
+  const schoolLogoUrl = (schoolRow?.logo_url as string | null | undefined) ?? null
 
   return (
     <div className="db-page">
-      <DashboardClient students={students} role={ctx.role} schoolName={schoolName} />
+      <DashboardClient
+        students={students}
+        role={ctx.role}
+        schoolName={schoolName}
+        schoolLogoUrl={schoolLogoUrl}
+      />
     </div>
   )
 }

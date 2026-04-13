@@ -17,18 +17,20 @@ import StudentGrid from './StudentGrid'
 import YearInReviewView from '@/components/dashboard/YearInReviewView'
 
 interface Props {
-  students:   Student[]
-  role:       string
-  schoolName: string
+  students:      Student[]
+  role:          string
+  schoolName:    string
+  schoolLogoUrl: string | null
 }
 
-export default function DashboardClient({ students, role, schoolName }: Props) {
+export default function DashboardClient({ students, role, schoolName, schoolLogoUrl }: Props) {
   const [activeView, setActiveView] = useState<DashboardView>('roster')
 
   return (
     <>
       <PageHeader
         schoolName={schoolName}
+        schoolLogoUrl={schoolLogoUrl}
         activeView={activeView}
         onViewChange={setActiveView}
         role={role}

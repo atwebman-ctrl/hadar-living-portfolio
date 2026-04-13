@@ -54,16 +54,18 @@ export function ParentPendingScreen() {
 
 export function PageHeader({
   schoolName,
+  schoolLogoUrl,
   activeView,
   onViewChange,
   role,
   children,
 }: {
-  schoolName:   string
-  activeView:   DashboardView
-  onViewChange: (view: DashboardView) => void
-  role:         string
-  children:     React.ReactNode
+  schoolName:     string
+  schoolLogoUrl?: string | null
+  activeView:     DashboardView
+  onViewChange:   (view: DashboardView) => void
+  role:           string
+  children:       React.ReactNode
 }) {
   const toggle = (view: DashboardView) =>
     onViewChange(activeView === view ? 'roster' : view)
@@ -78,18 +80,27 @@ export function PageHeader({
         justifyContent: 'space-between',
       }}
     >
-      <p
-        style={{
-          fontFamily:    'var(--font-mono)',
-          fontSize:      '0.72rem',
-          letterSpacing: '0.16em',
-          color:         GOLD,
-          textTransform: 'uppercase',
-          margin:        0,
-        }}
-      >
-        {schoolName}
-      </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {schoolLogoUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={schoolLogoUrl}
+            alt=""
+            style={{ maxHeight: 28, filter: 'brightness(10)', opacity: 0.9 }}
+          />
+        )}
+        <span
+          style={{
+            fontFamily:    'var(--font-mono)',
+            fontSize:      '0.72rem',
+            letterSpacing: '0.16em',
+            color:         GOLD,
+            textTransform: 'uppercase',
+          }}
+        >
+          {schoolName}
+        </span>
+      </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
         <HeaderIconButton
