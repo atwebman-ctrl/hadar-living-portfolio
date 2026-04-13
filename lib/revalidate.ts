@@ -19,3 +19,12 @@ import { revalidateTag } from 'next/cache'
 export function revalidatePortfolio(studentId: string): void {
   revalidateTag(`portfolio-${studentId}`, 'max')
 }
+
+/**
+ * Bust every cached portfolio within a school. Call after a
+ * school-level mutation (logo, theme, name) so all student
+ * portfolio pages pick up the new branding on next render.
+ */
+export function revalidateSchool(schoolId: string): void {
+  revalidateTag(`school-${schoolId}`, 'max')
+}

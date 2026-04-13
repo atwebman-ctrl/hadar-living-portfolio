@@ -129,14 +129,15 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies, 0004 Sprint 3 tables, 0005 parent_students, 0006 student archived_at, 0007 book_catalog, 0010 grade_level_enum, 0011 student_profile_fields (gender, date_of_birth, enrollment_status), 0012 data_foundation (audit columns, soft delete, academic_years, enrollment_records, class_assignments)
 - `design-reference/` — Target aesthetic HTML files (landing.html, hadar-portfolio.html)
 - `app/dashboard/page.tsx` — Teacher/admin student list; parent redirect (OR filter on parent_clerk_user_id + invited_email); server component
-- `app/dashboard/DashboardUI.tsx` — Presentational sub-components: OrgPickerScreen, ParentPendingScreen, PageHeader, StudentCard, EmptyState
+- `app/dashboard/DashboardUI.tsx` — Presentational sub-components: OrgPickerScreen, ParentPendingScreen, PageHeader, StudentCard, EmptyState. The header "Settings" gear is a `<Link href="/dashboard/settings">` (admin only); Year-in-Review is still a view toggle.
 - `app/dashboard/AddStudentForm.tsx` — Client component modal form; POSTs to /api/dashboard/students; gradeLevel is a `<select>` using `GRADE_SELECT_OPTIONS`
-- `app/dashboard/DashboardClient.tsx` — `'use client'` wrapper; owns `activeView: DashboardView` state; renders sidebar + conditional view components
+- `app/dashboard/DashboardClient.tsx` — `'use client'` wrapper; owns `activeView: DashboardView` state (`roster` | `year-in-review`); renders sidebar + StudentGrid/YearInReviewView
+- `app/dashboard/settings/page.tsx` — Server component; admin-only `/dashboard/settings` route; non-admin redirects to `/dashboard`; fetches `schools.id/name/logo_url` and hands them to `SettingsUI`
+- `app/dashboard/settings/SettingsUI.tsx` — `'use client'` UI for school settings; "School Identity" section with logo preview (120px) and Upload Logo button (POST /api/dashboard/settings/logo, 2 MB max, image/* only, optimistic update via local state); "School Name" section is display-only for now
 - `app/dashboard/DashboardSidebar.tsx` — Sidebar nav (Student Rosters, By Grade, Year in Review, Settings); Settings admin-only
 - `app/dashboard/StudentGrid.tsx` — Grade filter pills + search; groups/sorts via `formatGrade`/`sortGrades`
 - `components/dashboard/ByGradeView.tsx` — Collapsible per-grade sections; sorted with `sortGrades()`
 - `components/dashboard/YearInReviewView.tsx` — Placeholder
-- `components/dashboard/SettingsView.tsx` — Admin-only placeholder
 - `app/not-found.tsx` — Styled 404 page using design system tokens
 - `app/admin/page.tsx` — Admin-only school settings overview; Sprint 3 placeholders for Teachers + Theme
 - `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio hub (server component); renders HubShell with 3 group cards
@@ -146,6 +147,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/api/ai/draft/route.ts` — POST: generate AI narrative draft via Claude Haiku; studentFirstName injected into system prompt; stores in ai_drafts; returns { draftId, text, sectionType }
 - `app/api/ai/drafts/[draftId]/route.ts` — PATCH: accept/reject/edit an AI draft; sets content_final, status, reviewed_by, reviewed_at
 - `app/api/dashboard/students/[studentId]/uploads/route.ts` — POST: multipart upload to portfolio-assets Supabase Storage; inserts into photos, handwriting_samples, or parent_uploads; role-gated (parent ownership check)
+- `app/api/dashboard/settings/logo/route.ts` — POST: admin-only multipart upload of the school logo to `portfolio-assets/{school_id}/logo.{ext}`; image/* only, 2 MB max, rate-limited 5/min per user; cleans up any prior extension in the folder; writes cache-busted public URL to `schools.logo_url`; calls `revalidateSchool(schoolId)` to bust every cached portfolio in that school. Vitest suite at `route.test.ts` covers admin happy path, auth/role rejection, non-image, file-too-large, and storage error.
 - `components/shared/AiDraftEditor.tsx` — Client component: view/edit/resolve AI draft; Accept, Edit & Accept, Reject buttons
 - `components/portfolio/AiNarrativePanel.tsx` — Generate button + inline AiDraftEditor; teacher/admin sees generate flow or resolved draft; parent sees accepted text only; wired into IntellectualArc ×2 (math_scores, english_scores), ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc
 - `components/shared/UploadButton.tsx` — Client component: hidden file input, XHR upload with progress bar, onSuccess/onError callbacks; wired into PhotoGallery, HandwritingSamples, ParentUploads

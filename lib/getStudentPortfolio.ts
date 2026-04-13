@@ -257,6 +257,6 @@ export function getStudentPortfolio(
   return unstable_cache(
     () => getStudentPortfolioUncached(studentId, schoolId),
     ['portfolio', studentId, schoolId],
-    { revalidate: 60, tags: [`portfolio-${studentId}`] },
+    { revalidate: 60, tags: [`portfolio-${studentId}`, `school-${schoolId}`] },
   )()
 }
