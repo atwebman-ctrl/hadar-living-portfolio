@@ -69,6 +69,21 @@ export default function StudentGrid({ students, role }: Props) {
         </div>
 
         <div className="db-toolbar-search">
+          <svg
+            className="db-search-icon"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
           <input
             type="search"
             className="db-search"
@@ -109,8 +124,13 @@ export default function StudentGrid({ students, role }: Props) {
         </div>
       </div>
 
+      <hr className="db-toolbar-rule" />
+
       {filtered.length === 0 ? (
-        <p className="db-no-results">No scholars match the current filters.</p>
+        <div className="db-empty-filter">
+          <p className="db-empty-filter-title">No scholars found</p>
+          <p className="db-empty-filter-hint">Try a different filter or add a new student</p>
+        </div>
       ) : viewMode === 'grid' ? (
         <div className="student-grid" style={{ display: 'grid', gap: '1.5rem' }}>
           {filtered.map((s) => <StudentCard key={s.id} student={s} role={role} />)}

@@ -16,7 +16,30 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  overflow: hidden;
 }
+.db-header::before,
+.db-header::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.db-header::before {
+  top: -140px;
+  right: -60px;
+  width: 260px;
+  height: 260px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.db-header::after {
+  bottom: -120px;
+  right: 120px;
+  width: 180px;
+  height: 180px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.db-header > * { position: relative; z-index: 1; }
 
 .db-header-icon-btn {
   display: inline-flex;
@@ -99,13 +122,22 @@
   min-width: 0;
 }
 .db-toolbar-search {
+  position: relative;
   flex: 0 0 auto;
   width: 250px;
   max-width: 100%;
 }
 .db-toolbar-search .db-search {
-  padding: 0.45rem 0.75rem;
+  padding: 0.45rem 0.75rem 0.45rem 2rem;
   font-size: 0.95rem;
+}
+.db-search-icon {
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8a7558;
+  pointer-events: none;
 }
 .db-view-toggle {
   display: inline-flex;
@@ -137,7 +169,7 @@
   color: #F7F4EE;
 }
 
-/* ── Grade filter pills ──────────────────────────────────── */
+/* ── Grade filter pills (mirrors portfolio YearSelector) ── */
 .db-pills {
   display: flex;
   flex-wrap: wrap;
@@ -145,18 +177,20 @@
   margin-bottom: 1rem;
 }
 .db-pill {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.25rem 0.75rem;
-  border: 1px solid rgba(184,160,80,0.55);
-  background: rgba(255,252,245,0.8);
-  color: #5a4a3a;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.875rem;
+  padding: 0.2rem 0.8rem;
+  border: 1px solid rgba(184,160,80,0.45);
+  background: transparent;
+  color: var(--ink-mid);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
-.db-pill--active {
+.db-pill:hover {
+  background: rgba(184,160,80,0.08);
+}
+.db-pill--active,
+.db-pill--active:hover {
   background: #B8A050;
   color: #F7F4EE;
   border-color: #9a8540;
@@ -177,7 +211,41 @@
 }
 .db-search::placeholder { color: #8a7558; font-style: italic; }
 .db-search:focus        { border-color: #B8A050; }
-.db-no-results          { font-family: 'EB Garamond', Georgia, serif; font-style: italic; font-size: 1rem; color: #8a7558; padding: 2rem 0; }
+
+/* ── Toolbar rule (gold section divider) ─────────────────── */
+.db-toolbar-rule {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgba(184,160,80,0) 0%,
+    rgba(184,160,80,0.45) 15%,
+    rgba(184,160,80,0.45) 85%,
+    rgba(184,160,80,0) 100%
+  );
+  border: none;
+  margin: 0 0 1.5rem;
+}
+
+/* ── Filter empty state ──────────────────────────────────── */
+.db-empty-filter {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+.db-empty-filter-title {
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: #5a4a3a;
+  margin: 0 0 0.65rem;
+}
+.db-empty-filter-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8a7558;
+  margin: 0;
+}
 
 /* ── Student grid ────────────────────────────────────────── */
 .student-grid {
@@ -394,14 +462,18 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1rem;
   letter-spacing: 0.04em;
-  color: #F7F4EE;
+  color: #ffffff;
   background: #B8A050;
   border: 1px solid #9a8540;
   padding: 0.55rem 1.4rem;
   cursor: pointer;
   transition: background 0.2s ease;
+  font-weight: 600;
 }
-.db-add-btn:hover { background: #9a8540; }
+.db-add-btn:hover {
+  background: #9a8540;
+  color: #ffffff;
+}
 
 /* ── List view ───────────────────────────────────────────── */
 .db-list-wrap {
