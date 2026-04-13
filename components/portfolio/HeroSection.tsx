@@ -26,10 +26,12 @@ const DEMO = {
 // ── Metric derivation (shared by StatsBar) ────────────────────
 
 function shortTerm(term: string): string {
-  const [season = '', year = ''] = term.split(' ')
+  const words = term.trim().split(/\s+/)
+  const season = words[0] ?? ''
+  const year = words[words.length - 1] ?? ''
   const mon: Record<string, string> = { Fall: 'Sep', Winter: 'Jan', Spring: 'Apr' }
   const monAbbr = mon[season] ?? season
-  const yy = year.length >= 2 ? year.slice(-2) : ''
+  const yy = /^\d+$/.test(year) && year.length >= 2 ? year.slice(-2) : ''
   return yy ? `${monAbbr} '${yy}` : monAbbr
 }
 
