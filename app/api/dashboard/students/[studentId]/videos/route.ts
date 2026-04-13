@@ -104,14 +104,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   if (dbError || !data) {
     console.error('[POST /api/dashboard/students/:id/videos]', dbError)
-    // TEMP DEBUG: surface raw Supabase error to client
     return NextResponse.json(
-      {
-        error: dbError?.message ?? 'Failed to save video.',
-        code: dbError?.code ?? 'DB_ERROR',
-        details: dbError?.details ?? null,
-        hint: dbError?.hint ?? null,
-      },
+      { error: 'Failed to save video.', code: 'DB_ERROR' },
       { status: 500 },
     )
   }
