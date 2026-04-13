@@ -536,17 +536,6 @@
 .db-list-col-photo  { width: 56px; padding-left: 1rem; padding-right: 0; }
 .db-list-col-action { width: 60px; text-align: right; padding-right: 1rem; }
 .db-list-num        { font-variant-numeric: tabular-nums; color: #5a4a3a; }
-.db-list-photo {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
-  flex-shrink: 0;
-  border: 1px solid rgba(184,160,80,0.35);
-  background: rgba(139,115,85,0.12);
-}
-.db-list-photo--empty { border-style: dashed; }
 .db-list-name {
   font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
   font-size: 1.05rem;

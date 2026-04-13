@@ -78,11 +78,29 @@ export default function StudentList({ students }: Props) {
             return (
               <tr key={s.id}>
                 <td className="db-list-col-photo">
-                  {photoUrl ? (
-                    <img src={photoUrl} alt="" className="db-list-photo" width={40} height={40} />
-                  ) : (
-                    <span className="db-list-photo db-list-photo--empty" aria-hidden="true" />
-                  )}
+                  <div style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    border: '1px solid rgba(184,160,80,0.35)',
+                    background: 'rgba(139,115,85,0.12)',
+                    borderStyle: photoUrl ? 'solid' : 'dashed',
+                  }}>
+                    {photoUrl && (
+                      <img
+                        src={photoUrl}
+                        alt={`${s.firstName} ${s.lastName}`}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block',
+                        }}
+                      />
+                    )}
+                  </div>
                 </td>
                 <td>
                   <Link href={`/portfolio/${s.id}`} className="db-list-name">
