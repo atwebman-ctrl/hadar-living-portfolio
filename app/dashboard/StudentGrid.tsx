@@ -8,19 +8,33 @@
 // and view-mode local state.
 // ============================================================
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import type { Student } from '@/lib/types'
 import { formatGrade, sortGrades } from '@/lib/gradeLevel'
 import { StudentCard, EmptyState } from './DashboardUI'
+import StudentList from './StudentList'
 
 interface Props { students: Student[]; role: string }
 
 type ViewMode = 'grid' | 'list'
 
+const VIEW_STORAGE_KEY = 'dashboard.viewMode'
+
 export default function StudentGrid({ students, role }: Props) {
   const [query,       setQuery]       = useState('')
   const [gradeFilter, setGradeFilter] = useState('All')
   const [viewMode,    setViewMode]    = useState<ViewMode>('grid')
+
+  // Rehydrate view mode from localStorage after mount (SSR-safe default: grid)
+  useEffect(() => {
+    const stored = window.localStorage.getItem(VIEW_STORAGE_KEY)
+    if (stored === 'grid' || stored === 'list') setViewMode(stored)
+  }, [])
+
+  const updateViewMode = (m: ViewMode) => {
+    setViewMode(m)
+    window.localStorage.setItem(VIEW_STORAGE_KEY, m)
+  }
 
   const grades = useMemo(() => {
     const set = new Set(students.map((s) => s.gradeLevel).filter(Boolean))
@@ -69,7 +83,7 @@ export default function StudentGrid({ students, role }: Props) {
           <ViewToggleButton
             label="Grid view"
             active={viewMode === 'grid'}
-            onClick={() => setViewMode('grid')}
+            onClick={() => updateViewMode('grid')}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3"  y="3"  width="7" height="7" />
@@ -81,7 +95,7 @@ export default function StudentGrid({ students, role }: Props) {
           <ViewToggleButton
             label="List view"
             active={viewMode === 'list'}
-            onClick={() => setViewMode('list')}
+            onClick={() => updateViewMode('list')}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <line x1="8" y1="6"  x2="21" y2="6"  />
@@ -102,7 +116,7 @@ export default function StudentGrid({ students, role }: Props) {
           {filtered.map((s) => <StudentCard key={s.id} student={s} role={role} />)}
         </div>
       ) : (
-        <p className="db-no-results">List view coming soon.</p>
+        <StudentList students={filtered} />
       )}
     </>
   )

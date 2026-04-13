@@ -224,6 +224,99 @@
 }
 .db-add-btn:hover { background: #9a8540; }
 
+/* ── List view ───────────────────────────────────────────── */
+.db-list-wrap {
+  border: 1px solid rgba(139,115,85,0.25);
+  background: #FDFBF7;
+  overflow-x: auto;
+}
+.db-list {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'EB Garamond', Georgia, serif;
+  color: #2c1f0e;
+}
+.db-list thead tr {
+  background: rgba(184,160,80,0.08);
+  border-bottom: 1px solid rgba(184,160,80,0.35);
+}
+.db-list th {
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  font-weight: normal;
+  white-space: nowrap;
+}
+.db-list-th {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6b5228;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: color 0.15s ease;
+}
+.db-list-th:hover              { color: #2c1f0e; }
+.db-list-th[data-active="true"]{ color: #2c1f0e; }
+.db-list-sort {
+  font-size: 0.55rem;
+  color: #B8A050;
+  min-width: 0.55rem;
+}
+.db-list tbody tr {
+  height: 52px;
+  border-left: 3px solid transparent;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.db-list tbody tr:nth-child(odd)  { background: #FDFBF7; }
+.db-list tbody tr:nth-child(even) { background: #F1EBDA; }
+.db-list tbody tr:hover           { border-left-color: #B8A050; }
+.db-list td {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+.db-list-col-photo  { width: 56px; padding-left: 1rem; padding-right: 0; }
+.db-list-col-action { width: 60px; text-align: right; padding-right: 1rem; }
+.db-list-num        { font-variant-numeric: tabular-nums; color: #5a4a3a; }
+.db-list-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 1px solid rgba(184,160,80,0.35);
+  background: rgba(139,115,85,0.12);
+}
+.db-list-photo--empty { border-style: dashed; }
+.db-list-name {
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.05rem;
+  color: #1E3A5F;
+  text-decoration: none;
+  font-weight: 600;
+}
+.db-list-name:hover {
+  text-decoration: underline;
+  text-decoration-color: #B8A050;
+  text-underline-offset: 3px;
+}
+.db-list-view {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #B8A050;
+  text-decoration: none;
+}
+.db-list-view:hover { color: #9a8540; }
+
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
   .db-sidebar-quote { display: none; }
