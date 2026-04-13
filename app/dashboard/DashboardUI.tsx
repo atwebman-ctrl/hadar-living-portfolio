@@ -9,25 +9,14 @@ import Link from 'next/link'
 import { OrganizationSwitcher } from '@clerk/nextjs'
 import type { Student } from '@/lib/types'
 import { formatGrade } from '@/lib/gradeLevel'
-import DeleteStudentButton from '@/components/dashboard/DeleteStudentButton'
 import EditStudentForm from '@/components/dashboard/EditStudentForm'
+import StudentCardOverflow from '@/components/dashboard/StudentCardOverflow'
 import type { DashboardView } from './dashboardTypes'
 
 // Archival palette constants (referenced in inline styles)
 const GOLD   = '#B8A050'
-const INK    = '#2c1f0e'
 const SEPIA  = '#5a4a3a'
 const FAINT  = '#8a7558'
-
-function calcAge(dob: string | null): number | null {
-  if (!dob) return null
-  const born  = new Date(dob)
-  const today = new Date()
-  let age = today.getFullYear() - born.getFullYear()
-  const m = today.getMonth() - born.getMonth()
-  if (m < 0 || (m === 0 && today.getDate() < born.getDate())) age--
-  return age
-}
 
 export function OrgPickerScreen() {
   return (
@@ -171,105 +160,58 @@ function buildPhotoUrl(path: string | null): string | null {
 export function StudentCard({ student, role }: { student: Student; role: string }) {
   const canEdit    = role === 'admin' || role === 'teacher'
   const canArchive = canEdit && !student.isDemo
-  const age        = calcAge(student.dateOfBirth)
   const initials   = `${student.firstName[0] ?? ''}${student.lastName[0] ?? ''}`.toUpperCase()
   const photoUrl   = buildPhotoUrl(student.profilePhotoPath ?? null)
+
+  const metaParts: string[] = [formatGrade(student.gradeLevel), student.academicYear]
+  if (student.gender === 'boy')  metaParts.push('Boy')
+  if (student.gender === 'girl') metaParts.push('Girl')
+
   return (
     <article className="db-student-card">
-
       {/*
         Link wraps ONLY the navigable card content.
-        EditStudentForm and DeleteStudentButton are siblings of the Link so
-        their clicks never bubble to it and never trigger navigation.
+        Action cluster (edit + overflow menu) is a sibling of the Link so
+        button clicks never bubble to it and never trigger navigation.
       */}
-      <Link href={`/portfolio/${student.id}`} style={{ textDecoration: 'none', display: 'block' }}>
-        {/* Profile photo / initials circle */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.85rem' }}>
-          <div style={{
-            width: 72, height: 72, borderRadius: '50%', overflow: 'hidden',
-            border: '2px solid rgba(184,160,80,0.3)', flexShrink: 0,
-            background: 'linear-gradient(135deg, #1a3a6b 0%, #C49A2A 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
+      <Link href={`/portfolio/${student.id}`} className="db-card-link">
+        <div className="db-card-head">
+          <div className="db-card-photo">
             {photoUrl
-              ? <img src={photoUrl} alt={`${student.firstName} ${student.lastName}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              : <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.5rem', color: '#fff', fontWeight: 700, userSelect: 'none' }}>{initials}</span>
-            }
+              ? <img src={photoUrl} alt={`${student.firstName} ${student.lastName}`} />
+              : <span className="db-card-initials">{initials}</span>}
+          </div>
+          <div className="db-card-identity">
+            <h2 className="db-card-name">{student.firstName} {student.lastName}</h2>
+            <p className="db-card-meta">{metaParts.join(' · ')}</p>
+            {student.enrollmentStatus !== 'active' && (
+              <span className="db-card-status">{student.enrollmentStatus}</span>
+            )}
           </div>
         </div>
 
-        <div style={{ borderBottom: '1px solid rgba(160,130,80,0.3)', paddingBottom: '0.85rem', marginBottom: '0.85rem' }}>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', 'EB Garamond', Georgia, serif", fontWeight: 700, fontSize: '1.375rem', color: INK, margin: 0, lineHeight: 1.2 }}>
-            {student.firstName} {student.lastName}
-          </h2>
-          {student.enrollmentStatus !== 'active' && (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#92400e', background: 'rgba(251,191,36,0.15)', border: '1px solid rgba(146,64,14,0.25)', padding: '0.15rem 0.45rem', whiteSpace: 'nowrap', display: 'inline-block', marginTop: '0.3rem' }}>
-              {student.enrollmentStatus}
-            </span>
-          )}
-          {student.isDemo && (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: FAINT, border: `1px solid rgba(138,117,88,0.3)`, padding: '0.1rem 0.4rem', marginTop: '0.35rem', display: 'inline-block' }}>
-              Demo
-            </span>
-          )}
+        {/*
+          Stat chips — NOTE: assessment data (MAP math, Hebrew composite)
+          is not loaded on the dashboard today; placeholders until a future
+          sprint bulk-fetches latest assessments per student.
+        */}
+        <div className="db-card-chips">
+          <span className="db-card-chip">Math: —</span>
+          <span className="db-card-chip">Heb: —</span>
         </div>
 
-        <dl style={{ margin: 0 }}>
-          <MetaRow label="Grade" value={formatGrade(student.gradeLevel)} />
-          <MetaRow label="Year"  value={student.academicYear} />
-          {student.gender && <MetaRow label="Gender" value={student.gender === 'boy' ? 'Boy' : 'Girl'} />}
-          {age !== null   && <MetaRow label="Age"    value={`Age ${age}`} />}
-        </dl>
-
-        <p style={{ marginTop: '1.25rem', fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '1.05rem', color: GOLD, textDecoration: 'underline', textDecorationColor: 'rgba(184,160,80,0.5)', textUnderlineOffset: '3px' }}>
-          View Portfolio →
-        </p>
+        <span className="db-card-view">View Portfolio →</span>
       </Link>
 
-      {/* Edit button — outside Link; clicks cannot bubble to the Link */}
-      {canEdit && (
-        <div style={{ position: 'absolute', top: '0.65rem', right: '0.75rem', zIndex: 2 }}>
-          <EditStudentForm student={student} />
-        </div>
-      )}
+      {student.isDemo && <span className="db-card-demo">Demo</span>}
 
-      {/* Archive button — already outside Link */}
-      {canArchive && (
-        <div style={{ position: 'absolute', bottom: '0.65rem', right: '0.75rem', zIndex: 2 }}>
-          <DeleteStudentButton studentId={student.id} />
+      {canEdit && (
+        <div className="db-card-actions">
+          <EditStudentForm student={student} />
+          {canArchive && <StudentCardOverflow studentId={student.id} />}
         </div>
       )}
     </article>
-  )
-}
-
-function MetaRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.35rem' }}>
-      <dt
-        style={{
-          fontFamily:    'var(--font-mono)',
-          fontSize:      '0.58rem',
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color:         SEPIA,
-          minWidth:      '3.5rem',
-          paddingTop:    '0.15rem',
-        }}
-      >
-        {label}
-      </dt>
-      <dd
-        style={{
-          fontFamily: "'EB Garamond', Georgia, serif",
-          fontSize:   '1rem',
-          color:      INK,
-          margin:     0,
-        }}
-      >
-        {value}
-      </dd>
-    </div>
   )
 }
 
