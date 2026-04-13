@@ -121,6 +121,26 @@ export default function LandingContent() {
 
       {/* ══ RIGHT — PARCHMENT PORTAL ══ */}
       <div className="lp-right">
+        <a
+          href="/sign-in"
+          style={{
+            position: 'absolute',
+            top: '1.5rem',
+            right: '2rem',
+            zIndex: 2,
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.6rem',
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'var(--ink-faint)',
+            textDecoration: 'none',
+            transition: 'color 0.15s ease',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--navy)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--ink-faint)' }}
+        >
+          Teacher Sign In →
+        </a>
         <div className="mobile-header">
           <h1>Hadar</h1>
           <p>Jewish Classical Academy</p>
