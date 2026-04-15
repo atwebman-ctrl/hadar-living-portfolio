@@ -138,16 +138,16 @@ export function HebrewCard({ assessments, studentId }: { assessments: Assessment
   return (
     <CardShell tab="hebrew" studentId={studentId} label="Hebrew">
       {!a ? (
-        <p style={EMPTY}>No AVANT scores yet</p>
+        <p style={EMPTY}>No Hebrew scores yet</p>
       ) : (
         <>
           <div style={{ fontSize: 22, fontWeight: 500, color: 'var(--ink)' }}>{a.level}</div>
           <div style={{ fontSize: 12, color: 'var(--ink-mid)', marginTop: 4 }}>
             AVANT composite · {a.composite.toFixed(2)}/10
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 52, marginTop: 12 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'stretch', height: 52, marginTop: 12 }}>
             {skills.map((s) => (
-              <div key={s.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div key={s.key} style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
                 <div style={{
                   width: '100%',
                   height: `${Math.max(0, Math.min(100, s.value * 10))}%`,
@@ -223,7 +223,7 @@ export function CompositionCard({ writingSamples, studentId }: {
           }}>
             <p style={{
               fontFamily: 'var(--font-body), Georgia, serif',
-              fontSize: 13,
+              fontSize: 14,
               color: 'var(--ink-light)',
               fontStyle: 'italic',
               padding: '10px 14px',

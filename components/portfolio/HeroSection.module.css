@@ -13,7 +13,7 @@
 .hero::after  { content: ''; position: absolute; bottom: -80px; right: 60px; width: 200px; height: 200px; border: 1px solid rgba(255,255,255,.04); border-radius: 50%; pointer-events: none; }
 .heroPhoto { flex-shrink: 0; }
 .heroIdentity { flex: 1; min-width: 0; }
-.heroSummary { font-family: 'DM Mono', monospace; font-size: .8rem; color: rgba(255,255,255,.55); margin: .6rem 0 0; line-height: 1.6; }
+.heroSummary { font-family: 'DM Mono', monospace; font-size: .8rem; color: rgba(255,255,255,.55); margin: .6rem 0 0; line-height: 1.6; max-width: 560px; }
 .compact h1 { font-size: 1.8rem; }
 
 /* h1 and em inside hero are element selectors — not scoped by CSS modules */
