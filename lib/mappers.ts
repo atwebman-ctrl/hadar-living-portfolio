@@ -238,6 +238,7 @@ export function mapTeacherNote(row: Row): TeacherNote {
     term:             (row.term as string) ?? null,
     highlightQuote:   (row.highlight_quote as string) ?? null,
     visibleToParents: (row.visible_to_parents as boolean) ?? true,
+    sectionAnchor:    (row.section_anchor as string) ?? null,
     createdAt:        row.created_at as string,
   };
 }

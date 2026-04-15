@@ -277,6 +277,7 @@ export interface TeacherNote {
   term: string | null;
   highlightQuote: string | null;
   visibleToParents: boolean;
+  sectionAnchor?: string | null;
   createdAt: string;
 }
 
