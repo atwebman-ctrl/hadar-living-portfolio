@@ -20,7 +20,6 @@ const VALID_SLUGS = [
   'math',
   'english',
   'hebrew',
-  'composition',
   'soulcraft',
 ] as const
 

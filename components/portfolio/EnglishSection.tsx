@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import type { Assessment, StudentVideo, AiDraft, TeacherNote, UserRole } from '@/lib/types'
+import type { Assessment, StudentVideo, AiDraft, TeacherNote, UserRole, WritingSample, HandwritingSample } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import SubjectScoreRows, { type ScoreDisplayRow } from '@/components/portfolio/SubjectScoreRows'
 import MapPercentileChart, { type StudentScorePoint } from '@/components/charts/MapPercentileChart'
 import InlineAssessmentForm from '@/components/portfolio/InlineAssessmentForm'
 import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import EnglishVideoTab from '@/components/portfolio/EnglishVideoTab'
+import CompositionView from '@/components/portfolio/CompositionView'
 import { DEMO_ENGLISH_ROWS, DEMO_READING_SCORES } from './IntellectualArcDemoData'
 import groupStyles from '@/components/portfolio/GroupDetail.module.css'
 import s from './sections.module.css'
@@ -15,6 +16,8 @@ import s from './sections.module.css'
 interface Props {
   assessments?:          Assessment[]
   studentVideos?:        StudentVideo[]
+  writingSamples?:       WritingSample[]
+  handwritingSamples?:   HandwritingSample[]
   teacherNotes?:         TeacherNote[]
   studentId?:            string
   studentName?:          string
@@ -25,12 +28,13 @@ interface Props {
   selectedYear?:         string
 }
 
-type SubTab = 'spelling' | 'grammar' | 'video'
+type SubTab = 'spelling' | 'grammar' | 'composition' | 'video'
 
 const SUB_TABS: { slug: SubTab; label: string }[] = [
-  { slug: 'spelling', label: 'Spelling' },
-  { slug: 'grammar',  label: 'Grammar'  },
-  { slug: 'video',    label: 'Video'    },
+  { slug: 'spelling',    label: 'Spelling'    },
+  { slug: 'grammar',     label: 'Grammar'     },
+  { slug: 'composition', label: 'Composition' },
+  { slug: 'video',       label: 'Video'       },
 ]
 
 // ── Helpers (copied verbatim from IntellectualArc) ────────────
@@ -109,6 +113,8 @@ function PlaceholderTab({ label }: { label: string }) {
 export default function EnglishSection({
   assessments,
   studentVideos,
+  writingSamples,
+  handwritingSamples,
   teacherNotes,
   studentId,
   studentName,
@@ -188,22 +194,20 @@ export default function EnglishSection({
       {/* ── Sub-tab content ──────────────────────────────────── */}
       {activeTab === 'spelling' && <PlaceholderTab label="Spelling" />}
       {activeTab === 'grammar'  && <PlaceholderTab label="Grammar"  />}
+      {activeTab === 'composition' && (
+        <CompositionView
+          writingSamples={(writingSamples ?? []).filter((x) => x.language === 'english')}
+          handwritingSamples={handwritingSamples ?? []}
+          teacherNotes={teacherNotes}
+          studentId={studentId ?? ''}
+          studentName={studentName}
+          role={role ?? 'parent'}
+          initialLanguage="english"
+          academicYear={academicYear}
+          gradeLevel={gradeLevel}
+        />
+      )}
       {activeTab === 'video'    && <EnglishVideoTab videos={englishVideos} canEdit={canEdit} studentId={studentId} teacherNotes={teacherNotes} role={role} />}
-
-      {/* ── Composition link ─────────────────────────────────── */}
-      <div style={{ marginTop: '1.5rem' }}>
-        <a
-          href="#"
-          style={{
-            display: 'inline-block',
-            fontSize: 13,
-            color: 'var(--ink-light)',
-            textDecoration: 'none',
-          }}
-        >
-          View all English compositions →
-        </a>
-      </div>
     </section>
   )
 }

@@ -17,7 +17,6 @@ import TheCanon from '@/components/portfolio/TheCanon'
 import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
 import HebrewSection from '@/components/portfolio/HebrewSection'
-import CompositionView from '@/components/portfolio/CompositionView'
 import CharacterArc from '@/components/portfolio/CharacterArc'
 
 // ── Error boundary ────────────────────────────────────────────
@@ -58,12 +57,11 @@ interface TabDef { slug: string; label: string }
 
 export const GROUP_TABS: Record<string, TabDef[]> = {
   portfolio: [
-    { slug: 'the-canon',   label: 'The Canon'   },
-    { slug: 'math',        label: 'Math'        },
-    { slug: 'english',     label: 'English'     },
-    { slug: 'hebrew',      label: 'Hebrew'      },
-    { slug: 'composition', label: 'Composition' },
-    { slug: 'soulcraft',   label: 'Soulcraft'   },
+    { slug: 'the-canon', label: 'The Canon' },
+    { slug: 'math',      label: 'Math'      },
+    { slug: 'english',   label: 'English'   },
+    { slug: 'hebrew',    label: 'Hebrew'    },
+    { slug: 'soulcraft', label: 'Soulcraft' },
   ],
 }
 
@@ -114,6 +112,8 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
         <EnglishSection
           assessments={assessments}
           studentVideos={portfolio.studentVideos}
+          writingSamples={portfolio.writingSamples}
+          handwritingSamples={portfolio.handwritingSamples}
           teacherNotes={teacherNotes}
           studentId={studentId}
           studentName={student.firstName}
@@ -129,26 +129,14 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
         <HebrewSection
           assessments={assessments}
           studentVideos={portfolio.studentVideos}
-          teacherNotes={teacherNotes}
-          studentId={studentId}
-          studentName={student.firstName}
-          role={role}
-          gradeLevel={student.gradeLevel}
-          existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
-        />
-      )
-    case 'composition':
-      return (
-        <CompositionView
           writingSamples={portfolio.writingSamples}
           handwritingSamples={portfolio.handwritingSamples}
           teacherNotes={teacherNotes}
           studentId={studentId}
           studentName={student.firstName}
           role={role}
-          academicYear={student.academicYear}
           gradeLevel={student.gradeLevel}
-          existingDraft={aiDrafts.find((d) => d.sectionType === 'writing')}
+          existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
         />
       )
     case 'soulcraft':

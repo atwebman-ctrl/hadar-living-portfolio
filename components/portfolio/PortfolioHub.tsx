@@ -15,7 +15,6 @@ import {
   EnglishCard,
   HebrewCard,
   CanonCard,
-  CompositionCard,
   SoulcraftCard,
 } from './DashboardCards'
 import grid from './DashboardGrid.module.css'
@@ -123,12 +122,11 @@ export default function PortfolioHub({ portfolio, studentId, role }: Props) {
       )}
 
       <div className={grid.grid}>
-        <MathCard        assessments={portfolio.assessments} studentId={studentId} />
-        <EnglishCard     assessments={portfolio.assessments} studentId={studentId} />
-        <HebrewCard      assessments={portfolio.assessments} studentId={studentId} />
-        <CanonCard       readings={portfolio.readings}       studentId={studentId} />
-        <CompositionCard writingSamples={portfolio.writingSamples} studentId={studentId} />
-        <SoulcraftCard   characterAwards={portfolio.characterAwards} studentId={studentId} />
+        <MathCard      assessments={portfolio.assessments} studentId={studentId} />
+        <EnglishCard   assessments={portfolio.assessments} studentId={studentId} />
+        <HebrewCard    assessments={portfolio.assessments} studentId={studentId} />
+        <CanonCard     readings={portfolio.readings}       studentId={studentId} />
+        <SoulcraftCard characterAwards={portfolio.characterAwards} studentId={studentId} />
       </div>
 
       <div className={grid.bottomLinks}>

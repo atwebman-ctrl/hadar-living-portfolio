@@ -16,7 +16,6 @@ import TheCanon from '@/components/portfolio/TheCanon'
 import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
 import HebrewSection from '@/components/portfolio/HebrewSection'
-import CompositionView from '@/components/portfolio/CompositionView'
 import CharacterArc from '@/components/portfolio/CharacterArc'
 import layoutStyles from '@/components/portfolio/layout.module.css'
 
@@ -114,6 +113,8 @@ export default function SectionDetailClient({
           <EnglishSection
             assessments={assessments}
             studentVideos={portfolio.studentVideos}
+            writingSamples={portfolio.writingSamples}
+            handwritingSamples={portfolio.handwritingSamples}
             teacherNotes={teacherNotes}
             studentId={studentId}
             studentName={student.firstName}
@@ -129,26 +130,14 @@ export default function SectionDetailClient({
           <HebrewSection
             assessments={assessments}
             studentVideos={portfolio.studentVideos}
-            teacherNotes={teacherNotes}
-            studentId={studentId}
-            studentName={student.firstName}
-            role={role}
-            gradeLevel={student.gradeLevel}
-            existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
-          />
-        )
-      case 'composition':
-        return (
-          <CompositionView
             writingSamples={portfolio.writingSamples}
             handwritingSamples={portfolio.handwritingSamples}
             teacherNotes={teacherNotes}
             studentId={studentId}
             studentName={student.firstName}
             role={role}
-            academicYear={student.academicYear}
             gradeLevel={student.gradeLevel}
-            existingDraft={aiDrafts.find((d) => d.sectionType === 'writing')}
+            existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
           />
         )
       case 'soulcraft':

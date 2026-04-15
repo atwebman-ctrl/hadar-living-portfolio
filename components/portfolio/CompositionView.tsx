@@ -179,18 +179,20 @@ export default function CompositionView({
         <div className={s.sectionRule} />
       </div>
 
-      {/* ── Language filter pills ────────────────────────────── */}
-      <div className={groupStyles.groupTabBar} style={{ marginBottom: '1.5rem' }}>
-        {LANG_PILLS.map((p) => (
-          <button
-            key={p.slug}
-            className={`${groupStyles.groupTab}${filter === p.slug ? ` ${groupStyles.groupTabActive}` : ''}`}
-            onClick={() => setFilter(p.slug)}
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
+      {/* ── Language filter pills (hidden when parent section pins the language) ── */}
+      {!initialLanguage && (
+        <div className={groupStyles.groupTabBar} style={{ marginBottom: '1.5rem' }}>
+          {LANG_PILLS.map((p) => (
+            <button
+              key={p.slug}
+              className={`${groupStyles.groupTab}${filter === p.slug ? ` ${groupStyles.groupTabActive}` : ''}`}
+              onClick={() => setFilter(p.slug)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ── Writing samples list ─────────────────────────────── */}
       {sorted.length === 0 ? (

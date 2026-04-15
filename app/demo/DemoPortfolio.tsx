@@ -10,7 +10,6 @@ import TheCanon from '@/components/portfolio/TheCanon'
 import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
 import HebrewSection from '@/components/portfolio/HebrewSection'
-import CompositionView from '@/components/portfolio/CompositionView'
 import CharacterArc from '@/components/portfolio/CharacterArc'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 
@@ -46,7 +45,6 @@ export default function DemoPortfolio() {
         <MathSection selectedYear="all" />
         <EnglishSection selectedYear="all" />
         <HebrewSection />
-        <CompositionView writingSamples={[]} handwritingSamples={[]} studentId="" role="parent" />
         <CharacterArc />
         <PortfolioFooter />
       </div>

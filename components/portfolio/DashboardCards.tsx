@@ -9,12 +9,11 @@
 // ============================================================
 
 import type React from 'react'
-import type { Assessment, Reading, WritingSample, CharacterAward } from '@/lib/types'
+import type { Assessment, Reading, CharacterAward } from '@/lib/types'
 import {
   latestMapScore,
   latestAvantComposite,
   readingMetrics,
-  latestComposition,
   type AvantSkill,
 } from '@/lib/dashboardHelpers'
 import PercentileTooltip from '@/components/shared/PercentileTooltip'
@@ -157,56 +156,6 @@ export function CanonCard({ readings, studentId }: { readings: Reading[]; studen
             {r.totalPages} pages read
             {r.avgRating != null && <> · avg rating {r.avgRating} ★</>}
           </div>
-        </>
-      )}
-    </CardShell>
-  )
-}
-
-// ── Composition card ──────────────────────────────────────────
-
-export function CompositionCard({ writingSamples, studentId }: {
-  writingSamples: WritingSample[]
-  studentId:      string
-}) {
-  const c = latestComposition(writingSamples)
-  return (
-    <CardShell tab="composition" studentId={studentId} label="Composition">
-      {!c ? (
-        <p style={EMPTY}>No writing samples yet</p>
-      ) : (
-        <>
-          <div style={{
-            position: 'relative',
-            background: 'var(--cream)',
-            border: '1px solid var(--cream-dark)',
-            borderRadius: 6,
-            height: 76,
-            overflow: 'hidden',
-            marginBottom: 8,
-          }}>
-            <p style={{
-              fontFamily: 'var(--font-body), Georgia, serif',
-              fontSize: 14,
-              color: 'var(--ink-light)',
-              fontStyle: 'italic',
-              padding: '10px 14px',
-              margin: 0,
-              lineHeight: 1.45,
-            }}>
-              {c.excerpt || 'No excerpt available'}
-            </p>
-            <span style={{
-              position: 'absolute', top: 6, right: 6,
-              fontSize: 9, textTransform: 'uppercase', letterSpacing: 0.6,
-              padding: '2px 7px', borderRadius: 4,
-              background: '#e6e8ee', color: '#4a5568',
-            }}>
-              {c.language}
-            </span>
-          </div>
-          <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 500 }}>{c.title}</div>
-          {c.date && <div style={{ fontSize: 11, color: 'var(--ink-light)', marginTop: 2 }}>{c.date}</div>}
         </>
       )}
     </CardShell>

@@ -1,32 +1,36 @@
 'use client'
 
 import { useState } from 'react'
-import type { Assessment, StudentVideo, AiDraft, TeacherNote, UserRole } from '@/lib/types'
+import type { Assessment, StudentVideo, AiDraft, TeacherNote, UserRole, WritingSample, HandwritingSample } from '@/lib/types'
 import AvantChart, { type AvantDataPoint } from '@/components/charts/AvantChart'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import InlineAvantForm from '@/components/portfolio/InlineAvantForm'
 import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import HebrewVideoTab from '@/components/portfolio/HebrewVideoTab'
+import CompositionView from '@/components/portfolio/CompositionView'
 import groupStyles from '@/components/portfolio/GroupDetail.module.css'
 import s from './sections.module.css'
 
 interface Props {
-  assessments?:   Assessment[]
-  studentVideos?: StudentVideo[]
-  teacherNotes?:  TeacherNote[]
-  studentId?:     string
-  studentName?:   string
-  role?:          UserRole
-  existingDraft?: AiDraft
-  gradeLevel?:    string
+  assessments?:        Assessment[]
+  studentVideos?:      StudentVideo[]
+  writingSamples?:     WritingSample[]
+  handwritingSamples?: HandwritingSample[]
+  teacherNotes?:       TeacherNote[]
+  studentId?:          string
+  studentName?:        string
+  role?:               UserRole
+  existingDraft?:      AiDraft
+  gradeLevel?:         string
 }
 
-type SubTab = 'spelling' | 'grammar' | 'video'
+type SubTab = 'spelling' | 'grammar' | 'composition' | 'video'
 
 const SUB_TABS: { slug: SubTab; label: string }[] = [
-  { slug: 'spelling', label: 'Spelling' },
-  { slug: 'grammar',  label: 'Grammar'  },
-  { slug: 'video',    label: 'Video'    },
+  { slug: 'spelling',    label: 'Spelling'    },
+  { slug: 'grammar',     label: 'Grammar'     },
+  { slug: 'composition', label: 'Composition' },
+  { slug: 'video',       label: 'Video'       },
 ]
 
 // ── AVANT constants (copied from ImmersionEngine) ─────────────
@@ -44,10 +48,7 @@ const DEMO_CALLOUT = {
   big: '6th',
   label: 'Grade',
   text: 'A 3rd grader with 6th-grade Hebrew skills.',
-  detail:
-    'On the national AVANT STAMP benchmark for Hebrew immersion schools (2022–23), Athena scores ' +
-    'at or above the average for students three years her senior. Her reading score of 6.0 and ' +
-    'listening score of 7.0 exceed the 6th-grade national averages of 4.75.',
+  detail: 'On the national AVANT STAMP benchmark for Hebrew immersion schools (2022–23), Athena scores at or above the average for students three years her senior. Her reading score of 6.0 and listening score of 7.0 exceed the 6th-grade national averages of 4.75.',
 }
 
 const DEMO_READING_ROWS = [
@@ -171,11 +172,14 @@ function PlaceholderTab({ label }: { label: string }) {
 export default function HebrewSection({
   assessments,
   studentVideos,
+  writingSamples,
+  handwritingSamples,
   teacherNotes,
   studentId,
   studentName,
   role,
   existingDraft,
+  gradeLevel,
 }: Props) {
   const [activeTab, setActiveTab] = useState<SubTab>('spelling')
 
@@ -280,14 +284,15 @@ export default function HebrewSection({
       {/* ── Sub-tab content ──────────────────────────────────── */}
       {activeTab === 'spelling' && <PlaceholderTab label="Spelling" />}
       {activeTab === 'grammar'  && <PlaceholderTab label="Grammar"  />}
-      {activeTab === 'video'    && <HebrewVideoTab videos={hebrewVideos} canEdit={canEdit} studentId={studentId} teacherNotes={teacherNotes} role={role} />}
-
-      {/* ── Composition link ─────────────────────────────────── */}
-      <div style={{ marginTop: '1.5rem' }}>
-        <a href="#" style={{ display: 'inline-block', fontSize: 13, color: 'var(--ink-light)', textDecoration: 'none' }}>
-          View all Hebrew compositions →
-        </a>
-      </div>
+      {activeTab === 'composition' && (
+        <CompositionView
+          writingSamples={(writingSamples ?? []).filter((x) => x.language === 'hebrew')}
+          handwritingSamples={handwritingSamples ?? []} teacherNotes={teacherNotes}
+          studentId={studentId ?? ''} studentName={studentName} role={role ?? 'parent'}
+          initialLanguage="hebrew" gradeLevel={gradeLevel}
+        />
+      )}
+      {activeTab === 'video' && <HebrewVideoTab videos={hebrewVideos} canEdit={canEdit} studentId={studentId} teacherNotes={teacherNotes} role={role} />}
     </section>
   )
 }

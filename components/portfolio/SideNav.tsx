@@ -15,12 +15,11 @@ const PORTFOLIO_GROUP = {
   slug:  'portfolio',
   label: 'Portfolio',
   items: [
-    { slug: 'the-canon',   label: 'The Canon'   },
-    { slug: 'math',        label: 'Math'        },
-    { slug: 'english',     label: 'English'     },
-    { slug: 'hebrew',      label: 'Hebrew'      },
-    { slug: 'composition', label: 'Composition' },
-    { slug: 'soulcraft',   label: 'Soulcraft'   },
+    { slug: 'the-canon', label: 'The Canon' },
+    { slug: 'math',      label: 'Math'      },
+    { slug: 'english',   label: 'English'   },
+    { slug: 'hebrew',    label: 'Hebrew'    },
+    { slug: 'soulcraft', label: 'Soulcraft' },
   ],
 }
 
@@ -28,13 +27,12 @@ const ALL_ITEMS = PORTFOLIO_GROUP.items
 
 // Anchor fallback for demo page (no studentId)
 const ANCHOR_ITEMS = [
-  { href: '#overview',    label: 'Overview'    },
-  { href: '#canon',       label: 'The Canon'   },
-  { href: '#math',        label: 'Math'        },
-  { href: '#english',     label: 'English'     },
-  { href: '#hebrew',      label: 'Hebrew'      },
-  { href: '#composition', label: 'Composition' },
-  { href: '#character',   label: 'Soulcraft'   },
+  { href: '#overview',  label: 'Overview'  },
+  { href: '#canon',     label: 'The Canon' },
+  { href: '#math',      label: 'Math'      },
+  { href: '#english',   label: 'English'   },
+  { href: '#hebrew',    label: 'Hebrew'    },
+  { href: '#character', label: 'Soulcraft' },
 ]
 
 interface SideNavProps {

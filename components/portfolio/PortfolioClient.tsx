@@ -16,7 +16,6 @@ import TheCanon from '@/components/portfolio/TheCanon'
 import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
 import HebrewSection from '@/components/portfolio/HebrewSection'
-import CompositionView from '@/components/portfolio/CompositionView'
 import CharacterArc from '@/components/portfolio/CharacterArc'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 import InviteParentButton from '@/components/shared/InviteParentButton'
@@ -78,6 +77,8 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
       <EnglishSection
         assessments={assessments}
         studentVideos={portfolio.studentVideos}
+        writingSamples={portfolio.writingSamples}
+        handwritingSamples={portfolio.handwritingSamples}
         studentId={studentId}
         studentName={student.firstName}
         role={role}
@@ -89,21 +90,13 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
       <HebrewSection
         assessments={assessments}
         studentVideos={portfolio.studentVideos}
-        studentId={studentId}
-        studentName={student.firstName}
-        role={role}
-        gradeLevel={student.gradeLevel}
-        existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
-      />
-      <CompositionView
         writingSamples={portfolio.writingSamples}
         handwritingSamples={portfolio.handwritingSamples}
         studentId={studentId}
         studentName={student.firstName}
         role={role}
-        academicYear={student.academicYear}
         gradeLevel={student.gradeLevel}
-        existingDraft={aiDrafts.find((d) => d.sectionType === 'writing')}
+        existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
       />
       <CharacterArc
         characterAwards={portfolio.characterAwards}

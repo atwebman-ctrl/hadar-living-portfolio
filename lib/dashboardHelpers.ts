@@ -5,7 +5,7 @@
 // for the dashboard cards on the hub overview. No React.
 // ============================================================
 
-import type { Assessment, Reading, WritingSample } from './types'
+import type { Assessment, Reading } from './types'
 
 type MapType = 'maps_math' | 'maps_english'
 
@@ -182,29 +182,3 @@ export function readingMetrics(readings: Reading[]): ReadingSummary | null {
   }
 }
 
-// ── Composition ──────────────────────────────────────────────
-
-export interface CompositionSummary {
-  title:    string
-  excerpt:  string
-  language: 'english' | 'hebrew'
-  date:     string | null
-}
-
-export function latestComposition(samples: WritingSample[]): CompositionSummary | null {
-  if (samples.length === 0) return null
-  const sorted = [...samples].sort((a, b) => {
-    const ay = (b.academicYear ?? '').localeCompare(a.academicYear ?? '')
-    if (ay !== 0) return ay
-    return termOrdinal(b.term) - termOrdinal(a.term)
-  })
-  const latest = sorted[0]
-  const source = latest.excerpt ?? latest.body ?? latest.ocrText ?? ''
-  const excerpt = source.length > 140 ? source.slice(0, 140).trimEnd() + '…' : source
-  return {
-    title:    latest.title,
-    excerpt,
-    language: latest.language,
-    date:     latest.term ?? latest.academicYear ?? null,
-  }
-}
