@@ -10,6 +10,15 @@
 
 import { Component, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import type { UserRole, PortfolioData } from '@/lib/types'
+import YearSelector from '@/components/portfolio/YearSelector'
+import TheCanon from '@/components/portfolio/TheCanon'
+import MathSection from '@/components/portfolio/MathSection'
+import EnglishSection from '@/components/portfolio/EnglishSection'
+import HebrewSection from '@/components/portfolio/HebrewSection'
+import CompositionView from '@/components/portfolio/CompositionView'
+import CharacterArc from '@/components/portfolio/CharacterArc'
+import layoutStyles from '@/components/portfolio/layout.module.css'
 
 // ── Error boundary ────────────────────────────────────────────
 
@@ -45,20 +54,6 @@ class SectionErrorBoundary extends Component<
     return this.props.children
   }
 }
-import type { UserRole, PortfolioData } from '@/lib/types'
-import YearSelector from '@/components/portfolio/YearSelector'
-import IntellectualArc from '@/components/portfolio/IntellectualArc'
-import ImmersionEngine from '@/components/portfolio/ImmersionEngine'
-import TheCanon from '@/components/portfolio/TheCanon'
-import CreativeEvolution from '@/components/portfolio/CreativeEvolution'
-import RhetoricRoom from '@/components/portfolio/RhetoricRoom'
-import CharacterArc from '@/components/portfolio/CharacterArc'
-import ScopeAndSequence from '@/components/portfolio/ScopeAndSequence'
-import HandwritingSamples from '@/components/portfolio/HandwritingSamples'
-import PhotoGallery from '@/components/portfolio/PhotoGallery'
-import TeacherNotes from '@/components/portfolio/TeacherNotes'
-import ParentUploads from '@/components/portfolio/ParentUploads'
-import layoutStyles from '@/components/portfolio/layout.module.css'
 
 interface Props {
   portfolio:    PortfolioData
@@ -88,31 +83,6 @@ export default function SectionDetailClient({
   // ── Section renderer ────────────────────────────────────────
   const renderSection = () => {
     switch (slug) {
-      case 'math':
-        return (
-          <IntellectualArc
-            assessments={assessments}
-            studentId={studentId}
-            studentName={student.firstName}
-            role={role}
-            gradeLevel={student.gradeLevel}
-            academicYear={student.academicYear}
-            currentYear={student.academicYear}
-            selectedYear={selectedYear}
-            existingMathDraft={aiDrafts.find((d) => d.sectionType === 'math_scores')}
-            existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
-          />
-        )
-      case 'hebrew':
-        return (
-          <ImmersionEngine
-            assessments={assessments}
-            studentId={studentId}
-            studentName={student.firstName}
-            role={role}
-            existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
-          />
-        )
       case 'the-canon':
         return (
           <TheCanon
@@ -123,23 +93,57 @@ export default function SectionDetailClient({
             existingDraft={aiDrafts.find((d) => d.sectionType === 'reading_bookshelf')}
           />
         )
-      case 'composition':
+      case 'math':
         return (
-          <CreativeEvolution
-            writingSamples={portfolio.writingSamples}
+          <MathSection
+            assessments={assessments}
             studentId={studentId}
             studentName={student.firstName}
             role={role}
-            existingDraft={aiDrafts.find((d) => d.sectionType === 'writing')}
+            gradeLevel={student.gradeLevel}
+            academicYear={student.academicYear}
+            currentYear={student.academicYear}
+            selectedYear={selectedYear}
+            existingMathDraft={aiDrafts.find((d) => d.sectionType === 'math_scores')}
           />
         )
-      case 'rhetoric-room':
+      case 'english':
         return (
-          <RhetoricRoom
-            videos={portfolio.videos}
+          <EnglishSection
+            assessments={assessments}
             studentVideos={portfolio.studentVideos}
             studentId={studentId}
+            studentName={student.firstName}
             role={role}
+            gradeLevel={student.gradeLevel}
+            academicYear={student.academicYear}
+            selectedYear={selectedYear}
+            existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
+          />
+        )
+      case 'hebrew':
+        return (
+          <HebrewSection
+            assessments={assessments}
+            studentVideos={portfolio.studentVideos}
+            studentId={studentId}
+            studentName={student.firstName}
+            role={role}
+            gradeLevel={student.gradeLevel}
+            existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
+          />
+        )
+      case 'composition':
+        return (
+          <CompositionView
+            writingSamples={portfolio.writingSamples}
+            handwritingSamples={portfolio.handwritingSamples}
+            studentId={studentId}
+            studentName={student.firstName}
+            role={role}
+            academicYear={student.academicYear}
+            gradeLevel={student.gradeLevel}
+            existingDraft={aiDrafts.find((d) => d.sectionType === 'writing')}
           />
         )
       case 'soulcraft':
@@ -152,59 +156,13 @@ export default function SectionDetailClient({
             existingDraft={aiDrafts.find((d) => d.sectionType === 'virtue_badges')}
           />
         )
-      case 'knowledge':
-        return (
-          <ScopeAndSequence
-            gradeLevel={student.gradeLevel}
-            subjects={portfolio.scopeAndSequence}
-          />
-        )
-      case 'handwriting':
-        return (
-          <HandwritingSamples
-            samples={portfolio.handwritingSamples}
-            uploadEnabled={role !== 'parent'}
-            studentId={studentId}
-            academicYear={student.academicYear}
-            gradeLevel={student.gradeLevel}
-          />
-        )
-      case 'photo-gallery':
-        return (
-          <PhotoGallery
-            photos={portfolio.photos}
-            uploadEnabled={role !== 'parent'}
-            studentId={studentId}
-            academicYear={student.academicYear}
-            gradeLevel={student.gradeLevel}
-          />
-        )
-      case 'teacher-notes':
-        return (
-          <TeacherNotes
-            notes={portfolio.teacherNotes}
-            role={role}
-            studentId={studentId}
-          />
-        )
-      case 'parent-uploads':
-        return (
-          <ParentUploads
-            uploads={portfolio.parentUploads}
-            uploadEnabled={true}
-            studentId={studentId}
-            role={role}
-            academicYear={student.academicYear}
-            gradeLevel={student.gradeLevel}
-          />
-        )
       default:
         return null
     }
   }
 
   // Sections that benefit from the year filter
-  const YEAR_FILTER_SLUGS = ['math', 'the-canon', 'composition']
+  const YEAR_FILTER_SLUGS = ['math', 'english', 'the-canon']
   const showYearFilter = YEAR_FILTER_SLUGS.includes(slug) && years.length > 1
 
   return (

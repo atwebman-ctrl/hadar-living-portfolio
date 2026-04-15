@@ -16,17 +16,12 @@ import SectionDetailClient from '@/components/portfolio/SectionDetailClient'
 import '../../../../demo/portfolio.css'
 
 const VALID_SLUGS = [
-  'math',
-  'hebrew',
   'the-canon',
+  'math',
+  'english',
+  'hebrew',
   'composition',
-  'rhetoric-room',
   'soulcraft',
-  'knowledge',
-  'handwriting',
-  'photo-gallery',
-  'teacher-notes',
-  'parent-uploads',
 ] as const
 
 type Props = {

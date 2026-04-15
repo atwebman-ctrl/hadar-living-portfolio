@@ -14,7 +14,7 @@ import RevealObserver from '@/components/portfolio/RevealObserver'
 import GroupDetailClient from '@/components/portfolio/GroupDetailClient'
 import '../../../../demo/portfolio.css'
 
-const VALID_GROUPS = ['academics', 'student-work', 'gallery'] as const
+const VALID_GROUPS = ['portfolio'] as const
 
 type Props = {
   params:       Promise<{ studentId: string; groupSlug: string }>

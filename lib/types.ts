@@ -319,6 +319,7 @@ export interface StudentVideo {
   gradeLevel: string;
   term: string;
   category: StudentVideoCategory;
+  language: "english" | "hebrew";
   createdAt: string;
 }
 

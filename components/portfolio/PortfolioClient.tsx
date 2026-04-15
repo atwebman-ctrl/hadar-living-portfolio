@@ -12,17 +12,12 @@
 import { useState, useMemo } from 'react'
 import type { UserRole, PortfolioData } from '@/lib/types'
 import HeroSection from '@/components/portfolio/HeroSection'
-import IntellectualArc from '@/components/portfolio/IntellectualArc'
-import ImmersionEngine from '@/components/portfolio/ImmersionEngine'
 import TheCanon from '@/components/portfolio/TheCanon'
-import CreativeEvolution from '@/components/portfolio/CreativeEvolution'
-import RhetoricRoom from '@/components/portfolio/RhetoricRoom'
+import MathSection from '@/components/portfolio/MathSection'
+import EnglishSection from '@/components/portfolio/EnglishSection'
+import HebrewSection from '@/components/portfolio/HebrewSection'
+import CompositionView from '@/components/portfolio/CompositionView'
 import CharacterArc from '@/components/portfolio/CharacterArc'
-import ScopeAndSequence from '@/components/portfolio/ScopeAndSequence'
-import HandwritingSamples from '@/components/portfolio/HandwritingSamples'
-import PhotoGallery from '@/components/portfolio/PhotoGallery'
-import TeacherNotes from '@/components/portfolio/TeacherNotes'
-import ParentUploads from '@/components/portfolio/ParentUploads'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 import InviteParentButton from '@/components/shared/InviteParentButton'
 import YearSelector from '@/components/portfolio/YearSelector'
@@ -54,13 +49,19 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
       <HeroSection
         student={student}
         school={school}
-        assessments={assessments}
         inviteButton={(role === 'admin' || role === 'teacher') ? <InviteParentButton studentId={studentId} /> : undefined}
       />
 
       <YearSelector years={years} selectedYear={selectedYear} onChange={setSelectedYear} />
 
-      <IntellectualArc
+      <TheCanon
+        readings={portfolio.readings}
+        studentId={studentId}
+        studentName={student.firstName}
+        role={role}
+        existingDraft={aiDrafts.find((d) => d.sectionType === 'reading_bookshelf')}
+      />
+      <MathSection
         assessments={assessments}
         studentId={studentId}
         studentName={student.firstName}
@@ -70,34 +71,36 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
         currentYear={student.academicYear}
         selectedYear={selectedYear}
         existingMathDraft={aiDrafts.find((d) => d.sectionType === 'math_scores')}
-        existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
       />
-      <ImmersionEngine
+      <EnglishSection
         assessments={assessments}
-        studentId={studentId}
-        studentName={student.firstName}
-        role={role}
-        existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
-      />
-      <TheCanon
-        readings={portfolio.readings}
-        studentId={studentId}
-        studentName={student.firstName}
-        role={role}
-        existingDraft={aiDrafts.find((d) => d.sectionType === 'reading_bookshelf')}
-      />
-      <CreativeEvolution
-        writingSamples={portfolio.writingSamples}
-        studentId={studentId}
-        studentName={student.firstName}
-        role={role}
-        existingDraft={aiDrafts.find((d) => d.sectionType === 'writing')}
-      />
-      <RhetoricRoom
-        videos={portfolio.videos}
         studentVideos={portfolio.studentVideos}
         studentId={studentId}
+        studentName={student.firstName}
         role={role}
+        gradeLevel={student.gradeLevel}
+        academicYear={student.academicYear}
+        selectedYear={selectedYear}
+        existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
+      />
+      <HebrewSection
+        assessments={assessments}
+        studentVideos={portfolio.studentVideos}
+        studentId={studentId}
+        studentName={student.firstName}
+        role={role}
+        gradeLevel={student.gradeLevel}
+        existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
+      />
+      <CompositionView
+        writingSamples={portfolio.writingSamples}
+        handwritingSamples={portfolio.handwritingSamples}
+        studentId={studentId}
+        studentName={student.firstName}
+        role={role}
+        academicYear={student.academicYear}
+        gradeLevel={student.gradeLevel}
+        existingDraft={aiDrafts.find((d) => d.sectionType === 'writing')}
       />
       <CharacterArc
         characterAwards={portfolio.characterAwards}
@@ -105,33 +108,6 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
         studentName={student.firstName}
         role={role}
         existingDraft={aiDrafts.find((d) => d.sectionType === 'virtue_badges')}
-      />
-      <ScopeAndSequence
-        gradeLevel={student.gradeLevel}
-        subjects={portfolio.scopeAndSequence}
-      />
-      <HandwritingSamples
-        samples={portfolio.handwritingSamples}
-        uploadEnabled={role !== 'parent'}
-        studentId={studentId}
-        academicYear={student.academicYear}
-        gradeLevel={student.gradeLevel}
-      />
-      <PhotoGallery
-        photos={portfolio.photos}
-        uploadEnabled={role !== 'parent'}
-        studentId={studentId}
-        academicYear={student.academicYear}
-        gradeLevel={student.gradeLevel}
-      />
-      <TeacherNotes notes={portfolio.teacherNotes} role={role} studentId={studentId} />
-      <ParentUploads
-        uploads={portfolio.parentUploads}
-        uploadEnabled={true}
-        studentId={studentId}
-        role={role}
-        academicYear={student.academicYear}
-        gradeLevel={student.gradeLevel}
       />
       <PortfolioFooter />
     </div>

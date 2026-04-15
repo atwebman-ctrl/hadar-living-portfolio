@@ -262,6 +262,7 @@ export function mapStudentVideo(row: Row): StudentVideo {
     gradeLevel:       row.grade_level as string,
     term:             row.term as string,
     category:         row.category as StudentVideo['category'],
+    language:         row.language as StudentVideo['language'],
     createdAt:        row.created_at as string,
   };
 }

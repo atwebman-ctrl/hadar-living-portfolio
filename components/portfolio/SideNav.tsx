@@ -3,50 +3,28 @@
 // ============================================================
 // components/portfolio/SideNav.tsx
 //
-// Portfolio sidebar navigation with collapsible group sections.
-// Groups match the hub layout: Academics, Student Work, Gallery.
-// Clicking a group header navigates to the group page.
-// Chevron toggles sub-item visibility.
+// Portfolio sidebar navigation.
+// Single "Portfolio" group with six tabs (always expanded),
+// plus standalone Teacher journal + Gallery links.
 // ============================================================
 
-import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import styles from './SideNav.module.css'
 
-const GROUPS = [
-  {
-    slug: 'academics',
-    label: 'Academics',
-    items: [
-      { slug: 'math',      label: 'Math' },
-      { slug: 'hebrew',    label: 'Hebrew' },
-      { slug: 'knowledge', label: 'Knowledge' },
-    ],
-  },
-  {
-    slug: 'student-work',
-    label: 'Student Work',
-    items: [
-      { slug: 'the-canon',     label: 'The Canon' },
-      { slug: 'composition',   label: 'Composition' },
-      { slug: 'rhetoric-room', label: 'Rhetoric Room' },
-      { slug: 'handwriting',   label: 'Handwriting' },
-      { slug: 'teacher-notes', label: 'Teacher Notes' },
-      { slug: 'soulcraft',     label: 'Soulcraft' },
-    ],
-  },
-  {
-    slug: 'gallery',
-    label: 'Gallery',
-    items: [
-      { slug: 'photo-gallery',  label: 'Photo Gallery' },
-      { slug: 'parent-uploads', label: 'Parent Uploads' },
-    ],
-  },
-]
+const PORTFOLIO_GROUP = {
+  slug:  'portfolio',
+  label: 'Portfolio',
+  items: [
+    { slug: 'the-canon',   label: 'The Canon'   },
+    { slug: 'math',        label: 'Math'        },
+    { slug: 'english',     label: 'English'     },
+    { slug: 'hebrew',      label: 'Hebrew'      },
+    { slug: 'composition', label: 'Composition' },
+    { slug: 'soulcraft',   label: 'Soulcraft'   },
+  ],
+}
 
-// Flat list for finding active section
-const ALL_ITEMS = GROUPS.flatMap((g) => g.items)
+const ALL_ITEMS = PORTFOLIO_GROUP.items
 
 // Anchor fallback for demo page (no studentId)
 const ANCHOR_ITEMS = [
@@ -84,8 +62,10 @@ export default function SideNav({
 }: SideNavProps = {}) {
   const pathname = usePathname()
 
-  const isHub  = !!studentId && pathname === `/portfolio/${studentId}`
-  const isFull = !!studentId && pathname === `/portfolio/${studentId}/full`
+  const isHub     = !!studentId && pathname === `/portfolio/${studentId}`
+  const isFull    = !!studentId && pathname === `/portfolio/${studentId}/full`
+  const isJournal = !!studentId && pathname === `/portfolio/${studentId}/journal`
+  const isGallery = !!studentId && pathname === `/portfolio/${studentId}/gallery`
 
   // Determine active section from path or prop
   const activeSection = activeSlug ?? (
@@ -94,27 +74,10 @@ export default function SideNav({
       : null
   )
 
-  // Determine active group from prop, path, or active section
-  const currentGroup = activeGroup ?? (
-    studentId
-      ? GROUPS.find((g) => pathname.includes(`/group/${g.slug}`))?.slug
-      : null
-  ) ?? (
-    activeSection
-      ? GROUPS.find((g) => g.items.some((i) => i.slug === activeSection))?.slug
-      : null
-  )
-
-  // Track which groups are expanded; start with active group open
-  const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
-    const init: Record<string, boolean> = {}
-    if (currentGroup) init[currentGroup] = true
-    return init
-  })
-
-  const toggleGroup = (slug: string) => {
-    setExpanded((prev) => ({ ...prev, [slug]: !prev[slug] }))
-  }
+  const isGroupActive =
+    activeGroup === 'portfolio' ||
+    (!!studentId && pathname.includes('/group/portfolio')) ||
+    (activeSection ? ALL_ITEMS.some((i) => i.slug === activeSection) : false)
 
   return (
     <nav className={styles.sidenav}>
@@ -141,52 +104,41 @@ export default function SideNav({
             Overview
           </a>
 
-          {GROUPS.map((group) => {
-            const isGroupActive = currentGroup === group.slug
-            const isOpen = expanded[group.slug] ?? false
+          <div>
+            <div className={styles.groupRow}>
+              <a
+                href={`/portfolio/${studentId}/group/${PORTFOLIO_GROUP.slug}`}
+                className={`${styles.groupLink}${isGroupActive ? ` ${styles.groupLinkActive}` : ''}`}
+              >
+                {PORTFOLIO_GROUP.label}
+              </a>
+            </div>
 
-            return (
-              <div key={group.slug}>
-                <div className={styles.groupRow}>
-                  <a
-                    href={`/portfolio/${studentId}/group/${group.slug}`}
-                    className={`${styles.groupLink}${isGroupActive ? ` ${styles.groupLinkActive}` : ''}`}
-                  >
-                    {group.label}
-                  </a>
-                  <button
-                    className={styles.chevron}
-                    onClick={(e) => { e.preventDefault(); toggleGroup(group.slug) }}
-                    aria-label={`Toggle ${group.label}`}
-                  >
-                    <svg
-                      width="10" height="10" viewBox="0 0 10 10"
-                      style={{
-                        transform:  isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-                        transition: 'transform 0.15s ease',
-                      }}
-                    >
-                      <path d="M3 1 L7 5 L3 9" stroke="currentColor" fill="none" strokeWidth="1.5" />
-                    </svg>
-                  </button>
-                </div>
+            <div className={styles.subItems}>
+              {PORTFOLIO_GROUP.items.map(({ slug, label }) => (
+                <a
+                  key={slug}
+                  href={`/portfolio/${studentId}/group/${PORTFOLIO_GROUP.slug}?tab=${slug}`}
+                  className={activeSection === slug ? 'active' : ''}
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+          </div>
 
-                {isOpen && (
-                  <div className={styles.subItems}>
-                    {group.items.map(({ slug, label }) => (
-                      <a
-                        key={slug}
-                        href={`/portfolio/${studentId}/group/${group.slug}?tab=${slug}`}
-                        className={activeSection === slug ? 'active' : ''}
-                      >
-                        {label}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })}
+          <a
+            href={`/portfolio/${studentId}/journal`}
+            className={`${styles.navLink}${isJournal ? ` ${styles.navLinkActive}` : ''}`}
+          >
+            Teacher journal
+          </a>
+          <a
+            href={`/portfolio/${studentId}/gallery`}
+            className={`${styles.navLink}${isGallery ? ` ${styles.navLinkActive}` : ''}`}
+          >
+            Gallery
+          </a>
 
           <a
             href={`/portfolio/${studentId}/full`}
