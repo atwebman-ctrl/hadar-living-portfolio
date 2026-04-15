@@ -105,9 +105,8 @@ function BottomLink({ href, icon, title, subtitle }: {
 export default function PortfolioHub({ portfolio, studentId, role }: Props) {
   const canEdit = role === 'admin' || role === 'teacher'
 
-  const noteCount   = portfolio.teacherNotes.length
-  const photoCount  = portfolio.photos.length
-  const parentCount = portfolio.parentUploads.length
+  const noteCount    = portfolio.teacherNotes.length
+  const galleryCount = portfolio.photos.length + portfolio.parentUploads.length
 
   const showBanner = role !== 'parent' || !!portfolio.student.progressSummary?.trim()
 
@@ -140,7 +139,7 @@ export default function PortfolioHub({ portfolio, studentId, role }: Props) {
           href={`/portfolio/${studentId}/gallery`}
           icon={<ImageIcon />}
           title="Gallery"
-          subtitle={`${photoCount} photo${photoCount !== 1 ? 's' : ''} · ${parentCount} parent upload${parentCount !== 1 ? 's' : ''}`}
+          subtitle={`${galleryCount} item${galleryCount !== 1 ? 's' : ''}`}
         />
       </div>
     </div>

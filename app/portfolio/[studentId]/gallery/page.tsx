@@ -1,8 +1,9 @@
 // ============================================================
 // app/portfolio/[studentId]/gallery/page.tsx
 //
-// Unified gallery page — classroom photos on top, parent
-// uploads below. Same auth/data pattern as the hub page.
+// Unified gallery page — single section with a source filter
+// (All / School / Parent) rendering photos and parent uploads
+// interleaved by date.
 // ============================================================
 
 import { notFound } from 'next/navigation'
@@ -11,8 +12,7 @@ import { getStudentPortfolio } from '@/lib/getStudentPortfolio'
 import { enforceParentAccess } from '@/lib/portfolioAuth'
 import SideNav from '@/components/portfolio/SideNav'
 import RevealObserver from '@/components/portfolio/RevealObserver'
-import PhotoGallery from '@/components/portfolio/PhotoGallery'
-import ParentUploads from '@/components/portfolio/ParentUploads'
+import UnifiedGallery from '@/components/portfolio/UnifiedGallery'
 import layoutStyles from '@/components/portfolio/layout.module.css'
 import '../../../demo/portfolio.css'
 
@@ -46,17 +46,10 @@ export default async function GalleryPage({ params }: Props) {
             ← Back to Overview
           </a>
         </div>
-        <div style={{ padding: '1.5rem 2.5rem 3rem', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-          <PhotoGallery
+        <div style={{ padding: '1.5rem 2.5rem 3rem' }}>
+          <UnifiedGallery
             photos={portfolio.photos}
-            uploadEnabled={role !== 'parent'}
-            studentId={studentId}
-            academicYear={student.academicYear}
-            gradeLevel={student.gradeLevel}
-          />
-          <ParentUploads
-            uploads={portfolio.parentUploads}
-            uploadEnabled={true}
+            parentUploads={portfolio.parentUploads}
             studentId={studentId}
             role={role}
             academicYear={student.academicYear}

@@ -1,5 +1,7 @@
 'use client'
 
+// DEPRECATED: Replaced by UnifiedGallery in Sprint 5. Safe to delete after confirming no remaining references.
+
 import { useState } from 'react'
 import type { Photo } from '@/lib/types'
 import UploadButton from '@/components/shared/UploadButton'
