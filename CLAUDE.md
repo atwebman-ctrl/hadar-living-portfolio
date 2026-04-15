@@ -182,6 +182,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - **Portfolio overview: 3 groups, not flat tiles** — Academics (Math, Hebrew, Knowledge), Student Work (The Canon, Composition, Rhetoric Room, Handwriting, Teacher Notes, Soulcraft), Gallery (Photo Gallery, Parent Uploads). The 11-tile flat layout is gone; do not revert. Display labels were renamed in Session 1 of the Sprint 5 refactor (was: Intellectual Arc, Immersion Engine, Scope & Sequence, Creative Evolution, Character Arc). Route slugs updated in lockstep; DB section_type / section_category values were NOT renamed.
 - **Hero section: student identity + school identity** — Left cluster is the student (photo + name + optional InviteParentButton). Right cluster is the school logo (or first-initial fallback circle) and italic school name at 35% opacity. Metrics live in `StatsBar` below the hero, not inside it. No school branding elsewhere on the hub — the hero is the single source.
 - **Year selector placement** — Hub overview: year pills merged into `StatsBar` right side. Group pages: standalone `<YearSelector>` rendered by `GroupDetailClient` only for tabs that filter by year. `SectionDetailClient` has its own year selector too. Never add a fourth instance.
+- **⚠️ Math tab still renders ELA** — After the Session 1 rename, `IntellectualArc.tsx` displays the label "Math" but its internal structure still renders BOTH a Mathematics section AND an English Language Arts section (with independent `math_scores` / `english_scores` AI panels). This is a known label/content mismatch until Session 5 of the Sprint 5 refactor, which splits ELA out into its own component. Do not "fix" by removing the ELA block — it's still load-bearing.
 - **Supabase RLS status** — RLS is enabled on all 20 public tables. Policies exist for core tables (0003). Sprint 3+ tables (photos, parent_uploads, handwriting_samples, teacher_notes, scope_and_sequence, book_catalog, student_videos) have RLS enabled but **policies not yet applied to production**. Service role bypasses RLS for all `app/api/` routes. ⚠️ Complete before giving parents direct DB access.
 
 ## Build Sprints (update checkboxes each session)
@@ -310,3 +311,17 @@ grep -rn "Hadar" components/ | grep -v node_modules
 grep -r "school_id" --include="*.ts" --include="*.tsx" | grep -v node_modules | grep -v .next
 # Every query/route should include school_id filtering
 ```
+
+## Sprint 5 Session 1 — Completed (April 14, 2026)
+
+Renames: Intellectual Arc → Math, Immersion Engine → Hebrew, Creative Evolution → Composition, Character Arc → Soulcraft, Scope & Sequence → Knowledge. Route slugs updated in lockstep. Component FILE NAMES not yet renamed.
+
+⚠️ THREE SECTION-NAME TAXONOMIES — do not confuse:
+1. Route slugs (UI): math, hebrew, composition, soulcraft, knowledge — UPDATED
+2. ai_drafts.section_type (DB): math_scores, english_scores, immersion, writing, virtue_badges, reading_bookshelf — UNCHANGED
+3. schools.enabled_sections (dormant): academic_scores, reading, writing, etc. — UNCHANGED
+
+⚠️ KNOWN MISMATCH: The "Math" tab (IntellectualArc.tsx) still renders both Mathematics AND English Language Arts sub-sections. ELA splits out in Session 5.
+
+Tab order confirmed: Academics (Math, Hebrew, Knowledge), Student Work (The Canon, Composition, Rhetoric Room, Handwriting, Teacher Notes, Soulcraft), Gallery (Photo Gallery, Parent Uploads).
+
