@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import type { Assessment, StudentVideo, AiDraft, UserRole } from '@/lib/types'
+import type { Assessment, StudentVideo, AiDraft, TeacherNote, UserRole } from '@/lib/types'
 import AvantChart, { type AvantDataPoint } from '@/components/charts/AvantChart'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import InlineAvantForm from '@/components/portfolio/InlineAvantForm'
+import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import HebrewVideoTab from '@/components/portfolio/HebrewVideoTab'
 import groupStyles from '@/components/portfolio/GroupDetail.module.css'
 import s from './sections.module.css'
@@ -12,6 +13,7 @@ import s from './sections.module.css'
 interface Props {
   assessments?:   Assessment[]
   studentVideos?: StudentVideo[]
+  teacherNotes?:  TeacherNote[]
   studentId?:     string
   studentName?:   string
   role?:          UserRole
@@ -169,6 +171,7 @@ function PlaceholderTab({ label }: { label: string }) {
 export default function HebrewSection({
   assessments,
   studentVideos,
+  teacherNotes,
   studentId,
   studentName,
   role,
@@ -234,10 +237,9 @@ export default function HebrewSection({
       <div className={`${s.chartWrap} reveal`}>
         <div className={s.chartTitle}>AVANT Hebrew — Four Skills Over Time</div>
         <div className={s.legend}>
-          <span><span className={s.legendDot} style={{ background: '#1B3A6B' }} /> Speaking</span>
-          <span><span className={s.legendDot} style={{ background: '#B8963E' }} /> Reading</span>
-          <span><span className={s.legendDot} style={{ background: '#2E7D5E' }} /> Listening</span>
-          <span><span className={s.legendDot} style={{ background: '#7C3AED' }} /> Writing</span>
+          {[['#1B3A6B','Speaking'],['#B8963E','Reading'],['#2E7D5E','Listening'],['#7C3AED','Writing']].map(([bg,lbl]) => (
+            <span key={lbl}><span className={s.legendDot} style={{ background: bg }} /> {lbl}</span>
+          ))}
         </div>
         <div style={{ position: 'relative', height: 260 }}>
           <AvantChart data={avantData ?? undefined} />
@@ -248,6 +250,17 @@ export default function HebrewSection({
         <BenchCard title="Reading — vs. national averages"   rows={readingRows} />
         <BenchCard title="Listening — vs. national averages" rows={listeningRows} />
       </div>
+
+      {studentId && (
+        <InlineSectionComment
+          studentId={studentId}
+          sectionCategory="immersion_engine"
+          sectionAnchor="hebrew-scores"
+          canEdit={canEdit}
+          notes={teacherNotes}
+          role={role}
+        />
+      )}
 
       {canEdit && <InlineAvantForm studentId={studentId!} />}
 
@@ -267,19 +280,11 @@ export default function HebrewSection({
       {/* ── Sub-tab content ──────────────────────────────────── */}
       {activeTab === 'spelling' && <PlaceholderTab label="Spelling" />}
       {activeTab === 'grammar'  && <PlaceholderTab label="Grammar"  />}
-      {activeTab === 'video'    && <HebrewVideoTab videos={hebrewVideos} canEdit={canEdit} studentId={studentId} />}
+      {activeTab === 'video'    && <HebrewVideoTab videos={hebrewVideos} canEdit={canEdit} studentId={studentId} teacherNotes={teacherNotes} role={role} />}
 
       {/* ── Composition link ─────────────────────────────────── */}
       <div style={{ marginTop: '1.5rem' }}>
-        <a
-          href="#"
-          style={{
-            display: 'inline-block',
-            fontSize: 13,
-            color: 'var(--ink-light)',
-            textDecoration: 'none',
-          }}
-        >
+        <a href="#" style={{ display: 'inline-block', fontSize: 13, color: 'var(--ink-light)', textDecoration: 'none' }}>
           View all Hebrew compositions →
         </a>
       </div>

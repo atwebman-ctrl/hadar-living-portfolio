@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import type { Assessment, StudentVideo, AiDraft, UserRole } from '@/lib/types'
+import type { Assessment, StudentVideo, AiDraft, TeacherNote, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import SubjectScoreRows, { type ScoreDisplayRow } from '@/components/portfolio/SubjectScoreRows'
 import MapPercentileChart, { type StudentScorePoint } from '@/components/charts/MapPercentileChart'
 import InlineAssessmentForm from '@/components/portfolio/InlineAssessmentForm'
+import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import EnglishVideoTab from '@/components/portfolio/EnglishVideoTab'
 import { DEMO_ENGLISH_ROWS, DEMO_READING_SCORES } from './IntellectualArcDemoData'
 import groupStyles from '@/components/portfolio/GroupDetail.module.css'
@@ -14,6 +15,7 @@ import s from './sections.module.css'
 interface Props {
   assessments?:          Assessment[]
   studentVideos?:        StudentVideo[]
+  teacherNotes?:         TeacherNote[]
   studentId?:            string
   studentName?:          string
   role?:                 UserRole
@@ -107,6 +109,7 @@ function PlaceholderTab({ label }: { label: string }) {
 export default function EnglishSection({
   assessments,
   studentVideos,
+  teacherNotes,
   studentId,
   studentName,
   role,
@@ -154,6 +157,16 @@ export default function EnglishSection({
         <div style={{ position: 'relative', height: 260, marginTop: '1rem' }}>
           <MapPercentileChart subject="reading" studentScores={readingScores} />
         </div>
+        {studentId && (
+          <InlineSectionComment
+            studentId={studentId}
+            sectionCategory="english"
+            sectionAnchor="english-scores"
+            canEdit={canEdit}
+            notes={teacherNotes}
+            role={role}
+          />
+        )}
         {studentId && role !== 'parent' && (
           <InlineAssessmentForm studentId={studentId} defaultType="maps_english" label="Add MAP Reading Score" />
         )}
@@ -175,7 +188,7 @@ export default function EnglishSection({
       {/* ── Sub-tab content ──────────────────────────────────── */}
       {activeTab === 'spelling' && <PlaceholderTab label="Spelling" />}
       {activeTab === 'grammar'  && <PlaceholderTab label="Grammar"  />}
-      {activeTab === 'video'    && <EnglishVideoTab videos={englishVideos} canEdit={canEdit} studentId={studentId} />}
+      {activeTab === 'video'    && <EnglishVideoTab videos={englishVideos} canEdit={canEdit} studentId={studentId} teacherNotes={teacherNotes} role={role} />}
 
       {/* ── Composition link ─────────────────────────────────── */}
       <div style={{ marginTop: '1.5rem' }}>

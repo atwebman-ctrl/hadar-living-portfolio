@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import type { WritingSample, HandwritingSample, AiDraft, UserRole } from '@/lib/types'
+import type { WritingSample, HandwritingSample, AiDraft, TeacherNote, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import InlineWritingForm from '@/components/portfolio/InlineWritingForm'
+import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import CompositionHandwriting from '@/components/portfolio/CompositionHandwriting'
 import groupStyles from '@/components/portfolio/GroupDetail.module.css'
 import s from './sections.module.css'
@@ -11,6 +12,7 @@ import s from './sections.module.css'
 interface Props {
   writingSamples:     WritingSample[]
   handwritingSamples: HandwritingSample[]
+  teacherNotes?:      TeacherNote[]
   studentId:          string
   studentName?:       string
   role:               UserRole
@@ -138,6 +140,7 @@ function SampleRow({ sample, showLangTag, expanded, onToggle }: {
 export default function CompositionView({
   writingSamples,
   handwritingSamples,
+  teacherNotes,
   studentId,
   studentName,
   role,
@@ -218,6 +221,15 @@ export default function CompositionView({
           draftContext={draftContext ?? {}}
         />
       )}
+
+      <InlineSectionComment
+        studentId={studentId}
+        sectionCategory="creative_evolution"
+        sectionAnchor="composition"
+        canEdit={canEdit}
+        notes={teacherNotes}
+        role={role}
+      />
 
       {/* TODO: pre-set InlineWritingForm.language to `filter` when filter !== 'all'. */}
       {canEdit && <InlineWritingForm studentId={studentId} />}

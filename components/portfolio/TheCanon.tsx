@@ -12,16 +12,18 @@
 // Demo fallback: renders DEMO_READINGS when no live data and no studentId.
 // ============================================================
 
-import type { Reading, AiDraft, UserRole } from '@/lib/types'
+import type { Reading, AiDraft, TeacherNote, UserRole } from '@/lib/types'
 import CanonListView from '@/components/portfolio/CanonListView'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import AiDraftEditor from '@/components/shared/AiDraftEditor'
 import InlineReadingForm from '@/components/portfolio/InlineReadingForm'
+import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import { DEMO_READINGS, DEMO_CANON_NARRATIVE } from './TheCanonDemoData'
 import s from './sections.module.css'
 
 interface Props {
   readings?:      Reading[]
+  teacherNotes?:  TeacherNote[]
   studentId?:     string
   studentName?:   string
   role?:          UserRole
@@ -39,10 +41,12 @@ function buildDraftContext(readings: Reading[], firstName: string | null) {
   }
 }
 
-export default function TheCanon({ readings, studentId, studentName, role, existingDraft }: Props) {
+export default function TheCanon({ readings, teacherNotes, studentId, studentName, role, existingDraft }: Props) {
   const isLive = !!readings && readings.length > 0
   const isDemo = !isLive && !studentId
   const displayReadings = isLive ? readings! : (isDemo ? DEMO_READINGS : [])
+
+  const canEdit = !!studentId && (role === 'admin' || role === 'teacher')
 
   const draftContext = (studentId && role && role !== 'parent' && isLive)
     ? buildDraftContext(readings!, studentName ?? null)
@@ -77,6 +81,17 @@ export default function TheCanon({ readings, studentId, studentName, role, exist
           initialStatus="accepted"
           initialText={DEMO_CANON_NARRATIVE}
           initialFinalText={DEMO_CANON_NARRATIVE}
+        />
+      )}
+
+      {studentId && (
+        <InlineSectionComment
+          studentId={studentId}
+          sectionCategory="the_canon"
+          sectionAnchor="canon-list"
+          canEdit={canEdit}
+          notes={teacherNotes}
+          role={role}
         />
       )}
 

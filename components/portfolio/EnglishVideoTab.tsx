@@ -1,13 +1,16 @@
 'use client'
 
-import type { StudentVideo } from '@/lib/types'
+import type { StudentVideo, TeacherNote, UserRole } from '@/lib/types'
 import InlineVideoForm from '@/components/portfolio/InlineVideoForm'
+import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import s from './sections.module.css'
 
 interface Props {
-  videos:     StudentVideo[]
-  canEdit:    boolean
-  studentId?: string
+  videos:       StudentVideo[]
+  canEdit:      boolean
+  studentId?:   string
+  teacherNotes?: TeacherNote[]
+  role?:        UserRole
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -73,13 +76,25 @@ function EmbedVideoCard({ video }: { video: StudentVideo }) {
   )
 }
 
-export default function EnglishVideoTab({ videos, canEdit, studentId }: Props) {
+export default function EnglishVideoTab({ videos, canEdit, studentId, teacherNotes, role }: Props) {
+  const commentEl = studentId ? (
+    <InlineSectionComment
+      studentId={studentId}
+      sectionCategory="english"
+      sectionAnchor="english-video"
+      canEdit={canEdit}
+      notes={teacherNotes}
+      role={role}
+    />
+  ) : null
+
   if (videos.length === 0) {
     return (
       <div style={{ padding: '2rem 0' }}>
         <p style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.25rem', maxWidth: 560 }}>
           No English videos yet. Add a YouTube or Vimeo link below to start tracing the arc of spoken performance.
         </p>
+        {commentEl}
         {canEdit && studentId && <InlineVideoForm studentId={studentId} />}
       </div>
     )
@@ -112,6 +127,7 @@ export default function EnglishVideoTab({ videos, canEdit, studentId }: Props) {
           {gridVideos.map((v) => <EmbedVideoCard key={v.id} video={v} />)}
         </div>
       )}
+      {commentEl}
       {canEdit && studentId && <InlineVideoForm studentId={studentId} />}
     </div>
   )

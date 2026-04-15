@@ -1,10 +1,12 @@
-import type { CharacterAward, AiDraft, UserRole } from '@/lib/types'
+import type { CharacterAward, AiDraft, TeacherNote, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import InlineCharacterForm from '@/components/portfolio/InlineCharacterForm'
+import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import s from './sections.module.css'
 
 interface Props {
   characterAwards?: CharacterAward[]
+  teacherNotes?:    TeacherNote[]
   studentId?:       string
   studentName?:     string
   role?:            UserRole
@@ -76,8 +78,9 @@ function buildDraftContext(characterAwards: CharacterAward[], studentFirstName: 
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function CharacterArc({ characterAwards, studentId, studentName, role, existingDraft }: Props) {
+export default function CharacterArc({ characterAwards, teacherNotes, studentId, studentName, role, existingDraft }: Props) {
   const hasData = !!characterAwards && characterAwards.length > 0
+  const canEdit = !!studentId && (role === 'admin' || role === 'teacher')
 
   const badges = hasData
     ? characterAwards!.map((a, i) => ({
@@ -149,6 +152,17 @@ export default function CharacterArc({ characterAwards, studentId, studentName, 
           sectionType="virtue_badges"
           existingDraft={existingDraft}
           draftContext={draftContext ?? {}}
+        />
+      )}
+
+      {studentId && (
+        <InlineSectionComment
+          studentId={studentId}
+          sectionCategory="character_arc"
+          sectionAnchor="soulcraft"
+          canEdit={canEdit}
+          notes={teacherNotes}
+          role={role}
         />
       )}
 

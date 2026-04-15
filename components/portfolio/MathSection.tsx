@@ -1,9 +1,10 @@
-import type { Assessment, AiDraft, UserRole } from '@/lib/types'
+import type { Assessment, AiDraft, TeacherNote, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import AiDraftEditor from '@/components/shared/AiDraftEditor'
 import SubjectScoreRows, { type ScoreDisplayRow } from '@/components/portfolio/SubjectScoreRows'
 import MapPercentileChart, { type StudentScorePoint } from '@/components/charts/MapPercentileChart'
 import InlineAssessmentForm from '@/components/portfolio/InlineAssessmentForm'
+import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import IntellectualArcAllYears from '@/components/portfolio/IntellectualArcAllYears'
 import {
   DEMO_MATH_ROWS, DEMO_MATH_SCORES, DEMO_MATH_NARRATIVE,
@@ -12,6 +13,7 @@ import s from './sections.module.css'
 
 interface Props {
   assessments?:       Assessment[]
+  teacherNotes?:      TeacherNote[]
   studentId?:         string
   studentName?:       string
   role?:              UserRole
@@ -114,6 +116,7 @@ function TestHistoryLink() {
 
 export default function MathSection({
   assessments,
+  teacherNotes,
   studentId,
   studentName,
   role,
@@ -123,6 +126,8 @@ export default function MathSection({
   currentYear,
   selectedYear,
 }: Props) {
+  const canEdit = !!studentId && (role === 'admin' || role === 'teacher')
+
   // When showing all years and there is real math data, delegate to the trajectory view.
   const allMath = assessments?.filter((a) => a.assessmentType === 'maps_math') ?? []
 
@@ -142,6 +147,16 @@ export default function MathSection({
           studentId={studentId}
           role={role}
         />
+        {studentId && (
+          <InlineSectionComment
+            studentId={studentId}
+            sectionCategory="intellectual_arc"
+            sectionAnchor="math-scores"
+            canEdit={canEdit}
+            notes={teacherNotes}
+            role={role}
+          />
+        )}
       </section>
     )
   }
@@ -208,6 +223,16 @@ export default function MathSection({
         <div style={{ position: 'relative', height: 260, marginTop: '1rem' }}>
           <MapPercentileChart subject="math" studentScores={mathScores} />
         </div>
+        {studentId && (
+          <InlineSectionComment
+            studentId={studentId}
+            sectionCategory="intellectual_arc"
+            sectionAnchor="math-scores"
+            canEdit={canEdit}
+            notes={teacherNotes}
+            role={role}
+          />
+        )}
         {studentId && role !== 'parent' && (
           <InlineAssessmentForm studentId={studentId} defaultType="maps_math" label="Add MAP Math Score" />
         )}

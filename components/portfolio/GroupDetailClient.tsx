@@ -78,7 +78,7 @@ const YEAR_FILTER_TABS = new Set(['math', 'english', 'the-canon'])
 function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
   slug: string; portfolio: PortfolioData; studentId: string; role: UserRole; selectedYear: string
 }) {
-  const { student, assessments, aiDrafts } = portfolio
+  const { student, assessments, aiDrafts, teacherNotes } = portfolio
   const filtered = <T extends { academicYear?: string | null }>(items: T[]): T[] =>
     selectedYear === 'all' ? items : items.filter((i) => i.academicYear === selectedYear)
 
@@ -87,6 +87,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
       return (
         <TheCanon
           readings={filtered(portfolio.readings)}
+          teacherNotes={teacherNotes}
           studentId={studentId}
           studentName={student.firstName}
           role={role}
@@ -97,6 +98,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
       return (
         <MathSection
           assessments={assessments}
+          teacherNotes={teacherNotes}
           studentId={studentId}
           studentName={student.firstName}
           role={role}
@@ -112,6 +114,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
         <EnglishSection
           assessments={assessments}
           studentVideos={portfolio.studentVideos}
+          teacherNotes={teacherNotes}
           studentId={studentId}
           studentName={student.firstName}
           role={role}
@@ -126,6 +129,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
         <HebrewSection
           assessments={assessments}
           studentVideos={portfolio.studentVideos}
+          teacherNotes={teacherNotes}
           studentId={studentId}
           studentName={student.firstName}
           role={role}
@@ -138,6 +142,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
         <CompositionView
           writingSamples={portfolio.writingSamples}
           handwritingSamples={portfolio.handwritingSamples}
+          teacherNotes={teacherNotes}
           studentId={studentId}
           studentName={student.firstName}
           role={role}
@@ -150,6 +155,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
       return (
         <CharacterArc
           characterAwards={portfolio.characterAwards}
+          teacherNotes={teacherNotes}
           studentId={studentId}
           studentName={student.firstName}
           role={role}

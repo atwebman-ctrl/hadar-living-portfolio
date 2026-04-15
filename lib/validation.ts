@@ -210,6 +210,7 @@ export type CreateCharacterAwardBodyInput = z.infer<typeof CreateCharacterAwardB
 // ── Teacher notes ─────────────────────────────────────────────
 
 export const SECTION_CATEGORY_VALUES = [
+  // Legacy / DB-authoritative values
   "intellectual_arc",
   "immersion_engine",
   "the_canon",
@@ -217,6 +218,12 @@ export const SECTION_CATEGORY_VALUES = [
   "rhetoric_room",
   "character_arc",
   "general",
+  // Sprint 5 renames — accepted alongside legacy values
+  "math",
+  "english",
+  "hebrew",
+  "composition",
+  "soulcraft",
 ] as const;
 
 const sectionCategoryEnum = z.enum(SECTION_CATEGORY_VALUES);
@@ -225,6 +232,7 @@ const sectionCategoryEnum = z.enum(SECTION_CATEGORY_VALUES);
 export const CreateTeacherNoteBodySchema = z.object({
   noteText:         z.string().min(1, "Note text cannot be empty"),
   sectionCategory:  sectionCategoryEnum.default("general"),
+  sectionAnchor:    z.string().max(200).optional(),
   term:             z.string().optional(),
   date:             z.string().date().optional(),
   highlightQuote:   z.string().optional(),

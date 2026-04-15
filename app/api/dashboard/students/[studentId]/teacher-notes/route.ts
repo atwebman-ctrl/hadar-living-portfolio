@@ -109,6 +109,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     term:             input.term ?? null,
     highlight_quote:  input.highlightQuote ?? null,
     visible_to_parents: input.visibleToParents,
+    section_anchor:   input.sectionAnchor ?? null,
     created_by:       ctx.userId,
     updated_by:       ctx.userId,
   }

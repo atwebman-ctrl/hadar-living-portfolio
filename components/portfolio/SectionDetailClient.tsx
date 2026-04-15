@@ -73,7 +73,7 @@ export default function SectionDetailClient({
   years,
 }: Props) {
   const router = useRouter()
-  const { student, assessments, aiDrafts } = portfolio
+  const { student, assessments, aiDrafts, teacherNotes } = portfolio
 
   const handleYearChange = (year: string) => {
     const base = `/portfolio/${studentId}/section/${slug}`
@@ -87,6 +87,7 @@ export default function SectionDetailClient({
         return (
           <TheCanon
             readings={portfolio.readings}
+            teacherNotes={teacherNotes}
             studentId={studentId}
             studentName={student.firstName}
             role={role}
@@ -97,6 +98,7 @@ export default function SectionDetailClient({
         return (
           <MathSection
             assessments={assessments}
+            teacherNotes={teacherNotes}
             studentId={studentId}
             studentName={student.firstName}
             role={role}
@@ -112,6 +114,7 @@ export default function SectionDetailClient({
           <EnglishSection
             assessments={assessments}
             studentVideos={portfolio.studentVideos}
+            teacherNotes={teacherNotes}
             studentId={studentId}
             studentName={student.firstName}
             role={role}
@@ -126,6 +129,7 @@ export default function SectionDetailClient({
           <HebrewSection
             assessments={assessments}
             studentVideos={portfolio.studentVideos}
+            teacherNotes={teacherNotes}
             studentId={studentId}
             studentName={student.firstName}
             role={role}
@@ -138,6 +142,7 @@ export default function SectionDetailClient({
           <CompositionView
             writingSamples={portfolio.writingSamples}
             handwritingSamples={portfolio.handwritingSamples}
+            teacherNotes={teacherNotes}
             studentId={studentId}
             studentName={student.firstName}
             role={role}
@@ -150,6 +155,7 @@ export default function SectionDetailClient({
         return (
           <CharacterArc
             characterAwards={portfolio.characterAwards}
+            teacherNotes={teacherNotes}
             studentId={studentId}
             studentName={student.firstName}
             role={role}

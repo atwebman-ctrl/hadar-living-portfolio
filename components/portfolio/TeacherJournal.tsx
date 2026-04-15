@@ -39,6 +39,25 @@ const SECTION_LABELS: Record<string, string> = {
 const ALL_SECTIONS = '__all__' as const
 type FilterValue = typeof ALL_SECTIONS | string
 
+// Map a note's sectionCategory to the tab slug used by /group/portfolio?tab=...
+// Returns null when the category has no matching tab (inert link).
+const CATEGORY_TO_TAB: Record<string, string> = {
+  intellectual_arc:   'math',
+  immersion_engine:   'hebrew',
+  the_canon:          'the-canon',
+  creative_evolution: 'composition',
+  character_arc:      'soulcraft',
+  math:               'math',
+  english:            'english',
+  hebrew:             'hebrew',
+  composition:        'composition',
+  soulcraft:          'soulcraft',
+}
+
+function tabSlugFor(n: TeacherNote): string | null {
+  return CATEGORY_TO_TAB[n.sectionCategory] ?? null
+}
+
 // ── Helpers ───────────────────────────────────────────────────
 
 function noteSection(n: TeacherNote): string {
@@ -58,9 +77,14 @@ function sortByDateDesc(notes: TeacherNote[]): TeacherNote[] {
 
 // ── Sub-components ────────────────────────────────────────────
 
-function NoteCard({ note }: { note: TeacherNote }) {
+function NoteCard({ note, studentId }: { note: TeacherNote; studentId?: string }) {
   const section = noteSection(note)
   const date    = formatDate(note.createdAt)
+  const tab     = tabSlugFor(note)
+  const anchor  = note.sectionAnchor ?? null
+  const href    = (studentId && tab && anchor)
+    ? `/portfolio/${studentId}/group/portfolio?tab=${tab}#${anchor}`
+    : null
   return (
     <blockquote style={{ margin: 0, background: 'var(--parchment)', border: '1px solid var(--rule)', borderLeft: '3px solid var(--gold)', padding: '1.25rem 1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '.75rem', flexWrap: 'wrap', gap: '.5rem' }}>
@@ -106,19 +130,27 @@ function NoteCard({ note }: { note: TeacherNote }) {
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '.65rem', letterSpacing: '.08em', color: 'var(--ink-light)', textTransform: 'uppercase' }}>
           — {note.authorName}
         </span>
-        {/* TODO: Wire "View in context" navigation using section_anchor (Session 4) */}
-        <a
-          href="#"
-          style={{ fontSize: 12, color: 'var(--ink-light)', textDecoration: 'none' }}
-        >
-          View in context →
-        </a>
+        {href ? (
+          <a
+            href={href}
+            style={{ fontSize: 12, color: 'var(--ink-light)', textDecoration: 'none' }}
+          >
+            View in context →
+          </a>
+        ) : (
+          <span
+            aria-disabled="true"
+            style={{ fontSize: 12, color: 'var(--ink-faint)', cursor: 'default' }}
+          >
+            View in context →
+          </span>
+        )}
       </footer>
     </blockquote>
   )
 }
 
-function SectionGroup({ label, notes }: { label: string; notes: TeacherNote[] }) {
+function SectionGroup({ label, notes, studentId }: { label: string; notes: TeacherNote[]; studentId?: string }) {
   return (
     <div style={{ marginBottom: '2rem' }}>
       <div style={{
@@ -132,7 +164,7 @@ function SectionGroup({ label, notes }: { label: string; notes: TeacherNote[] })
         </span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        {notes.map((n) => <NoteCard key={n.id} note={n} />)}
+        {notes.map((n) => <NoteCard key={n.id} note={n} studentId={studentId} />)}
       </div>
     </div>
   )
@@ -140,7 +172,7 @@ function SectionGroup({ label, notes }: { label: string; notes: TeacherNote[] })
 
 // ── Component ─────────────────────────────────────────────────
 
-export default function TeacherJournal({ notes, role }: Props) {
+export default function TeacherJournal({ notes, role, studentId }: Props) {
   const [filter, setFilter] = useState<FilterValue>(ALL_SECTIONS)
 
   // Parents only see notes marked visible_to_parents = true
@@ -212,12 +244,12 @@ export default function TeacherJournal({ notes, role }: Props) {
       ) : grouped ? (
         <div className="reveal">
           {grouped.map(([label, list]) => (
-            <SectionGroup key={label} label={label} notes={list} />
+            <SectionGroup key={label} label={label} notes={list} studentId={studentId} />
           ))}
         </div>
       ) : (
         <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {sorted.map((n) => <NoteCard key={n.id} note={n} />)}
+          {sorted.map((n) => <NoteCard key={n.id} note={n} studentId={studentId} />)}
         </div>
       )}
     </section>
