@@ -5,6 +5,9 @@ Say "🫡" in your first message to acknowledge you've read this document.
 Always recommend the optimal, future-proofed solution — never the shortcut.
 At end of every session: ask "anything to clean up?" and remind Aaron to update this file.
 
+## Verification-First Workflow
+Before modifying existing files or wiring into existing interfaces, always verify assumptions against the actual codebase first. Output prop interfaces, type definitions, CSS variables, database columns, and component structure BEFORE writing implementation code. Never guess at type strings, prop names, or data shapes — read the source files. This applies especially to: switch case values, assessment type strings, section_type/section_category DB values, CSS variable names, and component prop interfaces.
+
 ## Reference Documents (read before any architecture or product questions)
 - **Master Brief:** `docs/hadar-living-portfolio-brief-v3.md` — product spec, section map, design philosophy, sprint task list, Tayler's requirements
 - **Architecture Doc:** `docs/hadar-living-portfolio-architecture.md` — ER diagram, API route map, component tree, data flow, auth flow, theming, AI layer, security checklist, design bible
@@ -278,6 +281,12 @@ Kept in-tree to avoid churn and because DemoPortfolio may still import them unti
   - [x] Phase 3B: Dashboard grid hub — 6 metric cards, slim hero, remove StatsBar
   - [x] Phase 4A: Demo page updated to new components
   - [ ] Phase 4B: Knowledge moved to teacher dashboard (deferred)
+- [x] Sprint 5 Session 3: Inline teacher comments
+  - [x] Migration: fix ghost columns (section_category, term, highlight_quote, visible_to_parents) + add section_anchor
+  - [x] InlineSectionComment component with note display + compact form
+  - [x] Wired into all 6 sections + 2 video tabs with section_anchor deep-links
+  - [x] TeacherJournal "View in context" links navigate to exact section via tab slug + anchor fragment
+  - [x] teacherNotes threaded through GroupDetailClient and SectionDetailClient to all section components
 - [ ] Sprint 5 (V2): School-wide analysis, State of the Union, multi-school theming
 
 ## Bugs Fixed (April 11, 2026)
