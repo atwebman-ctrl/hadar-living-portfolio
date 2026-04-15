@@ -12,18 +12,25 @@ type MapType = 'maps_math' | 'maps_english'
 const AVANT_TYPES = ['avant_speaking', 'avant_reading', 'avant_listening', 'avant_writing'] as const
 type AvantType = typeof AVANT_TYPES[number]
 
+// ── Term ordering ────────────────────────────────────────────
+// Terms within an academic year run Fall → Winter → Spring.
+// Lexicographic sort breaks this (Fall < Spring < Winter), so
+// every comparator must use termOrdinal instead of raw term strings.
+const TERM_ORDER: Record<string, number> = { Fall: 0, Winter: 1, Spring: 2 }
+
+function termOrdinal(term: string | null | undefined): number {
+  if (!term) return 0
+  const [season, yearStr] = term.split(' ')
+  const year = parseInt(yearStr ?? '0', 10)
+  return year * 10 + (TERM_ORDER[season] ?? 0)
+}
+
 // ── Shared sort ──────────────────────────────────────────────
 
 function compareAssessmentDesc(a: Assessment, b: Assessment): number {
   const yearCmp = (b.academicYear ?? '').localeCompare(a.academicYear ?? '')
   if (yearCmp !== 0) return yearCmp
-  return (b.term ?? '').localeCompare(a.term ?? '')
-}
-
-function sortAscChronological(a: Assessment, b: Assessment): number {
-  const yearCmp = (a.academicYear ?? '').localeCompare(b.academicYear ?? '')
-  if (yearCmp !== 0) return yearCmp
-  return (a.term ?? '').localeCompare(b.term ?? '')
+  return termOrdinal(b.term) - termOrdinal(a.term)
 }
 
 // ── MAP scores ───────────────────────────────────────────────
@@ -35,6 +42,7 @@ export interface MapScoreSummary {
   delta:      number | null
   term:       string
   prevTerm:   string | null
+  isYoY:      boolean
 }
 
 export function latestMapScore(assessments: Assessment[], type: MapType): MapScoreSummary | null {
@@ -42,10 +50,21 @@ export function latestMapScore(assessments: Assessment[], type: MapType): MapSco
     .filter((a) => a.assessmentType === type)
     .sort(compareAssessmentDesc)
   if (rows.length === 0) return null
-  const [latest, prev] = rows
+
+  const latest = rows[0]
   const latestScore = latest.ritScore ?? latest.score ?? null
-  const prevScore   = prev ? (prev.ritScore ?? prev.score ?? null) : null
-  const delta       = latestScore != null && prevScore != null ? latestScore - prevScore : null
+
+  // Prefer winter-to-winter year-over-year comparison when available.
+  // Fall back to the second-most-recent row so cards with limited data still show a delta.
+  const prevWinter = rows.find(
+    (r) => (r.term ?? '').startsWith('Winter') && r.academicYear !== latest.academicYear,
+  )
+  const prev  = prevWinter ?? rows[1] ?? null
+  const isYoY = !!prevWinter
+
+  const prevScore = prev ? (prev.ritScore ?? prev.score ?? null) : null
+  const delta     = latestScore != null && prevScore != null ? latestScore - prevScore : null
+
   return {
     score:      latestScore,
     rit:        latest.ritScore,
@@ -53,19 +72,23 @@ export function latestMapScore(assessments: Assessment[], type: MapType): MapSco
     delta,
     term:       latest.term,
     prevTerm:   prev?.term ?? null,
+    isYoY,
   }
 }
 
 // ── AVANT composite ──────────────────────────────────────────
 
+export type AvantSkill = 'listening' | 'reading' | 'writing' | 'speaking'
+
 export interface AvantCompositeSummary {
-  composite:   number
-  level:       string
-  listening:   number | null
-  reading:     number | null
-  writing:     number | null
-  speaking:    number | null
-  lowestSkill: 'listening' | 'reading' | 'writing' | 'speaking' | null
+  composite:      number
+  level:          string
+  listening:      number | null
+  reading:        number | null
+  writing:        number | null
+  speaking:       number | null
+  lowestSkill:    AvantSkill | null
+  strongestSkill: AvantSkill | null
 }
 
 // Grade-equivalent bands borrowed from HebrewSection.tsx
@@ -85,18 +108,22 @@ export function latestAvantComposite(assessments: Assessment[]): AvantCompositeS
   const rows = assessments.filter((a) => (AVANT_TYPES as readonly string[]).includes(a.assessmentType))
   if (rows.length === 0) return null
 
-  const groups = new Map<string, Partial<Record<AvantType, number>>>()
+  const groups = new Map<string, { year: string; term: string; skills: Partial<Record<AvantType, number>> }>()
   for (const a of rows) {
     if (a.score == null) continue
-    const key = `${a.academicYear}||${a.term}`
-    const entry = groups.get(key) ?? {}
-    entry[a.assessmentType as AvantType] = a.score
+    const key   = `${a.academicYear}||${a.term}`
+    const entry = groups.get(key) ?? { year: a.academicYear ?? '', term: a.term ?? '', skills: {} }
+    entry.skills[a.assessmentType as AvantType] = a.score
     groups.set(key, entry)
   }
   if (groups.size === 0) return null
 
-  const sorted = [...groups.entries()].sort(([a], [b]) => b.localeCompare(a))
-  const [, latest] = sorted[0]
+  const sorted = [...groups.values()].sort((a, b) => {
+    const yearCmp = b.year.localeCompare(a.year)
+    if (yearCmp !== 0) return yearCmp
+    return termOrdinal(b.term) - termOrdinal(a.term)
+  })
+  const latest = sorted[0].skills
 
   const listening = latest.avant_listening ?? null
   const reading   = latest.avant_reading   ?? null
@@ -108,12 +135,13 @@ export function latestAvantComposite(assessments: Assessment[]): AvantCompositeS
     { skill: 'reading'   as const, v: reading   },
     { skill: 'writing'   as const, v: writing   },
     { skill: 'speaking'  as const, v: speaking  },
-  ].filter((x): x is { skill: 'listening'|'reading'|'writing'|'speaking'; v: number } => x.v != null)
+  ].filter((x): x is { skill: AvantSkill; v: number } => x.v != null)
 
   if (present.length === 0) return null
 
   const composite = present.reduce((s, x) => s + x.v, 0) / present.length
   const lowest    = present.reduce((min, x) => (x.v < min.v ? x : min), present[0])
+  const highest   = present.reduce((max, x) => (x.v > max.v ? x : max), present[0])
 
   return {
     composite,
@@ -122,7 +150,8 @@ export function latestAvantComposite(assessments: Assessment[]): AvantCompositeS
     reading,
     writing,
     speaking,
-    lowestSkill: lowest.skill,
+    lowestSkill:    lowest.skill,
+    strongestSkill: highest.skill,
   }
 }
 
@@ -167,7 +196,7 @@ export function latestComposition(samples: WritingSample[]): CompositionSummary 
   const sorted = [...samples].sort((a, b) => {
     const ay = (b.academicYear ?? '').localeCompare(a.academicYear ?? '')
     if (ay !== 0) return ay
-    return (b.term ?? '').localeCompare(a.term ?? '')
+    return termOrdinal(b.term) - termOrdinal(a.term)
   })
   const latest = sorted[0]
   const source = latest.excerpt ?? latest.body ?? latest.ocrText ?? ''
@@ -178,33 +207,4 @@ export function latestComposition(samples: WritingSample[]): CompositionSummary 
     language: latest.language,
     date:     latest.term ?? latest.academicYear ?? null,
   }
-}
-
-// ── Sparkline ────────────────────────────────────────────────
-
-export function sparklinePoints(
-  assessments: Assessment[],
-  type: MapType,
-): { x: number; y: number }[] {
-  const rows = assessments
-    .filter((a) => a.assessmentType === type)
-    .sort(sortAscChronological)
-    .slice(-6)
-    .map((a) => a.ritScore ?? a.score)
-    .filter((v): v is number => v != null)
-
-  if (rows.length === 0) return []
-  if (rows.length === 1) return [{ x: 100, y: 22 }]
-
-  const min = Math.min(...rows)
-  const max = Math.max(...rows)
-  const range = max - min || 1
-  const step  = rows.length > 1 ? 200 / (rows.length - 1) : 0
-
-  return rows.map((v, i) => {
-    const x = Math.round(i * step)
-    // y=6 (top) for max, y=38 (bottom) for min — invert since SVG y grows down
-    const y = Math.round(6 + ((max - v) / range) * 32)
-    return { x, y }
-  })
 }

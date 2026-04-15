@@ -15,9 +15,17 @@ import {
   latestAvantComposite,
   readingMetrics,
   latestComposition,
-  sparklinePoints,
+  type AvantSkill,
 } from '@/lib/dashboardHelpers'
+import PercentileTooltip from '@/components/shared/PercentileTooltip'
 import grid from './DashboardGrid.module.css'
+
+const SKILL_LABEL: Record<AvantSkill, string> = {
+  listening: 'Listening',
+  reading:   'Reading',
+  writing:   'Writing',
+  speaking:  'Speaking',
+}
 
 // ── Shared atoms ──────────────────────────────────────────────
 
@@ -52,33 +60,6 @@ function CardShell({ tab, studentId, label, children }: {
   )
 }
 
-// ── Map sparkline ─────────────────────────────────────────────
-
-function Sparkline({ points }: { points: { x: number; y: number }[] }) {
-  if (points.length === 0) return null
-  const polyline = points.map((p) => `${p.x},${p.y}`).join(' ')
-  const last = points[points.length - 1]
-  const first = points[0]
-  return (
-    <svg viewBox="0 0 200 44" preserveAspectRatio="none" style={{ width: '100%', height: 44, marginTop: 10 }}>
-      {points.length > 1 && (
-        <polyline
-          points={polyline}
-          fill="none"
-          stroke="var(--navy)"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      )}
-      {points.length > 1 && (
-        <circle cx={first.x} cy={first.y} r={3} fill="var(--navy)" opacity={0.3} />
-      )}
-      <circle cx={last.x} cy={last.y} r={4} fill="var(--gold)" stroke="var(--white)" strokeWidth={1.5} />
-    </svg>
-  )
-}
-
 // ── Math / English cards ──────────────────────────────────────
 
 function MapCard({ label, tab, assessments, studentId, type }: {
@@ -89,7 +70,6 @@ function MapCard({ label, tab, assessments, studentId, type }: {
   type:        'maps_math' | 'maps_english'
 }) {
   const m = latestMapScore(assessments, type)
-  const pts = sparklinePoints(assessments, type)
   return (
     <CardShell tab={tab} studentId={studentId} label={label}>
       {m?.score == null ? (
@@ -102,15 +82,18 @@ function MapCard({ label, tab, assessments, studentId, type }: {
           </div>
           <div style={{ fontSize: 12, color: 'var(--ink-mid)', marginTop: 4 }}>
             {m.percentile != null && (
-              <span style={{ color: 'var(--teal)' }}>{m.percentile}th percentile</span>
+              <span style={{ color: 'var(--teal)' }}>
+                {m.percentile}th percentile
+                <PercentileTooltip percentile={m.percentile} />
+              </span>
             )}
             {m.delta != null && (
               <span style={{ marginLeft: m.percentile != null ? 8 : 0 }}>
-                {m.delta >= 0 ? '+' : ''}{m.delta} since {m.prevTerm}
+                {m.delta >= 0 ? '+' : ''}{m.delta}
+                {m.isYoY ? ' YoY' : ` since ${m.prevTerm}`}
               </span>
             )}
           </div>
-          <Sparkline points={pts} />
         </>
       )}
     </CardShell>
@@ -129,12 +112,7 @@ export function EnglishCard({ assessments, studentId }: { assessments: Assessmen
 
 export function HebrewCard({ assessments, studentId }: { assessments: Assessment[]; studentId: string }) {
   const a = latestAvantComposite(assessments)
-  const skills = [
-    { key: 'listening' as const, label: 'Listen', value: a?.listening ?? 0 },
-    { key: 'reading'   as const, label: 'Read',   value: a?.reading   ?? 0 },
-    { key: 'writing'   as const, label: 'Write',  value: a?.writing   ?? 0 },
-    { key: 'speaking'  as const, label: 'Speak',  value: a?.speaking  ?? 0 },
-  ]
+  const showStrengths = !!a && a.strongestSkill && a.lowestSkill && a.strongestSkill !== a.lowestSkill
   return (
     <CardShell tab="hebrew" studentId={studentId} label="Hebrew">
       {!a ? (
@@ -145,25 +123,11 @@ export function HebrewCard({ assessments, studentId }: { assessments: Assessment
           <div style={{ fontSize: 12, color: 'var(--ink-mid)', marginTop: 4 }}>
             AVANT composite · {a.composite.toFixed(2)}/10
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'stretch', height: 52, marginTop: 12 }}>
-            {skills.map((s) => (
-              <div key={s.key} style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
-                <div style={{
-                  width: '100%',
-                  height: `${Math.max(0, Math.min(100, s.value * 10))}%`,
-                  background: a.lowestSkill === s.key ? 'var(--gold)' : 'var(--navy)',
-                  borderRadius: '3px 3px 0 0',
-                }} />
-              </div>
-            ))}
-          </div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-            {skills.map((s) => (
-              <div key={s.key} style={{ flex: 1, textAlign: 'center', fontSize: 10, color: 'var(--ink-light)' }}>
-                {s.label}
-              </div>
-            ))}
-          </div>
+          {showStrengths && (
+            <div style={{ fontSize: 12, color: 'var(--ink-light)', marginTop: 6 }}>
+              Strongest: {SKILL_LABEL[a.strongestSkill!]} · Needs work: {SKILL_LABEL[a.lowestSkill!]}
+            </div>
+          )}
         </>
       )}
     </CardShell>

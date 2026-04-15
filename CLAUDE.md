@@ -156,7 +156,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/portfolio/[studentId]/group/[groupSlug]/page.tsx` — Single group detail page (server component); VALID_GROUPS narrowed to `['portfolio']`; fetches portfolio, renders GroupDetailClient with `initialTab` from `?tab=` searchParam
 - `app/portfolio/[studentId]/journal/page.tsx` — Teacher journal route (server component); fetches portfolio, renders `<TeacherJournal>` with all teacher notes
 - `app/portfolio/[studentId]/gallery/page.tsx` — Gallery route (server component); stacks `<PhotoGallery>` + `<ParentUploads>` vertically
-- `lib/dashboardHelpers.ts` — Pure helper functions for PortfolioHub dashboard cards: `latestMapScore`, `latestAvantComposite`, `readingMetrics`, `latestComposition`, `sparklinePoints`. No React, no side effects.
+- `lib/dashboardHelpers.ts` — Pure helper functions for PortfolioHub dashboard cards: `latestMapScore` (winter-YoY delta), `latestAvantComposite` (with strongest/lowest skill), `readingMetrics`, `latestComposition`. `termOrdinal()` provides chronological Fall→Winter→Spring ordering — never lexicographic-sort term strings. No React, no side effects.
 - `app/sign-in/[[...sign-in]]/page.tsx` — Clerk SignIn centered on cream background
 - `app/sign-up/[[...sign-up]]/page.tsx` — Clerk SignUp centered on cream background
 - `app/api/ai/draft/route.ts` — POST: generate AI narrative draft via Claude Haiku; studentFirstName injected into system prompt; stores in ai_drafts; returns { draftId, text, sectionType }
