@@ -28,18 +28,13 @@ const ALL_ITEMS = PORTFOLIO_GROUP.items
 
 // Anchor fallback for demo page (no studentId)
 const ANCHOR_ITEMS = [
-  { href: '#overview',       label: 'Overview' },
-  { href: '#academics',      label: 'Math' },
-  { href: '#hebrew',         label: 'Hebrew' },
-  { href: '#canon',          label: 'The Canon' },
-  { href: '#writing',        label: 'Composition' },
-  { href: '#rhetoric',       label: 'Rhetoric Room' },
-  { href: '#character',      label: 'Soulcraft' },
-  { href: '#scope',          label: 'Knowledge' },
-  { href: '#handwriting',    label: 'Handwriting' },
-  { href: '#photos',         label: 'Photo Gallery' },
-  { href: '#teacher-notes',  label: 'Teacher Notes' },
-  { href: '#parent-uploads', label: 'Parent Uploads' },
+  { href: '#overview',    label: 'Overview'    },
+  { href: '#canon',       label: 'The Canon'   },
+  { href: '#math',        label: 'Math'        },
+  { href: '#english',     label: 'English'     },
+  { href: '#hebrew',      label: 'Hebrew'      },
+  { href: '#composition', label: 'Composition' },
+  { href: '#character',   label: 'Soulcraft'   },
 ]
 
 interface SideNavProps {

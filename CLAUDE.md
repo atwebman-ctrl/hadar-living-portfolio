@@ -93,12 +93,19 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/globals.css` — Global styles
 - `app/api/demo/auth/route.ts` — Demo password gate API route
 - `components/portfolio/` — Section components (CharacterArc, CreativeEvolution, HeroSection, ImmersionEngine, IntellectualArc, PortfolioFooter, RhetoricRoom, SideNav, TheCanon)
-- `components/portfolio/GroupDetailClient.tsx` — `'use client'` tabbed view for group detail pages (`/group/[groupSlug]`); owns `selectedYear` + `years` state; `YEAR_FILTER_TABS` gates `<YearSelector>` to only math, the-canon, composition tabs; TheCanon/CreativeEvolution receive filtered data arrays; IntellectualArc receives `selectedYear` prop; `TabErrorBoundary` class resets on tab change
-- `components/portfolio/YearSelector.tsx` — Year-filter pill bar; used in GroupDetailClient and SectionDetailClient (NOT in HubShell — year pills are merged into StatsBar there)
-- `components/portfolio/HeroSection.tsx` — Identity strip (photo + name on the left, school logo/initial + italic name on the right at 35% opacity); exports `StatsBar` named export (metrics ribbon + year pills, `justify-content: space-between`); takes `school?: SchoolConfig` so the right cluster can render `logoUrl` or fall back to a first-initial circle; photo/initials circle is 96px; padding `1.25rem 2.5rem`
-- `components/portfolio/HubShell.tsx` — `'use client'` hub wrapper; owns `selectedYear` + `years` state; passes year props to `<StatsBar>` (no standalone YearSelector); renders 3-group `<PortfolioHub>` below
-- `components/portfolio/PortfolioHub.tsx` — 3 elegant group cards (Academics, Student Work, Gallery); each links to `/portfolio/[studentId]/group/[slug]`. Subtitle helpers `academicsSubtitle`/`studentWorkSubtitle`/`gallerySubtitle` return dynamic summaries when data exists (latest Math percentile + Hebrew composite / latest book + teacher-note count / photo + parent-upload counts); static copy is the fallback. The hub ends at the "View Full Portfolio →" button — school branding lives on the hero's right side, not here.
-- `components/portfolio/SideNav.tsx` — Sidebar nav with expandable groups; group headers link to `/group/[slug]`; chevron button independently toggles sub-items; sub-items link to `/group/[slug]?tab=[section-slug]`; accepts `activeGroup` prop
+- `components/portfolio/GroupDetailClient.tsx` — `'use client'` tabbed view for the single `/group/portfolio` page; 6 tabs (the-canon, math, english, hebrew, composition, soulcraft); owns `selectedYear` + `years` state; `YEAR_FILTER_TABS` gates `<YearSelector>` to only math, english, the-canon; math/english/the-canon/composition receive filtered data; `TabErrorBoundary` class resets on tab change
+- `components/portfolio/YearSelector.tsx` — Year-filter pill bar; used in GroupDetailClient and SectionDetailClient only (hub dashboard has no year filter)
+- `components/portfolio/HeroSection.tsx` — Slim identity strip (72px photo with gold border + name + "Grade {n} · Age {age}" line on the left, school logo/initial + italic name on the right at 50% opacity); takes `student?` and `school?` with demo fallbacks; `compact` prop for hub mode; StatsBar export removed in Sprint 5 Session 2
+- `components/portfolio/HubShell.tsx` — `'use client'` hub wrapper; thin shell that renders `<HeroSection compact />` + `<PortfolioHub>`; no selectedYear state (year filtering lives in detail views only)
+- `components/portfolio/PortfolioHub.tsx` — Visual dashboard grid: summary banner (AI progress draft, teacher/admin only) + 2-column 6-card grid (MathCard, EnglishCard, HebrewCard, CanonCard, CompositionCard, SoulcraftCard) + bottom link tiles (Teacher journal, Gallery). All cards link to `/portfolio/[studentId]/group/portfolio?tab=[slug]`.
+- `components/portfolio/DashboardCards.tsx` — 6 metric card components consumed by PortfolioHub (MapCard-based Math/English with RIT + percentile + delta + SVG sparkline; HebrewCard with AVANT composite + 4-skill bar chart + lowest-skill highlight; CanonCard with book count + current read + pages/rating; CompositionCard with excerpt preview + language tag; SoulcraftCard with virtue badge pills). Shared `CardShell` wraps each tile.
+- `components/portfolio/DashboardGrid.module.css` — Grid + card + bottom-link + summary-banner styles for PortfolioHub; collapses to 1 column at ≤600px
+- `components/portfolio/MathSection.tsx` — Math detail view (MAP math scores only); split out of IntellectualArc in Session 2; renders SubjectScoreRows + MapPercentileChart + InlineAssessmentForm + math_scores AI panel; `selectedYear="all"` delegates to `IntellectualArcAllYears` trajectory view
+- `components/portfolio/EnglishSection.tsx` — English detail view (MAP ELA scores + Spelling/Grammar/Video sub-tabs); renders SubjectScoreRows + MapPercentileChart + english_scores AI panel + `EnglishVideoTab`; "View all English compositions →" link points at Composition tab
+- `components/portfolio/HebrewSection.tsx` — Hebrew detail view (AVANT reading/listening/writing/speaking + Spelling/Grammar/Video sub-tabs); renders AvantChart + InlineAvantForm + immersion AI panel + `HebrewVideoTab`
+- `components/portfolio/CompositionView.tsx` — Unified cross-language writing samples + handwriting; `LANG_PILLS` filter (all/english/hebrew); required props (writingSamples, handwritingSamples, studentId, role); empty-state message when filter yields no samples
+- `components/portfolio/TeacherJournal.tsx` — Aggregation view of all teacher notes for a student; rendered by `/portfolio/[studentId]/journal` route
+- `components/portfolio/SideNav.tsx` — Sidebar nav: single "Portfolio" group (always expanded, no chevron, 6 sub-items) + standalone Teacher journal + Gallery links below; anchor-fallback mode (no `studentId`) shows 7 in-page links for the demo scroll view; `activeGroup` prop highlights when on `/group/portfolio`
 - `components/portfolio/RevealObserver.tsx` — IntersectionObserver wrapper; fires CSS reveal animations when sections enter viewport. Required on real portfolio pages — sections were invisible without it (bug fixed)
 - `components/portfolio/SubjectScoreRows.tsx` — Compact RIT/percentile score table; accepts `ScoreDisplayRow[]`; used by IntellectualArc for Math and ELA sub-sections
 - `components/portfolio/InlineAssessmentForm.tsx` — Inline data-entry form inside IntellectualArc; replaces TeacherDataPanel for assessment scores; POSTs to assessments API; calls `router.refresh()` on save
@@ -140,8 +147,11 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `components/dashboard/YearInReviewView.tsx` — Placeholder
 - `app/not-found.tsx` — Styled 404 page using design system tokens
 - `app/admin/page.tsx` — Admin-only school settings overview; Sprint 3 placeholders for Teachers + Theme
-- `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio hub (server component); renders HubShell with 3 group cards
-- `app/portfolio/[studentId]/group/[groupSlug]/page.tsx` — Group detail page (server component); validates slug (academics|student-work|gallery), fetches portfolio, renders GroupDetailClient with `initialTab` from `?tab=` searchParam
+- `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio hub (server component); renders HubShell with visual dashboard grid
+- `app/portfolio/[studentId]/group/[groupSlug]/page.tsx` — Single group detail page (server component); VALID_GROUPS narrowed to `['portfolio']`; fetches portfolio, renders GroupDetailClient with `initialTab` from `?tab=` searchParam
+- `app/portfolio/[studentId]/journal/page.tsx` — Teacher journal route (server component); fetches portfolio, renders `<TeacherJournal>` with all teacher notes
+- `app/portfolio/[studentId]/gallery/page.tsx` — Gallery route (server component); stacks `<PhotoGallery>` + `<ParentUploads>` vertically
+- `lib/dashboardHelpers.ts` — Pure helper functions for PortfolioHub dashboard cards: `latestMapScore`, `latestAvantComposite`, `readingMetrics`, `latestComposition`, `sparklinePoints`. No React, no side effects.
 - `app/sign-in/[[...sign-in]]/page.tsx` — Clerk SignIn centered on cream background
 - `app/sign-up/[[...sign-up]]/page.tsx` — Clerk SignUp centered on cream background
 - `app/api/ai/draft/route.ts` — POST: generate AI narrative draft via Claude Haiku; studentFirstName injected into system prompt; stores in ai_drafts; returns { draftId, text, sectionType }
@@ -157,6 +167,15 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `supabase/migrations/0005_parent_students.sql` — parent_students table: invited_email, nullable parent_clerk_user_id, status (pending/active), RLS; apply before testing invite flow
 - `supabase/migrations/0012_data_foundation.sql` — audit columns (created_by, updated_by, updated_at) + soft delete (deleted_at) on 6 content tables; academic_years table (canonical year registry per school); enrollment_records table (enrollment history per student); class_assignments table (student ↔ teacher per year)
 - `.github/workflows/ci.yml` — GitHub Actions CI; triggers on push/PR to main; runs `npm ci` → `npx tsc --noEmit` → `npx vitest run`; `check` job name must match branch protection status check
+
+### Orphaned / legacy (file exists but only used by DemoPortfolio.tsx, if at all)
+Kept in-tree to avoid churn and because DemoPortfolio may still import them until Phase 4A lands. **Do not wire these into new pages or the real portfolio tree** — they are superseded:
+- `components/portfolio/IntellectualArc.tsx` — superseded by MathSection + EnglishSection
+- `components/portfolio/ImmersionEngine.tsx` — superseded by HebrewSection
+- `components/portfolio/CreativeEvolution.tsx` — superseded by CompositionView
+- `components/portfolio/RhetoricRoom.tsx` — removed from tabs; no replacement
+- `components/portfolio/HandwritingSamples.tsx` — merged into CompositionView (via CompositionHandwriting)
+- `components/portfolio/ScopeAndSequence.tsx` — removed from tabs; pending move to teacher dashboard
 
 ### Does NOT exist yet (do not reference as if it does)
 - `components/theme/ThemeProvider.tsx` — School theme context
@@ -179,10 +198,12 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - **Teachers have broad read access within their school** — RLS policies give teachers SELECT on all students in their school. Narrowing to assigned students is deferred to Sprint 3 when a `student_teachers` join table is added.
 - **`ai_drafts` INSERT is service-role only** — No authenticated INSERT policy exists. Only the AI pipeline (via `supabaseAdmin`) creates draft rows. Teachers update (accept/edit/reject); they never insert.
 - **Signin form styles in `landing-mobile.css`** — The form's mobile overrides are tightly coupled to its base styles; co-locating them in the same file keeps the cascade readable. This is intentional, not a mistake.
-- **Portfolio overview: 3 groups, not flat tiles** — Academics (Math, Hebrew, Knowledge), Student Work (The Canon, Composition, Rhetoric Room, Handwriting, Teacher Notes, Soulcraft), Gallery (Photo Gallery, Parent Uploads). The 11-tile flat layout is gone; do not revert. Display labels were renamed in Session 1 of the Sprint 5 refactor (was: Intellectual Arc, Immersion Engine, Scope & Sequence, Creative Evolution, Character Arc). Route slugs updated in lockstep; DB section_type / section_category values were NOT renamed.
-- **Hero section: student identity + school identity** — Left cluster is the student (photo + name + optional InviteParentButton). Right cluster is the school logo (or first-initial fallback circle) and italic school name at 35% opacity. Metrics live in `StatsBar` below the hero, not inside it. No school branding elsewhere on the hub — the hero is the single source.
-- **Year selector placement** — Hub overview: year pills merged into `StatsBar` right side. Group pages: standalone `<YearSelector>` rendered by `GroupDetailClient` only for tabs that filter by year. `SectionDetailClient` has its own year selector too. Never add a fourth instance.
-- **⚠️ Math tab still renders ELA** — After the Session 1 rename, `IntellectualArc.tsx` displays the label "Math" but its internal structure still renders BOTH a Mathematics section AND an English Language Arts section (with independent `math_scores` / `english_scores` AI panels). This is a known label/content mismatch until Session 5 of the Sprint 5 refactor, which splits ELA out into its own component. Do not "fix" by removing the ELA block — it's still load-bearing.
+- **Portfolio overview: flat tab list + dashboard hub** — Tabs are The Canon, Math, English, Hebrew, Composition, Soulcraft under a single `/group/portfolio` route, plus standalone `/journal` and `/gallery` routes. The hub page is a visual dashboard grid (6 metric cards + 2 bottom links), NOT a list of group cards. Was 3-group hub (Academics, Student Work, Gallery) through Sprint 4; restructured in Sprint 5 Session 2. Display labels were renamed in Session 1 (was: Intellectual Arc, Immersion Engine, Scope & Sequence, Creative Evolution, Character Arc); DB `section_type` / `section_category` values were NOT renamed.
+- **Composition is a unified cross-language view** — `CompositionView` shows writing samples + handwriting filtered by language (All / English / Hebrew). It is NOT nested under English or Hebrew. The English and Hebrew detail views each link to the Composition tab, and may pre-filter by language when that wiring is added.
+- **Knowledge (Scope & Sequence) removed from portfolio tabs** — `ScopeAndSequence.tsx` is orphaned until it moves to the teacher dashboard as a per-grade view. Do not add a Knowledge tab back to the portfolio.
+- **Hero section: slim identity strip** — Left cluster is the student (72px photo with `2px solid var(--gold)` border + name + "Grade {n} · Age {age}" line + optional InviteParentButton). Right cluster is the school logo (or first-initial fallback) and italic school name at 50% opacity. No metrics here — StatsBar was removed in Session 2.
+- **StatsBar removed from hub** — Year filtering happens inside detail views only (GroupDetailClient + SectionDetailClient). The hub dashboard does not filter by year.
+- **Year selector placement** — Standalone `<YearSelector>` rendered by `GroupDetailClient` only for tabs that filter by year (math, english, the-canon). `SectionDetailClient` has its own for the same slugs. Never add a third instance, and never add one to the hub.
 - **Supabase RLS status** — RLS is enabled on all 20 public tables. Policies exist for core tables (0003). Sprint 3+ tables (photos, parent_uploads, handwriting_samples, teacher_notes, scope_and_sequence, book_catalog, student_videos) have RLS enabled but **policies not yet applied to production**. Service role bypasses RLS for all `app/api/` routes. ⚠️ Complete before giving parents direct DB access.
 
 ## Build Sprints (update checkboxes each session)
@@ -244,6 +265,13 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
   - [ ] OCR pipeline for handwriting samples
   - [ ] Writing/rhetoric critique generation
   - [ ] Test score extraction
+- [x] Sprint 5 Session 2: Nav restructure + dashboard grid hub — COMPLETE
+  - [x] Phase 1: language columns on writing_samples + student_videos, video_storage_path fix
+  - [x] Phase 2: MathSection, EnglishSection, HebrewSection, CompositionView, TeacherJournal
+  - [x] Phase 3A: Flatten navigation — single Portfolio group, /journal + /gallery routes
+  - [x] Phase 3B: Dashboard grid hub — 6 metric cards, slim hero, remove StatsBar
+  - [x] Phase 4A: Demo page updated to new components
+  - [ ] Phase 4B: Knowledge moved to teacher dashboard (deferred)
 - [ ] Sprint 5 (V2): School-wide analysis, State of the Union, multi-school theming
 
 ## Bugs Fixed (April 11, 2026)
@@ -312,16 +340,14 @@ grep -r "school_id" --include="*.ts" --include="*.tsx" | grep -v node_modules | 
 # Every query/route should include school_id filtering
 ```
 
-## Sprint 5 Session 1 — Completed (April 14, 2026)
+## Sprint 5 Session 2 — Completed (April 15, 2026)
 
-Renames: Intellectual Arc → Math, Immersion Engine → Hebrew, Creative Evolution → Composition, Character Arc → Soulcraft, Scope & Sequence → Knowledge. Route slugs updated in lockstep. Component FILE NAMES not yet renamed.
+Session 1 renamed labels; Session 2 restructured the tree. Navigation is now a flat 6-tab list under a single `/group/portfolio` route, the hub page is a visual dashboard grid, and Math/English/Hebrew/Composition have their own dedicated section components.
 
 ⚠️ THREE SECTION-NAME TAXONOMIES — do not confuse:
-1. Route slugs (UI): math, hebrew, composition, soulcraft, knowledge — UPDATED
+1. Route slugs (UI): the-canon, math, english, hebrew, composition, soulcraft — current
 2. ai_drafts.section_type (DB): math_scores, english_scores, immersion, writing, virtue_badges, reading_bookshelf — UNCHANGED
 3. schools.enabled_sections (dormant): academic_scores, reading, writing, etc. — UNCHANGED
 
-⚠️ KNOWN MISMATCH: The "Math" tab (IntellectualArc.tsx) still renders both Mathematics AND English Language Arts sub-sections. ELA splits out in Session 5.
-
-Tab order confirmed: Academics (Math, Hebrew, Knowledge), Student Work (The Canon, Composition, Rhetoric Room, Handwriting, Teacher Notes, Soulcraft), Gallery (Photo Gallery, Parent Uploads).
+Tab order: The Canon · Math · English · Hebrew · Composition · Soulcraft. Teacher journal and Gallery live at `/journal` and `/gallery` — not inside the tab list.
 

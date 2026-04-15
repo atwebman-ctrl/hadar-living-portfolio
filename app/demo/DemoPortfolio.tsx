@@ -6,17 +6,12 @@ import layoutStyles from '@/components/portfolio/layout.module.css'
 import RevealObserver from '@/components/portfolio/RevealObserver'
 import SideNav from '@/components/portfolio/SideNav'
 import HeroSection from '@/components/portfolio/HeroSection'
-import IntellectualArc from '@/components/portfolio/IntellectualArc'
-import ImmersionEngine from '@/components/portfolio/ImmersionEngine'
 import TheCanon from '@/components/portfolio/TheCanon'
-import CreativeEvolution from '@/components/portfolio/CreativeEvolution'
-import RhetoricRoom from '@/components/portfolio/RhetoricRoom'
+import MathSection from '@/components/portfolio/MathSection'
+import EnglishSection from '@/components/portfolio/EnglishSection'
+import HebrewSection from '@/components/portfolio/HebrewSection'
+import CompositionView from '@/components/portfolio/CompositionView'
 import CharacterArc from '@/components/portfolio/CharacterArc'
-import ScopeAndSequence from '@/components/portfolio/ScopeAndSequence'
-import HandwritingSamples from '@/components/portfolio/HandwritingSamples'
-import PhotoGallery from '@/components/portfolio/PhotoGallery'
-import TeacherNotes from '@/components/portfolio/TeacherNotes'
-import ParentUploads from '@/components/portfolio/ParentUploads'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 
 export default function DemoPortfolio() {
@@ -47,17 +42,12 @@ export default function DemoPortfolio() {
       <SideNav />
       <div className={layoutStyles.main}>
         <HeroSection />
-        <IntellectualArc />
-        <ImmersionEngine />
         <TheCanon />
-        <CreativeEvolution />
-        <RhetoricRoom />
+        <MathSection selectedYear="all" />
+        <EnglishSection selectedYear="all" />
+        <HebrewSection />
+        <CompositionView writingSamples={[]} handwritingSamples={[]} studentId="" role="parent" />
         <CharacterArc />
-        <ScopeAndSequence />
-        <HandwritingSamples />
-        <PhotoGallery />
-        <TeacherNotes />
-        <ParentUploads />
         <PortfolioFooter />
       </div>
     </>
