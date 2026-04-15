@@ -28,6 +28,9 @@ export default function HubShell({ portfolio, studentId, role }: Props) {
       <HeroSection
         student={portfolio.student}
         school={portfolio.school}
+        studentId={studentId}
+        assessments={portfolio.assessments}
+        role={role}
         compact
         inviteButton={canInvite ? <InviteParentButton studentId={studentId} /> : undefined}
       />

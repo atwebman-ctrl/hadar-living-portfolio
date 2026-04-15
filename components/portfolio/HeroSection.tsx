@@ -1,5 +1,9 @@
+'use client'
+
 import type React from 'react'
-import type { Student, SchoolConfig } from '@/lib/types'
+import type { Student, SchoolConfig, Assessment, UserRole } from '@/lib/types'
+import { ordinal } from '@/lib/utils'
+import InlineEditableText from '@/components/shared/InlineEditableText'
 import heroStyles from './HeroSection.module.css'
 
 // ── Types ─────────────────────────────────────────────────────
@@ -9,6 +13,9 @@ interface HeroProps {
   school?:       SchoolConfig
   compact?:      boolean
   inviteButton?: React.ReactNode
+  studentId?:    string
+  assessments?:  Assessment[]
+  role?:         UserRole
 }
 
 // ── Demo fallbacks ────────────────────────────────────────────
@@ -29,20 +36,52 @@ function computeAge(iso: string | null | undefined): number | null {
   return Math.floor((Date.now() - ts) / 31557600000)
 }
 
+function topAccomplishment(assessments?: Assessment[]): string | null {
+  if (!assessments?.length) return null
+  let best: { pct: number; label: string } | null = null
+  for (const a of assessments) {
+    if (a.percentile == null) continue
+    const label =
+      a.assessmentType === 'maps_math'    ? 'math'    :
+      a.assessmentType === 'maps_english' ? 'reading' : null
+    if (!label) continue
+    if (!best || a.percentile > best.pct) best = { pct: a.percentile, label }
+  }
+  return best ? `${ordinal(best.pct)} percentile in ${best.label}` : null
+}
+
 // ── HeroSection — identity only ───────────────────────────────
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 
-export default function HeroSection({ student, school, compact, inviteButton }: HeroProps) {
+export default function HeroSection({
+  student, school, compact, inviteButton, studentId, assessments, role,
+}: HeroProps) {
   const firstName  = student?.firstName  ?? DEMO.firstName
   const lastName   = student?.lastName   ?? DEMO.lastName
   const summary    = student?.summary    ?? DEMO.summary
   const gradeLevel = student?.gradeLevel ?? DEMO.gradeLevel
   const age        = computeAge(student?.dateOfBirth)
+  const highlight  = topAccomplishment(assessments)
   const initials   = `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase()
   const photoUrl   = student?.profilePhotoPath
     ? `${SUPABASE_URL}/storage/v1/object/public/portfolio-assets/${student.profilePhotoPath}`
     : null
+
+  const canEdit = !!studentId && (role === 'admin' || role === 'teacher')
+
+  const saveSummary = async (next: string) => {
+    if (!studentId) return
+    const res = await fetch(`/api/dashboard/students/${studentId}`, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ summary: next }),
+    })
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body?.error ?? 'Failed to save summary')
+    }
+  }
 
   const photoCircle: React.CSSProperties = {
     width:          72,
@@ -71,6 +110,15 @@ export default function HeroSection({ student, school, compact, inviteButton }: 
     margin:        '0.35rem 0 0',
   }
 
+  const summaryTextStyle: React.CSSProperties = {
+    fontFamily: 'DM Mono, monospace',
+    fontSize:   '0.8rem',
+    color:      'rgba(255,255,255,0.55)',
+    lineHeight: 1.6,
+    maxWidth:   560,
+    margin:     '0.6rem 0 0',
+  }
+
   return (
     <div className={`${heroStyles.hero}${compact ? ` ${heroStyles.compact}` : ''}`} id="overview">
       <div className={heroStyles.heroPhoto}>
@@ -82,9 +130,20 @@ export default function HeroSection({ student, school, compact, inviteButton }: 
       <div className={heroStyles.heroIdentity}>
         <h1>{firstName}<br /><em>{lastName}</em></h1>
         <p style={gradeLine}>
-          Grade {gradeLevel}{age !== null && ` · Age ${age}`}
+          Grade {gradeLevel}{age !== null && ` · Age ${age}`}{highlight && ` · ${highlight}`}
         </p>
-        {summary && <p className={heroStyles.heroSummary}>{summary}</p>}
+        {(canEdit || (summary && summary.trim() !== '')) && (
+          <div style={{ marginTop: '0.6rem', maxWidth: 560 }}>
+            <InlineEditableText
+              value={summary ?? ''}
+              placeholder="Add a short hero blurb for this student…"
+              onSave={saveSummary}
+              canEdit={canEdit}
+              maxLength={1000}
+              textStyle={summaryTextStyle}
+            />
+          </div>
+        )}
         {inviteButton && <div style={{ marginTop: '0.75rem' }}>{inviteButton}</div>}
       </div>
 

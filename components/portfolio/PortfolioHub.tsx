@@ -8,7 +8,8 @@
 // ============================================================
 
 import type React from 'react'
-import type { PortfolioData, UserRole } from '@/lib/types'
+import type { PortfolioData, Student, UserRole } from '@/lib/types'
+import InlineEditableText from '@/components/shared/InlineEditableText'
 import {
   MathCard,
   EnglishCard,
@@ -26,13 +27,6 @@ interface Props {
 }
 
 // ── Icons ─────────────────────────────────────────────────────
-
-const PencilIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 20h9" />
-    <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-  </svg>
-)
 
 const DocumentIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -53,22 +47,37 @@ const ImageIcon = () => (
 
 // ── Summary banner ────────────────────────────────────────────
 
-function SummaryBanner({ canEdit }: { canEdit: boolean }) {
-  // TODO: Wire to AI draft with sectionType 'progress_summary'
+function SummaryBanner({ student, studentId, canEdit }: {
+  student:   Student
+  studentId: string
+  canEdit:   boolean
+}) {
+  // TODO: Show "AI draft" badge when progress_summary is AI-generated.
+  const save = async (next: string) => {
+    const res = await fetch(`/api/dashboard/students/${studentId}`, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ progressSummary: next }),
+    })
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body?.error ?? 'Failed to save progress summary')
+    }
+  }
+
   return (
     <div className={grid.summaryBanner}>
       <div>
         <span className={grid.summaryLabel}>Progress summary</span>
-        <span className={grid.summaryBadge}>AI draft</span>
       </div>
-      <p className={grid.summaryText}>
-        Summary will be generated from assessment data and teacher notes.
-      </p>
-      {canEdit && (
-        <button className={grid.summaryEditBtn} aria-label="Edit summary" type="button">
-          <PencilIcon />
-        </button>
-      )}
+      <InlineEditableText
+        value={student.progressSummary ?? ''}
+        placeholder="Click to add a progress summary for this student…"
+        onSave={save}
+        canEdit={canEdit}
+        maxLength={1000}
+        textStyle={{ fontSize: '0.9rem', lineHeight: 1.55, color: 'var(--ink)', margin: '0.35rem 0 0' }}
+      />
     </div>
   )
 }
@@ -101,9 +110,17 @@ export default function PortfolioHub({ portfolio, studentId, role }: Props) {
   const photoCount  = portfolio.photos.length
   const parentCount = portfolio.parentUploads.length
 
+  const showBanner = role !== 'parent' || !!portfolio.student.progressSummary?.trim()
+
   return (
     <div style={{ padding: '1.5rem 2.5rem 3rem' }}>
-      {role !== 'parent' && <SummaryBanner canEdit={canEdit} />}
+      {showBanner && (
+        <SummaryBanner
+          student={portfolio.student}
+          studentId={studentId}
+          canEdit={canEdit}
+        />
+      )}
 
       <div className={grid.grid}>
         <MathCard        assessments={portfolio.assessments} studentId={studentId} />

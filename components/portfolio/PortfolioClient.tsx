@@ -49,6 +49,9 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
       <HeroSection
         student={student}
         school={school}
+        studentId={studentId}
+        assessments={assessments}
+        role={role}
         inviteButton={(role === 'admin' || role === 'teacher') ? <InviteParentButton studentId={studentId} /> : undefined}
       />
 

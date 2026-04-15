@@ -73,6 +73,7 @@ export interface Student {
   parentUserIds: string[];  // Clerk user IDs
   profilePhotoPath: string | null;
   summary: string | null;
+  progressSummary: string | null;
   isDemo: boolean;
   archivedAt: string | null;
   createdAt: string;

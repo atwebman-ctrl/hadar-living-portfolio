@@ -191,6 +191,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   if (input.parentUserIds !== undefined)    updates.parent_user_ids    = input.parentUserIds
   if (input.profilePhotoPath !== undefined) updates.profile_photo_path = input.profilePhotoPath
   if (input.summary !== undefined)          updates.summary            = input.summary
+  if (input.progressSummary !== undefined)  updates.progress_summary   = input.progressSummary
   // 0011 profile fields
   if (input.gender !== undefined)           updates.gender             = input.gender
   if (input.dateOfBirth !== undefined)      updates.date_of_birth      = input.dateOfBirth

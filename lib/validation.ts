@@ -33,7 +33,8 @@ export const CreateStudentSchema = z.object({
   academicYear,
   parentUserIds:    z.array(z.string()).default([]),
   profilePhotoPath: z.string().nullable().optional(),
-  summary:          z.string().nullable().optional(),
+  summary:          z.string().max(1000).nullable().optional(),
+  progressSummary:  z.string().max(1000).nullable().optional(),
   isDemo:           z.boolean().default(false),
   // 0011 profile fields — preprocess coerces empty string → null (form sends '' for unselected fields)
   gender:           z.preprocess(v => v === '' ? null : v, z.enum(['boy', 'girl']).nullable().optional()),

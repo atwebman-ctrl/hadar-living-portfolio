@@ -41,6 +41,7 @@ export function mapStudent(row: Row): Student {
     parentUserIds: (row.parent_user_ids as string[]) ?? [],
     profilePhotoPath: (row.profile_photo_path as string) ?? null,
     summary: (row.summary as string) ?? null,
+    progressSummary: (row.progress_summary as string) ?? null,
     isDemo: row.is_demo as boolean,
     archivedAt: (row.archived_at as string) ?? null,
     createdAt: row.created_at as string,
