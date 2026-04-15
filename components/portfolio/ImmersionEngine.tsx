@@ -177,7 +177,7 @@ export default function ImmersionEngine({ assessments, studentId, studentName, r
     <section id="hebrew">
       <div className={`${s.sectionHeader} reveal`}>
         <span className={s.sectionNum}>02</span>
-        <h2 className={s.sectionTitle}>The Immersion Engine</h2>
+        <h2 className={s.sectionTitle}>Hebrew</h2>
         <div className={s.sectionRule} />
       </div>
 

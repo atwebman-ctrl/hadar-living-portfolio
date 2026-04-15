@@ -9,23 +9,24 @@ interface Props {
 }
 
 // Maps section_category / legacy section_type values to display labels.
+// ⚠️ Keys are DB-stored enum values — do NOT rename. Values are UI display labels.
 const SECTION_LABELS: Record<string, string> = {
   // New section_category values
-  intellectual_arc:   'Intellectual Arc',
-  immersion_engine:   'Immersion Engine',
+  intellectual_arc:   'Math',
+  immersion_engine:   'Hebrew',
   the_canon:          'The Canon',
-  creative_evolution: 'Creative Evolution',
+  creative_evolution: 'Composition',
   rhetoric_room:      'Rhetoric Room',
-  character_arc:      'Character Arc',
+  character_arc:      'Soulcraft',
   general:            'General',
   // Legacy section_type values (pre-migration notes)
-  academic_scores:    'Intellectual Arc',
+  academic_scores:    'Math',
   reading_bookshelf:  'The Canon',
-  writing:            'Creative Evolution',
+  writing:            'Composition',
   rhetoric:           'Rhetoric Room',
-  virtue_badges:      'Character Arc',
+  virtue_badges:      'Soulcraft',
   handwriting:        'Handwriting',
-  scope_sequence:     'Scope & Sequence',
+  scope_sequence:     'Knowledge',
   academic_progress:  'Academic Progress',
   social_development: 'Social Development',
   behavioral:         'Behavioral',

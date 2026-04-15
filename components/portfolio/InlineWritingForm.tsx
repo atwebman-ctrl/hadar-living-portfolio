@@ -4,7 +4,7 @@
 // components/portfolio/InlineWritingForm.tsx
 //
 // "+ Add Writing Sample" button opens a modal popup inside the
-// Creative Evolution section. Visible to admin/teacher only
+// Composition section. Visible to admin/teacher only
 // (caller gates). POSTs to the writing-samples route and calls
 // router.refresh() on success.
 // ============================================================

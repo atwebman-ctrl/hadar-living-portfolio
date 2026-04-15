@@ -111,7 +111,7 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
       <section id="academics">
         <div className={`${s.sectionHeader} reveal`}>
           <span className={s.sectionNum}>01</span>
-          <h2 className={s.sectionTitle}>The Intellectual Arc</h2>
+          <h2 className={s.sectionTitle}>Math</h2>
           <div className={s.sectionRule} />
         </div>
         <IntellectualArcAllYears
@@ -175,7 +175,7 @@ export default function IntellectualArc({ assessments, studentId, studentName, r
     <section id="academics">
       <div className={`${s.sectionHeader} reveal`}>
         <span className={s.sectionNum}>01</span>
-        <h2 className={s.sectionTitle}>The Intellectual Arc</h2>
+        <h2 className={s.sectionTitle}>Math</h2>
         <div className={s.sectionRule} />
       </div>
 

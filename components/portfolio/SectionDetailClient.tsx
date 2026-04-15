@@ -88,7 +88,7 @@ export default function SectionDetailClient({
   // ── Section renderer ────────────────────────────────────────
   const renderSection = () => {
     switch (slug) {
-      case 'intellectual-arc':
+      case 'math':
         return (
           <IntellectualArc
             assessments={assessments}
@@ -103,7 +103,7 @@ export default function SectionDetailClient({
             existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
           />
         )
-      case 'immersion-engine':
+      case 'hebrew':
         return (
           <ImmersionEngine
             assessments={assessments}
@@ -123,7 +123,7 @@ export default function SectionDetailClient({
             existingDraft={aiDrafts.find((d) => d.sectionType === 'reading_bookshelf')}
           />
         )
-      case 'creative-evolution':
+      case 'composition':
         return (
           <CreativeEvolution
             writingSamples={portfolio.writingSamples}
@@ -142,7 +142,7 @@ export default function SectionDetailClient({
             role={role}
           />
         )
-      case 'character-arc':
+      case 'soulcraft':
         return (
           <CharacterArc
             characterAwards={portfolio.characterAwards}
@@ -152,7 +152,7 @@ export default function SectionDetailClient({
             existingDraft={aiDrafts.find((d) => d.sectionType === 'virtue_badges')}
           />
         )
-      case 'scope-and-sequence':
+      case 'knowledge':
         return (
           <ScopeAndSequence
             gradeLevel={student.gradeLevel}
@@ -204,7 +204,7 @@ export default function SectionDetailClient({
   }
 
   // Sections that benefit from the year filter
-  const YEAR_FILTER_SLUGS = ['intellectual-arc', 'the-canon', 'creative-evolution']
+  const YEAR_FILTER_SLUGS = ['math', 'the-canon', 'composition']
   const showYearFilter = YEAR_FILTER_SLUGS.includes(slug) && years.length > 1
 
   return (

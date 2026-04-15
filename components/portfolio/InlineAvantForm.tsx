@@ -4,7 +4,7 @@
 // components/portfolio/InlineAvantForm.tsx
 //
 // "+ Add AVANT Score" button opens a modal popup inside the
-// Immersion Engine section. Visible to admin/teacher only
+// Hebrew section. Visible to admin/teacher only
 // (caller gates). POSTs to the assessments route and calls
 // router.refresh() on success.
 // ============================================================

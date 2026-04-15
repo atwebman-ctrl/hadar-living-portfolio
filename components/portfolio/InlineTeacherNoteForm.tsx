@@ -22,13 +22,15 @@ import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modal
 
 interface Props { studentId: string }
 
+// ⚠️ `value` strings are DB-stored section_category values — do NOT rename.
+// Only `label` is UI-facing.
 const SECTION_CATEGORIES = [
-  { value: 'intellectual_arc',   label: 'Intellectual Arc' },
-  { value: 'immersion_engine',   label: 'Immersion Engine' },
+  { value: 'intellectual_arc',   label: 'Math' },
+  { value: 'immersion_engine',   label: 'Hebrew' },
   { value: 'the_canon',          label: 'The Canon' },
-  { value: 'creative_evolution', label: 'Creative Evolution' },
+  { value: 'creative_evolution', label: 'Composition' },
   { value: 'rhetoric_room',      label: 'Rhetoric Room' },
-  { value: 'character_arc',      label: 'Character Arc' },
+  { value: 'character_arc',      label: 'Soulcraft' },
   { value: 'general',            label: 'General' },
 ] as const
 

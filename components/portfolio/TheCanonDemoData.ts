@@ -58,7 +58,7 @@ export const DEMO_READINGS: Reading[] = [
     academicYear: DEMO_ACADEMIC_YEAR, completed: true, sortOrder: 5,
     whyChosen: 'Drawn in by her own name — wanted to know "who Athena really was."',
     valuesSkills: null, pageCount: 192,
-    teacherNotes: 'Became a ready reference for Athena all year. She began citing myths in her own writing (see the "Piglet flood" retelling in Creative Evolution). Strong retention of genealogy and epithets.',
+    teacherNotes: 'Became a ready reference for Athena all year. She began citing myths in her own writing (see the "Piglet flood" retelling in Composition). Strong retention of genealogy and epithets.',
     readingDifficulty: 'stretch', studentRating: 5,
     dateStarted: '2024-12-09', dateFinished: '2025-01-10',
     keyQuote: '"She sprang fully grown from the forehead of Zeus, with a mighty battle cry."',

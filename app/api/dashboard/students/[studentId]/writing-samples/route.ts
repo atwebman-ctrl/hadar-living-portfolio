@@ -2,7 +2,7 @@
 // app/api/dashboard/students/[studentId]/writing-samples/route.ts
 //
 // POST /api/dashboard/students/[studentId]/writing-samples
-//   Add a writing sample via the inline Creative Evolution form.
+//   Add a writing sample via the inline Composition form.
 //
 // Body fields (0009 columns):
 //   title, genre, excerpt (optional), teacherComments (optional),

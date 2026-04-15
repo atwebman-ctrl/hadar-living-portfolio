@@ -16,13 +16,13 @@ import SectionDetailClient from '@/components/portfolio/SectionDetailClient'
 import '../../../../demo/portfolio.css'
 
 const VALID_SLUGS = [
-  'intellectual-arc',
-  'immersion-engine',
+  'math',
+  'hebrew',
   'the-canon',
-  'creative-evolution',
+  'composition',
   'rhetoric-room',
-  'character-arc',
-  'scope-and-sequence',
+  'soulcraft',
+  'knowledge',
   'handwriting',
   'photo-gallery',
   'teacher-notes',

@@ -63,17 +63,17 @@ interface TabDef { slug: string; label: string }
 
 export const GROUP_TABS: Record<string, TabDef[]> = {
   academics: [
-    { slug: 'intellectual-arc',   label: 'Intellectual Arc' },
-    { slug: 'immersion-engine',   label: 'Immersion Engine' },
-    { slug: 'scope-and-sequence', label: 'Scope & Sequence' },
+    { slug: 'math',      label: 'Math' },
+    { slug: 'hebrew',    label: 'Hebrew' },
+    { slug: 'knowledge', label: 'Knowledge' },
   ],
   'student-work': [
-    { slug: 'the-canon',          label: 'The Canon' },
-    { slug: 'creative-evolution', label: 'Creative Evolution' },
-    { slug: 'rhetoric-room',      label: 'Rhetoric Room' },
-    { slug: 'handwriting',        label: 'Handwriting' },
-    { slug: 'teacher-notes',      label: 'Teacher Notes' },
-    { slug: 'character-arc',      label: 'Character Arc' },
+    { slug: 'the-canon',     label: 'The Canon' },
+    { slug: 'composition',   label: 'Composition' },
+    { slug: 'rhetoric-room', label: 'Rhetoric Room' },
+    { slug: 'handwriting',   label: 'Handwriting' },
+    { slug: 'teacher-notes', label: 'Teacher Notes' },
+    { slug: 'soulcraft',     label: 'Soulcraft' },
   ],
   gallery: [
     { slug: 'photo-gallery',  label: 'Photo Gallery' },
@@ -89,7 +89,7 @@ export const GROUP_TITLES: Record<string, string> = {
 
 // ── Section renderer ──────────────────────────────────────────
 
-const YEAR_FILTER_TABS = new Set(['intellectual-arc', 'the-canon', 'creative-evolution'])
+const YEAR_FILTER_TABS = new Set(['math', 'the-canon', 'composition'])
 
 function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
   slug: string; portfolio: PortfolioData; studentId: string; role: UserRole; selectedYear: string
@@ -99,7 +99,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
     selectedYear === 'all' ? items : items.filter((i) => i.academicYear === selectedYear)
 
   switch (slug) {
-    case 'intellectual-arc':
+    case 'math':
       return (
         <IntellectualArc
           assessments={assessments}
@@ -114,7 +114,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
           existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
         />
       )
-    case 'immersion-engine':
+    case 'hebrew':
       return (
         <ImmersionEngine
           assessments={assessments}
@@ -124,7 +124,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
           existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
         />
       )
-    case 'scope-and-sequence':
+    case 'knowledge':
       return <ScopeAndSequence gradeLevel={student.gradeLevel} subjects={portfolio.scopeAndSequence} />
     case 'the-canon':
       return (
@@ -136,7 +136,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
           existingDraft={aiDrafts.find((d) => d.sectionType === 'reading_bookshelf')}
         />
       )
-    case 'creative-evolution':
+    case 'composition':
       return (
         <CreativeEvolution
           writingSamples={filtered(portfolio.writingSamples)}
@@ -160,7 +160,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
       )
     case 'teacher-notes':
       return <TeacherNotes notes={portfolio.teacherNotes} role={role} studentId={studentId} />
-    case 'character-arc':
+    case 'soulcraft':
       return (
         <CharacterArc
           characterAwards={portfolio.characterAwards}

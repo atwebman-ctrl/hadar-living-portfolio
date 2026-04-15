@@ -105,7 +105,7 @@ export default function CreativeEvolution({ writingSamples, studentId, studentNa
     <section id="writing">
       <div className={`${cs.sectionHeader} reveal`}>
         <span className={cs.sectionNum}>04</span>
-        <h2 className={cs.sectionTitle}>Creative Evolution</h2>
+        <h2 className={cs.sectionTitle}>Composition</h2>
         <div className={cs.sectionRule} />
       </div>
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.5rem', maxWidth: 560 }}>

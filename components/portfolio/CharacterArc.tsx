@@ -104,7 +104,7 @@ export default function CharacterArc({ characterAwards, studentId, studentName, 
     <section id="character">
       <div className={`${s.sectionHeader} reveal`}>
         <span className={s.sectionNum}>06</span>
-        <h2 className={s.sectionTitle}>The Character Arc</h2>
+        <h2 className={s.sectionTitle}>Soulcraft</h2>
         <div className={s.sectionRule} />
       </div>
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.75rem', maxWidth: 560 }}>
