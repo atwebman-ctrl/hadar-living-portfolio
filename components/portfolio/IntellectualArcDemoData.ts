@@ -2,17 +2,17 @@ import type { ScoreDisplayRow } from '@/components/portfolio/SubjectScoreRows'
 import type { StudentScorePoint } from '@/components/charts/MapPercentileChart'
 
 export const DEMO_MATH_ROWS: ScoreDisplayRow[] = [
-  { term: 'Spring 2025', academicYear: '2024-2025', ritScore: 231, score: null, percentile: 95 },
-  { term: 'Fall 2024',   academicYear: '2024-2025', ritScore: 224, score: null, percentile: 90 },
-  { term: 'Spring 2024', academicYear: '2023-2024', ritScore: 215, score: null, percentile: 82 },
-  { term: 'Fall 2023',   academicYear: '2023-2024', ritScore: 208, score: null, percentile: 76 },
+  { term: 'Spring 2025', academicYear: '2024-2025', ritScore: 231, score: null, percentile: 95, gradeLevel: 'Gr 3' },
+  { term: 'Fall 2024',   academicYear: '2024-2025', ritScore: 224, score: null, percentile: 90, gradeLevel: 'Gr 3' },
+  { term: 'Spring 2024', academicYear: '2023-2024', ritScore: 215, score: null, percentile: 82, gradeLevel: 'Gr 2' },
+  { term: 'Fall 2023',   academicYear: '2023-2024', ritScore: 208, score: null, percentile: 76, gradeLevel: 'Gr 2' },
 ]
 
 export const DEMO_ENGLISH_ROWS: ScoreDisplayRow[] = [
-  { term: 'Spring 2025', academicYear: '2024-2025', ritScore: 218, score: null, percentile: 89 },
-  { term: 'Fall 2024',   academicYear: '2024-2025', ritScore: 212, score: null, percentile: 85 },
-  { term: 'Spring 2024', academicYear: '2023-2024', ritScore: 205, score: null, percentile: 78 },
-  { term: 'Fall 2023',   academicYear: '2023-2024', ritScore: 198, score: null, percentile: 72 },
+  { term: 'Spring 2025', academicYear: '2024-2025', ritScore: 218, score: null, percentile: 89, gradeLevel: 'Gr 3' },
+  { term: 'Fall 2024',   academicYear: '2024-2025', ritScore: 212, score: null, percentile: 85, gradeLevel: 'Gr 3' },
+  { term: 'Spring 2024', academicYear: '2023-2024', ritScore: 205, score: null, percentile: 78, gradeLevel: 'Gr 2' },
+  { term: 'Fall 2023',   academicYear: '2023-2024', ritScore: 198, score: null, percentile: 72, gradeLevel: 'Gr 2' },
 ]
 
 export const DEMO_MATH_SCORES: StudentScorePoint[] = [

@@ -3,8 +3,10 @@
 //
 // Source: NWEA MAP Growth Norms 2025 (approximate published values).
 // Mean RIT by grade (0=K … 8=Grade 8) and season.
-// Winter = Fall mean + 5, Spring = Fall mean + 9 (typical growth).
-// SD is held constant across seasons within a grade (simplification).
+// Winter = Fall mean + 6, Spring = Fall mean + 10 (growth is
+// front-loaded in the first semester). FALL_SUMMER_DIP is subtracted
+// from every grade after the first in a requested range to show the
+// summer-loss sawtooth. SD held constant across seasons within a grade.
 // ============================================================
 
 export type NormSeason  = 'fall' | 'winter' | 'spring'
@@ -38,9 +40,12 @@ const READING_FALL: Array<{ mean: number; sd: number }> = [
 
 const SEASON_OFFSET: Record<NormSeason, number> = {
   fall:   0,
-  winter: 5,
-  spring: 9,
+  winter: 6,
+  spring: 10,
 }
+
+// Applied to fall means of every grade after the first in a requested range.
+const FALL_SUMMER_DIP = 1.5
 
 // Z-scores for standard percentile cut-points
 const Z = {
@@ -91,7 +96,11 @@ export function getPercentileBands(
 
   for (let g = gradeRange.start; g <= gradeRange.end; g++) {
     seasons.forEach((season, si) => {
-      const { mean, sd } = getNorm(subject, g, season)
+      const base = getNorm(subject, g, season)
+      const mean = (season === 'fall' && g > gradeRange.start)
+        ? base.mean - FALL_SUMMER_DIP
+        : base.mean
+      const sd = base.sd
       points.push({
         grade:  g,
         season,

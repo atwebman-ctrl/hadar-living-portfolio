@@ -30,11 +30,27 @@ interface Props {
 
 // ── Helpers (copied verbatim from IntellectualArc) ────────────
 
-function toDisplayRows(assessments: Assessment[]): ScoreDisplayRow[] {
-  return assessments.map((a) => ({
-    id: a.id, term: a.term, academicYear: a.academicYear,
-    ritScore: a.ritScore, score: a.score, percentile: a.percentile,
-  }))
+function toDisplayRows(
+  assessments: Assessment[],
+  currentGradeNum: number | null,
+  currentAcademicYear: string | null | undefined,
+): ScoreDisplayRow[] {
+  const curStart = currentAcademicYear ? parseInt(currentAcademicYear.split('-')[0], 10) : NaN
+  return assessments.map((a) => {
+    let gradeTag: string | undefined
+    if (currentGradeNum !== null && !isNaN(curStart)) {
+      const aStart = parseInt((a.academicYear ?? '').split('-')[0], 10)
+      if (!isNaN(aStart)) {
+        const g = currentGradeNum - (curStart - aStart)
+        if (g >= 0 && g <= 12) gradeTag = g === 0 ? 'K' : `Gr ${g}`
+      }
+    }
+    return {
+      id: a.id, term: a.term, academicYear: a.academicYear,
+      ritScore: a.ritScore, score: a.score, percentile: a.percentile,
+      gradeLevel: gradeTag,
+    }
+  })
 }
 
 function buildSubjectContext(
@@ -168,7 +184,10 @@ export default function MathSection({
 
   const mathAssessments = visibleAssessments?.filter((a) => a.assessmentType === 'maps_math') ?? []
   const hasMathData     = mathAssessments.length > 0
-  const mathRows        = hasMathData ? toDisplayRows(mathAssessments) : DEMO_MATH_ROWS
+  const gradeNum        = gradeLevel ? parseGradeNumber(gradeLevel) : null
+  const mathRows        = hasMathData
+    ? toDisplayRows(mathAssessments, gradeNum, academicYear)
+    : DEMO_MATH_ROWS
 
   // Math percentile delta for callout (DB newest-first)
   const mathPcts = mathRows.filter((r) => r.percentile != null).map((r) => r.percentile as number)
@@ -182,7 +201,6 @@ export default function MathSection({
   const mathContext = canGenerate ? buildSubjectContext(mathRows, 'Mathematics', studentName ?? null) : null
 
   // Percentile chart student scores — fall back to demo when no subject-specific data
-  const gradeNum = gradeLevel ? parseGradeNumber(gradeLevel) : null
   const mathScores = (hasMathData && gradeNum !== null && academicYear)
     ? toStudentScorePoints(mathAssessments, gradeNum, academicYear)
     : DEMO_MATH_SCORES
@@ -207,6 +225,9 @@ export default function MathSection({
             </div>
           </div>
         )}
+        <div style={{ position: 'relative', height: 260, marginBottom: '1.25rem' }}>
+          <MapPercentileChart subject="math" studentScores={mathScores} />
+        </div>
         <SubjectScoreRows rows={mathRows} />
         {studentId && role && (mathContext || role === 'parent') && (
           <AiNarrativePanel studentId={studentId} role={role} sectionType="math_scores" existingDraft={existingMathDraft} draftContext={mathContext ?? {}} />
@@ -220,9 +241,6 @@ export default function MathSection({
             initialFinalText={DEMO_MATH_NARRATIVE}
           />
         )}
-        <div style={{ position: 'relative', height: 260, marginTop: '1rem' }}>
-          <MapPercentileChart subject="math" studentScores={mathScores} />
-        </div>
         {studentId && (
           <InlineSectionComment
             studentId={studentId}

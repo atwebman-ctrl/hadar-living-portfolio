@@ -39,11 +39,27 @@ const SUB_TABS: { slug: SubTab; label: string }[] = [
 
 // ── Helpers (copied verbatim from IntellectualArc) ────────────
 
-function toDisplayRows(assessments: Assessment[]): ScoreDisplayRow[] {
-  return assessments.map((a) => ({
-    id: a.id, term: a.term, academicYear: a.academicYear,
-    ritScore: a.ritScore, score: a.score, percentile: a.percentile,
-  }))
+function toDisplayRows(
+  assessments: Assessment[],
+  currentGradeNum: number | null,
+  currentAcademicYear: string | null | undefined,
+): ScoreDisplayRow[] {
+  const curStart = currentAcademicYear ? parseInt(currentAcademicYear.split('-')[0], 10) : NaN
+  return assessments.map((a) => {
+    let gradeTag: string | undefined
+    if (currentGradeNum !== null && !isNaN(curStart)) {
+      const aStart = parseInt((a.academicYear ?? '').split('-')[0], 10)
+      if (!isNaN(aStart)) {
+        const g = currentGradeNum - (curStart - aStart)
+        if (g >= 0 && g <= 12) gradeTag = g === 0 ? 'K' : `Gr ${g}`
+      }
+    }
+    return {
+      id: a.id, term: a.term, academicYear: a.academicYear,
+      ritScore: a.ritScore, score: a.score, percentile: a.percentile,
+      gradeLevel: gradeTag,
+    }
+  })
 }
 
 function buildSubjectContext(
@@ -132,12 +148,14 @@ export default function EnglishSection({
 
   const englishAssessments = visibleAssessments?.filter((a) => a.assessmentType === 'maps_english') ?? []
   const hasEnglishData     = englishAssessments.length > 0
-  const englishRows        = hasEnglishData ? toDisplayRows(englishAssessments) : DEMO_ENGLISH_ROWS
+  const gradeNum           = gradeLevel ? parseGradeNumber(gradeLevel) : null
+  const englishRows        = hasEnglishData
+    ? toDisplayRows(englishAssessments, gradeNum, academicYear)
+    : DEMO_ENGLISH_ROWS
 
   const canGenerate    = !!studentId && !!role && role !== 'parent'
   const englishContext = canGenerate ? buildSubjectContext(englishRows, 'English Language Arts', studentName ?? null) : null
 
-  const gradeNum = gradeLevel ? parseGradeNumber(gradeLevel) : null
   const readingScores = (hasEnglishData && gradeNum !== null && academicYear)
     ? toStudentScorePoints(englishAssessments, gradeNum, academicYear)
     : DEMO_READING_SCORES
@@ -156,13 +174,13 @@ export default function EnglishSection({
       {/* ── Standardized Tests (always visible) ──────────────── */}
       <div className={`${s.chartWrap} reveal`}>
         <SubjectHeading title="English Language Arts" tag="MAP Assessment" />
+        <div style={{ position: 'relative', height: 260, marginBottom: '1.25rem' }}>
+          <MapPercentileChart subject="reading" studentScores={readingScores} />
+        </div>
         <SubjectScoreRows rows={englishRows} />
         {studentId && role && (englishContext || role === 'parent') && (
           <AiNarrativePanel studentId={studentId} role={role} sectionType="english_scores" existingDraft={existingEnglishDraft} draftContext={englishContext ?? {}} />
         )}
-        <div style={{ position: 'relative', height: 260, marginTop: '1rem' }}>
-          <MapPercentileChart subject="reading" studentScores={readingScores} />
-        </div>
         {studentId && (
           <InlineSectionComment
             studentId={studentId}
