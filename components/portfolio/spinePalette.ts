@@ -1,3 +1,5 @@
+// DEPRECATED: Replaced by CanonListView in Sprint 5. Safe to delete after confirming no remaining references.
+
 export interface SpineColor { color: string; text: string }
 
 export const SPINE_PALETTE: SpineColor[] = [

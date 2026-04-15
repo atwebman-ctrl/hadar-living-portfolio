@@ -1,5 +1,7 @@
 'use client'
 
+// DEPRECATED: Replaced by CanonListView in Sprint 5. Safe to delete after confirming no remaining references.
+
 // ============================================================
 // components/portfolio/ClassBookshelf.tsx
 //
