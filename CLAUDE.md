@@ -146,10 +146,14 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/dashboard/DashboardClient.tsx` — `'use client'` wrapper; owns `activeView: DashboardView` state (`roster` | `year-in-review`); renders sidebar + StudentGrid/YearInReviewView
 - `app/dashboard/settings/page.tsx` — Server component; admin-only `/dashboard/settings` route; non-admin redirects to `/dashboard`; fetches `schools.id/name/logo_url` and hands them to `SettingsUI`
 - `app/dashboard/settings/SettingsUI.tsx` — `'use client'` UI for school settings; "School Identity" section with logo preview (120px) and Upload Logo button (POST /api/dashboard/settings/logo, 2 MB max, image/* only, optimistic update via local state); "School Name" section is display-only for now
-- `app/dashboard/DashboardSidebar.tsx` — Sidebar nav (Student Rosters, By Grade, Year in Review, Settings); Settings admin-only
+- `app/dashboard/dashboardTypes.ts` — `DashboardView` union: 'roster' | 'year-in-review' | 'workbench'
 - `app/dashboard/StudentGrid.tsx` — Grade filter pills + search; groups/sorts via `formatGrade`/`sortGrades`
 - `components/dashboard/ByGradeView.tsx` — Collapsible per-grade sections; sorted with `sortGrades()`
 - `components/dashboard/YearInReviewView.tsx` — Placeholder
+- `components/dashboard/NoteSlideOver.tsx` — Right-side slide-over panel for quick notes from the student roster; triggered by pencil button on StudentCard; POSTs to teacher-notes endpoint
+- `components/dashboard/WorkbenchView.tsx` — Teacher Workbench shell with mode tabs (Quick notes, Bulk scores, Photos, Completeness); rendered when DashboardView === 'workbench'
+- `components/dashboard/QuickNotesMode.tsx` — Stream-style note entry: student autocomplete → textarea → category → save; session feed of saved notes below; used by WorkbenchView
+- `components/dashboard/StudentAutocomplete.tsx` — Type-ahead student picker; filters pre-loaded students[], dropdown shows name + grade, keyboard nav + Tab-to-select
 - `app/not-found.tsx` — Styled 404 page using design system tokens
 - `app/admin/page.tsx` — Admin-only school settings overview; Sprint 3 placeholders for Teachers + Theme
 - `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio hub (server component); renders HubShell with visual dashboard grid

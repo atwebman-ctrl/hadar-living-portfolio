@@ -1,1 +1,1 @@
-export type DashboardView = 'roster' | 'year-in-review'
+export type DashboardView = 'roster' | 'year-in-review' | 'workbench'

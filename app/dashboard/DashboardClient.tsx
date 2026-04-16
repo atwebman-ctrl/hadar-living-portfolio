@@ -15,6 +15,7 @@ import { PageHeader } from './DashboardUI'
 import AddStudentForm from './AddStudentForm'
 import StudentGrid from './StudentGrid'
 import YearInReviewView from '@/components/dashboard/YearInReviewView'
+import WorkbenchView from '@/components/dashboard/WorkbenchView'
 
 interface Props {
   students:      Student[]
@@ -41,6 +42,7 @@ export default function DashboardClient({ students, role, schoolName, schoolLogo
       <main className="db-main">
         {activeView === 'roster'         && <StudentGrid students={students} role={role} />}
         {activeView === 'year-in-review' && <YearInReviewView />}
+        {activeView === 'workbench'      && <WorkbenchView students={students} role={role} />}
       </main>
 
       <div className="db-sidebar-quote">
