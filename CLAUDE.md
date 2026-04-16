@@ -154,6 +154,9 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `components/dashboard/WorkbenchView.tsx` — Teacher Workbench shell with mode tabs (Quick notes, Bulk scores, Photos, Completeness); rendered when DashboardView === 'workbench'
 - `components/dashboard/QuickNotesMode.tsx` — Stream-style note entry: student autocomplete → textarea → category → save; session feed of saved notes below; used by WorkbenchView
 - `components/dashboard/StudentAutocomplete.tsx` — Type-ahead student picker; filters pre-loaded students[], dropdown shows name + grade, keyboard nav + Tab-to-select
+- `components/dashboard/BatchPhotosMode.tsx` — Drag-and-drop batch photo upload; per-photo student tagging via StudentAutocomplete, term/category selectors, sequential upload to existing uploads API
+- `components/dashboard/CompletenessMode.tsx` — School-wide completeness grid; fetches from GET /api/dashboard/completeness; dot-matrix (green/amber/gray) per student per data type; "Add" links switch to Bulk Scores mode or link to portfolio
+- `app/api/dashboard/completeness/route.ts` — GET: school-wide data counts (assessments, readings, notes, writing, photos, awards) aggregated per student; admin/teacher only
 - `app/not-found.tsx` — Styled 404 page using design system tokens
 - `app/admin/page.tsx` — Admin-only school settings overview; Sprint 3 placeholders for Teachers + Theme
 - `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio hub (server component); renders HubShell with visual dashboard grid
