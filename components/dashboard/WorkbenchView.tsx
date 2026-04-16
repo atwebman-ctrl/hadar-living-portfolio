@@ -13,6 +13,7 @@
 import { useState, type CSSProperties } from 'react'
 import type { Student } from '@/lib/types'
 import QuickNotesMode from './QuickNotesMode'
+import BulkScoresMode from './BulkScoresMode'
 
 interface Props {
   students: Student[]
@@ -68,7 +69,7 @@ export default function WorkbenchView({ students, role }: Props) {
       </div>
 
       {mode === 'notes' && <QuickNotesMode students={students} />}
-      {mode === 'scores'       && <div style={PLACEHOLDER}>Bulk score entry — coming soon</div>}
+      {mode === 'scores'       && <BulkScoresMode students={students} />}
       {mode === 'photos'       && <div style={PLACEHOLDER}>Batch photo upload — coming soon</div>}
       {mode === 'completeness' && <div style={PLACEHOLDER}>Completeness dashboard — coming soon</div>}
     </div>
