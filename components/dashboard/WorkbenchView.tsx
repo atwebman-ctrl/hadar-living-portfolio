@@ -14,13 +14,15 @@ import { useState, type CSSProperties } from 'react'
 import type { Student } from '@/lib/types'
 import QuickNotesMode from './QuickNotesMode'
 import BulkScoresMode from './BulkScoresMode'
+import BatchPhotosMode from './BatchPhotosMode'
+import CompletenessMode from './CompletenessMode'
 
 interface Props {
   students: Student[]
   role:     string
 }
 
-type WorkbenchMode = 'notes' | 'scores' | 'photos' | 'completeness'
+export type WorkbenchMode = 'notes' | 'scores' | 'photos' | 'completeness'
 
 const MODES: { key: WorkbenchMode; label: string }[] = [
   { key: 'notes',        label: 'Quick notes' },
@@ -45,11 +47,6 @@ const TAB_ACTIVE: CSSProperties = {
   ...TAB, color: 'var(--navy)', borderBottomColor: 'var(--gold)',
 }
 
-const PLACEHOLDER: CSSProperties = {
-  fontFamily: 'var(--font-body)', fontStyle: 'italic', fontSize: '0.95rem',
-  color: 'var(--ink-faint)', padding: '3rem 0',
-}
-
 export default function WorkbenchView({ students, role }: Props) {
   const [mode, setMode] = useState<WorkbenchMode>('notes')
 
@@ -70,8 +67,8 @@ export default function WorkbenchView({ students, role }: Props) {
 
       {mode === 'notes' && <QuickNotesMode students={students} />}
       {mode === 'scores'       && <BulkScoresMode students={students} />}
-      {mode === 'photos'       && <div style={PLACEHOLDER}>Batch photo upload — coming soon</div>}
-      {mode === 'completeness' && <div style={PLACEHOLDER}>Completeness dashboard — coming soon</div>}
+      {mode === 'photos'       && <BatchPhotosMode students={students} />}
+      {mode === 'completeness' && <CompletenessMode students={students} onSwitchMode={setMode} />}
     </div>
   )
 }
