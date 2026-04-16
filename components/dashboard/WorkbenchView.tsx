@@ -12,7 +12,7 @@
 
 import { useState, type CSSProperties } from 'react'
 import type { Student } from '@/lib/types'
-import QuickNotesMode from './QuickNotesMode'
+import QuickNotesMode, { type FeedNote } from './QuickNotesMode'
 import BulkScoresMode from './BulkScoresMode'
 import BatchPhotosMode from './BatchPhotosMode'
 import CompletenessMode from './CompletenessMode'
@@ -49,6 +49,7 @@ const TAB_ACTIVE: CSSProperties = {
 
 export default function WorkbenchView({ students, role }: Props) {
   const [mode, setMode] = useState<WorkbenchMode>('notes')
+  const [notesFeed, setNotesFeed] = useState<FeedNote[]>([])
 
   return (
     <div style={{ maxWidth: 960 }}>
@@ -65,7 +66,7 @@ export default function WorkbenchView({ students, role }: Props) {
         ))}
       </div>
 
-      {mode === 'notes' && <QuickNotesMode students={students} />}
+      {mode === 'notes' && <QuickNotesMode students={students} feed={notesFeed} setFeed={setNotesFeed} />}
       {mode === 'scores'       && <BulkScoresMode students={students} />}
       {mode === 'photos'       && <BatchPhotosMode students={students} />}
       {mode === 'completeness' && <CompletenessMode students={students} onSwitchMode={setMode} />}

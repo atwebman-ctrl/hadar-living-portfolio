@@ -12,7 +12,11 @@ import { useCallback, useRef, useState, type CSSProperties } from 'react'
 import type { Student, TeacherNote } from '@/lib/types'
 import StudentAutocomplete from './StudentAutocomplete'
 
-interface Props { students: Student[] }
+interface Props {
+  students: Student[]
+  feed:     FeedNote[]
+  setFeed:  React.Dispatch<React.SetStateAction<FeedNote[]>>
+}
 
 const CATEGORIES = [
   { value: 'general',            label: 'Auto' },
@@ -101,7 +105,7 @@ const EMPTY: CSSProperties = {
 
 // ── Saved note with timestamp for local feed ─────────────────
 
-interface FeedNote {
+export interface FeedNote {
   note:        TeacherNote
   studentName: string
   savedAt:     string // ISO timestamp
@@ -109,14 +113,13 @@ interface FeedNote {
 
 // ── Component ─────────────────────────────────────────────────
 
-export default function QuickNotesMode({ students }: Props) {
+export default function QuickNotesMode({ students, feed, setFeed }: Props) {
   const [selected,  setSelected]  = useState<{ id: string; name: string } | null>(null)
   const [text,      setText]      = useState('')
   const [category,  setCategory]  = useState('general')
   const [saving,    setSaving]    = useState(false)
   const [flash,     setFlash]     = useState(false)
   const [error,     setError]     = useState<string | null>(null)
-  const [feed,      setFeed]      = useState<FeedNote[]>([])
   const noteRef = useRef<HTMLTextAreaElement>(null)
 
   const handleSave = useCallback(async () => {
