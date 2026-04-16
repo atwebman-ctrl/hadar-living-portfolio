@@ -38,20 +38,20 @@ const BAR: CSSProperties = {
 
 const TAB: CSSProperties = {
   fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.1em',
-  textTransform: 'uppercase', background: 'none', border: 'none',
+  textTransform: 'uppercase', background: 'none', border: 'none', outline: 'none',
   borderBottom: '2px solid transparent', padding: '12px 20px', minHeight: 44,
   cursor: 'pointer', color: 'var(--ink-light)', transition: 'color 0.15s, border-color 0.15s',
 }
 
 const TAB_ACTIVE: CSSProperties = {
-  ...TAB, color: 'var(--navy)', borderBottomColor: 'var(--gold)',
+  ...TAB, color: 'var(--navy)', borderBottomColor: 'var(--gold)', background: 'none',
 }
 
 export default function WorkbenchView({ students, role }: Props) {
   const [mode, setMode] = useState<WorkbenchMode>('notes')
 
   return (
-    <div>
+    <div style={{ maxWidth: 960 }}>
       <div style={BAR}>
         {MODES.map((m) => (
           <button

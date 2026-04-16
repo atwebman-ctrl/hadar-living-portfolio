@@ -50,8 +50,6 @@ function timeAgo(iso: string): string {
 
 const ROW: CSSProperties = {
   display: 'flex', alignItems: 'flex-start', gap: 12,
-  padding: 16, background: 'var(--white)', border: '1px solid var(--rule)',
-  borderRadius: 6,
 }
 
 const INPUT: CSSProperties = {
@@ -84,8 +82,9 @@ const FEED_LABEL: CSSProperties = {
 }
 
 const FEED_ROW: CSSProperties = {
-  display: 'flex', alignItems: 'baseline', gap: 12, padding: '10px 0',
-  borderBottom: '1px solid var(--rule)', fontSize: 13,
+  display: 'flex', alignItems: 'baseline', gap: 12, padding: '10px 12px',
+  borderBottom: '1px solid var(--rule)', borderLeft: '3px solid var(--gold)',
+  fontSize: 13,
 }
 
 const BADGE: CSSProperties = {
@@ -160,6 +159,8 @@ export default function QuickNotesMode({ students }: Props) {
 
   return (
     <div>
+      {/* ── Input group ── */}
+      <div style={{ background: 'var(--white)', border: '1px solid var(--rule)', borderRadius: 8, padding: 16 }}>
       {/* ── Primary input row ── */}
       <div style={ROW}>
         <div style={{ width: 220, flexShrink: 0 }}>
@@ -208,6 +209,7 @@ export default function QuickNotesMode({ students }: Props) {
         </div>
         <div style={{ ...NOTE_INPUT, color: 'var(--ink-faint)' }}>Next observation…</div>
       </div>
+      </div>{/* close input group */}
 
       {/* ── Feed ── */}
       <div style={FEED_LABEL}>Saved today</div>
