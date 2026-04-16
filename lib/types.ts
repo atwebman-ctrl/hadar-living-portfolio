@@ -98,6 +98,8 @@ export interface Assessment {
   term: string;                // e.g. "Fall 2025"
   academicYear: string;
   notes: string | null;
+  pdfPath: string | null;
+  pdfPublicUrl: string | null;
   createdAt: string;
 }
 

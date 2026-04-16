@@ -222,7 +222,10 @@ export async function getStudentPortfolioUncached(
   return {
     student: mapStudent(studentRow as Row),
     school: mapSchool(schoolRow as Row),
-    assessments: assessmentRows.filter(notDeleted).map((r) => mapAssessment(r as Row)),
+    assessments: assessmentRows.filter(notDeleted).map((r) => {
+      const a = mapAssessment(r as Row)
+      return { ...a, pdfPublicUrl: storagePublicUrl(a.pdfPath) }
+    }),
     readings: readingRows.filter(notDeleted).map((r) => mapReading(r as Row)),
     writingSamples: writingSampleRows.filter(notDeleted).map((r) => mapWritingSample(r as Row)),
     handwritingSamples: handwritingRows.filter(notDeleted).map((r) => {

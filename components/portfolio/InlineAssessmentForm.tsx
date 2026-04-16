@@ -8,7 +8,7 @@
 // not rendering this for parents).
 // ============================================================
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { TERM_OPTIONS, ACADEMIC_YEAR_OPTIONS } from '@/lib/constants'
 import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modalStyles'
@@ -70,8 +70,13 @@ export default function InlineAssessmentForm({ studentId, defaultType = 'maps_ma
   const [status, setStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
   const [fields, setFields] = useState<Fields>(() => ({ assessmentType: defaultType, score: '', percentile: '', term: '', academicYear: '' }))
   const [saving, setSaving] = useState(false)
+  const [savedId, setSavedId]     = useState<string | null>(null)
+  const [pdfUploading, setPdfUploading] = useState(false)
+  const pdfRef = useRef<HTMLInputElement>(null)
 
-  function close() { setOpen(false); setStatus(null) }
+  function close() {
+    setOpen(false); setStatus(null); setSavedId(null)
+  }
 
   const set = (k: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setFields((f) => ({ ...f, [k]: e.target.value }))
@@ -95,14 +100,46 @@ export default function InlineAssessmentForm({ studentId, defaultType = 'maps_ma
       if (!res.ok) {
         setStatus({ type: 'error', msg: (body as { error?: string }).error ?? 'Failed to save.' })
       } else {
-        setFields({ assessmentType: defaultType, score: '', percentile: '', term: '', academicYear: '' })
-        close()
-        router.refresh()
+        const isMap = fields.assessmentType === 'maps_math' || fields.assessmentType === 'maps_english'
+        const createdId = (body as { id?: string }).id
+        if (isMap && createdId) {
+          setSavedId(createdId)
+          setStatus({ type: 'success', msg: 'Score saved. Attach a MAP report PDF below, or close.' })
+        } else {
+          setFields({ assessmentType: defaultType, score: '', percentile: '', term: '', academicYear: '' })
+          close()
+          router.refresh()
+        }
       }
     } catch {
       setStatus({ type: 'error', msg: 'Network error.' })
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handlePdfUpload(file: File) {
+    if (!savedId) return
+    setPdfUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch(`/api/dashboard/students/${studentId}/assessments/${savedId}/pdf`, {
+        method: 'POST', body: fd,
+      })
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        setStatus({ type: 'error', msg: (j as { error?: string }).error ?? 'PDF upload failed.' })
+      } else {
+        setStatus({ type: 'success', msg: 'PDF attached.' })
+        setFields({ assessmentType: defaultType, score: '', percentile: '', term: '', academicYear: '' })
+        setSavedId(null)
+        setTimeout(() => { close(); router.refresh() }, 800)
+      }
+    } catch {
+      setStatus({ type: 'error', msg: 'Network error.' })
+    } finally {
+      setPdfUploading(false)
     }
   }
 
@@ -161,11 +198,26 @@ export default function InlineAssessmentForm({ studentId, defaultType = 'maps_ma
                   </div>
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
-                  <button type="submit" disabled={saving} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold-pale)', background: 'var(--navy)', border: '1px solid var(--gold)', padding: '0.5rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+                  <button type="submit" disabled={saving || !!savedId} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold-pale)', background: 'var(--navy)', border: '1px solid var(--gold)', padding: '0.5rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: (saving || !!savedId) ? 0.6 : 1 }}>
                     {saving ? 'Saving…' : 'Save Assessment'}
                   </button>
                 </div>
               </form>
+              {savedId && (
+                <div style={{ marginTop: '0.75rem', padding: '0.75rem', border: '1px solid var(--rule)', borderRadius: 6, background: 'var(--cream)' }}>
+                  <div style={{ ...lbl, marginBottom: '0.5rem' }}>Attach MAP report (PDF or image)</div>
+                  <input ref={pdfRef} type="file" accept=".pdf,image/*" style={{ display: 'none' }}
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) void handlePdfUpload(f) }} />
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button type="button" disabled={pdfUploading} onClick={() => pdfRef.current?.click()} style={{ ...toggleBtn, opacity: pdfUploading ? 0.6 : 1 }}>
+                      {pdfUploading ? 'Uploading…' : 'Choose file'}
+                    </button>
+                    <button type="button" onClick={() => { setFields({ assessmentType: defaultType, score: '', percentile: '', term: '', academicYear: '' }); close(); router.refresh() }} style={{ ...toggleBtn, border: 'none', textDecoration: 'underline', color: 'var(--ink-light)' }}>
+                      Skip
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

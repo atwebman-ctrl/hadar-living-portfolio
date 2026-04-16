@@ -1,11 +1,4 @@
-// ============================================================
 // lib/mappers.ts — Row mappers: snake_case DB → camelCase TS
-//
-// Each function accepts a raw Supabase row (Record<string, unknown>)
-// and returns the typed domain object from lib/types.ts.
-// Imported exclusively by getStudentPortfolio.ts and API routes
-// that need to normalise Supabase responses.
-// ============================================================
 
 import type {
   Student,
@@ -80,6 +73,8 @@ export function mapAssessment(row: Row): Assessment {
     term: row.term as string,
     academicYear: row.academic_year as string,
     notes: (row.notes as string) ?? null,
+    pdfPath: (row.pdf_path as string) ?? null,
+    pdfPublicUrl: null,
     createdAt: row.created_at as string,
   };
 }

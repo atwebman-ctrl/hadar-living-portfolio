@@ -58,6 +58,7 @@ function toDisplayRows(
       id: a.id, term: a.term, academicYear: a.academicYear,
       ritScore: a.ritScore, score: a.score, percentile: a.percentile,
       gradeLevel: gradeTag,
+      pdfPath: a.pdfPath, pdfPublicUrl: a.pdfPublicUrl,
     }
   })
 }
