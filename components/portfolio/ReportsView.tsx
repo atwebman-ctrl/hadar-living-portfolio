@@ -45,7 +45,7 @@ function fmtDate(iso: string | null | undefined): string {
 const label: React.CSSProperties = { fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-mid)' }
 const inp:   React.CSSProperties = { padding: '6px 10px', fontFamily: 'var(--font-body)', fontSize: '0.85rem', color: 'var(--ink)', background: 'var(--cream)', border: '1px solid var(--rule)' }
 const sel:   React.CSSProperties = { ...inp, fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.08em', cursor: 'pointer' }
-const btn:   React.CSSProperties = { padding: '8px 18px', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--cream)', background: 'var(--navy)', border: '1px solid var(--navy)', cursor: 'pointer' }
+const btn:   React.CSSProperties = { padding: '12px 22px', minHeight: 44, fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--cream)', background: 'var(--navy)', border: '1px solid var(--navy)', cursor: 'pointer' }
 const tag:   React.CSSProperties = { display: 'inline-block', padding: '2px 8px', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-light)', background: 'var(--cream)', border: '1px solid var(--rule)', marginRight: '0.4rem' }
 
 // ── Component ─────────────────────────────────────────────────

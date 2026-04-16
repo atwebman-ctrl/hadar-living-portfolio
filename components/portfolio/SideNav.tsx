@@ -136,7 +136,6 @@ export default function SideNav({
           <a
             href={`/portfolio/${studentId}/full`}
             className={`${styles.navLink}${isReports ? ` ${styles.navLinkActive}` : ''}`}
-            style={{ opacity: 0.65, fontSize: '0.78rem', marginTop: '0.5rem' }}
           >
             Reports
           </a>

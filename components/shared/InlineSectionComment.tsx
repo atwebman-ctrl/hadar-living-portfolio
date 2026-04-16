@@ -29,7 +29,7 @@ interface Props {
 
 const LINK: CSSProperties = {
   display: 'inline-block', fontSize: 13, color: 'var(--gold)', opacity: 0.6,
-  background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+  background: 'none', border: 'none', padding: '10px 0', minHeight: 44, cursor: 'pointer',
   fontFamily: 'var(--font-body)', textDecoration: 'none',
 }
 
@@ -42,12 +42,26 @@ const TEXTAREA: CSSProperties = {
 const SAVE_BTN: CSSProperties = {
   fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase',
   background: 'var(--navy)', color: 'var(--cream)', border: 'none',
-  padding: '6px 14px', cursor: 'pointer', borderRadius: 3,
+  padding: '10px 18px', minHeight: 44, cursor: 'pointer', borderRadius: 3,
 }
 
 const CANCEL_LINK: CSSProperties = {
   fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--ink-light)',
-  background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline',
+  background: 'none', border: 'none', cursor: 'pointer', padding: '10px 0', minHeight: 44, textDecoration: 'underline',
+}
+
+// Section-aware ghost prompt — evocative placeholder text tailored to the
+// section the note is being left against.
+function ghostPrompt(cat: string): string {
+  switch (cat) {
+    case 'intellectual_arc': case 'math':       return 'What mathematical thinking did you notice today?'
+    case 'english':                             return 'How is their reading or writing developing?'
+    case 'immersion_engine': case 'hebrew':     return 'What progress did you see in Hebrew today?'
+    case 'the_canon':                           return 'How did they engage with this book?'
+    case 'creative_evolution': case 'composition': return 'What voice or craft did you notice in their writing?'
+    case 'character_arc': case 'soulcraft':     return 'What moment of character did you witness?'
+    default:                                    return 'What did you notice about this student today?'
+  }
 }
 
 // ── Existing-note card ────────────────────────────────────────
@@ -145,7 +159,7 @@ export default function InlineSectionComment({
 
       {canEdit && !expanded && !saved && (
         <button type="button" style={LINK} onClick={() => setExpanded(true)}>
-          Add a note…
+          Add a note about this section…
         </button>
       )}
 
@@ -153,7 +167,7 @@ export default function InlineSectionComment({
         <div>
           <textarea
             style={TEXTAREA}
-            placeholder="Note for this section…"
+            placeholder={ghostPrompt(sectionCategory)}
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={2}

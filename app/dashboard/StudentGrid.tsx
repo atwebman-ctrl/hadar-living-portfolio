@@ -13,6 +13,7 @@ import type { Student } from '@/lib/types'
 import { formatGrade, sortGrades } from '@/lib/gradeLevel'
 import { StudentCard, EmptyState } from './DashboardUI'
 import StudentList from './StudentList'
+import NoteSlideOver from '@/components/dashboard/NoteSlideOver'
 
 interface Props { students: Student[]; role: string }
 
@@ -24,6 +25,12 @@ export default function StudentGrid({ students, role }: Props) {
   const [query,       setQuery]       = useState('')
   const [gradeFilter, setGradeFilter] = useState('All')
   const [viewMode,    setViewMode]    = useState<ViewMode>('list')
+  const [slideOverStudent, setSlideOverStudent] = useState<{ id: string; name: string } | null>(null)
+
+  const canEdit = role === 'admin' || role === 'teacher'
+  const openQuickNote = canEdit
+    ? (s: Student) => setSlideOverStudent({ id: s.id, name: `${s.firstName} ${s.lastName}` })
+    : undefined
 
   // Rehydrate view mode from localStorage after mount (SSR-safe default: list)
   useEffect(() => {
@@ -133,11 +140,20 @@ export default function StudentGrid({ students, role }: Props) {
         </div>
       ) : viewMode === 'grid' ? (
         <div className="student-grid" style={{ display: 'grid', gap: '1.5rem' }}>
-          {filtered.map((s) => <StudentCard key={s.id} student={s} role={role} />)}
+          {filtered.map((s) => (
+            <StudentCard key={s.id} student={s} role={role} onQuickNote={openQuickNote} />
+          ))}
         </div>
       ) : (
         <StudentList students={filtered} />
       )}
+
+      <NoteSlideOver
+        studentId={slideOverStudent?.id ?? ''}
+        studentName={slideOverStudent?.name ?? ''}
+        isOpen={slideOverStudent !== null}
+        onClose={() => setSlideOverStudent(null)}
+      />
     </>
   )
 }

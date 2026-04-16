@@ -169,7 +169,15 @@ function buildPhotoUrl(path: string | null): string | null {
   return `${SUPABASE_URL}/storage/v1/object/public/portfolio-assets/${path}`
 }
 
-export function StudentCard({ student, role }: { student: Student; role: string }) {
+export function StudentCard({
+  student,
+  role,
+  onQuickNote,
+}: {
+  student:      Student
+  role:         string
+  onQuickNote?: (student: Student) => void
+}) {
   const canEdit    = role === 'admin' || role === 'teacher'
   const canArchive = canEdit && !student.isDemo
   const initials   = `${student.firstName[0] ?? ''}${student.lastName[0] ?? ''}`.toUpperCase()
@@ -220,6 +228,20 @@ export function StudentCard({ student, role }: { student: Student; role: string 
 
       {canEdit && (
         <div className="db-card-actions">
+          {onQuickNote && (
+            <button
+              type="button"
+              className="db-card-note-btn"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickNote(student) }}
+              aria-label={`Add quick note for ${student.firstName} ${student.lastName}`}
+              title="Add quick note"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+            </button>
+          )}
           <EditStudentForm student={student} />
           {canArchive && <StudentCardOverflow studentId={student.id} />}
         </div>

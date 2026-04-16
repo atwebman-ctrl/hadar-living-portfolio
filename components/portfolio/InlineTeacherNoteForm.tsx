@@ -23,13 +23,14 @@ import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modal
 interface Props { studentId: string }
 
 // ⚠️ `value` strings are DB-stored section_category values — do NOT rename.
-// Only `label` is UI-facing.
+// Only `label` is UI-facing. English is the one new-style value here because
+// it had no legacy counterpart (Math + English used to share intellectual_arc).
 const SECTION_CATEGORIES = [
   { value: 'intellectual_arc',   label: 'Math' },
+  { value: 'english',            label: 'English' },
   { value: 'immersion_engine',   label: 'Hebrew' },
   { value: 'the_canon',          label: 'The Canon' },
   { value: 'creative_evolution', label: 'Composition' },
-  { value: 'rhetoric_room',      label: 'Rhetoric Room' },
   { value: 'character_arc',      label: 'Soulcraft' },
   { value: 'general',            label: 'General' },
 ] as const
@@ -39,7 +40,7 @@ const SECTION_CATEGORIES = [
 const toggleBtn: React.CSSProperties = {
   fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em',
   textTransform: 'uppercase', color: 'var(--navy)', background: 'none',
-  border: '1px solid var(--navy)', padding: '4px 12px', cursor: 'pointer',
+  border: '1px solid var(--navy)', padding: '10px 16px', minHeight: 44, cursor: 'pointer',
 }
 const sectionHead: React.CSSProperties = {
   fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.14em',
@@ -62,7 +63,7 @@ const twoCol: React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr
 const submitBtn: React.CSSProperties = {
   fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.1em',
   textTransform: 'uppercase', background: 'var(--navy)', color: 'var(--gold-pale)',
-  border: 'none', padding: '7px 20px', cursor: 'pointer', marginTop: '0.25rem',
+  border: 'none', padding: '12px 24px', minHeight: 44, cursor: 'pointer', marginTop: '0.25rem',
 }
 const statusBar = (type: 'success' | 'error'): React.CSSProperties => ({
   padding: '0.4rem 0.75rem', marginBottom: '0.75rem',
@@ -166,14 +167,14 @@ export default function InlineTeacherNoteForm({ studentId }: Props) {
                   <span style={lbl}>Note</span>
                   <textarea style={{ ...inp, minHeight: '8rem', resize: 'vertical' }} required
                     value={form.noteText}
-                    placeholder="Write a qualitative observation about this student…"
+                    placeholder="What did you observe about this student today? A moment of insight, a struggle, a breakthrough…"
                     onChange={(e) => update('noteText', e.target.value)} />
                 </div>
                 <div style={fieldWrap}>
                   <span style={lbl}>Pull Quote (optional)</span>
                   <textarea style={{ ...inp, minHeight: '3rem', resize: 'vertical' }}
                     value={form.highlightQuote}
-                    placeholder="A single sentence to feature on the portfolio summary card…"
+                    placeholder="One sentence to highlight — the kind of thing you'd share with a parent."
                     onChange={(e) => update('highlightQuote', e.target.value)} />
                 </div>
 

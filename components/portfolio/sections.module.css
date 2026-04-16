@@ -49,7 +49,7 @@
 /* ── FLIPBOOK ─────────────────────────────────────────────────── */
 @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .flipTabs { display: flex; border-bottom: 1px solid var(--rule); }
-.flipTab { padding: 10px 20px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; background: none; border: none; cursor: pointer; color: var(--ink-light); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
+.flipTab { padding: 12px 24px; min-height: 44px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; background: none; border: none; cursor: pointer; color: var(--ink-light); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
 .flipTabActive { color: var(--navy); border-bottom-color: var(--navy); background: var(--white); }
 .flipPane { display: none; padding: 2rem; background: var(--white); border: 1px solid var(--rule); border-top: none; border-radius: 0 0 4px 4px; min-height: 240px; }
 .flipPaneActive { display: block; animation: fadeUp .3s ease; }

@@ -23,7 +23,7 @@ const WRAP: CSSProperties = { position: 'relative' }
 
 const PENCIL_BTN: CSSProperties = {
   position: 'absolute', top: 0, right: 0,
-  width: 28, height: 28,
+  width: 44, height: 44,
   border: '1px solid var(--rule)', borderRadius: 6,
   background: 'var(--white)', color: 'var(--ink-light)',
   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -39,13 +39,13 @@ const TEXTAREA: CSSProperties = {
 
 const SAVE_BTN: CSSProperties = {
   background: 'var(--gold)', color: 'white',
-  border: 'none', borderRadius: 6, padding: '6px 16px',
+  border: 'none', borderRadius: 6, padding: '10px 20px', minHeight: 44,
   fontSize: 13, cursor: 'pointer',
 }
 
 const CANCEL_BTN: CSSProperties = {
   background: 'transparent', color: 'var(--ink-light)',
-  border: 'none', borderRadius: 6, padding: '6px 16px',
+  border: 'none', borderRadius: 6, padding: '10px 20px', minHeight: 44,
   fontSize: 13, cursor: 'pointer',
 }
 
@@ -115,7 +115,7 @@ export default function InlineEditableText({
 
   return (
     <div
-      style={{ ...WRAP, paddingRight: canEdit ? 36 : 0 }}
+      style={{ ...WRAP, paddingRight: canEdit ? 52 : 0 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
