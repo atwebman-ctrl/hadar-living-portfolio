@@ -18,6 +18,7 @@ import type {
   CharacterAward,
   Photo,
   ParentUpload,
+  ReportCard,
   Teacher,
   TeacherNote,
   AiDraft,
@@ -208,6 +209,18 @@ export function mapParentUpload(row: Row): ParentUpload {
     uploadedBy:  row.uploaded_by as string,
     createdAt:   row.created_at as string,
     publicUrl:   null, // set post-mapping in getStudentPortfolio
+  };
+}
+
+export function mapReportCard(row: Row): ReportCard {
+  return {
+    id: row.id as string, schoolId: row.school_id as string, studentId: row.student_id as string,
+    title: row.title as string, description: (row.description as string) ?? null,
+    academicYear: row.academic_year as string, term: (row.term as string) ?? null,
+    gradeLevel: (row.grade_level as string) ?? null, storagePath: row.storage_path as string,
+    fileType: (row.file_type as string) ?? 'application/pdf',
+    uploadedBy: row.uploaded_by as string, createdAt: row.created_at as string,
+    publicUrl: null,
   };
 }
 

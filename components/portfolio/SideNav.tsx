@@ -56,7 +56,7 @@ export default function SideNav({
   const pathname = usePathname()
 
   const isHub     = !!studentId && pathname === `/portfolio/${studentId}`
-  const isFull    = !!studentId && pathname === `/portfolio/${studentId}/full`
+  const isReports = !!studentId && pathname === `/portfolio/${studentId}/full`
   const isJournal = !!studentId && pathname === `/portfolio/${studentId}/journal`
   const isGallery = !!studentId && pathname === `/portfolio/${studentId}/gallery`
 
@@ -135,10 +135,10 @@ export default function SideNav({
 
           <a
             href={`/portfolio/${studentId}/full`}
-            className={`${styles.navLink}${isFull ? ` ${styles.navLinkActive}` : ''}`}
+            className={`${styles.navLink}${isReports ? ` ${styles.navLinkActive}` : ''}`}
             style={{ opacity: 0.65, fontSize: '0.78rem', marginTop: '0.5rem' }}
           >
-            Full Portfolio
+            Reports
           </a>
         </>
       ) : (

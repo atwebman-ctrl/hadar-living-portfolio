@@ -217,6 +217,22 @@ export interface ParentUpload {
   publicUrl: string | null;
 }
 
+export interface ReportCard {
+  id: string;
+  schoolId: string;
+  studentId: string;
+  title: string;
+  description: string | null;
+  academicYear: string;
+  term: string | null;
+  gradeLevel: string | null;
+  storagePath: string;
+  fileType: string;
+  uploadedBy: string;
+  createdAt: string;
+  publicUrl: string | null;
+}
+
 export interface Teacher {
   id: string;
   schoolId: string;
@@ -299,6 +315,7 @@ export interface PortfolioData {
   teacherNotes: TeacherNote[];
   aiDrafts: AiDraft[];  // only accepted drafts in parent view
   studentVideos: StudentVideo[];
+  reportCards: ReportCard[];
 }
 
 // ── Student videos (0008 migration) ──────────────────────────

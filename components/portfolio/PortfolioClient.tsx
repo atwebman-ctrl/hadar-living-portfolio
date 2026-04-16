@@ -20,7 +20,6 @@ import CharacterArc from '@/components/portfolio/CharacterArc'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 import InviteParentButton from '@/components/shared/InviteParentButton'
 import YearSelector from '@/components/portfolio/YearSelector'
-import layoutStyles from '@/components/portfolio/layout.module.css'
 
 interface Props {
   portfolio: PortfolioData
@@ -44,7 +43,7 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
   const { student, school, assessments, aiDrafts } = portfolio
 
   return (
-    <div className={layoutStyles.main}>
+    <>
       <HeroSection
         student={student}
         school={school}
@@ -106,6 +105,6 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
         existingDraft={aiDrafts.find((d) => d.sectionType === 'virtue_badges')}
       />
       <PortfolioFooter />
-    </div>
+    </>
   )
 }

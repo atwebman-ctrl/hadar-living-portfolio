@@ -27,6 +27,7 @@ import {
   mapCharacterAward,
   mapPhoto,
   mapParentUpload,
+  mapReportCard,
   mapTeacherNote,
   mapScopeAndSequence,
   mapAiDraft,
@@ -95,6 +96,7 @@ export async function getStudentPortfolioUncached(
     scopeRows,
     aiDraftRows,
     studentVideoRows,
+    reportCardRows,
   ] = await Promise.all([
     // deleted_at filter applied in-memory below so the query works both before
     // and after migration 0012 is applied to production.
@@ -198,6 +200,15 @@ export async function getStudentPortfolioUncached(
         .eq("school_id", schoolId)
         .order("created_at", { ascending: true })
     ),
+    // report_cards: deleted_at filter applied in-memory below.
+    safeQuery(() =>
+      supabaseAdmin
+        .from("report_cards")
+        .select("*")
+        .eq("student_id", studentId)
+        .eq("school_id", schoolId)
+        .order("academic_year", { ascending: false })
+    ),
   ]);
 
   type Row = Record<string, unknown>;
@@ -235,6 +246,10 @@ export async function getStudentPortfolioUncached(
     studentVideos: studentVideoRows.filter(notDeleted).map((r) => {
       const v = mapStudentVideo(r as Row)
       return { ...v, videoPublicUrl: storagePublicUrl(v.videoStoragePath) }
+    }),
+    reportCards: reportCardRows.filter(notDeleted).map((r) => {
+      const c = mapReportCard(r as Row)
+      return { ...c, publicUrl: storagePublicUrl(c.storagePath) }
     }),
   };
 }
