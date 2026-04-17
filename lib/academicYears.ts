@@ -8,6 +8,26 @@
 
 import { supabaseAdmin } from './supabaseAdmin'
 
+// Read-only lookup: returns the row id if it exists, null otherwise.
+// Use this from read-path code (dashboard, lists) where creating a row
+// as a side effect of a GET would be inappropriate.
+export async function getAcademicYearId(
+  schoolId: string,
+  label: string,
+): Promise<string | null> {
+  const { data, error } = await supabaseAdmin
+    .from('academic_years')
+    .select('id')
+    .eq('school_id', schoolId)
+    .eq('label', label)
+    .maybeSingle()
+
+  if (error) {
+    throw new Error(`getAcademicYearId: lookup failed — ${error.message}`)
+  }
+  return (data?.id as string | undefined) ?? null
+}
+
 export async function getOrCreateAcademicYearId(
   schoolId: string,
   label: string,

@@ -11,6 +11,7 @@
 import { useState } from 'react'
 import type { Student } from '@/lib/types'
 import type { DashboardView } from './dashboardTypes'
+import type { StudentProfileStatus } from '@/lib/profileStatus'
 import { PageHeader } from './DashboardUI'
 import AddStudentForm from './AddStudentForm'
 import StudentGrid from './StudentGrid'
@@ -18,13 +19,20 @@ import YearInReviewView from '@/components/dashboard/YearInReviewView'
 import WorkbenchView from '@/components/dashboard/WorkbenchView'
 
 interface Props {
-  students:      Student[]
-  role:          string
-  schoolName:    string
-  schoolLogoUrl: string | null
+  students:         Student[]
+  role:             string
+  schoolName:       string
+  schoolLogoUrl:    string | null
+  profileStatuses:  Record<string, StudentProfileStatus>
 }
 
-export default function DashboardClient({ students, role, schoolName, schoolLogoUrl }: Props) {
+export default function DashboardClient({
+  students,
+  role,
+  schoolName,
+  schoolLogoUrl,
+  profileStatuses,
+}: Props) {
   const [activeView, setActiveView] = useState<DashboardView>('roster')
 
   return (
@@ -40,7 +48,7 @@ export default function DashboardClient({ students, role, schoolName, schoolLogo
       </PageHeader>
 
       <main className="db-main">
-        {activeView === 'roster'         && <StudentGrid students={students} role={role} />}
+        {activeView === 'roster'         && <StudentGrid students={students} role={role} profileStatuses={profileStatuses} />}
         {activeView === 'year-in-review' && <YearInReviewView />}
         {activeView === 'workbench'      && <WorkbenchView students={students} role={role} />}
       </main>

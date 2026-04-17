@@ -10,18 +10,23 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import type { Student } from '@/lib/types'
+import type { StudentProfileStatus } from '@/lib/profileStatus'
 import { formatGrade, sortGrades } from '@/lib/gradeLevel'
 import { StudentCard, EmptyState } from './DashboardUI'
 import StudentList from './StudentList'
 import NoteSlideOver from '@/components/dashboard/NoteSlideOver'
 
-interface Props { students: Student[]; role: string }
+interface Props {
+  students:         Student[]
+  role:             string
+  profileStatuses:  Record<string, StudentProfileStatus>
+}
 
 type ViewMode = 'grid' | 'list'
 
 const VIEW_STORAGE_KEY = 'dashboard.viewMode'
 
-export default function StudentGrid({ students, role }: Props) {
+export default function StudentGrid({ students, role, profileStatuses }: Props) {
   const [query,       setQuery]       = useState('')
   const [gradeFilter, setGradeFilter] = useState('All')
   const [viewMode,    setViewMode]    = useState<ViewMode>('list')
@@ -141,11 +146,17 @@ export default function StudentGrid({ students, role }: Props) {
       ) : viewMode === 'grid' ? (
         <div className="student-grid" style={{ display: 'grid', gap: '1.5rem' }}>
           {filtered.map((s) => (
-            <StudentCard key={s.id} student={s} role={role} onQuickNote={openQuickNote} />
+            <StudentCard
+              key={s.id}
+              student={s}
+              role={role}
+              onQuickNote={openQuickNote}
+              profileStatus={profileStatuses[s.id]}
+            />
           ))}
         </div>
       ) : (
-        <StudentList students={filtered} />
+        <StudentList students={filtered} profileStatuses={profileStatuses} />
       )}
 
       <NoteSlideOver

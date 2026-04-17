@@ -17,6 +17,7 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import type { Student } from '@/lib/types'
+import type { StudentProfileStatus } from '@/lib/profileStatus'
 import { GRADE_LEVELS, formatGrade } from '@/lib/gradeLevel'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
@@ -29,9 +30,37 @@ function buildPhotoUrl(path: string | null): string | null {
 type SortKey = 'name' | 'grade' | 'year' | 'gender' | 'mapMath' | 'mapEnglish' | 'hebrew'
 type SortDir = 'asc' | 'desc'
 
-interface Props { students: Student[] }
+interface Props {
+  students:        Student[]
+  profileStatuses: Record<string, StudentProfileStatus>
+}
 
-export default function StudentList({ students }: Props) {
+function ProfileStatusCell({ status }: { status: StudentProfileStatus | undefined }) {
+  if (!status || status.kind === 'not_started') {
+    return <span style={{ color: 'var(--ink-faint)' }}>—</span>
+  }
+  if (status.kind === 'in_draft') {
+    return (
+      <span style={{ color: 'var(--gold)', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: '0.06em' }}>
+        DRAFT · {status.requiredComplete}/{status.requiredTotal}
+      </span>
+    )
+  }
+  if (status.kind === 'in_review') {
+    return (
+      <span style={{ color: 'var(--gold)', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: '0.06em', fontWeight: 600 }}>
+        REVIEW
+      </span>
+    )
+  }
+  return (
+    <span style={{ color: 'var(--teal, #2d6a6a)', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: '0.06em', fontWeight: 600 }}>
+      PUBLISHED
+    </span>
+  )
+}
+
+export default function StudentList({ students, profileStatuses }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
@@ -66,6 +95,11 @@ export default function StudentList({ students }: Props) {
             <SortableTh label="MAP Math"    col="mapMath"    sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
             <SortableTh label="MAP English" col="mapEnglish" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
             <SortableTh label="Hebrew"      col="hebrew"     sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
+            <th>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-faint)' }}>
+                Spring Profile
+              </span>
+            </th>
             <th className="db-list-col-action" aria-label="Actions" />
           </tr>
         </thead>
@@ -113,6 +147,9 @@ export default function StudentList({ students }: Props) {
                 <td className="db-list-num">—</td>
                 <td className="db-list-num">—</td>
                 <td className="db-list-num">—</td>
+                <td>
+                  <ProfileStatusCell status={profileStatuses[s.id]} />
+                </td>
                 <td className="db-list-col-action">
                   <Link href={`/portfolio/${s.id}`} className="db-list-view">View</Link>
                 </td>
