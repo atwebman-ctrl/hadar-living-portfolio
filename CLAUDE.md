@@ -378,7 +378,7 @@ Tab order: The Canon · Math · English · Hebrew · Soulcraft. Each of English 
 ## Session · Apr 16 2026 · Major scope pivot to Profile Builder
 
 ### What shipped this session
-- StreamComposer Phase 1 scaffold (not committed yet — Aaron will commit separately). Five files under 300 lines each, typecheck clean:
+- StreamComposer Phase 1 scaffold (committed earlier in session). Five files under 300 lines each, typecheck clean:
   - components/dashboard/StreamComposer.tsx (294 lines)
   - components/dashboard/ComposerOptionsRow.tsx (226 lines)
   - components/dashboard/ComposerNoteBody.tsx (60 lines)
@@ -387,6 +387,22 @@ Tab order: The Canon · Math · English · Hebrew · Soulcraft. Each of English 
   - lib/types.ts: new FeedEntry discriminated union added (note/score/photo variants)
 - Dev-only test route at /dashboard/stream-test renders the scaffold in isolation
 - Component is NOT wired into WorkbenchView — intentionally parked
+
+Two additional commits beyond the StreamComposer scaffold:
+
+1. **55138da — Ghost migration repair**
+   - Found students table was never actually in migration 0012's ALTER list
+   - Added missing deleted_at, created_by, updated_by columns + partial index
+   - Preserved diagnostic scripts in scripts/ for future ghost audits
+
+2. **56df410 — Profile Builder Phase 1 (schema + creation flow)**
+   - Three new Supabase tables: profiles, profile_sections, profile_section_attachments
+   - TypeScript types in lib/types/profileBuilder.ts
+   - POST /api/dashboard/profiles endpoint
+   - Server page at /dashboard/profiles/[studentId]/[season]
+   - Client components: ProfileOverview + EmptyState + Filled + styles
+   - Helper: lib/academicYears.ts::getOrCreateAcademicYearId (with sensible Aug 1 – Jun 30 defaults)
+   - End-to-end verified: Athena's Spring 2025-2026 profile created, 9 sections seeded
 
 ### Major scope reframe
 Mid-session pivot after Tayler shared Athena's actual Hadar Student Learning Profile PDF. Reading that document made clear that Quire's hero feature is not a portfolio dashboard or data-capture workbench. It is a Learning Profile Builder — a system that replaces the 1.5-hour manual assembly of a per-student, per-semester document (currently done in Google Slides) with a ~10-20 minute assisted assembly. Data Quire already holds (MAP, AVANT, Lexile, reading list, writing samples, photos, captured notes) flows into a structured document; AI drafts narrative prose; teachers edit and approve; Dr. Worth (Head of School) reviews and publishes; parents receive a permanent record.
@@ -420,15 +436,22 @@ Standalone HTML mockup built at `/Users/aaronandmijntjewebman/Downloads/quire-pr
 ### StreamComposer scaffold reframe
 Originally built as replacement for WorkbenchView's 4-tab UI. Now understood to be Quick Capture (Tool B in the architecture). Reuse, do not discard. Future work will move from /dashboard/stream-test to a global slide-over reachable from any page via floating button + keyboard shortcut (Cmd+Shift+N).
 
+### Phase plan (Phase 1 complete)
+- ✅ Phase 1: schema + creation flow (shipped tonight — 56df410)
+- Phase 2: per-section editor (next)
+- Phase 3: AI narrative drafting via Claude API with school voice guide
+- Phase 4: Dr. Worth review queue + approval/publish flow
+- Phase 5: parent view + PDF export
+- Phase 6: Quick Capture integration (reframes StreamComposer scaffold)
+
 ### Pending / blocked
 - Tayler's reaction to final mockup (she has been iterating actively — thesis validated, now in UX polish feedback mode)
-- Next session: plan Profile Builder schema and phased build
-  - New Supabase tables needed: profiles (per student per term), profile_sections, section_attachments
-  - Phase 1 likely: schema + read-only Profile Overview page pulling Athena's real data from existing tables
-  - Phase 2: editor per section type
-  - Phase 3: AI-drafted narrative generation (per section type, using school voice guide)
-  - Phase 4: Dr. Worth review queue + approval/publish flow
-  - Phase 5: parent view + PDF export
+
+### Pending tech debt (grown tonight)
+- hadar-living-portfolio → quire-platform rename (increasingly urgent)
+- CURRENT_ACADEMIC_YEAR_LABEL hardcoded to '2025-2026' in app/dashboard/profiles/[studentId]/[season]/page.tsx — derive from academic_years.is_current
+- lib/types.ts refactor into directory (re-export stopgap working fine for now)
+- Ghost migration audit should run more broadly — tonight we only verified 0012's 6 content tables; earlier 0001-0011 could have similar issues
 
 ### Deferred / backburnered
 - Finishing Phases 2-4 of StreamComposer (wiring into WorkbenchView). Revisit only if Profile Builder direction falters or Quick Capture gets prioritized independently.
