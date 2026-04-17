@@ -17,7 +17,6 @@ import { mapProfile, mapProfileSection } from '@/lib/mappers/profileBuilder'
 import { getAcademicYearId } from '@/lib/academicYears'
 import { formatGrade } from '@/lib/gradeLevel'
 import { mergeMapsAssessments } from '@/lib/mapsHelpers'
-import { mergeAvantAssessments } from '@/lib/avantHelpers'
 import type { HebrewSkillAverages } from '@/lib/hebrewComparisonNorms'
 import {
   PROFILE_SECTION_KINDS,
@@ -30,7 +29,11 @@ import MAPSSectionWrapper from './MAPSSectionWrapper'
 import AVANTSectionWrapper from './AVANTSectionWrapper'
 import HebrewComparisonSectionWrapper from './HebrewComparisonSectionWrapper'
 import ReadingListSectionWrapper from './ReadingListSectionWrapper'
+import EnglishCompositionSectionWrapper from './EnglishCompositionSectionWrapper'
+import HebrewCompositionSectionWrapper from './HebrewCompositionSectionWrapper'
 import { parseLexileRange } from './_lexileRange'
+import { loadCompositionSamples } from './_compositionSamples'
+import { loadAvantAssessments } from './_avantData'
 
 const CURRENT_ACADEMIC_YEAR_LABEL = '2025-2026'
 
@@ -168,21 +171,9 @@ export default async function SectionEditorPage({ params }: Props) {
 
   // ── AVANT Hebrew ─────────────────────────────────────────────
   if (sectionKind === 'avant_hebrew') {
-    const { data: rows } = await supabaseAdmin
-      .from('assessments')
-      .select('id, assessment_type, term, academic_year, score')
-      .eq('student_id', studentId)
-      .eq('school_id', schoolId)
-      .like('assessment_type', 'avant%')
-      .is('deleted_at', null)
-
-    const studentCurrentGrade = parseInt(student.gradeLevel, 10)
-    const assessments = mergeAvantAssessments(
-      (rows ?? []) as Parameters<typeof mergeAvantAssessments>[0],
-      Number.isNaN(studentCurrentGrade) ? 0 : studentCurrentGrade,
-      student.academicYear,
+    const assessments = await loadAvantAssessments(
+      studentId, schoolId, student.gradeLevel, student.academicYear,
     )
-
     return (
       <AVANTSectionWrapper
         profileId={profile.id}
@@ -200,19 +191,8 @@ export default async function SectionEditorPage({ params }: Props) {
 
   // ── Hebrew · National comparison ─────────────────────────────
   if (sectionKind === 'hebrew_comparison') {
-    const { data: rows } = await supabaseAdmin
-      .from('assessments')
-      .select('id, assessment_type, term, academic_year, score')
-      .eq('student_id', studentId)
-      .eq('school_id', schoolId)
-      .like('assessment_type', 'avant%')
-      .is('deleted_at', null)
-
-    const studentCurrentGrade = parseInt(student.gradeLevel, 10)
-    const merged = mergeAvantAssessments(
-      (rows ?? []) as Parameters<typeof mergeAvantAssessments>[0],
-      Number.isNaN(studentCurrentGrade) ? 0 : studentCurrentGrade,
-      student.academicYear,
+    const merged = await loadAvantAssessments(
+      studentId, schoolId, student.gradeLevel, student.academicYear,
     )
     const latest = merged.length > 0 ? merged[merged.length - 1] : null
     const present = [latest?.reading, latest?.writing, latest?.listening, latest?.speaking]
@@ -270,6 +250,28 @@ export default async function SectionEditorPage({ params }: Props) {
     )
   }
 
+  // ── English / Hebrew composition ─────────────────────────────
+  if (sectionKind === 'english_composition' || sectionKind === 'hebrew_composition') {
+    const language = sectionKind === 'english_composition' ? 'english' : 'hebrew'
+    const samples = await loadCompositionSamples(studentId, schoolId, language)
+    const Wrapper = sectionKind === 'english_composition'
+      ? EnglishCompositionSectionWrapper
+      : HebrewCompositionSectionWrapper
+    return (
+      <Wrapper
+        profileId={profile.id}
+        sectionId={section.id}
+        initialNarrative={initialNarrative}
+        initialStatus={section.status}
+        studentName={studentName}
+        gradeLabel={gradeLabel}
+        termLabel={profile.term}
+        backHref={backHref}
+        samples={samples}
+      />
+    )
+  }
+
   // ── Placeholder for unimplemented section kinds ──────────────
   return (
     <SectionEditorShell
@@ -280,16 +282,10 @@ export default async function SectionEditorPage({ params }: Props) {
       sectionStatus={section.status}
       backHref={backHref}
     >
-      <div
-        style={{
-          fontFamily: 'var(--font-body)',
-          fontSize:   14,
-          color:      'var(--ink-mid)',
-          textAlign:  'center',
-          padding:    '40px 20px',
-          lineHeight: 1.6,
-        }}
-      >
+      <div style={{
+        fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--ink-mid)',
+        textAlign: 'center', padding: '40px 20px', lineHeight: 1.6,
+      }}>
         This section editor is coming in a later phase.
         <br />
         Use the back link above to return to the profile overview.

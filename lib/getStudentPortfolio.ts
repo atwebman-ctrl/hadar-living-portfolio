@@ -34,15 +34,7 @@ import {
   mapStudentVideo,
 } from "./mappers";
 
-const STORAGE_BUCKET = 'portfolio-assets'
-
-// Compute the public URL for a storage path. Synchronous — no network
-// call. Requires the portfolio-assets bucket to be set to public in
-// the Supabase dashboard (Storage → Policies → Public bucket).
-function storagePublicUrl(path: string | null): string | null {
-  if (!path) return null
-  return supabaseAdmin.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl
-}
+import { storagePublicUrl } from './storage'
 
 // Wraps a Supabase query and returns an empty array on error instead
 // of throwing, so a missing Sprint-3 table doesn't crash the whole fetch.
