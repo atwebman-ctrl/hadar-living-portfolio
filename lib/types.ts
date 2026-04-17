@@ -364,3 +364,32 @@ export interface ApiError {
   error: string;
   code: string;
 }
+
+// ── StreamComposer feed entries ───────────────────────────────
+// Discriminated union for the unified Workbench feed. Phase 1
+// only produces the 'note' variant; 'score' and 'photo' wire in
+// during Phase 4 when the bulk-score and batch-photo flows fold
+// into StreamComposer.
+
+export type FeedEntry =
+  | { kind: 'note';  note: TeacherNote; studentName: string; savedAt: string }
+  | {
+      kind: 'score';
+      assessment: {
+        id: string;
+        type: string;
+        rit: number | null;
+        percentile: number | null;
+        term: string;
+        gradeLevel: number;
+      };
+      studentName: string;
+      savedAt: string;
+    }
+  | {
+      kind: 'photo';
+      photos: { id: string; storagePath: string }[];
+      studentName: string;
+      sectionCategory: string;
+      savedAt: string;
+    };

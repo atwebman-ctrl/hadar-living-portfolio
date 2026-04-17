@@ -375,3 +375,26 @@ Session 1 renamed labels; Session 2 restructured the tree. Navigation is now a f
 
 Tab order: The Canon · Math · English · Hebrew · Soulcraft. Each of English and Hebrew has Spelling · Grammar · Composition · Video sub-tabs. Teacher journal and Gallery live at `/journal` and `/gallery` — not inside the tab list.
 
+## Session · Apr 16 2026 · Scope reframe
+
+**StreamComposer Phase 1 scaffold landed (uncommitted at session pause, locally complete).** Five files, all under 300 lines, typechecks clean. Dev-only test route at `/dashboard/stream-test`. Component is NOT wired into WorkbenchView — scaffold-only. Files:
+- `components/dashboard/StreamComposer.tsx` (294 lines)
+- `components/dashboard/ComposerOptionsRow.tsx` (226 lines)
+- `components/dashboard/ComposerNoteBody.tsx` (60 lines)
+- `components/dashboard/ComposerScoreBody.tsx` (112 lines)
+- `components/dashboard/ComposerPhotoBody.tsx` (98 lines)
+- `app/dashboard/stream-test/page.tsx` (110 lines, throwaway — delete in Phase 4)
+- `lib/types.ts` — added `FeedEntry` discriminated union (`'note' | 'score' | 'photo'`); only `'note'` is produced in Phase 1
+
+**Major scope reframe mid-session: Quire's hero feature is the Learning Profile Builder, not the dashboard/workbench.** Source: Tayler shared Athena's Hadar Student Learning Profile (PDF), revealing teachers spend ~1.5 hours per student per term manually assembling these in Google Slides. Quire's value prop becomes: Profile Builder replaces the manual assembly; captured notes/photos flow automatically into profile narratives.
+
+**Two-tool architecture now guides the roadmap:**
+- **Tool A (hero) — Learning Profile Builder.** Per-term, per-student document assembly. Sections: MAPS, Lexile, AVANT, Hebrew comparison, Canon reading list, English composition, Hebrew composition, Character Development, Rhetoric/Poetry, + optional highlights. Teacher drafts → Dr. Worth (Head of School) reviews + approves → parents receive.
+- **Tool B (support) — Quick Capture.** Globally available from anywhere in app (slide-over panel, keyboard shortcut). Teachers log ad hoc notes/photos/videos; data pools in student records and surfaces during profile build.
+
+**Mockup at `/Users/aaronandmijntjewebman/Downloads/quire-profile-builder-mockup.html`** (or wherever Aaron saved it). Eight states: teacher landing, profile overview, inside-section editor, optional highlight section, quick capture slide-over, review handoff, parent-facing published view, term archive.
+
+**Pending:** Aaron sends mockup to Tayler for reaction. **No further build work until her feedback.**
+
+**StreamComposer scaffold reframe:** originally built as replacement for WorkbenchView tabs (Quick notes / Bulk scores / Photos / Completeness). Now understood to be the **Quick Capture tool (Tool B)**. Reuse, don't discard. Future work will move it from `/dashboard/stream-test` to a global slide-over available from any page (keyboard-shortcut summon, persists across route changes).
+
