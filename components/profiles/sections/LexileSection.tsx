@@ -52,6 +52,14 @@ function lexileToY(lexile: number, height: number): number {
   return height - pct * height
 }
 
+// Pick a grade-band descriptor for a Lexile range by finding the
+// highest reference rung that sits inside the range. Returns null
+// if no rung falls inside the band.
+function bandDescriptor(rangeMinL: number, rangeMaxL: number): string | null {
+  const inside = RUNGS.filter((r) => r.lexile >= rangeMinL && r.lexile <= rangeMaxL)
+  return inside.length > 0 ? inside[0].label : null
+}
+
 export default function LexileSection({
   band, narrative, onNarrativeChange, isGenerating, onGenerateDraft,
 }: Props) {
@@ -78,54 +86,77 @@ export default function LexileSection({
               strokeWidth={1}
             />
 
-            {/* highlighted band */}
-            {band && (
-              <rect
-                x={20}
-                y={lexileToY(band.rangeMaxL, ladderHeight) + 20}
-                width={ladderWidth - 28}
-                height={
-                  lexileToY(band.rangeMinL, ladderHeight) -
-                  lexileToY(band.rangeMaxL, ladderHeight)
-                }
-                fill="rgba(196,154,42,0.18)"
-                stroke="var(--gold)"
-                strokeWidth={1}
-                rx={4}
-              />
-            )}
+            {/* benchmark rungs — skip any that fall inside Athena's
+                band so the band's stroke doesn't cross their text */}
+            {RUNGS
+              .filter((r) =>
+                !band || r.lexile < band.rangeMinL || r.lexile > band.rangeMaxL,
+              )
+              .map((r) => {
+                const y = lexileToY(r.lexile, ladderHeight) + 20
+                return (
+                  <g key={r.label}>
+                    <line x1={42} x2={54} y1={y} y2={y} stroke="var(--ink-faint)" strokeWidth={1} />
+                    <text
+                      x={62} y={y + 4}
+                      fontFamily="var(--font-body)"
+                      fontSize={11}
+                      fill="var(--ink-mid)"
+                    >
+                      {r.label} · {r.lexile}L
+                    </text>
+                  </g>
+                )
+              })}
 
-            {/* rungs */}
-            {RUNGS.map((r) => {
-              const y = lexileToY(r.lexile, ladderHeight) + 20
+            {/* highlighted band — top edge anchored to range ceiling,
+                bottom edge to range floor; labels live inside */}
+            {band && (() => {
+              const yTop    = lexileToY(band.rangeMaxL, ladderHeight) + 20
+              const yBottom = lexileToY(band.rangeMinL, ladderHeight) + 20
+              const height  = yBottom - yTop
+              const yCenter = yTop + height / 2
+              const descriptor = bandDescriptor(band.rangeMinL, band.rangeMaxL)
               return (
-                <g key={r.label}>
-                  <line x1={42} x2={54} y1={y} y2={y} stroke="var(--ink-faint)" strokeWidth={1} />
+                <g>
+                  <rect
+                    x={20}
+                    y={yTop}
+                    width={ladderWidth - 28}
+                    height={height}
+                    fill="rgba(196,154,42,0.18)"
+                    stroke="var(--gold)"
+                    strokeWidth={1}
+                    rx={4}
+                  />
+                  {/* tick marks at the band's edges so it reads as
+                      anchored to the rail, not floating */}
+                  <line x1={42} x2={54} y1={yTop}    y2={yTop}    stroke="var(--gold)" strokeWidth={1} />
+                  <line x1={42} x2={54} y1={yBottom} y2={yBottom} stroke="var(--gold)" strokeWidth={1} />
                   <text
-                    x={62} y={y + 4}
-                    fontFamily="var(--font-body)"
-                    fontSize={11}
-                    fill="var(--ink-mid)"
+                    x={62}
+                    y={descriptor ? yCenter - 2 : yCenter + 4}
+                    fontFamily="var(--font-heading)"
+                    fontSize={13}
+                    fontWeight={600}
+                    fill="var(--gold)"
                   >
-                    {r.label} · {r.lexile}L
+                    {band.label}
                   </text>
+                  {descriptor && (
+                    <text
+                      x={62}
+                      y={yCenter + 14}
+                      fontFamily="var(--font-body)"
+                      fontSize={11}
+                      fill="var(--gold)"
+                    >
+                      {descriptor}
+                    </text>
+                  )}
                 </g>
               )
-            })}
-
-            {/* student marker label */}
-            {band && (
-              <text
-                x={62}
-                y={lexileToY((band.rangeMinL + band.rangeMaxL) / 2, ladderHeight) + 24}
-                fontFamily="var(--font-heading)"
-                fontSize={13}
-                fontWeight={600}
-                fill="var(--gold)"
-              >
-                {band.label}
-              </text>
-            )}
+            })()}
           </svg>
         </div>
 
