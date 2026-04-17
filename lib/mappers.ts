@@ -292,3 +292,6 @@ export function mapAiDraft(row: Row): AiDraft {
     createdAt: row.created_at as string,
   };
 }
+
+// Profile Builder mappers — see lib/mappers/profileBuilder.ts
+export { mapProfile, mapProfileSection, mapProfileSectionAttachment } from './mappers/profileBuilder'

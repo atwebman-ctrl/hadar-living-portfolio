@@ -288,3 +288,8 @@ export class ValidationError extends Error {
 // Re-export InviteParentSchema so validation.test.ts and any other
 // callers that import it from this module continue to work.
 export { InviteParentSchema, type InviteParentInput } from './validationExtended'
+
+// Profile Builder schemas live in their own file to keep this
+// module under the 300-line limit. Re-export so callers can keep
+// importing from '@/lib/validation'.
+export * from './validation/profileBuilder'
