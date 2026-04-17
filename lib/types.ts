@@ -393,3 +393,11 @@ export type FeedEntry =
       sectionCategory: string;
       savedAt: string;
     };
+
+// ============================================================
+// Re-exports from lib/types/ directory
+// As lib/types.ts grows beyond maintainable size, new types are
+// added to focused files under lib/types/ and re-exported here
+// for backwards-compatible import from '@/lib/types'.
+// ============================================================
+export * from './types/profileBuilder'
