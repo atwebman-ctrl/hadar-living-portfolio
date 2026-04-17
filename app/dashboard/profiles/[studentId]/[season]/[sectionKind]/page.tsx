@@ -3,9 +3,10 @@
 //
 // Server component — per-section editor route. Validates the
 // section kind, fetches the student, profile, profile_section,
-// and (for Lexile) the underlying assessment row, then hands
-// it to the matching client wrapper. Routing is polymorphic —
-// each section kind maps to its own wrapper.
+// then branches to the matching section wrapper. Routing is
+// polymorphic — each section kind maps to its own wrapper.
+// Unimplemented kinds render a "Coming soon" placeholder so
+// teachers don't hit 404s when clicking through the overview.
 // ============================================================
 
 import { notFound } from 'next/navigation'
@@ -14,11 +15,16 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
 import { mapProfile, mapProfileSection } from '@/lib/mappers/profileBuilder'
 import { getAcademicYearId } from '@/lib/academicYears'
+import { formatGrade } from '@/lib/gradeLevel'
+import { mergeMapsAssessments } from '@/lib/mapsHelpers'
 import {
   PROFILE_SECTION_KINDS,
+  PROFILE_SECTION_KIND_LABELS,
   type ProfileSectionKind,
 } from '@/lib/types/profileBuilder'
+import SectionEditorShell from '@/components/profiles/sections/SectionEditorShell'
 import LexileSectionWrapper from './LexileSectionWrapper'
+import MAPSSectionWrapper from './MAPSSectionWrapper'
 
 const CURRENT_ACADEMIC_YEAR_LABEL = '2025-2026'
 
@@ -36,7 +42,6 @@ function isValidSectionKind(s: string): s is ProfileSectionKind {
 
 function parseLexileRange(value: string | null): { min: number; max: number } | null {
   if (!value) return null
-  // Accepts "1150L-1300L", "1150L–1300L", or single "1225L" (treated as both ends).
   const m = value.match(/(\d+)L?\s*[-–]\s*(\d+)L?/)
   if (m) return { min: Number(m[1]), max: Number(m[2]) }
   const single = value.match(/(\d+)L?/)
@@ -53,7 +58,6 @@ export default async function SectionEditorPage({ params }: Props) {
   const { schoolId, role } = await getAuthContext().catch(() => notFound())
   if (role === 'parent') notFound()
 
-  // Student
   const { data: studentRow } = await supabaseAdmin
     .from('students')
     .select('*')
@@ -65,7 +69,6 @@ export default async function SectionEditorPage({ params }: Props) {
   if (!studentRow) notFound()
   const student = mapStudent(studentRow as Record<string, unknown>)
 
-  // Profile (must exist — section editor is reachable only from overview)
   const academicYearId = await getAcademicYearId(schoolId, CURRENT_ACADEMIC_YEAR_LABEL)
   if (!academicYearId) notFound()
 
@@ -81,7 +84,6 @@ export default async function SectionEditorPage({ params }: Props) {
   if (!profileRow) notFound()
   const profile = mapProfile(profileRow as Parameters<typeof mapProfile>[0])
 
-  // The matching profile_section row
   const { data: sectionRow } = await supabaseAdmin
     .from('profile_sections')
     .select('*')
@@ -93,8 +95,12 @@ export default async function SectionEditorPage({ params }: Props) {
   if (!sectionRow) notFound()
   const section = mapProfileSection(sectionRow as Parameters<typeof mapProfileSection>[0])
 
-  const backHref = `/dashboard/profiles/${studentId}/${season}`
+  const studentName = `${student.firstName} ${student.lastName}`
+  const gradeLabel  = formatGrade(student.gradeLevel)
+  const backHref    = `/dashboard/profiles/${studentId}/${season}`
+  const initialNarrative = section.narrativeText ?? section.narrativeDraft ?? ''
 
+  // ── Lexile ───────────────────────────────────────────────────
   if (sectionKind === 'lexile') {
     const { data: lexRow } = await supabaseAdmin
       .from('assessments')
@@ -131,7 +137,62 @@ export default async function SectionEditorPage({ params }: Props) {
     )
   }
 
-  // Other section kinds aren't implemented yet — keep the route
-  // tight and 404 rather than render an empty shell.
-  notFound()
+  // ── MAPS scores ──────────────────────────────────────────────
+  if (sectionKind === 'maps_scores') {
+    const { data: rows } = await supabaseAdmin
+      .from('assessments')
+      .select('id, assessment_type, term, academic_year, rit_score, percentile')
+      .eq('student_id', studentId)
+      .eq('school_id', schoolId)
+      .in('assessment_type', ['maps_math', 'maps_english'])
+      .is('deleted_at', null)
+
+    const studentCurrentGrade = parseInt(student.gradeLevel, 10)
+    const assessments = mergeMapsAssessments(
+      (rows ?? []) as Parameters<typeof mergeMapsAssessments>[0],
+      Number.isNaN(studentCurrentGrade) ? 0 : studentCurrentGrade,
+      student.academicYear,
+    )
+
+    return (
+      <MAPSSectionWrapper
+        profileId={profile.id}
+        sectionId={section.id}
+        initialNarrative={initialNarrative}
+        initialStatus={section.status}
+        studentName={studentName}
+        gradeLabel={gradeLabel}
+        termLabel={profile.term}
+        backHref={backHref}
+        assessments={assessments}
+      />
+    )
+  }
+
+  // ── Placeholder for unimplemented section kinds ──────────────
+  return (
+    <SectionEditorShell
+      studentName={studentName}
+      gradeLabel={gradeLabel}
+      termLabel={profile.term}
+      sectionTitle={PROFILE_SECTION_KIND_LABELS[sectionKind]}
+      sectionStatus={section.status}
+      backHref={backHref}
+    >
+      <div
+        style={{
+          fontFamily: 'var(--font-body)',
+          fontSize:   14,
+          color:      'var(--ink-mid)',
+          textAlign:  'center',
+          padding:    '40px 20px',
+          lineHeight: 1.6,
+        }}
+      >
+        This section editor is coming in a later phase.
+        <br />
+        Use the back link above to return to the profile overview.
+      </div>
+    </SectionEditorShell>
+  )
 }
