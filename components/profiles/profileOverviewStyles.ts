@@ -107,8 +107,7 @@ export const SECTION_STATUS: CSSProperties = {
 export const OPEN_LINK: CSSProperties = {
   fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 500,
   letterSpacing: '0.06em', textTransform: 'uppercase',
-  color: 'var(--ink-faint)', textDecoration: 'none',
-  pointerEvents: 'none', cursor: 'not-allowed',
+  color: 'var(--gold)', textDecoration: 'none',
 }
 
 export const SEASON_LABEL = { fall: 'Fall', spring: 'Spring' } as const

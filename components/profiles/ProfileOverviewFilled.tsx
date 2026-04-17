@@ -8,6 +8,7 @@
 // per-section editing wires up in a later phase.
 // ============================================================
 
+import Link from 'next/link'
 import type { Student } from '@/lib/types'
 import {
   PROFILE_SECTION_KIND_LABELS,
@@ -99,9 +100,12 @@ export default function ProfileOverviewFilled({
                   </div>
                   <div style={SECTION_STATUS}>{STATUS_LABEL[s.status]}</div>
                 </div>
-                <a href="#todo" style={OPEN_LINK} aria-disabled="true">
+                <Link
+                  href={`/dashboard/profiles/${student.id}/${season}/${s.sectionKind}`}
+                  style={OPEN_LINK}
+                >
                   Open section →
-                </a>
+                </Link>
               </div>
             )
           })}
