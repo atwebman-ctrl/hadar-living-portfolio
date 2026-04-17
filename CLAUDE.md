@@ -375,26 +375,63 @@ Session 1 renamed labels; Session 2 restructured the tree. Navigation is now a f
 
 Tab order: The Canon · Math · English · Hebrew · Soulcraft. Each of English and Hebrew has Spelling · Grammar · Composition · Video sub-tabs. Teacher journal and Gallery live at `/journal` and `/gallery` — not inside the tab list.
 
-## Session · Apr 16 2026 · Scope reframe
+## Session · Apr 16 2026 · Major scope pivot to Profile Builder
 
-**StreamComposer Phase 1 scaffold landed (uncommitted at session pause, locally complete).** Five files, all under 300 lines, typechecks clean. Dev-only test route at `/dashboard/stream-test`. Component is NOT wired into WorkbenchView — scaffold-only. Files:
-- `components/dashboard/StreamComposer.tsx` (294 lines)
-- `components/dashboard/ComposerOptionsRow.tsx` (226 lines)
-- `components/dashboard/ComposerNoteBody.tsx` (60 lines)
-- `components/dashboard/ComposerScoreBody.tsx` (112 lines)
-- `components/dashboard/ComposerPhotoBody.tsx` (98 lines)
-- `app/dashboard/stream-test/page.tsx` (110 lines, throwaway — delete in Phase 4)
-- `lib/types.ts` — added `FeedEntry` discriminated union (`'note' | 'score' | 'photo'`); only `'note'` is produced in Phase 1
+### What shipped this session
+- StreamComposer Phase 1 scaffold (not committed yet — Aaron will commit separately). Five files under 300 lines each, typecheck clean:
+  - components/dashboard/StreamComposer.tsx (294 lines)
+  - components/dashboard/ComposerOptionsRow.tsx (226 lines)
+  - components/dashboard/ComposerNoteBody.tsx (60 lines)
+  - components/dashboard/ComposerScoreBody.tsx (112 lines)
+  - components/dashboard/ComposerPhotoBody.tsx (98 lines)
+  - lib/types.ts: new FeedEntry discriminated union added (note/score/photo variants)
+- Dev-only test route at /dashboard/stream-test renders the scaffold in isolation
+- Component is NOT wired into WorkbenchView — intentionally parked
 
-**Major scope reframe mid-session: Quire's hero feature is the Learning Profile Builder, not the dashboard/workbench.** Source: Tayler shared Athena's Hadar Student Learning Profile (PDF), revealing teachers spend ~1.5 hours per student per term manually assembling these in Google Slides. Quire's value prop becomes: Profile Builder replaces the manual assembly; captured notes/photos flow automatically into profile narratives.
+### Major scope reframe
+Mid-session pivot after Tayler shared Athena's actual Hadar Student Learning Profile PDF. Reading that document made clear that Quire's hero feature is not a portfolio dashboard or data-capture workbench. It is a Learning Profile Builder — a system that replaces the 1.5-hour manual assembly of a per-student, per-semester document (currently done in Google Slides) with a ~10-20 minute assisted assembly. Data Quire already holds (MAP, AVANT, Lexile, reading list, writing samples, photos, captured notes) flows into a structured document; AI drafts narrative prose; teachers edit and approve; Dr. Worth (Head of School) reviews and publishes; parents receive a permanent record.
 
-**Two-tool architecture now guides the roadmap:**
-- **Tool A (hero) — Learning Profile Builder.** Per-term, per-student document assembly. Sections: MAPS, Lexile, AVANT, Hebrew comparison, Canon reading list, English composition, Hebrew composition, Character Development, Rhetoric/Poetry, + optional highlights. Teacher drafts → Dr. Worth (Head of School) reviews + approves → parents receive.
-- **Tool B (support) — Quick Capture.** Globally available from anywhere in app (slide-over panel, keyboard shortcut). Teachers log ad hoc notes/photos/videos; data pools in student records and surfaces during profile build.
+### Cadence and roles (confirmed with Aaron)
+- Two semesters per year: Fall and Spring
+- ~8 students per grade in current Hadar setup
+- Two-role workflow: **Teacher** (drafts profile, fills sections, reviews AI drafts) → **Dr. Liliana Worth, Head of School** (reviews, approves, publishes)
+- Tayler Lonsdale is the customer and school founder, NOT in the per-student workflow — she's the decision-maker for what Quire becomes
+- Parents receive the published document (web view + downloadable PDF). Previous semesters stay accessible and downloadable forever.
 
-**Mockup at `/Users/aaronandmijntjewebman/Downloads/quire-profile-builder-mockup.html`** (or wherever Aaron saved it). Eight states: teacher landing, profile overview, inside-section editor, optional highlight section, quick capture slide-over, review handoff, parent-facing published view, term archive.
+### Product architecture (5 things, clear jobs)
+1. **Roster + Profile Queue** — teacher's landing page, shows class and each student's current-semester profile status
+2. **Profile Builder** (hero) — main workspace for assembling a semester's profile per student. Sections: MAPS Math & English, Lexile, AVANT Hebrew, Hebrew national comparison, Canon reading list, English composition, Hebrew composition, Character Development (Middot), Rhetoric (Poetry Recitation), plus optional highlight sections (art, field trips, etc.)
+3. **Captured data feed** — each student has a chronological stream of notes/photos/videos logged over the term; feeds into Profile Builder sections automatically
+4. **Quick Capture** (support) — globally available slide-over panel for logging ad hoc notes, photos, videos. The StreamComposer scaffold becomes this feature; not a top-level page.
+5. **Parent View** — published profile, beautiful and archivable. Web display + PDF export. All past semesters browseable.
 
-**Pending:** Aaron sends mockup to Tayler for reaction. **No further build work until her feedback.**
+### Section structure (required vs optional)
+- ~12 required sections per profile (auto-data + character + work samples + rhetoric)
+- ~2+ optional sections per profile (added when relevant: art, field trips, field-specific highlights)
+- Completion is measured against REQUIRED sections only. Optional sections are additive, not part of the completion tally.
+- Status vocabulary: Complete / Awaiting your narrative / In progress / Not started
 
-**StreamComposer scaffold reframe:** originally built as replacement for WorkbenchView tabs (Quick notes / Bulk scores / Photos / Completeness). Now understood to be the **Quick Capture tool (Tool B)**. Reuse, don't discard. Future work will move it from `/dashboard/stream-test` to a global slide-over available from any page (keyboard-shortcut summon, persists across route changes).
+### AI / Claude naming in product
+Per Tayler's feedback, Claude should NOT be named in product UI copy. Use "Quire" or passive language ("A draft is ready for you to review"). Claude can be credited in marketing/footer/about contexts per Anthropic's terms, but the teacher-facing workflow should read as Quire's product, not a thin wrapper on Claude.
+
+### Mockup artifact
+Standalone HTML mockup built at `/Users/aaronandmijntjewebman/Downloads/quire-profile-builder-mockup.html` (eight states, real Quire tokens, fonts via Google Fonts). Shared with Tayler for reaction. Mockup should be considered the spec-in-progress for the next several weeks of build work.
+
+### StreamComposer scaffold reframe
+Originally built as replacement for WorkbenchView's 4-tab UI. Now understood to be Quick Capture (Tool B in the architecture). Reuse, do not discard. Future work will move from /dashboard/stream-test to a global slide-over reachable from any page via floating button + keyboard shortcut (Cmd+Shift+N).
+
+### Pending / blocked
+- Tayler's reaction to final mockup (she has been iterating actively — thesis validated, now in UX polish feedback mode)
+- Next session: plan Profile Builder schema and phased build
+  - New Supabase tables needed: profiles (per student per term), profile_sections, section_attachments
+  - Phase 1 likely: schema + read-only Profile Overview page pulling Athena's real data from existing tables
+  - Phase 2: editor per section type
+  - Phase 3: AI-drafted narrative generation (per section type, using school voice guide)
+  - Phase 4: Dr. Worth review queue + approval/publish flow
+  - Phase 5: parent view + PDF export
+
+### Deferred / backburnered
+- Finishing Phases 2-4 of StreamComposer (wiring into WorkbenchView). Revisit only if Profile Builder direction falters or Quick Capture gets prioritized independently.
+- Auto-categorization of teacher notes via Haiku. Low priority.
+- hadar-living-portfolio → quire-platform rename. Still pending. Good moment to do it is when we start Profile Builder build, since we'll be rewriting significant portions of the routing anyway.
 
