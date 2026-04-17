@@ -17,6 +17,7 @@ import { mapProfile, mapProfileSection } from '@/lib/mappers/profileBuilder'
 import { getAcademicYearId } from '@/lib/academicYears'
 import { formatGrade } from '@/lib/gradeLevel'
 import { mergeMapsAssessments } from '@/lib/mapsHelpers'
+import { mergeAvantAssessments } from '@/lib/avantHelpers'
 import {
   PROFILE_SECTION_KINDS,
   PROFILE_SECTION_KIND_LABELS,
@@ -25,6 +26,7 @@ import {
 import SectionEditorShell from '@/components/profiles/sections/SectionEditorShell'
 import LexileSectionWrapper from './LexileSectionWrapper'
 import MAPSSectionWrapper from './MAPSSectionWrapper'
+import AVANTSectionWrapper from './AVANTSectionWrapper'
 
 const CURRENT_ACADEMIC_YEAR_LABEL = '2025-2026'
 
@@ -156,6 +158,38 @@ export default async function SectionEditorPage({ params }: Props) {
 
     return (
       <MAPSSectionWrapper
+        profileId={profile.id}
+        sectionId={section.id}
+        initialNarrative={initialNarrative}
+        initialStatus={section.status}
+        studentName={studentName}
+        gradeLabel={gradeLabel}
+        termLabel={profile.term}
+        backHref={backHref}
+        assessments={assessments}
+      />
+    )
+  }
+
+  // ── AVANT Hebrew ─────────────────────────────────────────────
+  if (sectionKind === 'avant_hebrew') {
+    const { data: rows } = await supabaseAdmin
+      .from('assessments')
+      .select('id, assessment_type, term, academic_year, score')
+      .eq('student_id', studentId)
+      .eq('school_id', schoolId)
+      .like('assessment_type', 'avant%')
+      .is('deleted_at', null)
+
+    const studentCurrentGrade = parseInt(student.gradeLevel, 10)
+    const assessments = mergeAvantAssessments(
+      (rows ?? []) as Parameters<typeof mergeAvantAssessments>[0],
+      Number.isNaN(studentCurrentGrade) ? 0 : studentCurrentGrade,
+      student.academicYear,
+    )
+
+    return (
+      <AVANTSectionWrapper
         profileId={profile.id}
         sectionId={section.id}
         initialNarrative={initialNarrative}
