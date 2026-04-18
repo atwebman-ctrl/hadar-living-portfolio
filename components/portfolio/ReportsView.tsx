@@ -14,6 +14,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import type { ReportCard, UserRole } from '@/lib/types'
+import type { Profile } from '@/lib/types/profileBuilder'
 import { ACADEMIC_YEAR_OPTIONS, TERM_OPTIONS, GRADE_SELECT_OPTIONS } from '@/lib/constants'
 import s from './sections.module.css'
 
@@ -24,6 +25,7 @@ interface Props {
   academicYear?:       string
   gradeLevel?:         string
   scrollingPortfolio?: React.ReactNode
+  publishedProfiles?:  Profile[]
 }
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -51,7 +53,8 @@ const tag:   React.CSSProperties = { display: 'inline-block', padding: '2px 8px'
 // ── Component ─────────────────────────────────────────────────
 
 export default function ReportsView({
-  reportCards, studentId, role, academicYear = '', gradeLevel = '', scrollingPortfolio,
+  reportCards, studentId, role, academicYear = '', gradeLevel = '',
+  scrollingPortfolio, publishedProfiles = [],
 }: Props) {
   const router = useRouter()
   const isStaff = role === 'admin' || role === 'teacher'
@@ -166,6 +169,38 @@ export default function ReportsView({
         </form>
       )}
 
+      {publishedProfiles.length > 0 && (
+        <div className="reveal" style={{ marginBottom: '2.5rem' }}>
+          <h3 style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-mid)', marginBottom: '0.85rem', fontWeight: 600 }}>
+            Semester Profiles
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+            {publishedProfiles.map((p) => (
+              <a
+                key={p.id}
+                href={`/portfolio/${studentId}/full/${p.id}`}
+                style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.5rem 1.5rem', padding: '1rem 1.25rem', border: '1px solid var(--gold)', background: 'var(--cream)', textDecoration: 'none', color: 'var(--ink)' }}
+              >
+                <div>
+                  <div style={{ fontFamily: 'var(--font-heading)', fontSize: '17px', color: 'var(--navy)', fontWeight: 600 }}>
+                    {p.term} Learning Profile
+                  </div>
+                  <div style={{ marginTop: '0.3rem', fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-light)' }}>
+                    Published {p.publishedAt ? new Date(p.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : ''}
+                  </div>
+                </div>
+                <div style={{ alignSelf: 'center', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)' }}>
+                  Open profile →
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <h3 className="reveal" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-mid)', marginBottom: '0.85rem', fontWeight: 600 }}>
+        Historical Report Cards
+      </h3>
       {sorted.length === 0 ? (
         <p className="reveal" style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', color: 'var(--ink-faint)', fontStyle: 'italic' }}>
           No report cards uploaded yet.

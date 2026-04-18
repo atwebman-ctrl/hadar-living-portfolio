@@ -11,6 +11,8 @@ import { notFound } from 'next/navigation'
 import { getAuthContext } from '@/lib/auth'
 import { getStudentPortfolio } from '@/lib/getStudentPortfolio'
 import { enforceParentAccess } from '@/lib/portfolioAuth'
+import { supabaseAdmin } from '@/lib/supabaseAdmin'
+import { mapProfile } from '@/lib/mappers/profileBuilder'
 import SideNav from '@/components/portfolio/SideNav'
 import RevealObserver from '@/components/portfolio/RevealObserver'
 import PortfolioClient from '@/components/portfolio/PortfolioClient'
@@ -28,6 +30,17 @@ export default async function ReportsPage({ params }: Props) {
   if (role === 'parent') {
     await enforceParentAccess(userId, schoolId, studentId)
   }
+
+  const { data: publishedRows } = await supabaseAdmin
+    .from('profiles')
+    .select('*')
+    .eq('student_id', studentId)
+    .eq('school_id', schoolId)
+    .eq('status', 'published')
+    .is('deleted_at', null)
+    .order('published_at', { ascending: false })
+  const publishedProfiles = (publishedRows ?? [])
+    .map((r) => mapProfile(r as Parameters<typeof mapProfile>[0]))
 
   const studentName = `${portfolio.student.firstName} ${portfolio.student.lastName}`
 
@@ -53,6 +66,7 @@ export default async function ReportsPage({ params }: Props) {
             role={role}
             academicYear={portfolio.student.academicYear}
             gradeLevel={portfolio.student.gradeLevel}
+            publishedProfiles={publishedProfiles}
             scrollingPortfolio={
               <PortfolioClient portfolio={portfolio} studentId={studentId} role={role} />
             }
