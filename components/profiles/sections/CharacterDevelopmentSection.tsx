@@ -85,8 +85,8 @@ export default function CharacterDevelopmentSection({
 
       <div style={DROPZONE_WRAP}>
         <UploadDropZone label={isEmpty
-          ? 'Upload certificates or photos · coming soon'
-          : 'Upload certificate photos · coming soon'} />
+          ? 'Upload certificates or photos'
+          : 'Upload certificate photos'} />
       </div>
 
       <div style={NARRATIVE_BLOCK}>

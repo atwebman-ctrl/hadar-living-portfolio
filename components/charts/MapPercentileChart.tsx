@@ -177,7 +177,7 @@ export default function MapPercentileChart({
               generateLabels: () => [
                 { text: '95th %ile', fillStyle: BAND_BG[4], strokeStyle: 'transparent', lineWidth: 0 },
                 { text: '75th %ile', fillStyle: BAND_BG[3], strokeStyle: 'transparent', lineWidth: 0 },
-                { text: 'Mean',      fillStyle: BAND_BG[2], strokeStyle: 'transparent', lineWidth: 0 },
+                { text: '50th %ile', fillStyle: BAND_BG[2], strokeStyle: 'transparent', lineWidth: 0 },
                 { text: '25th %ile', fillStyle: BAND_BG[1], strokeStyle: 'transparent', lineWidth: 0 },
                 { text: '5th %ile',  fillStyle: BAND_BG[0], strokeStyle: 'transparent', lineWidth: 0 },
               ],
@@ -200,7 +200,7 @@ export default function MapPercentileChart({
           x: {
             grid:  { display: false },
             ticks: { font: { family: 'DM Mono', size: 9 }, maxRotation: 0 },
-            title: { display: true, text: 'Grade', font: { family: 'DM Mono', size: 9 }, color: '#999' },
+            title: { display: true, text: 'Grade · Season', font: { family: 'DM Mono', size: 9 }, color: '#999' },
           },
           y: {
             min:   yMin,

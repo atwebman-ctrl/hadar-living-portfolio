@@ -91,6 +91,26 @@ export default function AVANTSection({
               ? <AvantChart data={points} />
               : <div style={EMPTY}>No AVANT scores to chart.</div>}
           </div>
+          {points.length > 0 && (
+            <div style={LEGEND_ROW}>
+              <div style={LEGEND_ITEM}>
+                <span style={{ ...LEGEND_SWATCH, background: '#1B3A6B' }} />
+                <span style={LEGEND_LABEL}>Speaking</span>
+              </div>
+              <div style={LEGEND_ITEM}>
+                <span style={{ ...LEGEND_SWATCH, background: '#B8963E' }} />
+                <span style={LEGEND_LABEL}>Reading</span>
+              </div>
+              <div style={LEGEND_ITEM}>
+                <span style={{ ...LEGEND_SWATCH, background: '#2E7D5E' }} />
+                <span style={LEGEND_LABEL}>Listening</span>
+              </div>
+              <div style={LEGEND_ITEM}>
+                <span style={{ ...LEGEND_SWATCH, background: '#7C3AED' }} />
+                <span style={LEGEND_LABEL}>Writing</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div>
@@ -163,6 +183,22 @@ const CHART_BOX: CSSProperties = {
   height: 280,
   background: 'var(--cream)', border: '1px solid var(--rule)',
   borderRadius: 6, padding: 8,
+}
+
+const LEGEND_ROW: CSSProperties = {
+  display: 'flex', flexWrap: 'wrap', gap: 16,
+  marginTop: 10, paddingLeft: 4,
+}
+const LEGEND_ITEM: CSSProperties = {
+  display: 'inline-flex', alignItems: 'center', gap: 6,
+}
+const LEGEND_SWATCH: CSSProperties = {
+  display: 'inline-block', width: 10, height: 10, borderRadius: 2,
+}
+const LEGEND_LABEL: CSSProperties = {
+  fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 500,
+  letterSpacing: '0.08em', textTransform: 'uppercase',
+  color: 'var(--ink-mid)',
 }
 
 const SOURCE_CARD: CSSProperties = {

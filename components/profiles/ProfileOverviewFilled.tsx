@@ -40,6 +40,27 @@ const STATUS_LABEL: Record<ProfileSectionStatus, string> = {
   complete:        'Complete',
 }
 
+const STATUS_ACCENT: Record<ProfileSectionStatus, string> = {
+  not_started:     'transparent',
+  in_progress:     'var(--gold)',
+  awaiting_review: 'var(--gold)',
+  complete:        'var(--teal)',
+}
+
+const STATUS_TEXT_COLOR: Record<ProfileSectionStatus, string> = {
+  not_started:     'var(--ink-faint)',
+  in_progress:     'var(--gold)',
+  awaiting_review: 'var(--gold)',
+  complete:        'var(--teal)',
+}
+
+const STATUS_TEXT_WEIGHT: Record<ProfileSectionStatus, number> = {
+  not_started:     500,
+  in_progress:     500,
+  awaiting_review: 600,
+  complete:        500,
+}
+
 export default function ProfileOverviewFilled({
   student, profile, sections, season, academicYearLabel,
 }: Props) {
@@ -92,13 +113,24 @@ export default function ProfileOverviewFilled({
         <div style={SECTION_LIST}>
           {sections.map((s, i) => {
             const isLast = i === sections.length - 1
+            const baseRow = isLast ? SECTION_ROW_LAST : SECTION_ROW
+            const rowStyle = {
+              ...baseRow,
+              borderLeft: `3px solid ${STATUS_ACCENT[s.status]}`,
+              opacity: s.status === 'complete' ? 0.65 : 1,
+            }
+            const statusStyle = {
+              ...SECTION_STATUS,
+              color: STATUS_TEXT_COLOR[s.status],
+              fontWeight: STATUS_TEXT_WEIGHT[s.status],
+            }
             return (
-              <div key={s.id} style={isLast ? SECTION_ROW_LAST : SECTION_ROW}>
+              <div key={s.id} style={rowStyle}>
                 <div>
                   <div style={SECTION_TITLE}>
                     {PROFILE_SECTION_KIND_LABELS[s.sectionKind]}
                   </div>
-                  <div style={SECTION_STATUS}>{STATUS_LABEL[s.status]}</div>
+                  <div style={statusStyle}>{STATUS_LABEL[s.status]}</div>
                 </div>
                 <Link
                   href={`/dashboard/profiles/${student.id}/${season}/${s.sectionKind}`}

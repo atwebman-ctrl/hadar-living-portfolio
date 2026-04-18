@@ -110,7 +110,7 @@ export default function PoetryRecitationSection({
       {title && <div style={TITLE_LINE}>{title}</div>}
 
       <div style={DROPZONE_WRAP}>
-        <UploadDropZone label="Upload photo with bronze medal · coming soon" />
+        <UploadDropZone label="Upload photo with bronze medal" />
       </div>
 
       <div style={NARRATIVE_BLOCK}>
