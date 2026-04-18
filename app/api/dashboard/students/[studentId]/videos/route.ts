@@ -2,7 +2,12 @@
 // app/api/dashboard/students/[studentId]/videos/route.ts
 //
 // POST /api/dashboard/students/[studentId]/videos
-//   Add a YouTube/Vimeo video link to a student's portfolio.
+//   Upsert a YouTube/Vimeo/Drive video link for a student.
+//   Idempotent on (student_id, category, term): if a row already
+//   exists for that triple, it is UPDATED with the new fields;
+//   otherwise a new row is INSERTed. This lets per-section
+//   editors (e.g. Poetry Recitation) save a URL repeatedly
+//   without creating duplicate rows.
 //
 // Auth: Clerk session required. Role: admin or teacher.
 // school_id derived server-side — never from client input.
@@ -26,7 +31,6 @@ type RouteContext = { params: Promise<{ studentId: string }> }
 export async function POST(req: NextRequest, { params }: RouteContext) {
   const { studentId } = await params
 
-  // 1. Parse body
   let body: unknown
   try {
     body = await req.json()
@@ -37,7 +41,6 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     )
   }
 
-  // 2. Validate body
   let input: CreateStudentVideoBodyInput
   try {
     input = validate(CreateStudentVideoBodySchema, body)
@@ -51,7 +54,6 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     throw err
   }
 
-  // 3. Auth + role
   let ctx!: Awaited<ReturnType<typeof getAuthContext>>
   try {
     ctx = await getAuthContext()
@@ -69,7 +71,6 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   if (!rateLimit(`${ctx.userId}:videos`, 30).ok) return rateLimitResponse()
 
-  // 4. Verify student belongs to the authenticated school
   const { data: student, error: studentError } = await supabaseAdmin
     .from('students')
     .select('id')
@@ -84,25 +85,59 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     )
   }
 
-  // 5. Insert — school_id and student_id from server only
-  const { data, error: dbError } = await supabaseAdmin
+  // Upsert by (student_id, category, term). The Poetry Recitation
+  // editor saves the same triple repeatedly and must not duplicate.
+  const { data: existing } = await supabaseAdmin
     .from('student_videos')
-    .insert({
-      school_id:          ctx.schoolId,
-      student_id:         studentId,
-      title:              input.title,
-      video_url:          input.videoUrl          ?? null,
-      video_storage_path: input.videoStoragePath  ?? null,
-      grade_level:        input.gradeLevel,
-      term:               input.term,
-      category:           input.category,
-      created_by:         ctx.userId,
-      updated_by:         ctx.userId,
-    })
-    .select()
-    .single()
+    .select('id')
+    .eq('student_id', studentId)
+    .eq('school_id',  ctx.schoolId)
+    .eq('category',   input.category)
+    .eq('term',       input.term)
+    .is('deleted_at', null)
+    .maybeSingle()
 
-  if (dbError || !data) {
+  let row: Record<string, unknown> | null = null
+  let dbError: unknown = null
+
+  if (existing?.id) {
+    const r = await supabaseAdmin
+      .from('student_videos')
+      .update({
+        title:              input.title,
+        video_url:          input.videoUrl          ?? null,
+        video_storage_path: input.videoStoragePath  ?? null,
+        grade_level:        input.gradeLevel,
+        updated_by:         ctx.userId,
+        updated_at:         new Date().toISOString(),
+      })
+      .eq('id', existing.id)
+      .select()
+      .single()
+    row = r.data as Record<string, unknown> | null
+    dbError = r.error
+  } else {
+    const r = await supabaseAdmin
+      .from('student_videos')
+      .insert({
+        school_id:          ctx.schoolId,
+        student_id:         studentId,
+        title:              input.title,
+        video_url:          input.videoUrl          ?? null,
+        video_storage_path: input.videoStoragePath  ?? null,
+        grade_level:        input.gradeLevel,
+        term:               input.term,
+        category:           input.category,
+        created_by:         ctx.userId,
+        updated_by:         ctx.userId,
+      })
+      .select()
+      .single()
+    row = r.data as Record<string, unknown> | null
+    dbError = r.error
+  }
+
+  if (dbError || !row) {
     console.error('[POST /api/dashboard/students/:id/videos]', dbError)
     return NextResponse.json(
       { error: 'Failed to save video.', code: 'DB_ERROR' },
@@ -112,7 +147,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   revalidatePortfolio(studentId)
   return NextResponse.json(
-    mapStudentVideo(data as Record<string, unknown>),
-    { status: 201 },
+    mapStudentVideo(row),
+    { status: existing?.id ? 200 : 201 },
   )
 }

@@ -31,9 +31,13 @@ import HebrewComparisonSectionWrapper from './HebrewComparisonSectionWrapper'
 import ReadingListSectionWrapper from './ReadingListSectionWrapper'
 import EnglishCompositionSectionWrapper from './EnglishCompositionSectionWrapper'
 import HebrewCompositionSectionWrapper from './HebrewCompositionSectionWrapper'
+import CharacterDevelopmentSectionWrapper from './CharacterDevelopmentSectionWrapper'
+import PoetryRecitationSectionWrapper from './PoetryRecitationSectionWrapper'
 import { parseLexileRange } from './_lexileRange'
 import { loadCompositionSamples } from './_compositionSamples'
 import { loadAvantAssessments } from './_avantData'
+import { loadCharacterAwards } from './_characterAwards'
+import { loadLatestPoetryVideo } from './_poetryVideo'
 
 const CURRENT_ACADEMIC_YEAR_LABEL = '2025-2026'
 
@@ -100,6 +104,19 @@ export default async function SectionEditorPage({ params }: Props) {
   const backHref    = `/dashboard/profiles/${studentId}/${season}`
   const initialNarrative = section.narrativeText ?? section.narrativeDraft ?? ''
 
+  // Shared props passed to every section wrapper that follows the
+  // common SectionEditorShell contract (all wrappers except Lexile).
+  const commonProps = {
+    profileId:        profile.id,
+    sectionId:        section.id,
+    initialNarrative,
+    initialStatus:    section.status,
+    studentName,
+    gradeLabel,
+    termLabel:        profile.term,
+    backHref,
+  } as const
+
   // ── Lexile ───────────────────────────────────────────────────
   if (sectionKind === 'lexile') {
     const { data: lexRow } = await supabaseAdmin
@@ -154,19 +171,7 @@ export default async function SectionEditorPage({ params }: Props) {
       student.academicYear,
     )
 
-    return (
-      <MAPSSectionWrapper
-        profileId={profile.id}
-        sectionId={section.id}
-        initialNarrative={initialNarrative}
-        initialStatus={section.status}
-        studentName={studentName}
-        gradeLabel={gradeLabel}
-        termLabel={profile.term}
-        backHref={backHref}
-        assessments={assessments}
-      />
-    )
+    return <MAPSSectionWrapper {...commonProps} assessments={assessments} />
   }
 
   // ── AVANT Hebrew ─────────────────────────────────────────────
@@ -174,19 +179,7 @@ export default async function SectionEditorPage({ params }: Props) {
     const assessments = await loadAvantAssessments(
       studentId, schoolId, student.gradeLevel, student.academicYear,
     )
-    return (
-      <AVANTSectionWrapper
-        profileId={profile.id}
-        sectionId={section.id}
-        initialNarrative={initialNarrative}
-        initialStatus={section.status}
-        studentName={studentName}
-        gradeLabel={gradeLabel}
-        termLabel={profile.term}
-        backHref={backHref}
-        assessments={assessments}
-      />
-    )
+    return <AVANTSectionWrapper {...commonProps} assessments={assessments} />
   }
 
   // ── Hebrew · National comparison ─────────────────────────────
@@ -208,19 +201,7 @@ export default async function SectionEditorPage({ params }: Props) {
       composite,
     }
 
-    return (
-      <HebrewComparisonSectionWrapper
-        profileId={profile.id}
-        sectionId={section.id}
-        initialNarrative={initialNarrative}
-        initialStatus={section.status}
-        studentName={studentName}
-        gradeLabel={gradeLabel}
-        termLabel={profile.term}
-        backHref={backHref}
-        athenaScores={athenaScores}
-      />
-    )
+    return <HebrewComparisonSectionWrapper {...commonProps} athenaScores={athenaScores} />
   }
 
   // ── Reading · English Canon ──────────────────────────────────
@@ -235,19 +216,7 @@ export default async function SectionEditorPage({ params }: Props) {
 
     const readings = (readingRows ?? []).map((r) => mapReading(r as Record<string, unknown>))
 
-    return (
-      <ReadingListSectionWrapper
-        profileId={profile.id}
-        sectionId={section.id}
-        initialNarrative={initialNarrative}
-        initialStatus={section.status}
-        studentName={studentName}
-        gradeLabel={gradeLabel}
-        termLabel={profile.term}
-        backHref={backHref}
-        readings={readings}
-      />
-    )
+    return <ReadingListSectionWrapper {...commonProps} readings={readings} />
   }
 
   // ── English / Hebrew composition ─────────────────────────────
@@ -257,17 +226,24 @@ export default async function SectionEditorPage({ params }: Props) {
     const Wrapper = sectionKind === 'english_composition'
       ? EnglishCompositionSectionWrapper
       : HebrewCompositionSectionWrapper
+    return <Wrapper {...commonProps} samples={samples} />
+  }
+
+  // ── Character Development · Middot ───────────────────────────
+  if (sectionKind === 'character_middot') {
+    const awards = await loadCharacterAwards(studentId, schoolId)
+    return <CharacterDevelopmentSectionWrapper {...commonProps} awards={awards} />
+  }
+
+  // ── Rhetoric · Poetry Recitation ─────────────────────────────
+  if (sectionKind === 'poetry_recitation') {
+    const { videoUrl, title } = await loadLatestPoetryVideo(studentId, schoolId)
     return (
-      <Wrapper
-        profileId={profile.id}
-        sectionId={section.id}
-        initialNarrative={initialNarrative}
-        initialStatus={section.status}
-        studentName={studentName}
-        gradeLabel={gradeLabel}
-        termLabel={profile.term}
-        backHref={backHref}
-        samples={samples}
+      <PoetryRecitationSectionWrapper
+        {...commonProps}
+        studentId={studentId}
+        initialVideoUrl={videoUrl}
+        initialVideoTitle={title}
       />
     )
   }
