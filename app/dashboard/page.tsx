@@ -89,12 +89,14 @@ export default async function DashboardPage() {
 
   const { data: schoolRow } = await supabaseAdmin
     .from('schools')
-    .select('name, logo_url')
+    .select('name, logo_url, pedagogical_schools')
     .eq('id', ctx.schoolId)
     .maybeSingle()
 
   const schoolName    = (schoolRow?.name     as string | undefined) ?? ''
   const schoolLogoUrl = (schoolRow?.logo_url as string | null | undefined) ?? null
+  const pedagogicalSchools =
+    (schoolRow?.pedagogical_schools as import('@/lib/types').PedagogicalSchool[] | null | undefined) ?? []
 
   // ── Profile status for the current term ───────────────────
   // Read-only resolution: if no academic_years row exists for this
@@ -116,6 +118,7 @@ export default async function DashboardPage() {
         role={ctx.role}
         schoolName={schoolName}
         schoolLogoUrl={schoolLogoUrl}
+        pedagogicalSchools={pedagogicalSchools}
         profileStatuses={profileStatuses}
       />
     </div>

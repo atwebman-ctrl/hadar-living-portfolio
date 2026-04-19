@@ -57,6 +57,7 @@ export function mapSchool(row: Row): SchoolConfig {
     enabledSections: (row.enabled_sections as SectionType[]) ?? [],
     websiteUrl: (row.website_url as string) ?? null,
     clerkOrgId: (row.clerk_org_id as string) ?? null,
+    pedagogicalSchools: (row.pedagogical_schools as SchoolConfig['pedagogicalSchools']) ?? [],
   };
 }
 

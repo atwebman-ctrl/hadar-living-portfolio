@@ -99,6 +99,7 @@ export default async function PublishedProfilePage({ params }: Props) {
         enabledSections:  [],
         websiteUrl:       (schoolRow.website_url as string | null) ?? null,
         clerkOrgId:       (schoolRow.clerk_org_id as string | null) ?? null,
+        pedagogicalSchools: [],
       }}
       student={student}
       profile={profile}

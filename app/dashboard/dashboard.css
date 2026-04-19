@@ -9,6 +9,25 @@
   position: relative;
 }
 
+/* ── Body: sidebar + main ────────────────────────────────── */
+/* Header is full-width; below it the sidebar sits in a fixed
+   240px left column and the main content flexes to fill. */
+.db-body {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+.db-sidebar-slot {
+  flex: 0 0 240px;
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .db-body { flex-direction: column; }
+  .db-sidebar-slot { flex: 0 0 auto; width: 100%; border-right: none; }
+}
+
 /* ── Header ──────────────────────────────────────────────── */
 .db-header {
   background: #1E3A5F !important;

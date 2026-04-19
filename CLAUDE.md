@@ -164,6 +164,13 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - `app/portfolio/[studentId]/group/[groupSlug]/page.tsx` — Single group detail page (server component); VALID_GROUPS narrowed to `['portfolio']`; fetches portfolio, renders GroupDetailClient with `initialTab` from `?tab=` searchParam
 - `app/portfolio/[studentId]/journal/page.tsx` — Teacher journal route (server component); fetches portfolio, renders `<TeacherJournal>` with all teacher notes
 - `app/portfolio/[studentId]/gallery/page.tsx` — Gallery route (server component); stacks `<PhotoGallery>` + `<ParentUploads>` vertically
+- `app/portfolio/[studentId]/full/page.tsx` — Reports tab (server component); queries published profiles + report cards, renders `ReportsView` with both surfaces and a `PortfolioClient` scrolling-all-sections fallback under "View all sections →"
+- `app/portfolio/[studentId]/full/[profileId]/page.tsx` — Parent-facing read-only published Learning Profile (server component); 404s for non-published or mismatched profiles; gates parents via `enforceParentAccess`; per-section data loaded inline (queries `assessments` / `readings` / `writing_samples` / `character_awards` / `student_videos`) and handed to `<PublishedProfile>` as `SectionPayload[]`
+- `components/portfolio/ReportsView.tsx` — Reports tab UI; "Semester Profiles" block (gold-bordered cards linking to `/full/[profileId]`) above historical report card uploads; takes optional `publishedProfiles?: Profile[]`
+- `components/portfolio/published/PublishedProfile.tsx` — Document wrapper for a published profile; cream 760px container; centered header (eyebrow + Playfair student name + term/grade + published date), 9 sections in canonical order, footer crediting "Dr. Liliana Worth, Head of School · {school.name}"; exports `SectionPayload`
+- `components/portfolio/published/PublishedSectionRenderer.tsx` — Read-only sibling of the editor section components; switch on `sectionKind`, renders header (Playfair title + DM Mono descriptor) + narrative as gold-left-bordered Lora blockquote + data block (tables, not charts, for printability); exports `PublishedSectionData` discriminated union
+- `components/portfolio/published/publishedStyles.ts` — Extracted `CSSProperties` constants for the renderer (SECTION/HEADER/TITLE/DESCRIPTOR/NARRATIVE/TABLE/etc.); kept the renderer under the 400-line cap
+- `scripts/publishAthenaSpringProfile.ts` — One-off backfill: flipped Athena's Spring 2025-2026 profile to `status='published'` with a `published_at` stamp; placeholder for the Phase 5 Dr. Worth review queue
 - `lib/dashboardHelpers.ts` — Pure helper functions for PortfolioHub dashboard cards: `latestMapScore` (winter-YoY delta), `latestAvantComposite` (with strongest/lowest skill), `readingMetrics`. `termOrdinal()` provides chronological Fall→Winter→Spring ordering — never lexicographic-sort term strings. No React, no side effects.
 - `app/sign-in/[[...sign-in]]/page.tsx` — Clerk SignIn centered on cream background
 - `app/sign-up/[[...sign-up]]/page.tsx` — Clerk SignUp centered on cream background
@@ -440,8 +447,11 @@ Originally built as replacement for WorkbenchView's 4-tab UI. Now understood to 
 - ✅ Phase 1: schema + creation flow (shipped tonight — 56df410)
 - Phase 2: per-section editor (next)
 - Phase 3: AI narrative drafting via Claude API with school voice guide
-- Phase 4: Dr. Worth review queue + approval/publish flow
+- Phase 4: Dr. Worth review queue + approval/publish flow (not yet shipped — Athena's Spring profile was published manually via `scripts/publishAthenaSpringProfile.ts` as a stand-in)
 - Phase 5: parent view + PDF export
+  - ✅ Read-only published document (PublishedProfile + PublishedSectionRenderer) and parent route at `/portfolio/[studentId]/full/[profileId]` shipped 2026-04-18; Reports tab links to it
+  - ⏳ PDF export still pending
+  - ⏳ Optional: render charts in published view instead of tables (chose tables for printability)
 - Phase 6: Quick Capture integration (reframes StreamComposer scaffold)
 
 ### Pending / blocked

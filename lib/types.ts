@@ -50,6 +50,13 @@ export interface ThemeConfig {
   fonts?: Record<string, string>; // font family overrides (V2)
 }
 
+export interface PedagogicalSchool {
+  id: string;
+  label: string;
+  grades: string[];
+  order: number;
+}
+
 export interface SchoolConfig {
   id: string;
   name: string;
@@ -59,6 +66,7 @@ export interface SchoolConfig {
   enabledSections: SectionType[];
   websiteUrl: string | null;
   clerkOrgId: string | null;
+  pedagogicalSchools: PedagogicalSchool[];
 }
 
 // ── Student ──────────────────────────────────────────────────
