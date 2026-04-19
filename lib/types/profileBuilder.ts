@@ -85,6 +85,8 @@ export interface Profile {
   status: ProfileStatus
   draftedBy: string | null
   reviewedBy: string | null
+  reviewedAt: string | null
+  reviewFeedback: string | null
   publishedAt: string | null
   unpublishedAt: string | null
   unpublishReason: string | null
@@ -153,6 +155,8 @@ export interface ProfileRow {
   status: ProfileStatus
   drafted_by: string | null
   reviewed_by: string | null
+  reviewed_at: string | null
+  review_feedback: string | null
   published_at: string | null
   unpublished_at: string | null
   unpublish_reason: string | null

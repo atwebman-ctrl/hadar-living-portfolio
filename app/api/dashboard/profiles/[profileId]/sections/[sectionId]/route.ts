@@ -25,8 +25,9 @@ import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelper
 type RouteContext = { params: Promise<{ profileId: string; sectionId: string }> }
 
 interface AuthorizedSection {
-  studentId: string
-  season:    string
+  studentId:     string
+  season:        string
+  profileStatus: string
 }
 
 async function resolveAndAuthorize(
@@ -36,7 +37,7 @@ async function resolveAndAuthorize(
 ): Promise<{ found: true; ctx: AuthorizedSection } | { found: false }> {
   const { data, error } = await supabaseAdmin
     .from('profile_sections')
-    .select('id, profile_id, school_id, profiles!inner(student_id, season, school_id, deleted_at)')
+    .select('id, profile_id, school_id, profiles!inner(student_id, season, status, school_id, deleted_at)')
     .eq('id', sectionId)
     .eq('profile_id', profileId)
     .eq('school_id', schoolId)
@@ -48,6 +49,7 @@ async function resolveAndAuthorize(
   const profileJoin = data.profiles as unknown as {
     student_id: string
     season:     string
+    status:     string
     school_id:  string
     deleted_at: string | null
   } | null
@@ -62,7 +64,11 @@ async function resolveAndAuthorize(
 
   return {
     found: true,
-    ctx:   { studentId: profileJoin.student_id, season: profileJoin.season },
+    ctx:   {
+      studentId:     profileJoin.student_id,
+      season:        profileJoin.season,
+      profileStatus: profileJoin.status,
+    },
   }
 }
 
@@ -97,6 +103,18 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   const resolved = await resolveAndAuthorize(profileId, sectionId, ctx.schoolId)
   if (!resolved.found)
     return NextResponse.json({ error: 'Section not found.', code: 'NOT_FOUND' }, { status: 404 })
+
+  // Profile is locked for edits while awaiting Dr. Worth's review.
+  // To make changes, the reviewer must return it to draft.
+  if (resolved.ctx.profileStatus === 'in_review') {
+    return NextResponse.json(
+      {
+        error: 'This profile is awaiting review and cannot be edited.',
+        code:  'LOCKED',
+      },
+      { status: 403 },
+    )
+  }
 
   const updateRow: Record<string, unknown> = {
     updated_by: ctx.userId,

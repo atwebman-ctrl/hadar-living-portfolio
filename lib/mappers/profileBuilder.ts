@@ -24,6 +24,8 @@ export function mapProfile(row: ProfileRow): Profile {
     status:           row.status,
     draftedBy:        row.drafted_by,
     reviewedBy:       row.reviewed_by,
+    reviewedAt:       row.reviewed_at,
+    reviewFeedback:   row.review_feedback,
     publishedAt:      row.published_at,
     unpublishedAt:    row.unpublished_at,
     unpublishReason:  row.unpublish_reason,

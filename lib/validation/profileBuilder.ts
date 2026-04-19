@@ -31,3 +31,12 @@ export const UpdateProfileSectionBodySchema = z.object({
 )
 
 export type UpdateProfileSectionBodyInput = z.infer<typeof UpdateProfileSectionBodySchema>
+
+// POST body for /api/dashboard/profiles/[profileId]/request-changes.
+// feedback is required and capped to keep the banner UI readable.
+export const RequestProfileChangesBodySchema = z.object({
+  feedback: z.string().min(1, 'Feedback is required.').max(2000),
+})
+
+export type RequestProfileChangesBodyInput = z.infer<typeof RequestProfileChangesBodySchema>
+
