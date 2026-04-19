@@ -11,5 +11,9 @@ export default defineConfig({
     // at the top of the file.
     environment: 'node',
     setupFiles: ['./vitest.setup.ts'],
+    // Integration tests live under tests/integration and run under a
+    // separate config (vitest.integration.config.ts) that points at
+    // local Supabase. Exclude them here so the unit suite stays offline.
+    exclude: ['**/node_modules/**', '**/.next/**', 'tests/integration/**', 'tests/e2e/**'],
   },
 })

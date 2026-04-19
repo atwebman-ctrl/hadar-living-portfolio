@@ -7,6 +7,9 @@ on:
     branches: [main]
 
 jobs:
+  # Unit suite — fast, offline. This is the only job gating branch protection
+  # (`check`). Integration and E2E below are non-blocking placeholders until
+  # the harness is battle-tested locally.
   check:
     runs-on: ubuntu-latest
     steps:
@@ -18,3 +21,48 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npx vitest run
+
+  # Integration suite — spins up local Supabase via the CLI, applies all
+  # migrations, runs the integration harness. Non-blocking for now. Make
+  # this a required check once we've watched it stay green for a week.
+  #
+  # NOTE: NEXT_PUBLIC_SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY below
+  # are the well-known Supabase local-development JWTs shipped with every
+  # `supabase start` invocation. They are NOT secrets — every developer on
+  # every machine running Supabase locally uses the same values. Hardcoding
+  # them in CI is intentional so the integration job doesn't need GitHub
+  # secrets plumbing. Production keys in .env.local are scoped separately
+  # and never referenced from this workflow.
+  integration:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: npm ci
+      - run: supabase start
+      - run: npm run test:integration
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+          SUPABASE_SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+
+  # E2E suite — boots `next dev` and drives Chromium. Non-blocking placeholder.
+  e2e:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
