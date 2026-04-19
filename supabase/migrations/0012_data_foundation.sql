@@ -143,10 +143,14 @@ create table if not exists class_assignments (
   academic_year    text        not null,
   subject          text,
   created_by       text,
-  created_at       timestamptz not null default now(),
-  constraint class_assignments_unique
-    unique (school_id, student_id, teacher_user_id, academic_year, coalesce(subject, ''))
+  created_at       timestamptz not null default now()
 );
+
+-- Unique enforcement via index, not table constraint: PostgreSQL rejects
+-- COALESCE() expressions in UNIQUE table constraints. Production already
+-- runs this as an index with the name class_assignments_unique_idx.
+create unique index if not exists class_assignments_unique_idx
+  on public.class_assignments (school_id, student_id, teacher_user_id, academic_year, coalesce(subject, ''));
 
 create index if not exists class_assignments_student_idx
   on class_assignments (student_id);
