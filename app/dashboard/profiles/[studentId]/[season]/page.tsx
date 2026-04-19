@@ -15,12 +15,9 @@ import {
   mapProfile,
   mapProfileSection,
 } from '@/lib/mappers/profileBuilder'
-import { getOrCreateAcademicYearId } from '@/lib/academicYears'
+import { getCurrentAcademicYear } from '@/lib/academicYears'
 import type { Profile, ProfileSection } from '@/lib/types/profileBuilder'
 import ProfileOverview from '@/components/profiles/ProfileOverview'
-
-// TODO: derive from academic_years.is_current in a future session.
-const CURRENT_ACADEMIC_YEAR_LABEL = '2025-2026'
 
 type Props = {
   params: Promise<{ studentId: string; season: string }>
@@ -53,10 +50,8 @@ export default async function ProfileOverviewPage({ params }: Props) {
   const student = mapStudent(studentRow as Record<string, unknown>)
 
   // Resolve academic_year_id so the profile lookup is correctly scoped.
-  const academicYearId = await getOrCreateAcademicYearId(
-    schoolId,
-    CURRENT_ACADEMIC_YEAR_LABEL,
-  )
+  const { id: academicYearId, label: academicYearLabel } =
+    await getCurrentAcademicYear(schoolId)
 
   // Profile (may not exist yet)
   const { data: profileRow } = await supabaseAdmin
@@ -92,7 +87,7 @@ export default async function ProfileOverviewPage({ params }: Props) {
       profile={profile}
       sections={sections}
       season={season}
-      academicYearLabel={CURRENT_ACADEMIC_YEAR_LABEL}
+      academicYearLabel={academicYearLabel}
     />
   )
 }

@@ -8,6 +8,32 @@
 
 import { supabaseAdmin } from './supabaseAdmin'
 
+// Returns the school's current academic year ({id, label}) by reading the
+// is_current flag on academic_years. Throws if no current row exists —
+// misconfiguration should surface early rather than silently fall back to
+// a hardcoded label.
+export async function getCurrentAcademicYear(
+  schoolId: string,
+): Promise<{ id: string; label: string }> {
+  const { data, error } = await supabaseAdmin
+    .from('academic_years')
+    .select('id, label')
+    .eq('school_id', schoolId)
+    .eq('is_current', true)
+    .maybeSingle()
+
+  if (error) {
+    throw new Error(`getCurrentAcademicYear: lookup failed — ${error.message}`)
+  }
+  if (!data) {
+    throw new Error(
+      `getCurrentAcademicYear: no current academic year set for school ${schoolId}. ` +
+      `Mark one row in academic_years as is_current=true.`,
+    )
+  }
+  return { id: data.id as string, label: data.label as string }
+}
+
 // Read-only lookup: returns the row id if it exists, null otherwise.
 // Use this from read-path code (dashboard, lists) where creating a row
 // as a side effect of a GET would be inappropriate.

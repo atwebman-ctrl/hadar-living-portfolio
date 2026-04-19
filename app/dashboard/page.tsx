@@ -16,16 +16,12 @@ import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
 import type { Student } from '@/lib/types'
-import { getAcademicYearId } from '@/lib/academicYears'
+import { getCurrentAcademicYear } from '@/lib/academicYears'
 import { getProfileStatusesForStudents, type StudentProfileStatus } from '@/lib/profileStatus'
 import { OrgPickerScreen, ParentPendingScreen } from './DashboardUI'
 import DashboardClient from './DashboardClient'
 import './dashboard.css'
 
-// TODO: derive from academic_years.is_current once the year-management
-// admin UI lands. Hardcoded for now; mirrored in
-// app/dashboard/profiles/[studentId]/[season]/page.tsx.
-const CURRENT_ACADEMIC_YEAR_LABEL = '2025-2026'
 const CURRENT_SEASON: 'fall' | 'spring' = 'spring'
 
 export default async function DashboardPage() {
@@ -99,10 +95,11 @@ export default async function DashboardPage() {
     (schoolRow?.pedagogical_schools as import('@/lib/types').PedagogicalSchool[] | null | undefined) ?? []
 
   // ── Profile status for the current term ───────────────────
-  // Read-only resolution: if no academic_years row exists for this
-  // label yet, every student renders as 'not_started'. We do NOT
-  // create the row here — that's reserved for the POST flow.
-  const academicYearId = await getAcademicYearId(ctx.schoolId, CURRENT_ACADEMIC_YEAR_LABEL).catch(() => null)
+  // Read-only resolution: if no academic_years row is marked
+  // is_current yet, every student renders as 'not_started'.
+  // getCurrentAcademicYear throws in that case — catch to null.
+  const currentYear = await getCurrentAcademicYear(ctx.schoolId).catch(() => null)
+  const academicYearId = currentYear?.id ?? null
   const statusMap = await getProfileStatusesForStudents(
     students.map((s) => s.id),
     ctx.schoolId,
