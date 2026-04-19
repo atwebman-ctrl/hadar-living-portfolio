@@ -348,6 +348,7 @@ npm run db:reset        # Reset local DB and replay all migrations (local only)
 
 - All 14 existing migrations (0001–0014) are tracked and marked as applied.
 - ⚠️ **0001–0014 may be ghost migrations** — they were retroactively marked applied without necessarily having run their DDL. If a column/constraint/index declared in one of those files is missing in production (e.g. `0014_video_storage_path.sql` claimed to add `student_videos.video_storage_path` but it wasn't actually there), create a new timestamped migration with idempotent DDL (`add column if not exists`, `drop constraint if exists` + `add constraint`, etc.) and push it. **Never edit the historical `00NN_*.sql` files in place** — the migration ledger is immutable once recorded.
+- **0012 fix (commit cdfb9ed, 2026-04-19):** Migration 0012 contained invalid SQL (COALESCE inside a UNIQUE table constraint). Production had been reconciled manually via a UNIQUE INDEX, but the file was never back-ported. Fixed in place to match production reality. This is an exception to the "never edit historical migrations" rule — the file had literally never been valid SQL, so there was no history to preserve. Local `supabase db reset` now replays all 24 migrations cleanly.
 - **Docker Desktop is NOT required** for `db:new` or `db:push` — only for `db:pull` and `db:reset` (local dev features we don't use).
 - Migration files live in `supabase/migrations/` and are committed to git like any other code.
 
@@ -370,6 +371,51 @@ grep -rn "Hadar" components/ | grep -v node_modules
 grep -r "school_id" --include="*.ts" --include="*.tsx" | grep -v node_modules | grep -v .next
 # Every query/route should include school_id filtering
 ```
+
+## Testing infrastructure
+
+As of commit 37a37a4, the repo has three test layers:
+
+**Unit (default Vitest suite)**
+- Run: `npm test`
+- Config: vitest.config.ts (excludes tests/integration/** and tests/e2e/**)
+- Pattern: mocks @/lib/supabaseAdmin + @/lib/auth, no DB
+- Currently 132 tests across 13 files
+- Fast, offline, no dependencies
+
+**Integration (Vitest against local Supabase)**
+- Run: `npm run test:integration`
+- Config: vitest.integration.config.ts
+- Requires: `supabase start` running (Docker Desktop + local stack)
+- Produces real DB writes against http://127.0.0.1:54321
+- Production guard in vitest.integration.setup.ts throws if URL isn't localhost
+- Harness: tests/integration/helpers/testHarness.ts
+  - adminClient() — service-role Supabase client
+  - seedSchool() — creates a throwaway tenant
+  - deleteSchool() — cleanup
+- Tests live in tests/integration/**/*.test.ts
+- Currently 1 file, 2 tests (smoke)
+
+**E2E (Playwright + Chromium)**
+- Run: `npm run test:e2e`
+- Config: playwright.config.ts (Chromium only, auto-boots `next dev -p 3100`)
+- Tests live in tests/e2e/**/*.spec.ts
+- Currently 1 test (landing-page smoke)
+- Known issues:
+  - Dev server Playwright spawns reads .env.local not .env.test (visible in [WebServer] output). Needs fixing before first real feature E2E test that relies on test-mode Clerk keys.
+  - Local Chromium hits ERR_NAME_NOT_RESOLVED on 127.0.0.1/localhost from inside Playwright's worker on this machine. Runs fine on CI (Ubuntu). Investigate when a real need for local E2E arises.
+
+**CI (.github/workflows/ci.yml)**
+- `check` job (tsc + vitest run) — blocking, required check
+- `integration` job — continue-on-error: true, spins up supabase locally
+- `e2e` job — continue-on-error: true, installs Playwright + Chromium
+- Integration + E2E will be promoted to required checks after staying green for a week
+
+**Workflow rules going forward**
+- Every new feature should ship with at least one integration test covering its critical path
+- PATCH/POST endpoints should have API-level tests that verify auth gating
+- Before external demos: the full trifecta (unit + integration + e2e) should be green
+- If you find yourself mocking the DB in a new test, ask whether it should be an integration test instead
 
 ## Sprint 5 Session 2 — Completed (April 15, 2026)
 
