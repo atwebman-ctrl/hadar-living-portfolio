@@ -14,7 +14,16 @@ import type { ProfileStatus, ProfileSectionStatus, ProfileSeason } from './types
 
 export type StudentProfileStatus =
   | { kind: 'not_started' }
-  | { kind: 'in_draft', requiredComplete: number, requiredTotal: number, profileId: string }
+  | {
+      kind: 'in_draft'
+      requiredComplete: number
+      requiredTotal:    number
+      profileId:        string
+      // True when the reviewer returned this profile to draft with feedback.
+      // The overview should show a "returned with feedback" banner; the
+      // dashboard badge should distinguish this from a plain fresh draft.
+      hasFeedback:      boolean
+    }
   | { kind: 'in_review', profileId: string }
   | { kind: 'published', publishedAt: string, profileId: string }
 
@@ -30,7 +39,7 @@ export async function getProfileStatusesForStudents(
   // 1. Fetch all profiles for these students in this term.
   const { data: profiles, error: profilesErr } = await supabaseAdmin
     .from('profiles')
-    .select('id, student_id, status, published_at')
+    .select('id, student_id, status, published_at, review_feedback')
     .eq('school_id', schoolId)
     .eq('season', season)
     .eq('academic_year_id', academicYearId)
@@ -89,6 +98,7 @@ export async function getProfileStatusesForStudents(
         requiredComplete: t.complete,
         requiredTotal:    t.total,
         profileId,
+        hasFeedback: (p.review_feedback as string | null) != null,
       })
     }
   }

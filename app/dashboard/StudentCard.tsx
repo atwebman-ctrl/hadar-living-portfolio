@@ -28,9 +28,11 @@ function statusLine(status: StudentProfileStatus | undefined): { text: string; c
       return { text: 'Spring profile · Not started', color: 'var(--ink-faint)', weight: 400 }
     case 'in_draft':
       return {
-        text:   `Spring profile · Draft ${status.requiredComplete}/${status.requiredTotal}`,
-        color:  'var(--gold)',
-        weight: 500,
+        text:   status.hasFeedback
+          ? `Spring profile · Returned · ${status.requiredComplete}/${status.requiredTotal}`
+          : `Spring profile · Draft ${status.requiredComplete}/${status.requiredTotal}`,
+        color:  status.hasFeedback ? 'var(--plum, #8a3a66)' : 'var(--gold)',
+        weight: status.hasFeedback ? 600 : 500,
       }
     case 'in_review':
       return { text: 'Spring profile · In review',  color: 'var(--gold)', weight: 600 }

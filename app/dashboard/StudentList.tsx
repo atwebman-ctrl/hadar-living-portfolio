@@ -40,6 +40,13 @@ function ProfileStatusCell({ status }: { status: StudentProfileStatus | undefine
     return <span style={{ color: 'var(--ink-faint)' }}>—</span>
   }
   if (status.kind === 'in_draft') {
+    if (status.hasFeedback) {
+      return (
+        <span style={{ color: 'var(--plum, #8a3a66)', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: '0.06em', fontWeight: 600 }}>
+          RETURNED · {status.requiredComplete}/{status.requiredTotal}
+        </span>
+      )
+    }
     return (
       <span style={{ color: 'var(--gold)', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: '0.06em' }}>
         DRAFT · {status.requiredComplete}/{status.requiredTotal}
