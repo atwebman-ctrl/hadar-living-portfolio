@@ -1,4 +1,4 @@
-# CLAUDE.md — Hadar Living Portfolio
+# CLAUDE.md — Quire (Hadar Living Portfolio)
 
 ## Agent Behavior
 Say "🫡" in your first message to acknowledge you've read this document.
@@ -9,11 +9,12 @@ At end of every session: ask "anything to clean up?" and remind Aaron to update 
 Before modifying existing files or wiring into existing interfaces, always verify assumptions against the actual codebase first. Output prop interfaces, type definitions, CSS variables, database columns, and component structure BEFORE writing implementation code. Never guess at type strings, prop names, or data shapes — read the source files. This applies especially to: switch case values, assessment type strings, section_type/section_category DB values, CSS variable names, and component prop interfaces.
 
 ## Reference Documents (read before any architecture or product questions)
-- **Master Brief:** `docs/hadar-living-portfolio-brief-v3.md` — product spec, section map, design philosophy, sprint task list, Tayler's requirements
+- **Master Brief:** `docs/hadar-living-portfolio-brief-v3.md` — product spec, section map, design philosophy, Tayler's requirements
 - **Architecture Doc:** `docs/hadar-living-portfolio-architecture.md` — ER diagram, API route map, component tree, data flow, auth flow, theming, AI layer, security checklist, design bible
 - **Design Reference:** `design-reference/` — HTML mockups (`landing.html`, `hadar-portfolio.html`) and `landing-reference.png` (canonical screenshot). Open in browser before any UI work.
+- **Archive:** `ARCHIVE.md` — historical session notes, completed sprints, superseded decisions. Read only when asked about past decisions; not needed for current work.
 
-If the answer to a question is in those docs, go there. This file is gotchas and guard rails — not the spec.
+If the answer is in those docs, go there. This file is gotchas and guard rails — not the spec.
 
 ## Stack
 Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organizations) · Chart.js / react-chartjs-2 · Zod
@@ -44,28 +45,26 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - No hardcoded student data in reusable components — all data via props from `getStudentPortfolio()`
 - Video slots accept either `storage_path` (Supabase) OR `external_url` (YouTube/Vimeo) — never assume one format
 - All chart components accept typed `data` prop — no inline data
-
-### Data
 - **Grade levels are a closed enum** — always `GRADE_LEVELS` from `lib/gradeLevel.ts` ('pre-k','k','1'…'12'). DB column is `grade_level text CHECK (...)`. Zod schema uses `z.enum([...GRADE_LEVELS])`. All UI dropdowns use `GRADE_SELECT_OPTIONS`. Never accept free-text grade input.
-- **Term fields are always `<select>` dropdowns** — import `TERM_OPTIONS` from `lib/constants.ts`; never free-text. All inline forms (InlineAssessmentForm, InlineAvantForm, InlineVideoForm, InlineWritingForm, InlineCharacterForm, AssessmentForm) use this.
+- **Term fields are always `<select>` dropdowns** — import `TERM_OPTIONS` from `lib/constants.ts`; never free-text. All inline forms use this.
 - **Academic year fields are always `<select>` dropdowns** — import `ACADEMIC_YEAR_OPTIONS` from `lib/constants.ts`. No pattern attribute needed; dropdown enforces format.
-- **Student profile fields (0011)** — `gender` ('boy'|'girl', nullable), `date_of_birth` (date, nullable; age always computed never stored), `enrollment_status` ('active'|'withdrawn'|'graduated'|'transferred', default 'active'). Constants: `GENDER_OPTIONS`, `ENROLLMENT_STATUS_OPTIONS` in `lib/constants.ts`. Enrollment status badge on card only when NOT 'active'.
-- **Zod v4 strict UUID validation** — `z.string().uuid()` in Zod v4 enforces RFC 4122 (version nibble 1–5, variant nibble 8/9/a/b). All fixed/seed UUIDs must be real v4 UUIDs. The Hadar school UUID is `a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d`.
+- **Student profile fields** — `gender` ('boy'|'girl', nullable), `date_of_birth` (date, nullable; age always computed never stored), `enrollment_status` ('active'|'withdrawn'|'graduated'|'transferred', default 'active'). Constants in `lib/constants.ts`. Enrollment badge on card only when NOT 'active'.
+- **Zod v4 strict UUID validation** — `z.string().uuid()` enforces RFC 4122 (version nibble 1–5, variant nibble 8/9/a/b). All fixed/seed UUIDs must be real v4 UUIDs. The Hadar school UUID is `a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d`.
+- **Chart.js registration** — `MapPercentileChart` and `MapTrajectoryChart` require `LineController` in `Chart.register()`. Do not remove; you'll hit "line is not a registered controller" at render.
 
 ### Tooling
 - Cursor commit button is bugged — always use terminal for git
 - If using Cursor, run in Claude-only mode (not Auto)
 - Next.js 16 uses `proxy.ts` (not `middleware.ts`) for Clerk middleware
 
-### Branch Workflow
-- All work happens on branches: `aaron/feature-name` or `mijntje/feature-name`
-- PRs required to merge to main; CI must pass before merge
-- Mijntje's PRs require Aaron's approval; Aaron can bypass as repo admin
-- CI runs `npx tsc --noEmit` + `npx vitest run` on every push/PR (`.github/workflows/ci.yml`)
+## Branch workflow
+- Solo-dev mode: pushes go directly to `main`. Husky runs the unit suite pre-commit as the main gate.
+- GitHub branch protection exists but allows admin bypass; this is acceptable while Aaron is the only committer.
+- When a second engineer joins the repo, formalize PR gating: all changes via PR, integration + e2e CI jobs promoted to required checks, admin bypass disabled.
 
 ## Code Hygiene Rules (enforce always)
 1. No file over 300 lines — split into sub-components immediately
-2. `SUPABASE_SERVICE_ROLE_KEY` only in `lib/supabaseAdmin.ts` (its definition) and `app/api/` routes. `supabaseAdmin` may be imported in server-only `lib/` helpers (e.g. `lib/auth.ts`, `lib/getStudentPortfolio.ts`) that are themselves only ever called from `app/api/` routes or server components — never from client components.
+2. `SUPABASE_SERVICE_ROLE_KEY` only in `lib/supabaseAdmin.ts` (its definition) and `app/api/` routes. `supabaseAdmin` may be imported in server-only `lib/` helpers (e.g. `lib/auth.ts`, `lib/getStudentPortfolio.ts`, `lib/sectionData.ts`) that are themselves only ever called from `app/api/` routes or server components — never from client components.
 3. No hardcoded student data in components — data flows from `getStudentPortfolio(id)`
 4. No hardcoded school name, branding, or theme in components — always from school config
 5. Every query filters by `school_id` — no exceptions
@@ -78,248 +77,61 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 12. **Audit columns** — every INSERT into assessments, readings, writing_samples, student_videos, teacher_notes, character_awards must include `created_by: ctx.userId` and `updated_by: ctx.userId`. Every UPDATE must refresh `updated_by` and `updated_at`.
 13. **Soft delete** — the 6 tables above have `deleted_at`. All SELECT queries in `getStudentPortfolio.ts` must include `.is('deleted_at', null)`. Use `update({ deleted_at: new Date().toISOString() })` — never hard-delete these rows.
 
-## Key Files
+## Key Cross-File Contracts
+Most component/file purposes are discoverable via Read. These entries capture **non-obvious cross-file contracts** that would bite if rediscovered by reading the file alone.
 
-### Exists now
-- `app/page.tsx` — Landing page entry (thin server component; renders LandingShell + LandingContent)
-- `app/LandingShell.tsx` — Client wrapper; checks `sessionStorage.splash_played`, mounts BookSplash overlay on first visit
-- `app/LandingContent.tsx` — Static landing page markup + CSS imports (extracted from page.tsx)
-- `app/styles/landing-layout.css` — CSS vars, keyframes, page grid
-- `app/styles/landing-left-panel.css` — Navy manuscript panel
-- `app/styles/landing-right-panel.css` — Parchment portal panel
-- `app/styles/landing-mobile.css` — Signin card, form, responsive overrides
-- `app/demo/page.tsx` — Demo portfolio (server component, password-gated)
-- `app/demo/DemoPortfolio.tsx` — Demo portfolio client component
-- `app/demo/DemoGate.tsx` — Password form component
-- `app/demo/portfolio.css` — Demo portfolio styles (⚠️ CSS variables not yet unified with landing styles — Sprint 1.5 remaining task); contains CSS for: `.hub-group-card`, `.stats-bar` / `.stats-bar-cell`, `.group-tab-bar` / `.group-tab`, `.sidenav-group-row`
-- `app/layout.tsx` — Root layout, ClerkProvider, font loading
-- `app/globals.css` — Global styles
-- `app/api/demo/auth/route.ts` — Demo password gate API route
-- `components/portfolio/` — Section components (CharacterArc, CreativeEvolution, HeroSection, ImmersionEngine, IntellectualArc, PortfolioFooter, RhetoricRoom, SideNav, TheCanon)
-- `components/portfolio/GroupDetailClient.tsx` — `'use client'` tabbed view for the single `/group/portfolio` page; 5 tabs (the-canon, math, english, hebrew, soulcraft); owns `selectedYear` + `years` state; `YEAR_FILTER_TABS` gates `<YearSelector>` to only math, english, the-canon; math/english/the-canon receive filtered data; English and Hebrew get `writingSamples` + `handwritingSamples` so their Composition sub-tab can render; `TabErrorBoundary` class resets on tab change
-- `components/portfolio/YearSelector.tsx` — Year-filter pill bar; used in GroupDetailClient and SectionDetailClient only (hub dashboard has no year filter)
-- `components/portfolio/HeroSection.tsx` — Slim identity strip (72px photo with gold border + name + "Grade {n} · Age {age}" line on the left, school logo/initial + italic name on the right at 50% opacity); takes `student?` and `school?` with demo fallbacks; `compact` prop for hub mode; StatsBar export removed in Sprint 5 Session 2
-- `components/portfolio/HubShell.tsx` — `'use client'` hub wrapper; thin shell that renders `<HeroSection compact />` + `<PortfolioHub>`; no selectedYear state (year filtering lives in detail views only)
-- `components/portfolio/PortfolioHub.tsx` — Visual dashboard grid: summary banner (AI progress draft, teacher/admin only) + 2-column 5-card grid (MathCard, EnglishCard, HebrewCard, CanonCard, SoulcraftCard) + bottom link tiles (Teacher journal, Gallery). All cards link to `/portfolio/[studentId]/group/portfolio?tab=[slug]`.
-- `components/portfolio/DashboardCards.tsx` — 5 metric card components consumed by PortfolioHub (MapCard-based Math/English with RIT + percentile + winter-YoY delta + click-toggle `PercentileTooltip`; HebrewCard with AVANT composite + level + Strongest/Needs-work line; CanonCard with book count + current read + pages/rating; SoulcraftCard with virtue badge pills). Shared `CardShell` wraps each tile. Composition no longer has its own card — it's a sub-tab inside English and Hebrew.
-- `components/portfolio/DashboardGrid.module.css` — Grid + card + bottom-link + summary-banner styles for PortfolioHub; collapses to 1 column at ≤600px
-- `components/portfolio/MathSection.tsx` — Math detail view (MAP math scores only); split out of IntellectualArc in Session 2; renders SubjectScoreRows + MapPercentileChart + InlineAssessmentForm + math_scores AI panel; `selectedYear="all"` delegates to `IntellectualArcAllYears` trajectory view
-- `components/portfolio/EnglishSection.tsx` — English detail view (MAP ELA scores + Spelling/Grammar/Composition/Video sub-tabs); renders SubjectScoreRows + MapPercentileChart + english_scores AI panel + `EnglishVideoTab`; Composition sub-tab renders `<CompositionView initialLanguage="english">` pre-filtered to English samples
-- `components/portfolio/HebrewSection.tsx` — Hebrew detail view (AVANT reading/listening/writing/speaking + Spelling/Grammar/Composition/Video sub-tabs); renders AvantChart + InlineAvantForm + immersion AI panel + `HebrewVideoTab`; Composition sub-tab renders `<CompositionView initialLanguage="hebrew">` pre-filtered to Hebrew samples
-- `components/portfolio/CompositionView.tsx` — Writing samples + handwriting list; `LANG_PILLS` filter (all/english/hebrew) only shown when `initialLanguage` prop is omitted. When `initialLanguage` is set (by English/Hebrew parent section), the pills hide and the internal filter is pinned to that language. Required props: writingSamples, handwritingSamples, studentId, role.
-- `components/portfolio/TeacherJournal.tsx` — Aggregation view of all teacher notes for a student; rendered by `/portfolio/[studentId]/journal` route
-- `components/portfolio/SideNav.tsx` — Sidebar nav: single "Portfolio" group (always expanded, no chevron, 5 sub-items) + standalone Teacher journal + Gallery links below; anchor-fallback mode (no `studentId`) shows 6 in-page links for the demo scroll view; `activeGroup` prop highlights when on `/group/portfolio`
-- `components/portfolio/RevealObserver.tsx` — IntersectionObserver wrapper; fires CSS reveal animations when sections enter viewport. Required on real portfolio pages — sections were invisible without it (bug fixed)
-- `components/portfolio/SubjectScoreRows.tsx` — Compact RIT/percentile score table; accepts `ScoreDisplayRow[]` with optional pdfPublicUrl; conditional download-icon column appears when any row has a PDF; used by MathSection and EnglishSection
-- `components/portfolio/InlineAssessmentForm.tsx` — Inline data-entry form for assessment scores; POSTs to assessments API; for MAP types, shows post-save PDF upload step (uploads to `/api/dashboard/students/{id}/assessments/{id}/pdf`); calls `router.refresh()` on close
-- `app/api/dashboard/students/[studentId]/assessments/[assessmentId]/pdf/route.ts` — POST: multipart PDF/image upload to portfolio-assets bucket, updates assessment.pdf_path; GET: returns public URL for the attached PDF; admin/teacher POST, any authenticated role GET
-- `components/portfolio/TheCanon.tsx` — Thin section shell: header → CanonListView → AiNarrativePanel (sectionType `reading_bookshelf`) → InlineReadingForm (teacher/admin only). Demo fallback renders DEMO_READINGS when no live data and no studentId. No tabs, no accordion — the Class Bookshelf tab was removed in the Canon rebuild.
-- `components/portfolio/CanonListView.tsx` — List-view renderer for the student's canon. Stats bar (book count, total pages, avg rating, currently-reading count) + sortable expandable rows. Currently-reading first, then dateFinished desc, then dateStarted desc. Only one row expanded at a time. Accepts `readings: Reading[]`, `studentId?`, `role?` — studentId/role reserved for future inline affordances.
-- `components/portfolio/CanonBookDetail.tsx` — Expanded row panel: Open Library cover (`https://covers.openlibrary.org/b/title/{title}-M.jpg`, navy serif fallback when the image errors) + author/pages/tag pills/difficulty badge + start/finish dates + key quote (gold-rule blockquote) + Teacher note + Why-this-book. Takes `reading` and a pre-computed `tag` prop to avoid an import cycle with CanonListView.
-- `components/portfolio/InlineReadingForm.tsx` — Inline data-entry form inside TheCanon; replaces TeacherDataPanel for reading list; "Add from catalog" opens BookCatalogPicker; calls `router.refresh()` on save
-- `components/portfolio/ReadingForm.tsx` — Enhanced book intake form; used by InlineReadingForm for the add-book modal (POST mode); 3 grouped sections (Book Info / Reading Details / Reflections); PATCH/edit mode still supported via optional `readingId` + `initial` props but not currently wired anywhere after the Canon rebuild
-- ~~`components/portfolio/TeacherDataPanel.tsx`~~ — Deleted (replaced by InlineAssessmentForm + InlineReadingForm)
-- `components/portfolio/StarRating.tsx` — 5-star click-to-rate input; gold filled vs outline; click same star again to clear; used in ReadingForm
-- `components/portfolio/BookCatalogPicker.tsx` — Modal overlay; fetches school book catalog, live search, auto-fills ReadingForm/InlineReadingForm title+author on selection
-- `components/portfolio/BookCatalogManager.tsx` — Book Catalog tab content; add-book form (title, author, gradeLevel) + paginated catalog list; school-scoped, no props needed
-- `components/splash/BookSplash.tsx` — Full-screen 3D CSS book-opening splash animation (navy cover → parchment reveal → fade); sessionStorage-gated (plays once per browser session); 9 unit tests
-- `components/charts/` — AvantChart, MapPercentileChart, MapTrajectoryChart
-- `components/charts/MapPercentileChart.tsx` — NWEA MAP percentile band chart; 5 stacked teal area fills (p5/p25/p50/p75/p95); student dots navy/gold (latest); auto-scales grade range and y-axis; subject='math'|'reading'; requires `LineController` in `Chart.register()` — do not remove
-- `components/charts/MapTrajectoryChart.tsx` — student score trajectory over time; also requires `LineController` in `Chart.register()`
-- `lib/nweaNorms.ts` — NWEA MAP Growth 2025 norm lookup (K–8, Math + Reading, fall/winter/spring); `getPercentileBands(subject, gradeRange)` returns p5–p95 via z-scores
-- `lib/types.ts` — Shared TypeScript types (all domain models; includes `BookCatalogEntry`)
-- `lib/mappers.ts` — Row mappers: Supabase snake_case → camelCase TS
-- `lib/supabase.ts` — Client-side Supabase client (anon key)
-- `lib/supabaseAdmin.ts` — Server-side admin client (service role key — API routes only)
-- `lib/getStudentPortfolio.ts` — Single data-fetch entry point
-- `lib/auth.ts` — Clerk helpers: getSchoolId(), getRole(), getAuthContext(), requireRole()
-- `lib/utils.ts` — Shared utilities: `ordinal(n)` (1→"1st"), `latestAssessment(assessments, type)` (most recent by academicYear)
-- `lib/modalStyles.ts` — Shared modal style constants: `MODAL_OVERLAY`, `MODAL_HEADER`, `modalPanel(maxWidth, maxHeight)`
-- `lib/validation.ts` — Zod schemas for all API route inputs; `gradeLevel` uses `z.enum([...GRADE_LEVELS])` — must match `lib/gradeLevel.ts`; `gender` and `dateOfBirth` use `z.preprocess(v => v === '' ? null : v, ...)` to coerce empty string → null (form sends `''` for unselected optional fields)
-- `lib/gradeLevel.ts` — `GRADE_LEVELS` const array, `GradeLevel` type, `formatGrade()`, `sortGrades()`, `GRADE_SELECT_OPTIONS`; single source of truth for grade enum
-- `lib/constants.ts` — Re-exports `GRADE_SELECT_OPTIONS` from `lib/gradeLevel`; defines `TERM_OPTIONS` ('Fall 2024'–'Spring 2026') and `TermOption` type; **all forms import from here — never hardcode term strings**
-- `proxy.ts` — Clerk middleware (Next.js 16); protects /dashboard, /admin, /portfolio; userId-only check (org not required) so OrgPickerScreen handles no-org case
-- `supabase/migrations/` — 0001 initial schema, 0002 multi-tenancy, 0003 RLS policies, 0004 Sprint 3 tables, 0005 parent_students, 0006 student archived_at, 0007 book_catalog, 0010 grade_level_enum, 0011 student_profile_fields (gender, date_of_birth, enrollment_status), 0012 data_foundation (audit columns, soft delete, academic_years, enrollment_records, class_assignments)
-- `design-reference/` — Target aesthetic HTML files (landing.html, hadar-portfolio.html)
-- `app/dashboard/page.tsx` — Teacher/admin student list; parent redirect (OR filter on parent_clerk_user_id + invited_email); server component
-- `app/dashboard/DashboardUI.tsx` — Presentational sub-components: OrgPickerScreen, ParentPendingScreen, PageHeader, StudentCard, EmptyState. The header "Settings" gear is a `<Link href="/dashboard/settings">` (admin only); Year-in-Review is still a view toggle.
-- `app/dashboard/AddStudentForm.tsx` — Client component modal form; POSTs to /api/dashboard/students; gradeLevel is a `<select>` using `GRADE_SELECT_OPTIONS`
-- `app/dashboard/DashboardClient.tsx` — `'use client'` wrapper; owns `activeView: DashboardView` state (`roster` | `year-in-review`); renders sidebar + StudentGrid/YearInReviewView
-- `app/dashboard/settings/page.tsx` — Server component; admin-only `/dashboard/settings` route; non-admin redirects to `/dashboard`; fetches `schools.id/name/logo_url` and hands them to `SettingsUI`
-- `app/dashboard/settings/SettingsUI.tsx` — `'use client'` UI for school settings; "School Identity" section with logo preview (120px) and Upload Logo button (POST /api/dashboard/settings/logo, 2 MB max, image/* only, optimistic update via local state); "School Name" section is display-only for now
-- `app/dashboard/dashboardTypes.ts` — `DashboardView` union: 'roster' | 'year-in-review' | 'workbench'
-- `app/dashboard/StudentGrid.tsx` — Grade filter pills + search; groups/sorts via `formatGrade`/`sortGrades`
-- `components/dashboard/ByGradeView.tsx` — Collapsible per-grade sections; sorted with `sortGrades()`
-- `components/dashboard/YearInReviewView.tsx` — Placeholder
-- `components/dashboard/NoteSlideOver.tsx` — Right-side slide-over panel for quick notes from the student roster; triggered by pencil button on StudentCard; POSTs to teacher-notes endpoint
-- `components/dashboard/WorkbenchView.tsx` — Teacher Workbench shell with mode tabs (Quick notes, Bulk scores, Photos, Completeness); rendered when DashboardView === 'workbench'
-- `components/dashboard/QuickNotesMode.tsx` — Stream-style note entry: student autocomplete → textarea → category → save; session feed of saved notes below; used by WorkbenchView
-- `components/dashboard/StudentAutocomplete.tsx` — Type-ahead student picker; filters pre-loaded students[], dropdown shows name + grade, keyboard nav + Tab-to-select
-- `components/dashboard/BatchPhotosMode.tsx` — Drag-and-drop batch photo upload; per-photo student tagging via StudentAutocomplete, term/category selectors, sequential upload to existing uploads API
-- `components/dashboard/CompletenessMode.tsx` — School-wide completeness grid; fetches from GET /api/dashboard/completeness; dot-matrix (green/amber/gray) per student per data type; "Add" links switch to Bulk Scores mode or link to portfolio
-- `app/api/dashboard/completeness/route.ts` — GET: school-wide data counts (assessments, readings, notes, writing, photos, awards) aggregated per student; admin/teacher only
-- `app/not-found.tsx` — Styled 404 page using design system tokens
-- `app/admin/page.tsx` — Admin-only school settings overview; Sprint 3 placeholders for Teachers + Theme
-- `app/portfolio/[studentId]/page.tsx` — Dynamic portfolio hub (server component); renders HubShell with visual dashboard grid
-- `app/portfolio/[studentId]/group/[groupSlug]/page.tsx` — Single group detail page (server component); VALID_GROUPS narrowed to `['portfolio']`; fetches portfolio, renders GroupDetailClient with `initialTab` from `?tab=` searchParam
-- `app/portfolio/[studentId]/journal/page.tsx` — Teacher journal route (server component); fetches portfolio, renders `<TeacherJournal>` with all teacher notes
-- `app/portfolio/[studentId]/gallery/page.tsx` — Gallery route (server component); stacks `<PhotoGallery>` + `<ParentUploads>` vertically
-- `app/portfolio/[studentId]/full/page.tsx` — Reports tab (server component); queries published profiles + report cards, renders `ReportsView` with both surfaces and a `PortfolioClient` scrolling-all-sections fallback under "View all sections →"
-- `app/portfolio/[studentId]/full/[profileId]/page.tsx` — Parent-facing read-only published Learning Profile (server component); 404s for non-published or mismatched profiles; gates parents via `enforceParentAccess`; per-section data loaded inline (queries `assessments` / `readings` / `writing_samples` / `character_awards` / `student_videos`) and handed to `<PublishedProfile>` as `SectionPayload[]`
-- `components/portfolio/ReportsView.tsx` — Reports tab UI; "Semester Profiles" block (gold-bordered cards linking to `/full/[profileId]`) above historical report card uploads; takes optional `publishedProfiles?: Profile[]`
-- `components/portfolio/published/PublishedProfile.tsx` — Document wrapper for a published profile; cream 760px container; centered header (eyebrow + Playfair student name + term/grade + published date), 9 sections in canonical order, footer crediting "Dr. Liliana Worth, Head of School · {school.name}"; exports `SectionPayload`
-- `components/portfolio/published/PublishedSectionRenderer.tsx` — Read-only sibling of the editor section components; switch on `sectionKind`, renders header (Playfair title + DM Mono descriptor) + narrative as gold-left-bordered Lora blockquote + data block (tables, not charts, for printability); exports `PublishedSectionData` discriminated union
-- `components/portfolio/published/publishedStyles.ts` — Extracted `CSSProperties` constants for the renderer (SECTION/HEADER/TITLE/DESCRIPTOR/NARRATIVE/TABLE/etc.); kept the renderer under the 400-line cap
-- `scripts/publishAthenaSpringProfile.ts` — One-off backfill: flipped Athena's Spring 2025-2026 profile to `status='published'` with a `published_at` stamp; placeholder for the Phase 5 Dr. Worth review queue
-- `lib/dashboardHelpers.ts` — Pure helper functions for PortfolioHub dashboard cards: `latestMapScore` (winter-YoY delta), `latestAvantComposite` (with strongest/lowest skill), `readingMetrics`. `termOrdinal()` provides chronological Fall→Winter→Spring ordering — never lexicographic-sort term strings. No React, no side effects.
-- `app/sign-in/[[...sign-in]]/page.tsx` — Clerk SignIn centered on cream background
-- `app/sign-up/[[...sign-up]]/page.tsx` — Clerk SignUp centered on cream background
-- `app/api/ai/draft/route.ts` — POST: generate AI narrative draft via Claude Haiku; studentFirstName injected into system prompt; stores in ai_drafts; returns { draftId, text, sectionType }
-- `app/api/ai/drafts/[draftId]/route.ts` — PATCH: accept/reject/edit an AI draft; sets content_final, status, reviewed_by, reviewed_at
-- `app/api/dashboard/students/[studentId]/uploads/route.ts` — POST: multipart upload to portfolio-assets Supabase Storage; inserts into photos, handwriting_samples, or parent_uploads; role-gated (parent ownership check)
-- `app/api/dashboard/settings/logo/route.ts` — POST: admin-only multipart upload of the school logo to `portfolio-assets/{school_id}/logo.{ext}`; image/* only, 2 MB max, rate-limited 5/min per user; cleans up any prior extension in the folder; writes cache-busted public URL to `schools.logo_url`; calls `revalidateSchool(schoolId)` to bust every cached portfolio in that school. Vitest suite at `route.test.ts` covers admin happy path, auth/role rejection, non-image, file-too-large, and storage error.
-- `components/shared/AiDraftEditor.tsx` — Client component: view/edit/resolve AI draft; Accept, Edit & Accept, Reject buttons
-- `components/portfolio/AiNarrativePanel.tsx` — Generate button + inline AiDraftEditor; teacher/admin sees generate flow or resolved draft; parent sees accepted text only; wired into IntellectualArc ×2 (math_scores, english_scores), ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc
-- `components/shared/UploadButton.tsx` — Client component: hidden file input, XHR upload with progress bar, onSuccess/onError callbacks; wired into PhotoGallery, HandwritingSamples, ParentUploads
-- `components/shared/InviteParentButton.tsx` — Client component: modal with email input, POSTs to invite-parent route; shown below HeroSection for admin/teacher only; trigger is text-link style (no border, opacity 0.5, fades to full on hover)
-- `app/api/dashboard/students/route.ts` — GET/POST students; POST INSERT includes `gender`, `date_of_birth`, `enrollment_status`, `updated_at`; Zod schema uses `z.preprocess` for optional nullable fields
-- `app/api/dashboard/students/[studentId]/invite-parent/route.ts` — POST: inserts pending parent_students row, calls Clerk createOrganizationInvitation with role 'org:parent'
-- `supabase/migrations/0005_parent_students.sql` — parent_students table: invited_email, nullable parent_clerk_user_id, status (pending/active), RLS; apply before testing invite flow
-- `supabase/migrations/0012_data_foundation.sql` — audit columns (created_by, updated_by, updated_at) + soft delete (deleted_at) on 6 content tables; academic_years table (canonical year registry per school); enrollment_records table (enrollment history per student); class_assignments table (student ↔ teacher per year)
-- `supabase/migrations/20260416021523_assessment_pdf_path.sql` — adds `pdf_path text` column to assessments (Supabase Storage path for MAP score report PDFs)
-- `.github/workflows/ci.yml` — GitHub Actions CI; triggers on push/PR to main; runs `npm ci` → `npx tsc --noEmit` → `npx vitest run`; `check` job name must match branch protection status check
+- `lib/supabaseAdmin.ts` — service-role client, lazy-init via Proxy. Server-only. Import via `lib/auth.ts`, `lib/getStudentPortfolio.ts`, `lib/sectionData.ts`, or directly inside `app/api/`.
+- `lib/auth.ts` — `getAuthContext()` returns `{ userId, schoolId, role }`. `getRole()` falls back to `school_members` table if Clerk orgRole is absent or `org:member`.
+- `lib/getStudentPortfolio.ts` — single data-fetch entry point for the portfolio tree. All section SELECTs must filter `school_id` and `.is('deleted_at', null)`.
+- `lib/sectionData.ts` — 8 loaders (maps/lexile/avant/canon/etc.) shared by Profile Builder editor routes AND the parent Published view. Signature: `(studentId, schoolId, gradeLevel, academicYear)`. Do not duplicate these loaders elsewhere.
+- `lib/academicYears.ts` — `getCurrentAcademicYear(schoolId)` returns the row with `is_current=true`. Throws if none is marked; catch to `null` only in read-only dashboard contexts. `getOrCreateAcademicYearId()` is used by Profile Builder create flow.
+- `lib/gradeLevel.ts` — single source of truth for `GRADE_LEVELS`, `GradeLevel`, `formatGrade`, `sortGrades`, `GRADE_SELECT_OPTIONS`. All forms import from here.
+- `lib/constants.ts` — re-exports grade options; defines `TERM_OPTIONS` + `TermOption`. All forms import from here — never hardcode term strings.
+- `lib/validation.ts` — Zod schemas for all API route inputs. `gender` + `dateOfBirth` use `z.preprocess(v => v === '' ? null : v, ...)` (form sends `''` for unselected optional fields).
+- `lib/types.ts` — shared domain types. `lib/types/profileBuilder.ts` has the Profile Builder types (Profile, ProfileSection, REQUIRED_SECTION_KINDS, etc.).
+- `proxy.ts` — Clerk middleware (Next 16 — not `middleware.ts`). Protects `/dashboard`, `/admin`, `/portfolio`. userId-only check; no-org users hit `OrgPickerScreen` in dashboard.
+- `supabase/migrations/` — numbered `00NN_*.sql` up to 0014 (some ghost — see Migration Workflow); all later migrations are timestamp-prefixed.
+- `scripts/publishAthenaSpringProfile.ts` — one-off backfill from pre-review-queue days; kept for reference but superseded by the approve route.
 
 ### Orphaned / legacy (file exists but only used by DemoPortfolio.tsx, if at all)
-Kept in-tree to avoid churn and because DemoPortfolio may still import them until Phase 4A lands. **Do not wire these into new pages or the real portfolio tree** — they are superseded:
+Kept in-tree to avoid churn. **Do not wire these into new pages or the real portfolio tree** — they are superseded:
 - `components/portfolio/IntellectualArc.tsx` — superseded by MathSection + EnglishSection
 - `components/portfolio/ImmersionEngine.tsx` — superseded by HebrewSection
 - `components/portfolio/CreativeEvolution.tsx` — superseded by CompositionView
 - `components/portfolio/RhetoricRoom.tsx` — removed from tabs; no replacement
-- `components/portfolio/HandwritingSamples.tsx` — merged into CompositionView (via CompositionHandwriting)
+- `components/portfolio/HandwritingSamples.tsx` — merged into CompositionView
 - `components/portfolio/ScopeAndSequence.tsx` — removed from tabs; pending move to teacher dashboard
-- `components/portfolio/BookDetail.tsx` — old accordion detail panel for a book spine; superseded by CanonBookDetail. Marked DEPRECATED at the top; no remaining imports.
-- `components/portfolio/ClassBookshelf.tsx` — old "Class Bookshelf" tab inside TheCanon; tab was removed in the Canon rebuild. Marked DEPRECATED; no remaining imports outside its own file.
-- `components/portfolio/spinePalette.ts` — color/height arrays for the old spine bookshelf; only ever consumed by BookDetail/ClassBookshelf. Marked DEPRECATED; no remaining imports outside the deprecated files.
+- `components/portfolio/BookDetail.tsx`, `ClassBookshelf.tsx`, `spinePalette.ts` — superseded by CanonListView + CanonBookDetail. Marked DEPRECATED.
 
 ### Does NOT exist yet (do not reference as if it does)
 - `components/theme/ThemeProvider.tsx` — School theme context
 - `lib/getSchoolConfig.ts` — Fetch school settings + theme
-- `middleware.ts` — does not exist; Next.js 16 uses `proxy.ts` instead
+- `middleware.ts` — Next.js 16 uses `proxy.ts` instead
 
 ## Auth (Clerk Organizations)
 - Each school = one Clerk Organization
 - Roles: `admin`, `teacher`, `parent` — scoped to the org, not global
-- `admin` — all student data within their school, school settings, teacher management
-- `teacher` — upload, edit, comment, review/accept AI drafts for assigned students
+- `admin` — all student data within their school, school settings, teacher management, Dr. Worth review queue
+- `teacher` — upload, edit, comment, review/accept AI drafts, draft profiles
 - `parent` — view-only on teacher content, upload-only in Parent Uploads section, sees only own children via `parent_user_ids`
 - `/demo` — cookie-based password gate (`demo_session` cookie), no Clerk required
-- `/dashboard`, `/admin`, `/portfolio` — Clerk protected via `proxy.ts`; unauthenticated → `/sign-in?redirect_url=...`; authenticated with no org → `OrgPickerScreen` (`<OrganizationSwitcher />`) in dashboard
+- `/dashboard`, `/admin`, `/portfolio` — Clerk protected via `proxy.ts`; unauthenticated → `/sign-in?redirect_url=...`; authenticated with no org → `OrgPickerScreen` in dashboard
 - Role fallback: if Clerk orgRole is absent or `org:member`, `getRole()` queries `school_members` table before throwing `AUTH_INVALID_ROLE`
 
 ## Architectural Decisions (locked — do not reverse without discussion)
 - **`on delete restrict` for all `school_id` FKs** — A school record cannot be deleted while student/content rows exist under it. Deletion must be a deliberate multi-step operation. (`school_members` uses cascade — member records are disposable.)
 - **`school_members` allows multiple roles per user** — Unique constraint is `(school_id, clerk_user_id, role)`, not `(school_id, clerk_user_id)`. A user can be both teacher and parent at the same school; they get two rows.
-- **Teachers have broad read access within their school** — RLS policies give teachers SELECT on all students in their school. Narrowing to assigned students is deferred to Sprint 3 when a `student_teachers` join table is added.
+- **Teachers have broad read access within their school** — RLS policies give teachers SELECT on all students in their school. Narrowing to assigned students is deferred until a `student_teachers` join table is added.
 - **`ai_drafts` INSERT is service-role only** — No authenticated INSERT policy exists. Only the AI pipeline (via `supabaseAdmin`) creates draft rows. Teachers update (accept/edit/reject); they never insert.
-- **Signin form styles in `landing-mobile.css`** — The form's mobile overrides are tightly coupled to its base styles; co-locating them in the same file keeps the cascade readable. This is intentional, not a mistake.
-- **Portfolio overview: flat tab list + dashboard hub** — Tabs are The Canon, Math, English, Hebrew, Soulcraft under a single `/group/portfolio` route, plus standalone `/journal` and `/gallery` routes. The hub page is a visual dashboard grid (5 metric cards + 2 bottom links), NOT a list of group cards. Was 3-group hub (Academics, Student Work, Gallery) through Sprint 4; restructured in Sprint 5 Session 2; Composition was moved from a top-level tab to a sub-tab inside English and Hebrew in a follow-up pass. Display labels were renamed in Session 1 (was: Intellectual Arc, Immersion Engine, Scope & Sequence, Creative Evolution, Character Arc); DB `section_type` / `section_category` values were NOT renamed.
-- **Composition lives as a sub-tab inside English and Hebrew** — `CompositionView` is now rendered from `EnglishSection` (with `initialLanguage="english"`) and from `HebrewSection` (with `initialLanguage="hebrew"`). When `initialLanguage` is set, CompositionView hides its language pill bar and the samples list is pre-filtered to that language. There is no longer a standalone Composition tab, a `/section/composition` route, a sidebar entry, or a `CompositionCard` on the hub. If you need to bring the unified cross-language view back, render `<CompositionView>` with `initialLanguage` omitted — the pills will reappear.
-- **The Canon renders as a list, not a bookshelf** — `CanonListView` + `CanonBookDetail` replaced the spine bookshelf + BookDetail accordion + ClassBookshelf tab. The list gives a scannable stats bar (books / pages / avg rating / currently reading) and denser row-per-book metadata that the bookshelf was burying. Do not reintroduce spine rendering into TheCanon. The deprecated `BookDetail.tsx`, `ClassBookshelf.tsx`, and `spinePalette.ts` stay in-tree only until they can be deleted cleanly. Inline edit/delete affordances were dropped in this pass — re-add them on the row, not via a separate detail accordion, if needed.
+- **Signin form styles in `landing-mobile.css`** — The form's mobile overrides are tightly coupled to its base styles; co-locating them in the same file keeps the cascade readable. Intentional.
+- **Portfolio overview: flat tab list + dashboard hub** — Tabs are The Canon, Math, English, Hebrew, Soulcraft under a single `/group/portfolio` route, plus standalone `/journal` and `/gallery` routes. The hub page is a visual dashboard grid (5 metric cards + 2 bottom links), NOT a list of group cards.
+- **Composition lives as a sub-tab inside English and Hebrew** — `CompositionView` is rendered from `EnglishSection` (with `initialLanguage="english"`) and from `HebrewSection` (with `initialLanguage="hebrew"`). When `initialLanguage` is set, CompositionView hides its language pill bar and the samples list is pre-filtered. There is no standalone Composition tab. To bring the unified cross-language view back, render `<CompositionView>` with `initialLanguage` omitted.
+- **The Canon renders as a list, not a bookshelf** — `CanonListView` + `CanonBookDetail` replaced the spine bookshelf + BookDetail accordion + ClassBookshelf tab. Do not reintroduce spine rendering into TheCanon.
 - **Knowledge (Scope & Sequence) removed from portfolio tabs** — `ScopeAndSequence.tsx` is orphaned until it moves to the teacher dashboard as a per-grade view. Do not add a Knowledge tab back to the portfolio.
-- **Hero section: slim identity strip** — Left cluster is the student (72px photo with `2px solid var(--gold)` border + name + "Grade {n} · Age {age}" line + optional InviteParentButton). Right cluster is the school logo (or first-initial fallback) and italic school name at 50% opacity. No metrics here — StatsBar was removed in Session 2.
+- **Hero section: slim identity strip** — Left cluster is the student (72px photo with `2px solid var(--gold)` border + name + "Grade {n} · Age {age}" line + optional InviteParentButton). Right cluster is school logo (or first-initial fallback) + italic school name at 50% opacity. No metrics.
 - **StatsBar removed from hub** — Year filtering happens inside detail views only (GroupDetailClient + SectionDetailClient). The hub dashboard does not filter by year.
 - **Year selector placement** — Standalone `<YearSelector>` rendered by `GroupDetailClient` only for tabs that filter by year (math, english, the-canon). `SectionDetailClient` has its own for the same slugs. Never add a third instance, and never add one to the hub.
 - **Supabase RLS status** — RLS is enabled on all 20 public tables. Policies exist for core tables (0003). Sprint 3+ tables (photos, parent_uploads, handwriting_samples, teacher_notes, scope_and_sequence, book_catalog, student_videos) have RLS enabled but **policies not yet applied to production**. Service role bypasses RLS for all `app/api/` routes. ⚠️ Complete before giving parents direct DB access.
-
-## Build Sprints (update checkboxes each session)
-- [x] Sprint 1: Landing page, demo portfolio, design system, six-section UI — COMPLETE
-- [x] Sprint 1.5: Security, multi-tenancy foundation, code hygiene — COMPLETE
-  - [x] Create `schools` table with theme_json, enabled_sections, clerk_org_id
-  - [x] Add `school_id` to all existing tables (0002 migration)
-  - [x] Create Hadar seed record (fixed UUID `a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d`)
-  - [x] Create `ai_drafts` table
-  - [x] Create `school_members` table
-  - [x] Install Clerk, wrap ClerkProvider in layout.tsx
-  - [x] Create proxy.ts with route protection (Next.js 16 — not middleware.ts)
-  - [x] Write Supabase RLS policies (0003 migration — pending Clerk JWT setup in Supabase dashboard)
-  - [x] Add `/demo` password gate (server component + API route)
-  - [x] Create `lib/supabase.ts`
-  - [x] Create `lib/supabaseAdmin.ts`
-  - [x] Create `lib/getStudentPortfolio.ts` + `lib/mappers.ts`
-  - [x] Create `lib/auth.ts`, `lib/types.ts`, `lib/validation.ts`
-  - [x] Install Zod
-  - [x] Split `page.css` (639 lines) into 4 partials under app/styles/
-  - [x] Unify CSS color variables — single canonical :root in globals.css; landing and portfolio :root blocks removed; --lapis* aliases kept for landing CSS compatibility
-  - [x] Clerk org setup — sign-in/sign-up pages, OrgPickerScreen for no-org users, role fallback via school_members table
-  - [x] Set up Vitest + basic tests — mappers, validation, soft-delete route (53 tests; husky pre-commit hook enforces vitest run)
-  - [x] Set up GitHub Actions CI — `.github/workflows/ci.yml`; tsc + vitest on push/PR; branch protection requires `check` job to pass
-  - [ ] Add Sentry error tracking
-  - [x] Audit package.json for phantom dependencies
-  - [x] Remove Hadar-specific strings from reusable components (SideNav now accepts schoolName/studentName props; falls back to "Hadar" for demo)
-- [x] Sprint 2: Data layer — Supabase + Clerk wired, dynamic `/portfolio/[studentId]`, admin CRUD — COMPLETE
-  - [x] Create `app/portfolio/[studentId]/page.tsx` — server component with Clerk auth, school_id derivation, parent access guard
-  - [x] Wire all six section components to typed `PortfolioData` props with demo fallbacks (HeroSection, IntellectualArc, ImmersionEngine, TheCanon, CreativeEvolution, RhetoricRoom, CharacterArc)
-  - [x] Export typed chart data interfaces (`MapsDataPoint`, `AvantDataPoint`); charts accept data props, fall back to demo
-  - [x] Fix `supabaseAdmin` to lazy-initialize via Proxy (prevents build-time crash when env vars absent)
-  - [x] Admin CRUD routes — `GET/POST /api/dashboard/students`, `GET/PATCH /api/dashboard/students/[studentId]`, `POST /api/dashboard/students/[studentId]/assessments`; `lib/apiHelpers.ts` with shared `authErrorResponse()`
-  - [x] Dynamic `/dashboard` — teacher/admin student list with Add Student form
-  - [x] Dynamic `/admin` — admin-only school settings overview; teacher/parent redirected
-- [x] Sprint 3: Expand to full 12 sections — COMPLETE
-  - [x] ScopeAndSequence, HandwritingSamples, PhotoGallery, TeacherNotes, ParentUploads, BookshelfAnimation components wired with real data
-  - [x] BookshelfAnimation removed from portfolio and demo renders — deleted (duplicate of The Canon)
-  - [x] `supabase/migrations/0004_sprint3_tables.sql` — 5 new tables with RLS (apply to live DB)
-  - [x] Seed updated with demo data for all Sprint 3 tables
-  - [x] SideNav expanded to all 13 sections; Sprint 3 sections in DemoPortfolio
-  - [x] `lib/types.ts` + `lib/mappers.ts` + `getStudentPortfolio.ts` updated for all Sprint 3 tables
-- [ ] Sprint 4: AI layer — OCR, writing/rhetoric critique, test score extraction, edit-and-accept UI
-  - [x] Install `@anthropic-ai/sdk`; add `ANTHROPIC_API_KEY` to env vars
-  - [x] `POST /api/ai/draft` — generate narrative draft via Claude Haiku; store in ai_drafts; sectionTypes: academic_scores, immersion, reading_bookshelf, writing, virtue_badges
-  - [x] `PATCH /api/ai/drafts/[draftId]` — accept/reject/edit a draft
-  - [x] `components/shared/AiDraftEditor.tsx` — three-mode UI (view / edit / resolved)
-  - [x] Wire AiNarrativePanel into 5 sections: IntellectualArc (split — see below), ImmersionEngine, TheCanon, CreativeEvolution, CharacterArc; studentFirstName in all contexts
-  - [x] IntellectualArc split into Mathematics and English Language Arts sub-sections — each has independent score rows (SubjectScoreRows) and AiNarrativePanel keyed to `math_scores` / `english_scores` section types; `academic_scores` type retired from this section
-  - [x] `POST /api/dashboard/students/[studentId]/uploads` — multipart upload to Supabase Storage (portfolio-assets); photos, handwriting, parent uploads
-  - [x] `components/shared/UploadButton.tsx` — XHR upload with progress; wired into PhotoGallery, HandwritingSamples, ParentUploads
-  - [x] Parent invite flow: `0005_parent_students.sql` (pending/active table with email+user_id indexes, RLS), `POST /api/dashboard/students/[studentId]/invite-parent` (Clerk org invite + DB row), `components/shared/InviteParentButton.tsx` (modal with email input, success/error states), `enforceParentAccess()` in portfolio page (email→userId linking on first visit) — COMPLETE
-  - [x] Parent dashboard redirect: `/dashboard` detects `role=parent`, queries `parent_students` with OR(parent_clerk_user_id, invited_email) fallback, links Clerk user ID on first email-match, redirects to `/portfolio/[studentId]`; shows `ParentPendingScreen` if no row found
-  - [x] Fix portfolio sections invisible on real student pages — `RevealObserver.tsx` (IntersectionObserver) was missing from dynamic route; sections now animate in correctly
-  - [x] Inline data entry redesign — `TeacherDataPanel` removed from portfolio/demo renders; replaced with `InlineAssessmentForm` (in IntellectualArc) and `InlineReadingForm` (in TheCanon); both call `router.refresh()` on save for instant UI update without full reload
-  - [x] Portfolio hub restructure — 11 flat tiles replaced with 3 group cards (Academics, Student Work, Gallery); tabbed sub-pages via `/portfolio/[studentId]/group/[groupSlug]`; SideNav rewritten with expandable groups + `?tab=` deep-link
-  - [x] Hero refinements — school name badge (absolutely positioned top-right); InviteParentButton text-link style (opacity 0.5); StatsBar border-top + box-shadow; photo 96px; year pills merged into StatsBar (right-aligned, no standalone YearSelector on hub)
-  - [x] Group page year selector — GroupDetailClient owns selectedYear state; YearSelector shown only for math/the-canon/composition tabs; IntellectualArc gets selectedYear prop; TheCanon/CreativeEvolution get pre-filtered arrays
-  - [ ] OCR pipeline for handwriting samples
-  - [ ] Writing/rhetoric critique generation
-  - [ ] Test score extraction
-- [x] Sprint 5 Session 2: Nav restructure + dashboard grid hub — COMPLETE
-  - [x] Phase 1: language columns on writing_samples + student_videos, video_storage_path fix
-  - [x] Phase 2: MathSection, EnglishSection, HebrewSection, CompositionView, TeacherJournal
-  - [x] Phase 3A: Flatten navigation — single Portfolio group, /journal + /gallery routes
-  - [x] Phase 3B: Dashboard grid hub — 6 metric cards, slim hero, remove StatsBar
-  - [x] Phase 4A: Demo page updated to new components
-  - [ ] Phase 4B: Knowledge moved to teacher dashboard (deferred)
-- [x] Sprint 5 Session 3: Inline teacher comments
-  - [x] Migration: fix ghost columns (section_category, term, highlight_quote, visible_to_parents) + add section_anchor
-  - [x] InlineSectionComment component with note display + compact form
-  - [x] Wired into all 6 sections + 2 video tabs with section_anchor deep-links
-  - [x] TeacherJournal "View in context" links navigate to exact section via tab slug + anchor fragment
-  - [x] teacherNotes threaded through GroupDetailClient and SectionDetailClient to all section components
-- [ ] Sprint 5 (V2): School-wide analysis, State of the Union, multi-school theming
-
-## Bugs Fixed (April 11, 2026)
-- **Chart.js "line is not a registered controller"** — `MapPercentileChart` and `MapTrajectoryChart` were missing `LineController` in `Chart.register()`. Fixed in both. Do not remove `LineController` from registration.
-- **Add Student failing silently** — Zod schema rejected empty-string `gender`/`dateOfBirth` from the form; INSERT was missing `gender`, `date_of_birth`, `enrollment_status`, `updated_at`. Fixed in `lib/validation.ts` (z.preprocess) and `app/api/dashboard/students/route.ts`.
-- **IntellectualArc crash** — `SectionDetailClient` lacked an error boundary. Added `SectionErrorBoundary` class component with `componentDidUpdate` reset on tab/key change; added try-catch logging on the section page.
-
-## Tayler's Pending Feedback Items
-Items raised by Tayler after reviewing the live portfolio. Not yet scheduled to a sprint — address before the next stakeholder review.
-
-- [x] **Book database** — `supabase/migrations/0007_book_catalog.sql`; `GET/POST /api/dashboard/schools/book-catalog`; `BookCatalogPicker` modal in ReadingForm auto-fills title+author; `BookCatalogManager` tab in TeacherDataPanel for adding/viewing catalog entries
-- [x] **Dynamic MAP percentile curves from NWEA 2025 norms** — `lib/nweaNorms.ts` (K–8 fall means + SDs, winter/spring offsets, z-score bands); `MapPercentileChart.tsx` (5 stacked teal area fills, student dots in navy/gold); replaces per-subject MapsChart in IntellectualArc; grade derived from student gradeLevel + academicYear offset
-- [x] **Book-opening splash animation** — `components/splash/BookSplash.tsx` + `BookSplash.css`; full-screen 3D CSS animation (navy illuminated-manuscript cover → rotateY open → parchment fill → fade); `app/LandingShell.tsx` checks `sessionStorage.splash_played` — plays once per session, skipped on repeat visits; 9 unit tests
-- [x] **Bookshelf nav link** — Removed: `SideNav.tsx` contains no `#bookshelf` entry. `BookshelfAnimation.tsx` deleted.
-- [ ] **Replace Lexile metric** — ⏳ BLOCKED: pending Karissa's input on preferred reading-level framework (Fountas & Pinnell, DRA, or narrative description). Lexile bar chart remains in place until decision.
-- [ ] **Scope and sequence from Lobel team** — ⏳ BLOCKED: Lobel team has not yet supplied curriculum scope and sequence content. ScopeAndSequence section shows placeholder/seed data. Build import or admin UI once format is confirmed.
-- [ ] **Load real Athena data** — Demo student currently uses hardcoded seed data; once DB is live, seed Athena's real assessment scores, readings, and samples so the demo portfolio reflects genuine student work
 
 ## Environment Variables
 ```
@@ -340,15 +152,14 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 All migrations go through the CLI — never apply SQL manually through the Supabase dashboard. Tracking is automatic.
 
 ```bash
-npm run db:new <name>   # Create next numbered migration file in supabase/migrations/
+npm run db:new <name>   # Create next timestamped migration file in supabase/migrations/
 npm run db:push         # Apply pending migrations to production
 npm run db:status       # List all migrations and their applied status
 npm run db:reset        # Reset local DB and replay all migrations (local only)
 ```
 
-- All 14 existing migrations (0001–0014) are tracked and marked as applied.
-- ⚠️ **0001–0014 may be ghost migrations** — they were retroactively marked applied without necessarily having run their DDL. If a column/constraint/index declared in one of those files is missing in production (e.g. `0014_video_storage_path.sql` claimed to add `student_videos.video_storage_path` but it wasn't actually there), create a new timestamped migration with idempotent DDL (`add column if not exists`, `drop constraint if exists` + `add constraint`, etc.) and push it. **Never edit the historical `00NN_*.sql` files in place** — the migration ledger is immutable once recorded.
-- **0012 fix (commit cdfb9ed, 2026-04-19):** Migration 0012 contained invalid SQL (COALESCE inside a UNIQUE table constraint). Production had been reconciled manually via a UNIQUE INDEX, but the file was never back-ported. Fixed in place to match production reality. This is an exception to the "never edit historical migrations" rule — the file had literally never been valid SQL, so there was no history to preserve. Local `supabase db reset` now replays all 24 migrations cleanly.
+- All numbered migrations (0001–0014) are tracked and marked as applied.
+- ⚠️ **0001–0014 may be ghost migrations** — they were retroactively marked applied without necessarily having run their DDL. If a column/constraint/index declared in one of those files is missing in production, create a new timestamped migration with idempotent DDL (`add column if not exists`, `drop constraint if exists` + `add constraint`, etc.) and push it. **Never edit the historical `00NN_*.sql` files in place** — the migration ledger is immutable once recorded. (See ARCHIVE.md for the one documented exception — 0012.)
 - **Docker Desktop is NOT required** for `db:new` or `db:push` — only for `db:pull` and `db:reset` (local dev features we don't use).
 - Migration files live in `supabase/migrations/` and are committed to git like any other code.
 
@@ -374,38 +185,31 @@ grep -r "school_id" --include="*.ts" --include="*.tsx" | grep -v node_modules | 
 
 ## Testing infrastructure
 
-As of commit 37a37a4, the repo has three test layers:
-
 **Unit (default Vitest suite)**
 - Run: `npm test`
-- Config: vitest.config.ts (excludes tests/integration/** and tests/e2e/**)
-- Pattern: mocks @/lib/supabaseAdmin + @/lib/auth, no DB
+- Config: `vitest.config.ts` (excludes tests/integration/** and tests/e2e/**)
+- Pattern: mocks `@/lib/supabaseAdmin` + `@/lib/auth`, no DB
 - Currently 132 tests across 13 files
 - Fast, offline, no dependencies
 
 **Integration (Vitest against local Supabase)**
 - Run: `npm run test:integration`
-- Config: vitest.integration.config.ts
+- Config: `vitest.integration.config.ts`
 - Requires: `supabase start` running (Docker Desktop + local stack)
-- Produces real DB writes against http://127.0.0.1:54321
-- Production guard in vitest.integration.setup.ts throws if URL isn't localhost
-- Harness: tests/integration/helpers/testHarness.ts
-  - adminClient() — service-role Supabase client
-  - seedSchool() — creates a throwaway tenant
-  - deleteSchool() — cleanup
-- Tests live in tests/integration/**/*.test.ts
-- Currently 1 file, 2 tests (smoke)
+- Produces real DB writes against `http://127.0.0.1:54321`
+- Production guard in `vitest.integration.setup.ts` throws if URL isn't localhost
+- Harness: `tests/integration/helpers/testHarness.ts` — `adminClient()`, `seedSchool()`, `seedStudent()`, `deleteSchool()`, `makeAuthContext()`
+- Currently 3 files, 6 tests (smoke, profileFlow, reviewFlow)
 
 **E2E (Playwright + Chromium)**
 - Run: `npm run test:e2e`
-- Config: playwright.config.ts (Chromium only, auto-boots `next dev -p 3100`)
-- Tests live in tests/e2e/**/*.spec.ts
+- Config: `playwright.config.ts` (Chromium only, auto-boots `next dev -p 3100`)
 - Currently 1 test (landing-page smoke)
 - Known issues:
-  - Dev server Playwright spawns reads .env.local not .env.test (visible in [WebServer] output). Needs fixing before first real feature E2E test that relies on test-mode Clerk keys.
-  - Local Chromium hits ERR_NAME_NOT_RESOLVED on 127.0.0.1/localhost from inside Playwright's worker on this machine. Runs fine on CI (Ubuntu). Investigate when a real need for local E2E arises.
+  - Dev server reads `.env.local` not `.env.test` — fix before first real feature E2E test that relies on test-mode Clerk keys.
+  - Local Chromium hits `ERR_NAME_NOT_RESOLVED` on 127.0.0.1 from inside Playwright's worker on this machine. Runs fine on CI (Ubuntu).
 
-**CI (.github/workflows/ci.yml)**
+**CI (`.github/workflows/ci.yml`)**
 - `check` job (tsc + vitest run) — blocking, required check
 - `integration` job — continue-on-error: true, spins up supabase locally
 - `e2e` job — continue-on-error: true, installs Playwright + Chromium
@@ -417,100 +221,55 @@ As of commit 37a37a4, the repo has three test layers:
 - Before external demos: the full trifecta (unit + integration + e2e) should be green
 - If you find yourself mocking the DB in a new test, ask whether it should be an integration test instead
 
-## Sprint 5 Session 2 — Completed (April 15, 2026)
-
-Session 1 renamed labels; Session 2 restructured the tree. Navigation is now a flat 5-tab list under a single `/group/portfolio` route, the hub page is a visual dashboard grid, and Math/English/Hebrew have their own dedicated section components. Composition was originally a 6th top-level tab, but was moved into English and Hebrew as a sub-tab in a follow-up pass — see the "Composition lives as a sub-tab" decision above.
-
-⚠️ THREE SECTION-NAME TAXONOMIES — do not confuse:
-1. Route slugs (UI): the-canon, math, english, hebrew, soulcraft — current
-2. ai_drafts.section_type (DB): math_scores, english_scores, immersion, writing, virtue_badges, reading_bookshelf — UNCHANGED
-3. schools.enabled_sections (dormant): academic_scores, reading, writing, etc. — UNCHANGED
+## ⚠️ Three section-name taxonomies — do not confuse
+1. **Route slugs (UI)**: `the-canon`, `math`, `english`, `hebrew`, `soulcraft` — current
+2. **`ai_drafts.section_type` (DB)**: `math_scores`, `english_scores`, `immersion`, `writing`, `virtue_badges`, `reading_bookshelf` — UNCHANGED
+3. **`schools.enabled_sections` (dormant)**: `academic_scores`, `reading`, `writing`, etc. — UNCHANGED
 
 Tab order: The Canon · Math · English · Hebrew · Soulcraft. Each of English and Hebrew has Spelling · Grammar · Composition · Video sub-tabs. Teacher journal and Gallery live at `/journal` and `/gallery` — not inside the tab list.
 
-## Session · Apr 16 2026 · Major scope pivot to Profile Builder
+## Product thesis
+Quire's hero feature is the **Learning Profile Builder** — a system that replaces the 1.5-hour manual per-student, per-semester profile assembly (currently Google Slides) with a ~10–20 minute assisted assembly. Data Quire already holds (MAP, AVANT, Lexile, reading list, writing samples, photos, captured notes) flows into a structured document; AI drafts narrative prose; teachers edit and approve; Dr. Worth (Head of School) reviews and publishes; parents receive a permanent record.
 
-### What shipped this session
-- StreamComposer Phase 1 scaffold (committed earlier in session). Five files under 300 lines each, typecheck clean:
-  - components/dashboard/StreamComposer.tsx (294 lines)
-  - components/dashboard/ComposerOptionsRow.tsx (226 lines)
-  - components/dashboard/ComposerNoteBody.tsx (60 lines)
-  - components/dashboard/ComposerScoreBody.tsx (112 lines)
-  - components/dashboard/ComposerPhotoBody.tsx (98 lines)
-  - lib/types.ts: new FeedEntry discriminated union added (note/score/photo variants)
-- Dev-only test route at /dashboard/stream-test renders the scaffold in isolation
-- Component is NOT wired into WorkbenchView — intentionally parked
-
-Two additional commits beyond the StreamComposer scaffold:
-
-1. **55138da — Ghost migration repair**
-   - Found students table was never actually in migration 0012's ALTER list
-   - Added missing deleted_at, created_by, updated_by columns + partial index
-   - Preserved diagnostic scripts in scripts/ for future ghost audits
-
-2. **56df410 — Profile Builder Phase 1 (schema + creation flow)**
-   - Three new Supabase tables: profiles, profile_sections, profile_section_attachments
-   - TypeScript types in lib/types/profileBuilder.ts
-   - POST /api/dashboard/profiles endpoint
-   - Server page at /dashboard/profiles/[studentId]/[season]
-   - Client components: ProfileOverview + EmptyState + Filled + styles
-   - Helper: lib/academicYears.ts::getOrCreateAcademicYearId (with sensible Aug 1 – Jun 30 defaults)
-   - End-to-end verified: Athena's Spring 2025-2026 profile created, 9 sections seeded
-
-### Major scope reframe
-Mid-session pivot after Tayler shared Athena's actual Hadar Student Learning Profile PDF. Reading that document made clear that Quire's hero feature is not a portfolio dashboard or data-capture workbench. It is a Learning Profile Builder — a system that replaces the 1.5-hour manual assembly of a per-student, per-semester document (currently done in Google Slides) with a ~10-20 minute assisted assembly. Data Quire already holds (MAP, AVANT, Lexile, reading list, writing samples, photos, captured notes) flows into a structured document; AI drafts narrative prose; teachers edit and approve; Dr. Worth (Head of School) reviews and publishes; parents receive a permanent record.
-
-### Cadence and roles (confirmed with Aaron)
+### Cadence and roles
 - Two semesters per year: Fall and Spring
 - ~8 students per grade in current Hadar setup
-- Two-role workflow: **Teacher** (drafts profile, fills sections, reviews AI drafts) → **Dr. Liliana Worth, Head of School** (reviews, approves, publishes)
-- Tayler Lonsdale is the customer and school founder, NOT in the per-student workflow — she's the decision-maker for what Quire becomes
-- Parents receive the published document (web view + downloadable PDF). Previous semesters stay accessible and downloadable forever.
+- Two-role workflow: **Teacher** (drafts, fills sections, reviews AI drafts) → **Dr. Liliana Worth, Head of School** (reviews, approves, publishes)
+- Tayler Lonsdale is the customer and school founder, NOT in the per-student workflow
+- Parents receive the published document (web view + downloadable PDF). Previous semesters stay accessible forever.
 
-### Product architecture (5 things, clear jobs)
-1. **Roster + Profile Queue** — teacher's landing page, shows class and each student's current-semester profile status
-2. **Profile Builder** (hero) — main workspace for assembling a semester's profile per student. Sections: MAPS Math & English, Lexile, AVANT Hebrew, Hebrew national comparison, Canon reading list, English composition, Hebrew composition, Character Development (Middot), Rhetoric (Poetry Recitation), plus optional highlight sections (art, field trips, etc.)
-3. **Captured data feed** — each student has a chronological stream of notes/photos/videos logged over the term; feeds into Profile Builder sections automatically
-4. **Quick Capture** (support) — globally available slide-over panel for logging ad hoc notes, photos, videos. The StreamComposer scaffold becomes this feature; not a top-level page.
-5. **Parent View** — published profile, beautiful and archivable. Web display + PDF export. All past semesters browseable.
+### Product architecture (5 things)
+1. **Roster + Profile Queue** — teacher's landing page; class + each student's current-semester profile status
+2. **Profile Builder** (hero) — workspace for assembling a semester's profile per student. 9 required sections: MAPS Math & English, Lexile, AVANT Hebrew, Hebrew national comparison, Canon reading list, English composition, Hebrew composition, Character Development (Middot), Rhetoric (Poetry Recitation). Plus optional highlight sections (art, field trips).
+3. **Captured data feed** — chronological stream of notes/photos/videos per student; feeds Profile Builder sections
+4. **Quick Capture** (support) — globally available slide-over panel for ad-hoc logging. StreamComposer scaffold becomes this feature; not a top-level page. Will be reachable via floating button + Cmd+Shift+N.
+5. **Parent View** — published profile, web display + PDF export. All past semesters browseable.
 
-### Section structure (required vs optional)
-- ~12 required sections per profile (auto-data + character + work samples + rhetoric)
-- ~2+ optional sections per profile (added when relevant: art, field trips, field-specific highlights)
-- Completion is measured against REQUIRED sections only. Optional sections are additive, not part of the completion tally.
-- Status vocabulary: Complete / Awaiting your narrative / In progress / Not started
+### Section completion
+- Completion is measured against **required** sections only. Optional sections are additive, not part of the completion tally.
+- Section status vocabulary: Complete / Awaiting your narrative / In progress / Not started
+- Profile status state machine: `draft` → `in_review` → `published`, or `in_review` → `draft` (with `review_feedback`)
 
 ### AI / Claude naming in product
 Per Tayler's feedback, Claude should NOT be named in product UI copy. Use "Quire" or passive language ("A draft is ready for you to review"). Claude can be credited in marketing/footer/about contexts per Anthropic's terms, but the teacher-facing workflow should read as Quire's product, not a thin wrapper on Claude.
 
-### Mockup artifact
-Standalone HTML mockup built at `/Users/aaronandmijntjewebman/Downloads/quire-profile-builder-mockup.html` (eight states, real Quire tokens, fonts via Google Fonts). Shared with Tayler for reaction. Mockup should be considered the spec-in-progress for the next several weeks of build work.
+## Profile Builder phase plan
+- ✅ **Phase 1–3**: Profile Builder structure + 9 sections (schema, creation flow, per-section editors, section data sources)
+- ✅ **Phase 4**: Dr. Worth review queue — shipped 2026-04-19 in Session A. `draft → in_review → published | draft-with-feedback` state machine. Admin-only `/dashboard/review-queue` list + preview. Section PATCH returns 403 LOCKED while profile is in_review. Three POST endpoints: `/submit`, `/approve`, `/request-changes`.
+- ⏳ **Phase 5**: real Claude API drafting behind Generate Draft buttons
+- ⏳ **Phase 6**: published-view polish (charts in published view instead of tables, poetry iframe, PDF export)
+- ⏳ **Phase 7**: Quick Capture (StreamComposer reactivation)
 
-### StreamComposer scaffold reframe
-Originally built as replacement for WorkbenchView's 4-tab UI. Now understood to be Quick Capture (Tool B in the architecture). Reuse, do not discard. Future work will move from /dashboard/stream-test to a global slide-over reachable from any page via floating button + keyboard shortcut (Cmd+Shift+N).
+## Session A state (April 19, 2026)
+- **Pedagogical schools sidebar**: per-tenant JSONB config on `schools.pedagogical_schools`, scales to K–12. Sidebar hides when ≤1 school configured (Hadar's case). See `components/dashboard/PedagogicalSidebar.tsx`.
+- **Dr. Worth Review Queue**: state machine on `profiles.status` — `draft → in_review → published` OR `draft + review_feedback` (returned). Admin-only `/dashboard/review-queue`. Section PATCH returns 403 LOCKED while profile is in_review. Three POST endpoints: `/submit`, `/approve`, `/request-changes`.
+- **Hygiene**: `getCurrentAcademicYear(schoolId)` helper replaces hardcoded `CURRENT_ACADEMIC_YEAR_LABEL`. Section data fetchers consolidated in `lib/sectionData.ts` (8 loaders), consumed identically by editor routes and parent published view.
 
-### Phase plan (Phase 1 complete)
-- ✅ Phase 1: schema + creation flow (shipped tonight — 56df410)
-- Phase 2: per-section editor (next)
-- Phase 3: AI narrative drafting via Claude API with school voice guide
-- Phase 4: Dr. Worth review queue + approval/publish flow (not yet shipped — Athena's Spring profile was published manually via `scripts/publishAthenaSpringProfile.ts` as a stand-in)
-- Phase 5: parent view + PDF export
-  - ✅ Read-only published document (PublishedProfile + PublishedSectionRenderer) and parent route at `/portfolio/[studentId]/full/[profileId]` shipped 2026-04-18; Reports tab links to it
-  - ⏳ PDF export still pending
-  - ⏳ Optional: render charts in published view instead of tables (chose tables for printability)
-- Phase 6: Quick Capture integration (reframes StreamComposer scaffold)
-
-### Pending / blocked
-- Tayler's reaction to final mockup (she has been iterating actively — thesis validated, now in UX polish feedback mode)
-
-### Pending tech debt (grown tonight)
-- hadar-living-portfolio → quire-platform rename (increasingly urgent)
-- CURRENT_ACADEMIC_YEAR_LABEL hardcoded to '2025-2026' in app/dashboard/profiles/[studentId]/[season]/page.tsx — derive from academic_years.is_current
-- lib/types.ts refactor into directory (re-export stopgap working fine for now)
-- Ghost migration audit should run more broadly — tonight we only verified 0012's 6 content tables; earlier 0001-0011 could have similar issues
-
-### Deferred / backburnered
-- Finishing Phases 2-4 of StreamComposer (wiring into WorkbenchView). Revisit only if Profile Builder direction falters or Quick Capture gets prioritized independently.
-- Auto-categorization of teacher notes via Haiku. Low priority.
-- hadar-living-portfolio → quire-platform rename. Still pending. Good moment to do it is when we start Profile Builder build, since we'll be rewriting significant portions of the routing anyway.
-
+## Blocked / pending items
+- **Replace Lexile metric** — ⏳ BLOCKED: pending Karissa's input on preferred reading-level framework (Fountas & Pinnell, DRA, or narrative description). Lexile bar chart remains in place until decision.
+- **Scope and sequence from Lobel team** — ⏳ BLOCKED: Lobel team has not supplied curriculum scope and sequence content. `ScopeAndSequence.tsx` is orphaned with placeholder/seed data. Build import or admin UI once format is confirmed.
+- **Load real Athena data** — Demo student currently uses hardcoded seed data; seed Athena's real assessment scores, readings, and samples so the demo portfolio reflects genuine student work.
+- **Sentry error tracking** — not yet installed.
+- **Tech debt**: `hadar-living-portfolio → quire-platform` rename (good moment: during a routing-heavy phase). `lib/types.ts` refactor into directory (re-export stopgap working fine for now). Broader ghost-migration audit for 0001–0011 columns.
+- **Deferred**: StreamComposer wiring into WorkbenchView (revisit only if Profile Builder falters or Quick Capture gets prioritized independently). Auto-categorization of teacher notes via Haiku.
+- **Tayler**: reaction to the final mockup (iterating actively — thesis validated, in UX polish feedback mode).
