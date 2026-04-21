@@ -8,6 +8,8 @@
 // internally newest-first (academic year desc, then term).
 // ============================================================
 
+import { percentileColor } from '@/lib/percentileColor'
+
 export interface ScoreDisplayRow {
   id?: string
   term: string
@@ -86,7 +88,7 @@ export default function SubjectScoreRows({ rows }: { rows: ScoreDisplayRow[] }) 
             <span style={{ ...monoSm, color: 'var(--navy)', fontWeight: 500 }}>
               {ritDisplay ?? '—'}
             </span>
-            <span style={{ ...monoSm, color: 'var(--ink-mid)' }}>
+            <span style={{ ...monoSm, color: percentileColor(r.percentile), fontWeight: 600 }}>
               {r.percentile != null ? `${r.percentile}th` : '—'}
             </span>
             {showPdf && (

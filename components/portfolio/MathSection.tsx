@@ -225,7 +225,7 @@ export default function MathSection({
             </div>
           </div>
         )}
-        <div style={{ position: 'relative', height: 260, marginBottom: '1.25rem' }}>
+        <div style={{ position: 'relative', height: 340, marginBottom: '1.25rem' }}>
           <MapPercentileChart subject="math" studentScores={mathScores} />
         </div>
         <SubjectScoreRows rows={mathRows} />

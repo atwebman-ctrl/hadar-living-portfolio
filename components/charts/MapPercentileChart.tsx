@@ -120,8 +120,14 @@ export default function MapPercentileChart({
       v === null ? 0 : i === lastIdx ? 7 : 5,
     )
 
-    const yMin = Math.max(100, Math.floor((Math.min(...p('p5'))  - 10) / 10) * 10)
-    const yMax = Math.ceil( (Math.max(...p('p95')) + 10) / 10) * 10
+    // Extend the upper bound well past p95 so scores in the 95th+ band have
+    // vertical room to separate. Also expand the lower padding. yMax must
+    // cover any student RIT that lands above p95 as well.
+    const studentMax = studentScores.reduce((m, s) => Math.max(m, s.ritScore), 0)
+    const p95Max     = Math.max(...p('p95'))
+    const topTarget  = Math.max(p95Max, studentMax) + 35
+    const yMin = Math.max(100, Math.floor((Math.min(...p('p5'))  - 15) / 10) * 10)
+    const yMax = Math.ceil( topTarget / 10) * 10
 
     const mkBand = (data: number[], fill: string, bg: string) => ({
       data, fill, backgroundColor: bg, borderColor: 'transparent',

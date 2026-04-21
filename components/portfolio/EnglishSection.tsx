@@ -174,7 +174,7 @@ export default function EnglishSection({
       {/* ── Standardized Tests (always visible) ──────────────── */}
       <div className={`${s.chartWrap} reveal`}>
         <SubjectHeading title="English Language Arts" tag="MAP Assessment" />
-        <div style={{ position: 'relative', height: 260, marginBottom: '1.25rem' }}>
+        <div style={{ position: 'relative', height: 340, marginBottom: '1.25rem' }}>
           <MapPercentileChart subject="reading" studentScores={readingScores} />
         </div>
         <SubjectScoreRows rows={englishRows} />

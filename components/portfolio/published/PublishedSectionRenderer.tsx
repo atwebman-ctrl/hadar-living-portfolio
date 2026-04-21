@@ -15,6 +15,7 @@ import {
   type HebrewSkillAverages, type HebrewSkill,
 } from '@/lib/hebrewComparisonNorms'
 import type { CompositionSample } from '@/components/profiles/sections/CompositionSection'
+import { percentileColor } from '@/lib/percentileColor'
 import * as S from './publishedStyles'
 
 export type PublishedSectionData =
@@ -139,9 +140,9 @@ function MapsBlock({ assessments }: { assessments: MAPSAssessment[] }) {
           <tr key={a.id}>
             <td style={S.TD}>{a.term}</td>
             <td style={S.TD}>{a.mathRIT ?? '—'}</td>
-            <td style={S.TD}>{ordinal(a.mathPercentile)}</td>
+            <td style={{ ...S.TD, color: percentileColor(a.mathPercentile), fontWeight: 600 }}>{ordinal(a.mathPercentile)}</td>
             <td style={S.TD}>{a.engRIT ?? '—'}</td>
-            <td style={S.TD}>{ordinal(a.engPercentile)}</td>
+            <td style={{ ...S.TD, color: percentileColor(a.engPercentile), fontWeight: 600 }}>{ordinal(a.engPercentile)}</td>
           </tr>
         ))}
       </tbody>

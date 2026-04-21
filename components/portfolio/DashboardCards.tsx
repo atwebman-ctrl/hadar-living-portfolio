@@ -17,6 +17,7 @@ import {
   type AvantSkill,
 } from '@/lib/dashboardHelpers'
 import PercentileTooltip from '@/components/shared/PercentileTooltip'
+import { percentileColor } from '@/lib/percentileColor'
 import grid from './DashboardGrid.module.css'
 
 const SKILL_LABEL: Record<AvantSkill, string> = {
@@ -81,7 +82,7 @@ function MapCard({ label, tab, assessments, studentId, type }: {
           </div>
           <div style={{ fontSize: 12, color: 'var(--ink-mid)', marginTop: 4 }}>
             {m.percentile != null && (
-              <span style={{ color: 'var(--teal)' }}>
+              <span style={{ color: percentileColor(m.percentile), fontWeight: 600 }}>
                 {m.percentile}th percentile
                 <PercentileTooltip percentile={m.percentile} />
               </span>
