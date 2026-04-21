@@ -3,6 +3,7 @@ import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import AiDraftEditor from '@/components/shared/AiDraftEditor'
 import SubjectScoreRows, { type ScoreDisplayRow } from '@/components/portfolio/SubjectScoreRows'
 import MapPercentileChart, { type StudentScorePoint } from '@/components/charts/MapPercentileChart'
+import { termToSeason } from '@/lib/mapsHelpers'
 import InlineAssessmentForm from '@/components/portfolio/InlineAssessmentForm'
 import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import IntellectualArcAllYears from '@/components/portfolio/IntellectualArcAllYears'
@@ -90,10 +91,8 @@ function toStudentScorePoints(
     if (isNaN(aStart)) return []
     const grade = currentGradeNum - (curStart - aStart)
     if (grade < 0 || grade > 8) return []
-    const t = (a.term ?? '').toLowerCase()
-    const season = t.includes('fall') ? 'fall' : t.includes('winter') ? 'winter' : t.includes('spring') ? 'spring' : null
-    if (!season) return []
-    return [{ grade, season, ritScore: a.ritScore }]
+    if (!a.term) return []
+    return [{ grade, season: termToSeason(a.term), ritScore: a.ritScore }]
   })
 }
 
