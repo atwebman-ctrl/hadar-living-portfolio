@@ -74,7 +74,7 @@ export default async function SectionEditorPage({ params }: Props) {
   if (!studentRow) notFound()
   const student = mapStudent(studentRow as Record<string, unknown>)
 
-  const { id: academicYearId } = await getCurrentAcademicYear(schoolId)
+  const { id: academicYearId, label: academicYearLabel } = await getCurrentAcademicYear(schoolId)
 
   const { data: profileRow } = await supabaseAdmin
     .from('profiles')
@@ -166,7 +166,7 @@ export default async function SectionEditorPage({ params }: Props) {
   // ── English / Hebrew composition ─────────────────────────────
   if (sectionKind === 'english_composition' || sectionKind === 'hebrew_composition') {
     const language = sectionKind === 'english_composition' ? 'english' : 'hebrew'
-    const samples = await loadCompositionSamples(studentId, schoolId, language)
+    const samples = await loadCompositionSamples(studentId, schoolId, language, academicYearLabel)
     const Wrapper = sectionKind === 'english_composition'
       ? EnglishCompositionSectionWrapper
       : HebrewCompositionSectionWrapper

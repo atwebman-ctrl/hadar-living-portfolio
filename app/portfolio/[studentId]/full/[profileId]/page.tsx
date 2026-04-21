@@ -14,6 +14,7 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { enforceParentAccess } from '@/lib/portfolioAuth'
 import { mapStudent } from '@/lib/mappers'
 import { mapProfile, mapProfileSection } from '@/lib/mappers/profileBuilder'
+import { getAcademicYearLabelById } from '@/lib/academicYears'
 import {
   loadLexileBand,
   loadMapsScores,
@@ -73,6 +74,11 @@ export default async function PublishedProfilePage({ params }: Props) {
   const sections = (sectionRows ?? [])
     .map((r) => mapProfileSection(r as Parameters<typeof mapProfileSection>[0]))
 
+  // Resolve the profile's academic year label (e.g. "2025-2026") so
+  // time-scoped loaders can filter to this profile's year rather than
+  // the student's current year (which differs for historical profiles).
+  const profileAcademicYear = await getAcademicYearLabelById(profile.academicYearId, schoolId)
+
   // ── Per-section data fetching ─────────────────────────────────
   const payloads: SectionPayload[] = await Promise.all(sections.map(async (section) => {
     const data = await loadSectionData(section.sectionKind, {
@@ -80,6 +86,7 @@ export default async function PublishedProfilePage({ params }: Props) {
       schoolId,
       gradeLevel:   student.gradeLevel,
       academicYear: student.academicYear,
+      profileYear:  profileAcademicYear,
       firstName:    student.firstName,
     })
     return { section, data }
@@ -110,6 +117,7 @@ type LoadCtx = {
   schoolId:     string
   gradeLevel:   string
   academicYear: string
+  profileYear:  string | null
   firstName:    string
 }
 
@@ -147,7 +155,7 @@ async function loadSectionData(
 
   if (kind === 'english_composition' || kind === 'hebrew_composition') {
     const language = kind === 'english_composition' ? 'english' : 'hebrew'
-    const samples = await loadCompositionSamples(studentId, schoolId, language)
+    const samples = await loadCompositionSamples(studentId, schoolId, language, ctx.profileYear ?? undefined)
     return { kind, samples }
   }
 

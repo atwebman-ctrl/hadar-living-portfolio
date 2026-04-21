@@ -34,6 +34,26 @@ export async function getCurrentAcademicYear(
   return { id: data.id as string, label: data.label as string }
 }
 
+// Read-only lookup: id → label ("2025-2026"). Used by profile surfaces
+// that need to filter time-scoped data by the profile's year (which is
+// stored as a FK on profiles.academic_year_id, not as a label).
+export async function getAcademicYearLabelById(
+  id:       string,
+  schoolId: string,
+): Promise<string | null> {
+  const { data, error } = await supabaseAdmin
+    .from('academic_years')
+    .select('label')
+    .eq('id', id)
+    .eq('school_id', schoolId)
+    .maybeSingle()
+
+  if (error) {
+    throw new Error(`getAcademicYearLabelById: lookup failed — ${error.message}`)
+  }
+  return (data?.label as string | undefined) ?? null
+}
+
 // Read-only lookup: returns the row id if it exists, null otherwise.
 // Use this from read-path code (dashboard, lists) where creating a row
 // as a side effect of a GET would be inappropriate.

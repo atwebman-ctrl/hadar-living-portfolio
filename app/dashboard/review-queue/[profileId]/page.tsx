@@ -14,6 +14,7 @@ import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
 import { mapProfile, mapProfileSection } from '@/lib/mappers/profileBuilder'
+import { getAcademicYearLabelById } from '@/lib/academicYears'
 import {
   loadLexileBand,
   loadMapsScores,
@@ -67,12 +68,18 @@ export default async function ReviewPreviewPage({ params }: Props) {
   const sections = (sectionRows ?? [])
     .map((r) => mapProfileSection(r as Parameters<typeof mapProfileSection>[0]))
 
+  // Resolve the profile's academic year label so time-scoped loaders
+  // filter to the profile's year, matching what the parent will eventually
+  // see on the published report card.
+  const profileAcademicYear = await getAcademicYearLabelById(profile.academicYearId, ctx.schoolId)
+
   const payloads: SectionPayload[] = await Promise.all(sections.map(async (section) => {
     const data = await loadSectionData(section.sectionKind, {
       studentId:    student.id,
       schoolId:     ctx.schoolId,
       gradeLevel:   student.gradeLevel,
       academicYear: student.academicYear,
+      profileYear:  profileAcademicYear,
       firstName:    student.firstName,
     })
     return { section, data }
@@ -106,6 +113,7 @@ type LoadCtx = {
   schoolId:     string
   gradeLevel:   string
   academicYear: string
+  profileYear:  string | null
   firstName:    string
 }
 
@@ -138,7 +146,7 @@ async function loadSectionData(
   }
   if (kind === 'english_composition' || kind === 'hebrew_composition') {
     const language = kind === 'english_composition' ? 'english' : 'hebrew'
-    const samples = await loadCompositionSamples(studentId, schoolId, language)
+    const samples = await loadCompositionSamples(studentId, schoolId, language, ctx.profileYear ?? undefined)
     return { kind, samples }
   }
   if (kind === 'character_middot') {

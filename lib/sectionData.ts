@@ -153,12 +153,23 @@ export async function loadCanonReadings(
 
 // ── Composition (English / Hebrew) ───────────────────────────
 
+// `academicYear` scopes results to a single year label (e.g. "2025-2026") and
+// is intended for profile surfaces — published report card, review queue
+// preview, Profile Builder editor. When omitted, returns the student's full
+// history (used by the parent portal's `/group/portfolio` view via
+// getStudentPortfolio).
+//
+// Known trade-off: we scope by year only, not by season. Fall and Spring
+// profiles in the same academic year therefore show the same set of samples.
+// writing_samples.term is nullable and loosely typed, so filtering on it
+// would silently drop samples whose term is null.
 export async function loadCompositionSamples(
-  studentId: string,
-  schoolId:  string,
-  language:  'english' | 'hebrew',
+  studentId:     string,
+  schoolId:      string,
+  language:      'english' | 'hebrew',
+  academicYear?: string,
 ): Promise<CompositionSample[]> {
-  const { data: rows } = await supabaseAdmin
+  let query = supabaseAdmin
     .from('writing_samples')
     .select('id, language, grade_level, academic_year, title, body, ocr_text, image_path')
     .eq('student_id', studentId)
@@ -166,6 +177,10 @@ export async function loadCompositionSamples(
     .eq('language', language)
     .is('deleted_at', null)
     .order('academic_year', { ascending: true })
+
+  if (academicYear) query = query.eq('academic_year', academicYear)
+
+  const { data: rows } = await query
 
   return (rows ?? []).map((r) => {
     const row = r as Record<string, unknown>
