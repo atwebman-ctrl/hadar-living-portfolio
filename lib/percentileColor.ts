@@ -8,7 +8,6 @@
 
 export function percentileColor(pct: number | null | undefined): string {
   if (pct == null) return 'var(--ink-mid)'
-  if (pct >= 95) return 'var(--ink)'
-  if (pct >= 50) return 'var(--gold)'
-  return 'var(--crimson)'
+  if (pct >= 95) return 'var(--gold)'
+  return 'var(--ink)'
 }
