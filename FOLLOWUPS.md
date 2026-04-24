@@ -93,3 +93,36 @@ When we tackle more than one loader, lift `profileYear` into a shared `LoadCtx` 
 - Both published and review-queue pages now resolve the profile's year once and pass it into `LoadCtx.profileYear`.
 - Editor page destructures `label` from the existing `getCurrentAcademicYear` call.
 - Commit: `5e70df0` — "Scope composition samples to profile's academic year on published, review queue, and editor surfaces. Portal dashboard view untouched."
+
+---
+
+## Students PATCH test coverage (2026-04-24)
+
+### Context
+
+Today's audit-column cleanup (commit `88e688a`) added `updated_by: ctx.userId` to the PATCH handler at `app/api/dashboard/students/[studentId]/route.ts:186`, alongside the existing `updated_at` refresh. The gap was only caught during a manual pre-edit verification pass — nothing in CI would have flagged a missing audit column on this route.
+
+### The gap
+
+`app/api/dashboard/students/[studentId]/route.test.ts` covers **only the DELETE handler** (soft-delete flow, demo-student guard, role check, DB error). The PATCH handler has **zero tests** despite being the endpoint behind the Edit Student form.
+
+### Why it matters
+
+PATCH is the hot path for every student edit: grade level, enrollment status, profile photo, parent assignment, summary, progress notes. A regression here ships silently. The cleanup we just did — adding `updated_by` to the updates object — had no test to assert it landed; a future refactor that drops the line would pass CI.
+
+### Suggested minimum coverage
+
+Mirror the DELETE test style already in the file (`makeUpdateChain` helper with `capturedUpdateArg`) and the assessments POST test style for insert-payload inspection. At minimum:
+
+1. **200 on valid update** — asserts response body is the mapped updated row, and the `.update(payload)` call received the expected snake_cased fields.
+2. **Audit columns present on UPDATE payload** — `updated_by` equals `ctx.userId`, `updated_at` is a valid ISO string. Guards against today's regression pattern.
+3. **403 on wrong role** — parent role rejected before DB is touched (`supabaseAdmin.from` not called).
+4. **404 when student not in school** — `eq('id', ...).eq('school_id', ctx.schoolId)` returns no row → NOT_FOUND (guards tenant isolation).
+5. **500 on DB error** — DB_ERROR code returned when Supabase surfaces an error.
+6. **Partial update** — sending only `{ gradeLevel }` updates only that column plus the audit trio; unrelated fields not overwritten to null.
+
+### Scope reference
+
+- Test harness patterns already in-tree: `app/api/dashboard/students/[studentId]/route.test.ts` (DELETE + `makeUpdateChain` with arg capture) and `app/api/dashboard/students/[studentId]/assessments/route.test.ts` (POST insert-payload assertions).
+- Low-risk addition: pure Vitest, mocks `@/lib/auth` and `@/lib/supabaseAdmin`, no DB required. Fits in the existing `check` CI job.
+- Consider extending the same pattern to the other audit-column-writing routes that lack payload assertions (cleanup candidate, not urgent).
