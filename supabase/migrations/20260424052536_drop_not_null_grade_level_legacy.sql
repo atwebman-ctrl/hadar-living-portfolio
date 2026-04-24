@@ -1,0 +1,28 @@
+-- ============================================================
+-- 20260424052536_drop_not_null_grade_level_legacy.sql
+--
+-- Drop NOT NULL on students.grade_level_legacy.
+--
+-- Root cause of the "Add Student" silent fail observed in prod on
+-- 2026-04-24 (Postgres error 23502, not-null violation).
+--
+-- Migration 0010_grade_level_enum.sql renamed the original free-text
+-- students.grade_level column to grade_level_legacy and added a new
+-- constrained grade_level column as the source of truth. The legacy
+-- column inherited the NOT NULL constraint from the pre-0010 schema
+-- (0001_initial_schema.sql defined grade_level as "text not null").
+--
+-- New INSERTs (correctly) only populate the new grade_level column,
+-- so every student created since 0010 shipped has failed the NOT NULL
+-- check on grade_level_legacy. Pre-0010 rows work because they were
+-- created before the rename.
+--
+-- lib/mappers.ts already tolerates NULL on grade_level_legacy via a
+-- ?? fallback. Nothing writes to it, and the mapper is the only reader.
+-- Making the column nullable is the minimum safe change.
+--
+-- Idempotent by nature: ALTER COLUMN ... DROP NOT NULL is a no-op if
+-- the column is already nullable.
+-- ============================================================
+
+alter table students alter column grade_level_legacy drop not null;
