@@ -74,7 +74,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 9. Validate all API inputs with Zod — no unvalidated data hits Supabase
 10. Run `npx tsc --noEmit` and `npx next build` before every push — never push a broken build
 11. Run `npx vitest run` before every commit — the husky pre-commit hook enforces this automatically
-12. **Audit columns** — every INSERT into assessments, readings, writing_samples, student_videos, teacher_notes, character_awards must include `created_by: ctx.userId` and `updated_by: ctx.userId`. Every UPDATE must refresh `updated_by` and `updated_at`.
+12. **Audit columns** — every INSERT into students, assessments, readings, writing_samples, student_videos, teacher_notes, character_awards must include `created_by: ctx.userId` and `updated_by: ctx.userId`. Every UPDATE must refresh `updated_by` and `updated_at`.
 13. **Soft delete** — the 6 tables above have `deleted_at`. All SELECT queries in `getStudentPortfolio.ts` must include `.is('deleted_at', null)`. Use `update({ deleted_at: new Date().toISOString() })` — never hard-delete these rows.
 
 ## Key Cross-File Contracts

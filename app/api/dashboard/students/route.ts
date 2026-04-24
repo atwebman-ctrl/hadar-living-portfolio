@@ -109,8 +109,7 @@ export async function POST(req: NextRequest) {
 
   // 4. Insert — school_id from auth; is_demo always false via API.
   // profile_photo_path and summary are set later via PATCH (edit student form),
-  // so we omit them here. This keeps the INSERT compatible with production tables
-  // that may not yet have those columns (migrations 0011/0019 may not be applied).
+  // so we omit them here — they're not required for creation.
   const insertPayload = {
     school_id:         ctx.schoolId,
     first_name:        input.firstName,
@@ -123,6 +122,8 @@ export async function POST(req: NextRequest) {
     date_of_birth:     input.dateOfBirth ?? null,
     enrollment_status: input.enrollmentStatus ?? 'active',
     updated_at:        new Date().toISOString(),
+    created_by:        ctx.userId,
+    updated_by:        ctx.userId,
   }
 
   console.log('[POST /api/dashboard/students] inserting:', JSON.stringify(insertPayload))

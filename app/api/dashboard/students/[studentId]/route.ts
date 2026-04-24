@@ -183,7 +183,10 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   // 4. Build the update object — only include fields present in the body.
   // updated_at is set explicitly (no auto-update trigger in the DB schema).
   // is_demo is intentionally excluded — it is immutable via this API.
-  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  const updates: Record<string, unknown> = {
+    updated_at: new Date().toISOString(),
+    updated_by: ctx.userId,
+  }
   if (input.firstName !== undefined)        updates.first_name         = input.firstName
   if (input.lastName !== undefined)         updates.last_name          = input.lastName
   if (input.gradeLevel !== undefined)       updates.grade_level        = input.gradeLevel
