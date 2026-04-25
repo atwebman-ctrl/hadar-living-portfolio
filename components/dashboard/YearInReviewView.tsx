@@ -6,7 +6,6 @@
 
 const INK   = '#2c1f0e'
 const SEPIA = '#5a4a3a'
-const FAINT = '#8a7558'
 
 export default function YearInReviewView() {
   return (
@@ -25,15 +24,9 @@ export default function YearInReviewView() {
       </div>
 
       <div style={{ border: '1px solid rgba(160,130,80,0.3)', background: 'rgba(255,252,245,0.5)', padding: '3rem 2rem', textAlign: 'center', maxWidth: 520 }}>
-        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '1.15rem', color: SEPIA, margin: '0 0 0.5rem' }}>
+        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '1.15rem', color: SEPIA, margin: 0 }}>
           No entries yet.
         </p>
-        <p style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: '0.9rem', color: FAINT, margin: '0 0 1.5rem' }}>
-          Admins can add milestones from this page.
-        </p>
-        <button className="db-add-btn" type="button" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
-          + Add Milestone
-        </button>
       </div>
     </>
   )
