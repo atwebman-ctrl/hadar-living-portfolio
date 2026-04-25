@@ -13,6 +13,7 @@ import {
   READING_DIFFICULTY_OPTIONS,
   CURRICULUM_CONNECTION_OPTIONS,
 } from '@/lib/constants'
+import type { Reading } from '@/lib/types'
 import layoutStyles from '@/components/portfolio/layout.module.css'
 
 // ── Shared styles ─────────────────────────────────────────────
@@ -65,7 +66,7 @@ interface Props {
   readingId?: string        // if set → edit mode (PATCH instead of POST)
   initial?:   Partial<Fields>
   onStatus:   (s: { type: 'success' | 'error'; msg: string } | null) => void
-  onSuccess?: () => void
+  onSuccess?: (reading: Reading) => void
 }
 
 // ── Component ─────────────────────────────────────────────────
@@ -117,7 +118,7 @@ export default function ReadingForm({ studentId, readingId, initial, onStatus, o
       } else {
         onStatus({ type: 'success', msg: isEdit ? 'Book updated.' : 'Book added to reading list.' })
         if (!isEdit) setFields(blank)
-        onSuccess?.()
+        onSuccess?.(data as Reading)
       }
     } catch {
       onStatus({ type: 'error', msg: 'Network error.' })

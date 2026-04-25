@@ -12,9 +12,11 @@ import { useRouter } from 'next/navigation'
 import ReadingForm from './ReadingForm'
 import BookCatalogManager from './BookCatalogManager'
 import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modalStyles'
+import type { Reading } from '@/lib/types'
 
 interface Props {
   studentId: string
+  onAddOptimistic?: (reading: Reading) => void
 }
 
 // ── Styles ────────────────────────────────────────────────────
@@ -41,7 +43,7 @@ const statusBar = (type: 'success' | 'error'): React.CSSProperties => ({
 
 // ── Component ─────────────────────────────────────────────────
 
-export default function InlineReadingForm({ studentId }: Props) {
+export default function InlineReadingForm({ studentId, onAddOptimistic }: Props) {
   const router = useRouter()
   const [addOpen,     setAddOpen]     = useState(false)
   const [catalogOpen, setCatalogOpen] = useState(false)
@@ -76,7 +78,11 @@ export default function InlineReadingForm({ studentId }: Props) {
               <ReadingForm
                 studentId={studentId}
                 onStatus={setStatus}
-                onSuccess={() => { closeAdd(); router.refresh() }}
+                onSuccess={(reading) => {
+                  onAddOptimistic?.(reading)
+                  closeAdd()
+                  router.refresh()
+                }}
               />
             </div>
           </div>

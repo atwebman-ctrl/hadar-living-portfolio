@@ -126,3 +126,30 @@ Mirror the DELETE test style already in the file (`makeUpdateChain` helper with 
 - Test harness patterns already in-tree: `app/api/dashboard/students/[studentId]/route.test.ts` (DELETE + `makeUpdateChain` with arg capture) and `app/api/dashboard/students/[studentId]/assessments/route.test.ts` (POST insert-payload assertions).
 - Low-risk addition: pure Vitest, mocks `@/lib/auth` and `@/lib/supabaseAdmin`, no DB required. Fits in the existing `check` CI job.
 - Consider extending the same pattern to the other audit-column-writing routes that lack payload assertions (cleanup candidate, not urgent).
+
+
+---
+
+## Optimistic list pattern rollout — apply useOptimisticList to remaining add forms (2026-04-25)
+
+**Context.** #27 (newly-added Canon books don't appear until cache propagates) was fixed by introducing `lib/useOptimisticList.ts` and applying it to `TheCanon` + `InlineReadingForm` + `ReadingForm`. The same bug exists on every other inline-add form on the portfolio — they all call `revalidatePortfolio() + router.refresh()`, which is racy under Next 16's split cache stores. The fix is mechanical: hoist a `useOptimisticList<T>` in the section component, surface `add` to the form, change the form's `onSuccess` to receive the inserted row.
+
+**Forms to migrate** (ordered by user-facing visibility — start at the top):
+
+1. `components/portfolio/InlineAssessmentForm.tsx` — assessments. Owner candidate: `MathSection` / `EnglishSection` / `HebrewSection` (whichever renders the form for the relevant assessmentType).
+2. `components/portfolio/InlineWritingForm.tsx` — writing samples. Owner: `CompositionView`.
+3. `components/portfolio/PhotoCard.tsx` + `components/shared/UploadButton.tsx` — gallery photos. Owner: gallery view component.
+4. `components/portfolio/InlineCharacterForm.tsx` — character / middot awards. Owner: `CharacterArc`.
+5. `components/portfolio/InlineTeacherNoteForm.tsx` — teacher notes. Owner: wherever notes are listed (likely `TeacherJournal` or per-section comment surfaces).
+6. `components/shared/InlineSectionComment.tsx` — section comments. Owner: per-section.
+7. `components/dashboard/EditStudentForm.tsx` — student edit (PATCH, not add). Different shape — may want a `useOptimisticUpdate` variant or just keep `router.refresh()`. Audit before migrating.
+8. `components/dashboard/ProfilePhotoUpload.tsx` — profile photo. Single-record, not list. Skip optimistic list; consider `useOptimisticState` variant if needed.
+9. `components/dashboard/DeleteStudentButton.tsx` — delete, not add. Out of scope for this hook.
+10. `components/dashboard/ReviewActionBar.tsx` — review submit/approve. Status mutation, not list add. Out of scope.
+11. `components/dashboard/NoteSlideOver.tsx` — quick capture notes. Owner: `NoteSlideOver` itself.
+12. `components/portfolio/ReportsView.tsx` — reports list. Owner: `ReportsView`.
+13. `components/portfolio/BookCatalogManager.tsx` — book catalog. Owner: `BookCatalogManager` itself (modal-scoped state).
+
+**Approach.** Each migration is ~10 lines of code: import hook, wrap props, pass `add`, change form's onSuccess signature. The hook is generic over `{ id: string }`, so any list type works. Test coverage for the hook is already in place (`lib/useOptimisticList.test.ts`); per-component tests are not required for the migration unless a section has unusual derivation logic.
+
+**Why not bundle now.** Each migration touches a different section component plus its inline form, and the changes are independent. Shipping them as a stack of small commits (one section per commit) keeps blast radius low and lets each one be tested independently in dev. A single mega-commit would be hard to revert if one section has a quirk.
