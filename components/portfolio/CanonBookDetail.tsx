@@ -72,7 +72,7 @@ export default function CanonBookDetail({ reading, tag }: Props) {
       marginBottom: 2,
     }}>
       <div style={{ display: 'flex', gap: 22 }}>
-        <div style={{ width: 110, flexShrink: 0 }}>
+        <div style={{ width: 110, aspectRatio: '2 / 3', flexShrink: 0 }}>
           {!coverError ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -80,11 +80,11 @@ export default function CanonBookDetail({ reading, tag }: Props) {
               alt={reading.title}
               onLoad={(e) => { if (e.currentTarget.naturalWidth === 1) setCoverError(true) }}
               onError={() => setCoverError(true)}
-              style={{ width: '100%', display: 'block', borderRadius: 4, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}
+              style={{ width: '100%', aspectRatio: '2 / 3', objectFit: 'cover', display: 'block', borderRadius: 4, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}
             />
           ) : (
             <div style={{
-              width: 110, height: 160, background: 'var(--navy)', color: 'var(--cream)',
+              width: '100%', height: '100%', background: 'var(--navy)', color: 'var(--cream)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               padding: 10, textAlign: 'center',
               fontSize: 13, fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic',
