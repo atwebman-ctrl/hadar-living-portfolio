@@ -18,7 +18,7 @@ import {
 } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
-import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, dbErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 
 // ── GET /api/dashboard/students ───────────────────────────────────────────────
 
@@ -49,11 +49,10 @@ export async function GET(_req: NextRequest) {
     .order('first_name', { ascending: true })
 
   if (dbError) {
-    console.error('[GET /api/dashboard/students]', dbError)
-    return NextResponse.json(
-      { error: 'Failed to fetch students.', code: 'DB_ERROR' },
-      { status: 500 }
-    )
+    return dbErrorResponse(dbError, {
+      route: 'GET /api/dashboard/students',
+      op:    'list students',
+    })
   }
 
   return NextResponse.json(
@@ -126,8 +125,6 @@ export async function POST(req: NextRequest) {
     updated_by:        ctx.userId,
   }
 
-  console.log('[POST /api/dashboard/students] inserting:', JSON.stringify(insertPayload))
-
   const { data, error: dbError } = await supabaseAdmin
     .from('students')
     .insert(insertPayload)
@@ -135,14 +132,10 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (dbError || !data) {
-    console.error('[POST /api/dashboard/students] DB error:', JSON.stringify(dbError))
-    console.error('[POST /api/dashboard/students] error code:', dbError?.code)
-    console.error('[POST /api/dashboard/students] error message:', dbError?.message)
-    console.error('[POST /api/dashboard/students] error details:', dbError?.details)
-    return NextResponse.json(
-      { error: 'Failed to create student record.', code: 'DB_ERROR' },
-      { status: 500 }
-    )
+    return dbErrorResponse(dbError, {
+      route: 'POST /api/dashboard/students',
+      op:    'insert student',
+    })
   }
 
   return NextResponse.json(

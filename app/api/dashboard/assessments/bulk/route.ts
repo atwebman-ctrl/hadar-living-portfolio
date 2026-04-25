@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
-import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, logDbError, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
 
 const BulkAssessmentSchema = z.object({
@@ -68,12 +68,12 @@ export async function POST(req: NextRequest) {
   const validSet = new Set((validStudents ?? []).map((s) => s.id))
 
   let inserted = 0
-  const errors: string[] = []
+  const errors: { traceId: string; code: string }[] = []
   const revalidateIds = new Set<string>()
 
   for (const entry of parsed.data.entries) {
     if (!validSet.has(entry.studentId)) {
-      errors.push(`Student ${entry.studentId} not found in this school.`)
+      errors.push({ traceId: crypto.randomUUID().slice(0, 8), code: 'STUDENT_NOT_FOUND' })
       continue
     }
 
@@ -93,7 +93,11 @@ export async function POST(req: NextRequest) {
       })
 
     if (dbError) {
-      errors.push(`Failed for student ${entry.studentId}: ${dbError.message}`)
+      const { traceId, code } = logDbError(dbError, {
+        route: 'POST /api/dashboard/assessments/bulk',
+        op:    'insert assessment (bulk row)',
+      })
+      errors.push({ traceId, code })
     } else {
       inserted++
       revalidateIds.add(entry.studentId)

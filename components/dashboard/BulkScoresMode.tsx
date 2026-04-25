@@ -145,7 +145,10 @@ export default function BulkScoresMode({ students }: Props) {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'Save failed.')
-      const { inserted, errors: errs } = json as { inserted: number; errors: string[] }
+      const { inserted, errors: errs } = json as {
+        inserted: number
+        errors: { traceId: string; code: string }[]
+      }
       if (errs?.length) {
         setToast({ type: 'warn', msg: `${inserted} saved, ${errs.length} failed` })
       } else {

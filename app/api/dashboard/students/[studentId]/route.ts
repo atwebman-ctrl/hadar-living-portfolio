@@ -19,7 +19,7 @@ import {
 } from '@/lib/validation'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { mapStudent } from '@/lib/mappers'
-import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, dbErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
@@ -121,11 +121,10 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
     .eq('school_id', ctx.schoolId)
 
   if (dbError) {
-    console.error('[DELETE /api/dashboard/students/:id]', dbError)
-    return NextResponse.json(
-      { error: 'Failed to archive student.', code: 'DB_ERROR' },
-      { status: 500 }
-    )
+    return dbErrorResponse(dbError, {
+      route: 'DELETE /api/dashboard/students/:id',
+      op:    'archive student',
+    })
   }
 
   revalidatePortfolio(studentId)
@@ -217,11 +216,10 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
         { status: 404 }
       )
     }
-    console.error('[PATCH /api/dashboard/students/:id]', dbError)
-    return NextResponse.json(
-      { error: 'Failed to update student record.', code: 'DB_ERROR' },
-      { status: 500 }
-    )
+    return dbErrorResponse(dbError, {
+      route: 'PATCH /api/dashboard/students/:id',
+      op:    'update student',
+    })
   }
 
   revalidatePortfolio(studentId)
