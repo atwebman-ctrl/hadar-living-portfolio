@@ -78,6 +78,7 @@ export default function CanonBookDetail({ reading, tag }: Props) {
             <img
               src={coverUrl}
               alt={reading.title}
+              onLoad={(e) => { if (e.currentTarget.naturalWidth === 1) setCoverError(true) }}
               onError={() => setCoverError(true)}
               style={{ width: '100%', display: 'block', borderRadius: 4, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}
             />
