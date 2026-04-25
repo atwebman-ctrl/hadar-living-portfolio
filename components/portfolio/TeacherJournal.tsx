@@ -45,12 +45,12 @@ const CATEGORY_TO_TAB: Record<string, string> = {
   intellectual_arc:   'math',
   immersion_engine:   'hebrew',
   the_canon:          'the-canon',
-  creative_evolution: 'composition',
+  creative_evolution: 'english',
   character_arc:      'soulcraft',
   math:               'math',
   english:            'english',
   hebrew:             'hebrew',
-  composition:        'composition',
+  composition:        'english',
   soulcraft:          'soulcraft',
 }
 
@@ -82,8 +82,8 @@ function NoteCard({ note, studentId }: { note: TeacherNote; studentId?: string }
   const date    = formatDate(note.createdAt)
   const tab     = tabSlugFor(note)
   const anchor  = note.sectionAnchor ?? null
-  const href    = (studentId && tab && anchor)
-    ? `/portfolio/${studentId}/group/portfolio?tab=${tab}#${anchor}`
+  const href    = (studentId && tab)
+    ? `/portfolio/${studentId}/group/portfolio?tab=${tab}${anchor ? `#${anchor}` : ''}`
     : null
   return (
     <blockquote style={{ margin: 0, background: 'var(--parchment)', border: '1px solid var(--rule)', borderLeft: '3px solid var(--gold)', padding: '1.25rem 1.5rem' }}>
