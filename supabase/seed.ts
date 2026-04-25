@@ -252,7 +252,7 @@ async function main() {
   await insert('handwriting_samples', [
     {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
-      image_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/handwriting/fall-2025-cursive.jpg`,
+      image_path: `${SCHOOL_ID}/${STUDENT_ID}/handwriting/fall-2025-cursive.jpg`,
       ocr_text: null,
       teacher_notes: 'Cursive introduction — consistent letter height observed. Loop formation on g and y needs attention.',
       term: 'Fall 2025',
@@ -260,7 +260,7 @@ async function main() {
     },
     {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
-      image_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/handwriting/winter-2026-cursive.jpg`,
+      image_path: `${SCHOOL_ID}/${STUDENT_ID}/handwriting/winter-2026-cursive.jpg`,
       ocr_text: null,
       teacher_notes: 'Improved spacing and word separation. Pen pressure is now much more controlled.',
       term: 'Winter 2026',
@@ -268,7 +268,7 @@ async function main() {
     },
     {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
-      image_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/handwriting/spring-2026-cursive.jpg`,
+      image_path: `${SCHOOL_ID}/${STUDENT_ID}/handwriting/spring-2026-cursive.jpg`,
       ocr_text: null,
       teacher_notes: null,
       term: 'Spring 2026',
@@ -280,7 +280,7 @@ async function main() {
   await insert('photos', [
     {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
-      storage_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/photos/science-fair-2026.jpg`,
+      storage_path: `${SCHOOL_ID}/${STUDENT_ID}/photos/science-fair-2026.jpg`,
       caption:       'Science fair project — life cycle diagram',
       date_taken:    '2026-02-18',
       grade_level:   'Grade 3',
@@ -288,7 +288,7 @@ async function main() {
     },
     {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
-      storage_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/photos/purim-play-2026.jpg`,
+      storage_path: `${SCHOOL_ID}/${STUDENT_ID}/photos/purim-play-2026.jpg`,
       caption:       'Purim play — Queen Esther costume',
       date_taken:    '2026-03-13',
       grade_level:   'Grade 3',
@@ -296,7 +296,7 @@ async function main() {
     },
     {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
-      storage_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/photos/shabbat-celebration-2025.jpg`,
+      storage_path: `${SCHOOL_ID}/${STUDENT_ID}/photos/shabbat-celebration-2025.jpg`,
       caption:       'Classroom Shabbat celebration',
       date_taken:    '2025-11-07',
       grade_level:   'Grade 3',
@@ -304,7 +304,7 @@ async function main() {
     },
     {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
-      storage_path: `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/photos/art-exhibition-2026.jpg`,
+      storage_path: `${SCHOOL_ID}/${STUDENT_ID}/photos/art-exhibition-2026.jpg`,
       caption:       'Art exhibition — watercolor landscape',
       date_taken:    '2026-01-22',
       grade_level:   'Grade 3',
@@ -318,7 +318,7 @@ async function main() {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
       upload_type:   'art',
       title:         'Mosaic — Jerusalem skyline',
-      storage_path:  `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/parent-uploads/mosaic-jerusalem.jpg`,
+      storage_path:  `${SCHOOL_ID}/${STUDENT_ID}/parent-uploads/mosaic-jerusalem.jpg`,
       description:   'Mixed-media mosaic created for the Hanukkah art show.',
       date:          '2026-01-01',
       grade_level:   'Grade 3',
@@ -329,7 +329,7 @@ async function main() {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
       upload_type:   'story',
       title:         'The Lost Compass',
-      storage_path:  `portfolio-assets/${SCHOOL_ID}/${STUDENT_ID}/parent-uploads/the-lost-compass.pdf`,
+      storage_path:  `${SCHOOL_ID}/${STUDENT_ID}/parent-uploads/the-lost-compass.pdf`,
       description:   'Original short story written over a weekend.',
       date:          '2025-10-18',
       grade_level:   'Grade 3',

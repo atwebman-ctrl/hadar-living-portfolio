@@ -153,3 +153,29 @@ Mirror the DELETE test style already in the file (`makeUpdateChain` helper with 
 **Approach.** Each migration is ~10 lines of code: import hook, wrap props, pass `add`, change form's onSuccess signature. The hook is generic over `{ id: string }`, so any list type works. Test coverage for the hook is already in place (`lib/useOptimisticList.test.ts`); per-component tests are not required for the migration unless a section has unusual derivation logic.
 
 **Why not bundle now.** Each migration touches a different section component plus its inline form, and the changes are independent. Shipping them as a stack of small commits (one section per commit) keeps blast radius low and lets each one be tested independently in dev. A single mega-commit would be hard to revert if one section has a quirk.
+
+
+---
+
+## Seed-time binary upload for demo data (2026-04-25)
+
+**Context.** #53 ("Lost Compass 404") had two coupled root causes: a path bug in `supabase/seed.ts` (every seeded `storage_path` / `image_path` was prefixed with the bucket name `portfolio-assets/`, which `storagePublicUrl()` then prepended a second time, producing 404s) AND missing binaries in the Supabase storage bucket. The path bug is fixed; the missing-files layer remains.
+
+**What's still broken after the path fix.**
+
+- 9 seeded rows now reference correct storage paths but the actual binary files do not exist in the `portfolio-assets` bucket:
+  - 3 handwriting samples (`handwriting/fall-2025-cursive.jpg`, `winter-2026-cursive.jpg`, `spring-2026-cursive.jpg`)
+  - 4 classroom photos (`photos/science-fair-2026.jpg`, `purim-play-2026.jpg`, `shabbat-celebration-2025.jpg`, `art-exhibition-2026.jpg`)
+  - 2 parent uploads (`parent-uploads/mosaic-jerusalem.jpg`, `parent-uploads/the-lost-compass.pdf`)
+- `<img>` tags render as broken (silently). PDF/recording cards expose a "View ↗" link that opens a Supabase 404 in a new tab — this is what Mijntje saw on Lost Compass.
+
+**What needs to happen.** Extend `supabase/seed.ts` so that alongside each row insert, the seed actually uploads a placeholder binary to the resolved storage path. Two clean paths:
+
+1. Check in small placeholder assets under `supabase/seed-assets/` (a 1-page PDF, a few JPGs at portfolio-card aspect) and have the seed script `supabaseAdmin.storage.from('portfolio-assets').upload(path, file)` each one before/after the row insert.
+2. Or: omit the binary-backed rows entirely from seed and rely on a separate manual upload pass for demo polish.
+
+Option 1 is the right answer — keeps `npm run db:reset` self-contained and gives every fresh local environment a working demo on day zero.
+
+**Estimated effort.** 1-2 hours: collect/license-check ~7 small placeholder images + a 1-page PDF, wire up an upload helper in seed.ts, handle re-run idempotency (`upsert: true`), verify in local Supabase Storage UI.
+
+**When to prioritize.** Before any external demo where Mijntje, Tayler, or Dr. Worth might click into Athena's gallery or parent uploads. Not blocking for current Profile Builder work.
