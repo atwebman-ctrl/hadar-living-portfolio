@@ -13,7 +13,7 @@
 
 import { useState } from 'react'
 import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modalStyles'
-import UploadButton from '@/components/shared/UploadButton'
+import DirectUploadButton from '@/components/shared/DirectUploadButton'
 
 interface Props {
   studentId:    string
@@ -115,7 +115,7 @@ export default function ParentUploadForm({ studentId, academicYear, gradeLevel }
               </div>
 
               <div style={{ marginTop: '1rem' }}>
-                <UploadButton
+                <DirectUploadButton
                   studentId={studentId}
                   uploadType="parent_upload"
                   academicYear={academicYear}

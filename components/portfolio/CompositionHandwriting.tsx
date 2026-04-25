@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { HandwritingSample, UserRole } from '@/lib/types'
-import UploadButton from '@/components/shared/UploadButton'
+import DirectUploadButton from '@/components/shared/DirectUploadButton'
 import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 import { TERM_OPTIONS } from '@/lib/constants'
 import s from './sections.module.css'
@@ -54,7 +54,7 @@ export default function CompositionHandwriting({ samples, studentId, role, acade
             {TERM_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
           {selectedTerm ? (
-            <UploadButton
+            <DirectUploadButton
               studentId={studentId}
               uploadType="handwriting"
               academicYear={academicYear}

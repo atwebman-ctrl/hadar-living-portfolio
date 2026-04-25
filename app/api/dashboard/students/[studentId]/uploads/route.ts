@@ -3,25 +3,28 @@
 //
 // POST /api/dashboard/students/[studentId]/uploads
 //
-// Accepts multipart form data, uploads the file to the
-// portfolio-assets Supabase storage bucket, and inserts a row
-// into the appropriate table (photos, handwriting_samples, or
-// parent_uploads).
+// Legacy multipart upload route. Receives multipart/form-data,
+// uploads the file to the portfolio-assets bucket, and inserts a
+// row into the appropriate table. Bounded by Vercel's ~4.5 MB
+// serverless body cap regardless of the local MAX_FILE_BYTES.
 //
-// Auth: admin or teacher for photo/handwriting.
-//       admin, teacher, or parent for parent_upload.
-//       Parents must also own the student (parentUserIds check).
-//
-// school_id is always derived server-side from the Clerk org.
-// The studentId URL param is validated against school_id before
-// any read or write occurs.
+// Photo / handwriting / parent_upload inserts now go through
+// lib/uploadInserters so the new /finalize route can share the
+// same DB-write logic. profile_photo and video paths stay inline
+// (separate scope).
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
-import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
+import { authErrorResponse, dbErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
 import { revalidatePortfolio } from '@/lib/revalidate'
+import {
+  insertPhotoRow,
+  insertHandwritingRow,
+  insertParentUploadRow,
+  InserterError,
+} from '@/lib/uploadInserters'
 
 type RouteContext = { params: Promise<{ studentId: string }> }
 
@@ -29,7 +32,7 @@ const ALLOWED_TYPES = ['photo', 'handwriting', 'parent_upload', 'video', 'profil
 type UploadType = typeof ALLOWED_TYPES[number]
 
 const BUCKET = 'portfolio-assets'
-const MAX_FILE_BYTES = 20 * 1024 * 1024 // 20 MB
+const MAX_FILE_BYTES = 20 * 1024 * 1024 // 20 MB — Vercel's body cap kicks in earlier
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -129,7 +132,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     )
   }
 
-  // 4. Verify student belongs to this school
+  // 5. Verify student belongs to this school
   const { data: student, error: stuErr } = await supabaseAdmin
     .from('students')
     .select('id, parent_user_ids')
@@ -144,7 +147,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     )
   }
 
-  // 5. Parent ownership check
+  // 6. Parent ownership check
   if (ctx.role === 'parent') {
     const parentIds: string[] = Array.isArray(student.parent_user_ids)
       ? (student.parent_user_ids as string[])
@@ -157,7 +160,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     }
   }
 
-  // 6. Profile photo — fixed path, upsert, update student row, return early
+  // 7. Profile photo — fixed path, upsert, update student row, return early
   if (type === 'profile_photo') {
     const ext   = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
     const pPath = profilePhotoPath(ctx.schoolId, studentId, ext)
@@ -176,9 +179,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ storagePath: pPath }, { status: 200 })
   }
 
-  // 7. Upload file to storage (timestamped path)
+  // 8. Upload file to storage (timestamped path)
   const path = storagePath(ctx.schoolId, studentId, type, file.name)
-  console.log(`[POST uploads] type=${type} path=${path} file=${file.name} size=${file.size}`)
   const { error: storageErr } = await uploadToStorage(path, file)
   if (storageErr) {
     console.error('[POST uploads] storage error:', storageErr)
@@ -187,124 +189,60 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       { status: 502 },
     )
   }
-  console.log('[POST uploads] storage upload OK')
 
-  // 8. Insert DB row
+  // 9. Insert DB row via shared helpers (storage-only for video)
   const academicYear = (formData.get('academic_year') as string | null) ?? ''
   const gradeLevel   = (formData.get('grade_level')   as string | null) ?? ''
 
-  if (type === 'photo') {
-    return insertPhoto({ schoolId: ctx.schoolId, studentId, path, formData, academicYear, gradeLevel })
-  }
-  if (type === 'handwriting') {
-    return insertHandwriting({ schoolId: ctx.schoolId, studentId, path, formData, academicYear, userId: ctx.userId })
-  }
   if (type === 'video') {
     // Storage-only: the student_videos DB row is created by the videos API route
     // after the user completes the form with title/grade/term/category.
-    console.log('[POST uploads] video stored at', path)
     revalidatePortfolio(studentId)
     return NextResponse.json({ storagePath: path }, { status: 200 })
   }
-  return insertParentUpload({ schoolId: ctx.schoolId, studentId, path, formData, academicYear, gradeLevel, uploadedBy: ctx.userId })
-}
 
-// ── Table inserters ───────────────────────────────────────────
+  const insertCtx = { userId: ctx.userId, schoolId: ctx.schoolId, studentId, storagePath: path }
 
-async function insertPhoto(args: {
-  schoolId: string; studentId: string; path: string
-  formData: FormData; academicYear: string; gradeLevel: string
-}) {
-  const { schoolId, studentId, path, formData, academicYear, gradeLevel } = args
-  const caption   = (formData.get('caption')    as string | null) || null
-  const dateTaken = (formData.get('date_taken') as string | null) || null
-  const term      = (formData.get('term')       as string | null) || null
-  const category  = (formData.get('category')   as string | null) || null
-
-  const { data, error } = await supabaseAdmin
-    .from('photos')
-    .insert({ school_id: schoolId, student_id: studentId, storage_path: path, caption, date_taken: dateTaken, term, category, grade_level: gradeLevel, academic_year: academicYear })
-    .select()
-    .single()
-
-  if (error || !data) {
-    console.error('[POST uploads] photos insert error:', error)
-    return NextResponse.json({ error: 'Failed to save photo record.', code: 'DB_ERROR' }, { status: 500 })
+  try {
+    let row: Record<string, unknown>
+    if (type === 'photo') {
+      ({ row } = await insertPhotoRow(insertCtx, {
+        caption:      (formData.get('caption')    as string | null) || null,
+        dateTaken:    (formData.get('date_taken') as string | null) || null,
+        term:         (formData.get('term')       as string | null) || null,
+        category:     (formData.get('category')   as string | null) || null,
+        gradeLevel,
+        academicYear,
+      }))
+    } else if (type === 'handwriting') {
+      const term = (formData.get('term') as string | null) || null
+      if (!term) {
+        return NextResponse.json(
+          { error: 'A term is required for handwriting samples.', code: 'MISSING_TERM' },
+          { status: 400 },
+        )
+      }
+      ({ row } = await insertHandwritingRow(insertCtx, {
+        term,
+        teacherNotes: (formData.get('description') as string | null) || null,
+        academicYear,
+      }))
+    } else {
+      ({ row } = await insertParentUploadRow(insertCtx, {
+        title:       (formData.get('title')              as string | null) ?? '',
+        description: (formData.get('description')        as string | null) || null,
+        date:        (formData.get('date')               as string | null) || null,
+        category:    (formData.get('parent_upload_type') as string | null) || null,
+        gradeLevel,
+        academicYear,
+      }))
+    }
+    revalidatePortfolio(studentId)
+    return NextResponse.json({ record: row, storagePath: path }, { status: 201 })
+  } catch (err) {
+    if (err instanceof InserterError) {
+      return dbErrorResponse(err.pgError, { route: 'POST /uploads', op: `insert ${type}` })
+    }
+    throw err
   }
-  revalidatePortfolio(studentId)
-  return NextResponse.json({ record: data, storagePath: path }, { status: 201 })
-}
-
-async function insertHandwriting(args: {
-  schoolId: string; studentId: string; path: string
-  formData: FormData; academicYear: string; userId: string
-}) {
-  const { schoolId, studentId, path, formData, academicYear, userId } = args
-
-  // DEBUG — log every FormData key/value received
-  const allFields: Record<string, string> = {}
-  formData.forEach((value, key) => {
-    allFields[key] = value instanceof File ? `[File: ${value.name}, ${value.size}b]` : String(value)
-  })
-  console.log('[insertHandwriting] received FormData fields:', JSON.stringify(allFields))
-
-  const term         = (formData.get('term')        as string | null) || null
-  const teacherNotes = (formData.get('description') as string | null) || null
-
-  if (!term) {
-    console.error('[insertHandwriting] term is missing from FormData — cannot insert (term NOT NULL)')
-    return NextResponse.json({ error: 'A term is required for handwriting samples.', code: 'MISSING_TERM' }, { status: 400 })
-  }
-
-  const payload = {
-    school_id:     schoolId,
-    student_id:    studentId,
-    image_path:    path,
-    ocr_text:      null,
-    teacher_notes: teacherNotes,
-    term,
-    academic_year: academicYear,
-    created_by:    userId,
-    updated_by:    userId,
-  }
-  console.log('[insertHandwriting] INSERT payload:', JSON.stringify(payload))
-
-  const { data, error } = await supabaseAdmin
-    .from('handwriting_samples')
-    .insert(payload)
-    .select()
-    .single()
-
-  if (error || !data) {
-    console.error('[insertHandwriting] Supabase error:', JSON.stringify(error))
-    console.error('[insertHandwriting] error.code:', error?.code, '| error.message:', error?.message, '| error.details:', error?.details, '| error.hint:', error?.hint)
-    return NextResponse.json({ error: 'Failed to save handwriting record.', code: 'DB_ERROR' }, { status: 500 })
-  }
-  console.log('[insertHandwriting] INSERT succeeded, id:', (data as Record<string, unknown>).id)
-  revalidatePortfolio(studentId)
-  return NextResponse.json({ record: data, storagePath: path }, { status: 201 })
-}
-
-async function insertParentUpload(args: {
-  schoolId: string; studentId: string; path: string
-  formData: FormData; academicYear: string; gradeLevel: string; uploadedBy: string
-}) {
-  const { schoolId, studentId, path, formData, academicYear, gradeLevel, uploadedBy } = args
-  const title       = (formData.get('title')              as string | null) ?? 'Untitled'
-  const description = (formData.get('description')        as string | null) || null
-  const date        = (formData.get('date')               as string | null) || null
-  const category    = (formData.get('parent_upload_type') as string | null) || 'other'
-
-  const { data, error } = await supabaseAdmin
-    .from('parent_uploads')
-    .insert({ school_id: schoolId, student_id: studentId, upload_type: category, category, title, storage_path: path, description, date, grade_level: gradeLevel, academic_year: academicYear, uploaded_by: uploadedBy })
-    .select()
-    .single()
-
-  if (error || !data) {
-    console.error('[POST uploads] parent_uploads insert error:', error)
-    return NextResponse.json({ error: 'Failed to save upload record.', code: 'DB_ERROR' }, { status: 500 })
-  }
-  revalidatePortfolio(studentId)
-  return NextResponse.json({ record: data, storagePath: path }, { status: 201 })
 }

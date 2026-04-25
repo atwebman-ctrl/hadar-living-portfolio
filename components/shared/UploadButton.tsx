@@ -3,42 +3,28 @@
 // ============================================================
 // components/shared/UploadButton.tsx
 //
-// Generic file upload button. Triggers a hidden <input type="file">,
-// POSTs multipart form data to the uploads API, and shows inline
-// progress feedback. Uses design-system tokens only.
+// Legacy multipart upload button. POSTs the file directly to
+// /api/dashboard/students/.../uploads, bounded by Vercel's
+// ~4.5 MB serverless body cap. Used by callers that haven't
+// migrated to DirectUploadButton yet (profile_photo, video,
+// school logo, report cards, assessment PDFs).
 //
-// Props
-//   studentId      — target student UUID
-//   uploadType     — 'photo' | 'handwriting' | 'parent_upload'
-//   academicYear   — e.g. '2025-2026'
-//   gradeLevel     — e.g. 'Grade 1'
-//   label          — button label (default: 'Upload File')
-//   accept         — MIME type filter (default: 'image/*')
-//   metadata       — extra form fields forwarded to the API
-//   onSuccess      — called with the server response on success
-//   onError        — called with the error message on failure
+// For surfaces inside the photo / handwriting / parent_upload
+// trio, prefer DirectUploadButton — it bypasses the body cap
+// via a signed-URL upload directly to Supabase storage.
 // ============================================================
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+  LEGACY_MAX_FILE_BYTES,
+  MIME_ALLOWLIST,
+  TYPE_LABEL,
+  errorMessageForStatus,
+  type UploadType,
+} from '@/lib/uploadValidation'
 
-export type UploadType = 'photo' | 'handwriting' | 'parent_upload'
-
-// Stay under Vercel's ~4.5 MB serverless body cap. Server-side direct uploads
-// (PR 2 / signed-URL flow) will lift this; until then 4 MB is the honest limit.
-const MAX_FILE_BYTES = 4 * 1024 * 1024
-
-const MIME_ALLOWLIST: Record<UploadType, RegExp> = {
-  photo:         /^image\//,
-  handwriting:   /^image\//,
-  parent_upload: /^(image|audio|video)\/|^application\/pdf$/,
-}
-
-const TYPE_LABEL: Record<UploadType, string> = {
-  photo:         'an image',
-  handwriting:   'an image',
-  parent_upload: 'an image, audio, video, or PDF',
-}
+export type { UploadType }
 
 export interface UploadMetadata {
   caption?:            string
@@ -101,7 +87,7 @@ export default function UploadButton({
     // Client-side validation — fast feedback before opening XHR. Server is
     // still the authoritative gate, but Vercel kills oversize requests before
     // our handler runs, so a client-side check prevents the silent-failure mode.
-    if (file.size > MAX_FILE_BYTES) {
+    if (file.size > LEGACY_MAX_FILE_BYTES) {
       const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
       const msg = `File too large (${sizeMB} MB). Please choose a file under 4 MB.`
       setStatus('error'); setErrorMsg(msg); onError?.(msg); return
@@ -153,16 +139,7 @@ export default function UploadButton({
 
     if (!result.ok) {
       const serverMsg = (result.body as Record<string, string> | null)?.error
-      let msg: string
-      switch (result.status) {
-        case 413: msg = 'File too large for the server. Please choose a smaller file.'; break
-        case 401: msg = 'Please sign in again to upload.'; break
-        case 403: msg = "You don't have permission to upload here."; break
-        default:
-          msg = result.status >= 500
-            ? 'Server error during upload. Please try again.'
-            : serverMsg ?? 'Upload failed. Please try again.'
-      }
+      const msg = errorMessageForStatus(result.status, serverMsg)
       setStatus('error')
       setErrorMsg(msg)
       onError?.(msg)

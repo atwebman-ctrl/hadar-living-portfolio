@@ -5,7 +5,7 @@ import type { Photo, ParentUpload, UserRole } from '@/lib/types'
 import PhotoCard from './PhotoCard'
 import ParentUploadCard, { type UploadCardItem } from './ParentUploadCard'
 import ParentUploadForm from './ParentUploadForm'
-import UploadButton from '@/components/shared/UploadButton'
+import DirectUploadButton from '@/components/shared/DirectUploadButton'
 import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 import { TERM_OPTIONS } from '@/lib/constants'
 import groupStyles from './GroupDetail.module.css'
@@ -235,7 +235,7 @@ export default function UnifiedGallery({
                   </select>
                 </div>
                 {selectedTerm ? (
-                  <UploadButton
+                  <DirectUploadButton
                     studentId={studentId}
                     uploadType="photo"
                     academicYear={academicYear}

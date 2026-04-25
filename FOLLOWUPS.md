@@ -179,3 +179,58 @@ Option 1 is the right answer — keeps `npm run db:reset` self-contained and giv
 **Estimated effort.** 1-2 hours: collect/license-check ~7 small placeholder images + a 1-page PDF, wire up an upload helper in seed.ts, handle re-run idempotency (`upsert: true`), verify in local Supabase Storage UI.
 
 **When to prioritize.** Before any external demo where Mijntje, Tayler, or Dr. Worth might click into Athena's gallery or parent uploads. Not blocking for current Profile Builder work.
+
+
+---
+
+## Signed-URL flow rollout to remaining uploads (2026-04-25)
+
+**Context.** #54 PR 2 introduced a signed-URL upload flow (`/uploads/sign` + `/uploads/finalize` + `DirectUploadButton`) so files larger than Vercel's ~4.5 MB serverless body cap can be PUT straight to Supabase storage. Three surfaces migrated in PR 2: classroom photos via `UnifiedGallery`, parent uploads via `ParentUploadForm`, and handwriting samples via `CompositionHandwriting`. Several remaining upload paths still go through the legacy multipart `/uploads` route and inherit the 4 MB cap.
+
+**Surfaces still on legacy multipart.**
+
+1. `components/dashboard/ProfilePhotoUpload.tsx` — student profile photo. Fixed-path upsert with a `students.profile_photo_path` column write. Could move to signed URL with a profile_photo branch on `/sign` + a dedicated finalizer that updates the students row instead of inserting elsewhere. `DirectUploadButton` is close to drop-in once those branches exist.
+2. `components/dashboard/VideoUploadZone.tsx` — student videos. Already storage-only on the legacy route (DB row created later by the videos API after the form submits). Migrate `VideoUploadZone` to call `/sign` directly, do raw PUT, then call the existing videos API instead of `/finalize`. Don't try to fold video into the generic `/finalize`.
+3. `app/api/dashboard/settings/logo/route.ts` (school logo) — admin-only, small (≤4 MB usually), low priority. Migrate only if logos start exceeding the cap.
+4. Report cards (if/when wired) — likely PDFs ≥4 MB; should be born on the signed-URL flow.
+5. Assessment PDF attachments (future) — same logic; born signed-URL.
+
+**Approach.** `DirectUploadButton` covers any caller whose finalize step is "insert one row in one of the three known tables". For finalizers that need to update existing rows (profile_photo) or hand off to a different API (videos), build a thin per-surface variant that reuses `/uploads/sign` and the same XHR PUT plumbing but calls a different finalize endpoint. Don't expand `/uploads/finalize` into a switch over every upload type — keep it scoped to the three insert-a-row cases.
+
+**Estimated effort per surface.** 1–3 hours. Profile photo is straightforward. Video needs a small refactor since the current legacy path is storage-only and the row-creation path lives elsewhere. School logo is essentially a copy-paste of profile photo.
+
+
+---
+
+## Orphan storage cleanup script (2026-04-25)
+
+**Context.** The signed-URL flow shipped in #54 PR 2 has a graceful-failure gap: `/uploads/sign` issues a token, the client PUTs the file to storage, then must call `/uploads/finalize` to insert the DB row. If the user closes the tab, drops their network, or the browser crashes between the PUT and the finalize call, the file lands in the bucket with no DB row referencing it — an orphan.
+
+`/finalize` itself verifies the object exists (good — closes one direction of the inconsistency), but there's no symmetric cleanup for objects that uploaded successfully and then never got finalized.
+
+**What needs to happen.** Periodic job (cron or Vercel scheduled function) that:
+
+1. Lists all objects in `portfolio-assets` under `{schoolId}/{studentId}/{type}/` prefixes.
+2. Joins against `photos.storage_path`, `handwriting_samples.image_path`, `parent_uploads.storage_path` (and any future signed-URL targets).
+3. For any object older than 24h that has no matching DB row, deletes it from storage.
+
+24 hours is generous — the signed-URL TTL is 2 hours, so anything older than that is definitely orphaned, not in-flight. 24h gives breathing room for any debug session.
+
+**Estimated effort.** 2–3 hours. Single TS script that imports `supabaseAdmin`, iterates three tables and the bucket, deletes the diff. Wire to GitHub Actions cron or Vercel cron once written.
+
+**When to prioritize.** Before the bucket starts approaching paid-tier limits, or before it gets large enough that a `list()` over the whole bucket becomes slow. For now (small alpha tenant), orphans are harmless.
+
+
+---
+
+## Magic-byte MIME validation at /finalize (2026-04-25)
+
+**Context.** `/uploads/sign` validates the client-claimed `mime` against `MIME_ALLOWLIST` before issuing a signed URL. This is a string-only check — a malicious client could send `mime: "image/jpeg"` while uploading an executable, and the storage object would land with a JPEG content-type header attached.
+
+For the current product surface — classroom photos, handwriting scans, parent-uploaded art and PDFs from authenticated users — this is acceptable. Users have to be signed in; the bucket is private; the worst case is that a teacher uploads a renamed file to their own student's gallery.
+
+**What we'd add when sensitivity grows.** In `/uploads/finalize`, after `verifyObjectExists()` succeeds, download the first ~16 bytes of the storage object via `supabaseAdmin.storage.from(bucket).download(path, { transform: { ... } })` (or a Range request through `createSignedUrl`) and check the magic-byte signature against the claimed MIME using a small in-tree map (PDF: `25 50 44 46`, JPEG: `FF D8 FF`, PNG: `89 50 4E 47`, MP4: `66 74 79 70` at offset 4, etc.). Reject + delete the object on mismatch.
+
+**Estimated effort.** 1–2 hours. Small library — we can write the magic-byte map ourselves (it's ~10 entries) rather than pull in `file-type` and its dependencies.
+
+**When to prioritize.** Before the upload surface accepts content from unauthenticated origins, or before parent uploads start being shown to other tenants. Not urgent on the current single-tenant deployment.
