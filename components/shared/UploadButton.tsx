@@ -24,6 +24,22 @@ import { useRouter } from 'next/navigation'
 
 export type UploadType = 'photo' | 'handwriting' | 'parent_upload'
 
+// Stay under Vercel's ~4.5 MB serverless body cap. Server-side direct uploads
+// (PR 2 / signed-URL flow) will lift this; until then 4 MB is the honest limit.
+const MAX_FILE_BYTES = 4 * 1024 * 1024
+
+const MIME_ALLOWLIST: Record<UploadType, RegExp> = {
+  photo:         /^image\//,
+  handwriting:   /^image\//,
+  parent_upload: /^(image|audio|video)\/|^application\/pdf$/,
+}
+
+const TYPE_LABEL: Record<UploadType, string> = {
+  photo:         'an image',
+  handwriting:   'an image',
+  parent_upload: 'an image, audio, video, or PDF',
+}
+
 export interface UploadMetadata {
   caption?:            string
   date_taken?:         string
@@ -82,6 +98,19 @@ export default function UploadButton({
     // Reset input so the same file can be re-selected after an error
     e.target.value = ''
 
+    // Client-side validation — fast feedback before opening XHR. Server is
+    // still the authoritative gate, but Vercel kills oversize requests before
+    // our handler runs, so a client-side check prevents the silent-failure mode.
+    if (file.size > MAX_FILE_BYTES) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
+      const msg = `File too large (${sizeMB} MB). Please choose a file under 4 MB.`
+      setStatus('error'); setErrorMsg(msg); onError?.(msg); return
+    }
+    if (!MIME_ALLOWLIST[uploadType].test(file.type)) {
+      const msg = `File type not allowed. Please choose ${TYPE_LABEL[uploadType]} file.`
+      setStatus('error'); setErrorMsg(msg); onError?.(msg); return
+    }
+
     setStatus('uploading')
     setProgress(0)
     setErrorMsg(null)
@@ -102,7 +131,7 @@ export default function UploadButton({
     if (metadata.parent_upload_type) form.append('parent_upload_type', metadata.parent_upload_type)
 
     // Use XHR so we can report real progress
-    const result = await new Promise<{ ok: boolean; body: unknown }>((resolve) => {
+    const result = await new Promise<{ ok: boolean; status: number; body: unknown }>((resolve) => {
       const xhr = new XMLHttpRequest()
       xhr.open('POST', `/api/dashboard/students/${studentId}/uploads`)
 
@@ -115,17 +144,25 @@ export default function UploadButton({
       xhr.addEventListener('load', () => {
         let body: unknown
         try { body = JSON.parse(xhr.responseText) } catch { body = null }
-        resolve({ ok: xhr.status >= 200 && xhr.status < 300, body })
+        resolve({ ok: xhr.status >= 200 && xhr.status < 300, status: xhr.status, body })
       })
 
-      xhr.addEventListener('error', () => resolve({ ok: false, body: null }))
+      xhr.addEventListener('error', () => resolve({ ok: false, status: 0, body: null }))
       xhr.send(form)
     })
 
     if (!result.ok) {
-      const msg =
-        (result.body as Record<string, string> | null)?.error ??
-        'Upload failed. Please try again.'
+      const serverMsg = (result.body as Record<string, string> | null)?.error
+      let msg: string
+      switch (result.status) {
+        case 413: msg = 'File too large for the server. Please choose a smaller file.'; break
+        case 401: msg = 'Please sign in again to upload.'; break
+        case 403: msg = "You don't have permission to upload here."; break
+        default:
+          msg = result.status >= 500
+            ? 'Server error during upload. Please try again.'
+            : serverMsg ?? 'Upload failed. Please try again.'
+      }
       setStatus('error')
       setErrorMsg(msg)
       onError?.(msg)
