@@ -39,7 +39,7 @@ The parent portal's portfolio view at `/portfolio/[studentId]/group/[groupSlug]`
 - **Renderer**: single "Latest measure" pair.
 - **Bug**: every historical profile shows today's latest Lexile band.
 - **Scope**: filter `academic_year <= profile.year`, take latest `created_at` within that window; optionally narrow by term ≤ profile term.
-- **Caveat**: Karissa's replacement-for-Lexile decision is still pending (see CLAUDE.md blocked items). May want to defer until the framework changes.
+- **Caveat**: Tayler's replacement-for-Lexile decision is still pending (school-level curriculum call she's coordinating with others). Scoping work here may become moot if the metric changes entirely.
 - **Complexity**: low (once the Lexile-vs-replacement question resolves).
 
 #### 4. `hebrewComparisonFromAvant` — LATEST-EVER
@@ -78,7 +78,7 @@ The parent portal's portfolio view at `/portfolio/[studentId]/group/[groupSlug]`
 1. **Canon, MAPS, AVANT, Hebrew comparison** — all have clean `academic_year` columns. Single small patch per loader + one call-site change per. Low risk, biggest coverage gain.
 2. **Character awards** — date-range query works today without a migration; column addition is cleaner if we're touching the table anyway.
 3. **Poetry video** — needs a migration or term-parsing. Migration preferred.
-4. **Lexile** — hold until Karissa's framework decision; scoping work may become moot if the whole metric changes.
+4. **Lexile** — hold until Tayler's framework decision; scoping work may become moot if the whole metric changes.
 
 ### Cross-cutting suggestion: plumb `profileYear` through `LoadCtx`
 
@@ -234,3 +234,18 @@ For the current product surface — classroom photos, handwriting scans, parent-
 **Estimated effort.** 1–2 hours. Small library — we can write the magic-byte map ourselves (it's ~10 entries) rather than pull in `file-type` and its dependencies.
 
 **When to prioritize.** Before the upload surface accepts content from unauthenticated origins, or before parent uploads start being shown to other tenants. Not urgent on the current single-tenant deployment.
+
+
+---
+
+## Tayler curriculum follow-ups — Lexile + scope and sequence (2026-04-25)
+
+**Context.** Two pending curriculum items Tayler is coordinating with the broader school team. Neither is urgent; both are blocked on school-level decisions, not engineering work.
+
+1. **Lexile replacement** — Tayler is evaluating whether to replace Lexile with a different reading-level metric. The technical implication for Quire is that loadLexileBand scoping (see profile-year scoping audit above) may become moot if the metric changes entirely. Hold all Lexile-related scoping work until the framework decision lands.
+
+2. **Scope and sequence** — Tayler has flagged that the school's scope and sequence (curriculum mapping per grade level) needs review or implementation in Quire. Specifics pending. Likely relates to the existing scope_and_sequence table.
+
+**When to prioritize.** Reactive — wait for Tayler to land on the curriculum side, then engineering work can be scoped properly. Following up periodically (every 2-4 weeks) is reasonable.
+
+**Owner.** Aaron tracks status with Tayler; engineering work triggered by her decisions.
