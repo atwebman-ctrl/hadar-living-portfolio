@@ -106,7 +106,7 @@ export default function AVANTSection({
                 <span style={LEGEND_LABEL}>Listening</span>
               </div>
               <div style={LEGEND_ITEM}>
-                <span style={{ ...LEGEND_SWATCH, background: '#7C3AED' }} />
+                <span style={{ ...LEGEND_SWATCH, background: 'var(--plum)' }} />
                 <span style={LEGEND_LABEL}>Writing</span>
               </div>
             </div>

@@ -189,7 +189,6 @@ export default function QuickNotesMode({ students, feed, setFeed }: Props) {
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
-          {/* TODO: "Auto" mode will use Claude to auto-categorize — for now defaults to general */}
           {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
         </select>
 

@@ -3,10 +3,6 @@
 //
 // Pure helpers for the AVANT Hebrew profile section: merging
 // raw per-skill assessment rows into one record per (year, term).
-//
-// TODO: when a 4th assessment-style section lands, refactor the
-// shared grade/season logic out of mapsHelpers.ts into a neutral
-// lib/assessmentHelpers.ts. For now, importing across files is fine.
 // ============================================================
 
 import { deriveGradeFromAcademicYear, termSortIndex } from './mapsHelpers'

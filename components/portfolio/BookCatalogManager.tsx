@@ -123,9 +123,9 @@ export default function BookCatalogManager() {
           fontFamily:    'var(--font-mono)',
           fontSize:      '0.62rem',
           letterSpacing: '0.06em',
-          color:         status.type === 'success' ? '#166534' : '#991b1b',
-          background:    status.type === 'success' ? '#f0fdf4' : '#fef2f2',
-          border:        `1px solid ${status.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
+          color:         status.type === 'success' ? 'var(--state-success)' : 'var(--state-error)',
+          background:    status.type === 'success' ? 'var(--state-success-bg)' : 'var(--state-error-bg)',
+          border:        `1px solid ${status.type === 'success' ? 'var(--state-success-border)' : 'var(--state-error-border)'}`,
         }}>
           {status.msg}
         </div>

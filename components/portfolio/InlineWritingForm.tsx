@@ -48,9 +48,9 @@ const submitBtn: React.CSSProperties = {
 const statusBar = (type: 'success' | 'error'): React.CSSProperties => ({
   padding: '0.4rem 0.75rem', marginBottom: '0.75rem',
   fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.06em',
-  color:      type === 'success' ? '#166534' : '#991b1b',
-  background: type === 'success' ? '#f0fdf4' : '#fef2f2',
-  border:     `1px solid ${type === 'success' ? '#bbf7d0' : '#fecaca'}`,
+  color:      type === 'success' ? 'var(--state-success)' : 'var(--state-error)',
+  background: type === 'success' ? 'var(--state-success-bg)' : 'var(--state-error-bg)',
+  border:     `1px solid ${type === 'success' ? 'var(--state-success-border)' : 'var(--state-error-border)'}`,
 })
 
 // ── Component ─────────────────────────────────────────────────

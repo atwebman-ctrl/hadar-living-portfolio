@@ -116,8 +116,6 @@ export default function BulkScoresMode({ students }: Props) {
     setShowPaste(false)
   }
 
-  // TODO: After bulk save, offer PDF upload per row for MAP scores
-
   async function handleSave() {
     const entries = filtered
       .map((s) => {

@@ -3,6 +3,7 @@
 //
 // PATCH — update a reading entry (all fields optional)
 // DELETE — soft-delete (sets deleted_at; never hard-deletes)
+// Currently no UI caller; reserved for future remove-book admin action.
 //
 // Auth: Clerk session, role admin or teacher.
 // Verifies student + reading both belong to the authenticated school.

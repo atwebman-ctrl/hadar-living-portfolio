@@ -233,7 +233,6 @@ export default function CompositionView({
         role={role}
       />
 
-      {/* TODO: pre-set InlineWritingForm.language to `filter` when filter !== 'all'. */}
       {canEdit && <InlineWritingForm studentId={studentId} />}
 
       {/* ── Handwriting section ──────────────────────────────── */}

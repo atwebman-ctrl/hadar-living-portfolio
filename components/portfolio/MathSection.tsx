@@ -107,27 +107,6 @@ function SubjectHeading({ title, tag }: { title: string; tag: string }) {
   )
 }
 
-// ── Muted "Standardized test history" link ────────────────────
-
-function TestHistoryLink() {
-  return (
-    <a
-      href="#"
-      style={{
-        display: 'inline-block',
-        marginTop: '0.25rem',
-        marginBottom: '1rem',
-        fontSize: 12,
-        color: 'var(--ink-light)',
-        textDecoration: 'none',
-        borderBottom: 'none',
-      }}
-    >
-      Standardized test history →
-    </a>
-  )
-}
-
 // ── Component ─────────────────────────────────────────────────
 
 export default function MathSection({
@@ -155,7 +134,6 @@ export default function MathSection({
           <h2 className={s.sectionTitle}>Math</h2>
           <div className={s.sectionRule} />
         </div>
-        <TestHistoryLink />
         <IntellectualArcAllYears
           mathAssessments={allMath}
           englishAssessments={[]}
@@ -212,7 +190,6 @@ export default function MathSection({
         <h2 className={s.sectionTitle}>Math</h2>
         <div className={s.sectionRule} />
       </div>
-      <TestHistoryLink />
 
       {/* ── Mathematics ──────────────────────────────────────── */}
       <div className={`${s.chartWrap} reveal`}>

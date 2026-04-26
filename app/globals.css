@@ -43,6 +43,15 @@
   --teal:        #2E7D5E;  /* growth / positive indicators */
   --crimson:     #8B2635;  /* error, alert */
   --forest:      #3A5C38;  /* secondary positive */
+  --plum:        #7A4868;  /* 4th chart color (AVANT Writing skill) */
+
+  /* ── State (status bars, inline form feedback) ──────────── */
+  --state-error:          var(--crimson);
+  --state-error-bg:       #F4E5E7;
+  --state-error-border:   #E5C8CC;
+  --state-success:        var(--forest);
+  --state-success-bg:     #E8EDE3;
+  --state-success-border: #C8D4BC;
 
   /* ── Landing page aliases ───────────────────────────────── */
   /* landing-layout.css was written with --lapis* names.       */

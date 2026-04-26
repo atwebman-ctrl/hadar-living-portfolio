@@ -78,21 +78,21 @@ export default function VideoUploadZone({ studentId, gradeLevel, onDone, onError
 
   if (state === 'done') return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '0.5rem 0.75rem', background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
-      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#166534' }}>
+      padding: '0.5rem 0.75rem', background: 'var(--state-success-bg)', border: '1px solid var(--state-success-border)' }}>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--state-success)' }}>
         ✓ {filename} uploaded
       </span>
       <button type="button" onClick={reset}
-        style={{ background: 'none', border: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: '#166534', cursor: 'pointer' }}>
+        style={{ background: 'none', border: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--state-success)', cursor: 'pointer' }}>
         Replace
       </button>
     </div>
   )
 
   if (state === 'error') return (
-    <div onClick={reset} style={{ border: '2px dashed #fecaca', background: '#fef2f2',
+    <div onClick={reset} style={{ border: '2px dashed var(--state-error-border)', background: 'var(--state-error-bg)',
       padding: '1rem', textAlign: 'center', cursor: 'pointer' }}>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#991b1b', letterSpacing: '0.06em' }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--state-error)', letterSpacing: '0.06em' }}>
         Upload failed — click to try again
       </div>
     </div>

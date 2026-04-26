@@ -249,3 +249,26 @@ For the current product surface — classroom photos, handwriting scans, parent-
 **When to prioritize.** Reactive — wait for Tayler to land on the curriculum side, then engineering work can be scoped properly. Following up periodically (every 2-4 weeks) is reasonable.
 
 **Owner.** Aaron tracks status with Tayler; engineering work triggered by her decisions.
+
+
+---
+
+## Code TODOs (collected 2026-04-26)
+
+**Context.** Inline `// TODO:` comments collected from the codebase during the 2026-04-26 hygiene sweep. Each item is small enough to fit a single PR but not urgent enough to block on. Migrated here to keep source files comment-clean.
+
+1. **Bulk score save → per-row PDF upload** (`components/dashboard/BulkScoresMode.tsx`). After a bulk MAP-score save, offer a PDF upload per row so the source report card can be attached. Useful for audit and parent-facing artifacts. Low effort once the `/uploads/sign` flow is generalized for non-image MIMEs.
+
+2. **Auto-categorize teacher notes via Claude** (`components/dashboard/QuickNotesMode.tsx`). The Quick Notes category dropdown defaults to `general`. A future "Auto" mode would route the note through Haiku and pick a category (`academic`, `behavior`, `social`, etc.). Already deferred in the broader Phase 7 Quick Capture work.
+
+3. **PDF upload for compositions** (`components/portfolio/CompositionHandwriting.tsx`). Extract the front page of an uploaded composition PDF as the handwriting preview image. Removes the need to upload a separate handwriting scan when the composition itself shows the handwriting. Touches `/uploads/sign` (PDF MIME), `/uploads/finalize`, and a server-side PDF-to-image step.
+
+4. **Pre-set composition form language** (`components/portfolio/CompositionView.tsx`). When `filter !== 'all'` (i.e., the user is viewing only English or only Hebrew samples), the inline writing form should pre-fill its `language` select to match. Pure UX nicety; no schema changes.
+
+5. **AI draft badge on progress summary** (`components/portfolio/PortfolioHub.tsx`). When `progress_summary` was AI-drafted (vs. teacher-written), show a small "AI draft" badge in the hub. Requires tracking the source on the row — likely a `progress_summary_source` column or reusing `ai_drafts` linkage. Defer until Phase 5 (real Claude drafting) lands.
+
+6. **Admin-configurable academic-year start/end dates** (`lib/academicYears.ts`). `getOrCreateAcademicYearId` currently hardcodes Aug 1 → Jun 30 as the academic-year window. Sensible default for US classical schools, but should be per-tenant configurable once a year-management admin UI exists. Tracked separately under "settings UI" backlog.
+
+7. **Refactor shared grade/season logic** (`lib/avantHelpers.ts`). When a 4th assessment-style section lands (beyond MAPS / AVANT / Lexile), refactor the shared grade-derivation and season-sort logic out of `mapsHelpers.ts` into a neutral `lib/assessmentHelpers.ts`. For now, cross-importing is fine — this only becomes worth the churn when there are 4+ consumers.
+
+**When to prioritize.** Each item independently — most can ship as small follow-up PRs. Items 5 and 7 are gated on other work (Phase 5; 4th assessment section).

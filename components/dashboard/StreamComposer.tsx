@@ -161,16 +161,10 @@ export default function StreamComposer({ students, onSaved }: Props) {
   }, [selected, text, category, term, visibleToParents, onSaved])
 
   const saveScore = useCallback(() => {
-    console.log('[StreamComposer] score save payload', {
-      studentId: selected?.id, assessment, rit, percentile, term,
-    })
     alert('Score save — Phase 4')
   }, [selected, assessment, rit, percentile, term])
 
   const savePhoto = useCallback(() => {
-    console.log('[StreamComposer] photo save payload', {
-      studentId: selected?.id, caption, category, term,
-    })
     alert('Photo save — Phase 4')
   }, [selected, caption, category, term])
 
@@ -191,8 +185,8 @@ export default function StreamComposer({ students, onSaved }: Props) {
     !!selected && !saving &&
     (entryType !== 'note' || !!text.trim())
 
-  const onPhotoFiles = (files: File[]) => {
-    console.log('[StreamComposer] photo files selected', files)
+  const onPhotoFiles = (_files: File[]) => {
+    // Phase 1 placeholder — real upload wires in Phase 4
   }
 
   const removeTag = (id: string) =>
@@ -200,7 +194,6 @@ export default function StreamComposer({ students, onSaved }: Props) {
 
   const onTagAnother = () => {
     // Phase 1 placeholder — real picker wires in Phase 4
-    console.log('[StreamComposer] tag another clicked')
   }
 
   return (
@@ -253,7 +246,7 @@ export default function StreamComposer({ students, onSaved }: Props) {
           <ComposerScoreBody
             rit={rit} setRit={setRit}
             percentile={percentile} setPercentile={setPercentile}
-            onAttachPdf={() => console.log('[StreamComposer] attach PDF clicked')}
+            onAttachPdf={() => { /* Phase 1 placeholder — real upload wires in Phase 4 */ }}
           />
         )}
         {entryType === 'photo' && (

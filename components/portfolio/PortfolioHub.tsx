@@ -51,7 +51,6 @@ function SummaryBanner({ student, studentId, canEdit }: {
   studentId: string
   canEdit:   boolean
 }) {
-  // TODO: Show "AI draft" badge when progress_summary is AI-generated.
   const save = async (next: string) => {
     const res = await fetch(`/api/dashboard/students/${studentId}`, {
       method: 'PATCH',

@@ -241,7 +241,7 @@ export default function HebrewSection({
       <div className={`${s.chartWrap} reveal`}>
         <div className={s.chartTitle}>AVANT Hebrew — Four Skills Over Time</div>
         <div className={s.legend}>
-          {[['#1B3A6B','Speaking'],['#B8963E','Reading'],['#2E7D5E','Listening'],['#7C3AED','Writing']].map(([bg,lbl]) => (
+          {[['#1B3A6B','Speaking'],['#B8963E','Reading'],['#2E7D5E','Listening'],['#7A4868','Writing']].map(([bg,lbl]) => (
             <span key={lbl}><span className={s.legendDot} style={{ background: bg }} /> {lbl}</span>
           ))}
         </div>

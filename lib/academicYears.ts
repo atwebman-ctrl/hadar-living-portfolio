@@ -98,9 +98,6 @@ export async function getOrCreateAcademicYearId(
   }
   const [, year1, year2] = m
 
-  // TODO: replace these defaults with admin-configurable start/end dates
-  // per school. Aug 1 → Jun 30 is a sensible default for US classical
-  // school calendars; good enough until a year-management UI lands.
   const startDate = `${year1}-08-01`
   const endDate   = `${year2}-06-30`
 

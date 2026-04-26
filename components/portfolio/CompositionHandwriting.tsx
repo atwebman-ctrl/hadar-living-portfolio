@@ -40,8 +40,6 @@ export default function CompositionHandwriting({ samples, studentId, role, acade
         </h3>
       </div>
 
-      {/* TODO: PDF upload for compositions — extract front page as handwriting preview */}
-
       {canUpload && (
         <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <select

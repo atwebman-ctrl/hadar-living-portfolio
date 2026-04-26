@@ -32,7 +32,7 @@ export default function AvantChart({ data = DEMO_DATA }: Props) {
       { label: 'Speaking',  data: data.map((d) => d.speaking),  backgroundColor: '#1B3A6B', borderRadius: 3, borderSkipped: false as const },
       { label: 'Reading',   data: data.map((d) => d.reading),   backgroundColor: '#B8963E', borderRadius: 3, borderSkipped: false as const },
       { label: 'Listening', data: data.map((d) => d.listening), backgroundColor: '#2E7D5E', borderRadius: 3, borderSkipped: false as const },
-      { label: 'Writing',   data: data.map((d) => d.writing),   backgroundColor: '#7C3AED', borderRadius: 3, borderSkipped: false as const },
+      { label: 'Writing',   data: data.map((d) => d.writing),   backgroundColor: '#7A4868', borderRadius: 3, borderSkipped: false as const },
     ],
   }
 
