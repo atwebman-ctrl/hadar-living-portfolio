@@ -1,8 +1,23 @@
+'use client'
+
+import { useState } from 'react'
 import type { CharacterAward, AiDraft, TeacherNote, UserRole } from '@/lib/types'
 import AiNarrativePanel from '@/components/portfolio/AiNarrativePanel'
 import InlineCharacterForm from '@/components/portfolio/InlineCharacterForm'
 import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import s from './sections.module.css'
+
+const addAwardBtn: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.1em',
+  textTransform: 'uppercase', color: 'var(--navy)', background: 'none',
+  border: '1px solid var(--navy)', padding: '4px 12px', cursor: 'pointer',
+}
+
+const placeholderBtn: React.CSSProperties = {
+  font: 'inherit', color: 'inherit', textAlign: 'center',
+  cursor: 'pointer', opacity: 0.4, borderStyle: 'dashed',
+  transition: 'opacity .2s, transform .2s, box-shadow .2s',
+}
 
 interface Props {
   characterAwards?: CharacterAward[]
@@ -81,6 +96,7 @@ function buildDraftContext(characterAwards: CharacterAward[], studentFirstName: 
 export default function CharacterArc({ characterAwards, teacherNotes, studentId, studentName, role, existingDraft }: Props) {
   const hasData = !!characterAwards && characterAwards.length > 0
   const canEdit = !!studentId && (role === 'admin' || role === 'teacher')
+  const [modalOpen, setModalOpen] = useState(false)
 
   const badges = hasData
     ? characterAwards!.map((a, i) => ({
@@ -132,16 +148,37 @@ export default function CharacterArc({ characterAwards, teacherNotes, studentId,
           </div>
         ))}
 
-        {/* Placeholder — next virtue to be earned */}
-        <div className={s.badgeCard} style={{ opacity: 0.4, borderStyle: 'dashed' }}>
-          <div className={s.badgeIcon} style={{ background: 'var(--cream-dark)', fontSize: 22 }}>+</div>
-          <div className={s.badgeHeb} style={{ color: 'var(--ink-faint)' }}>???</div>
-          <div className={s.badgeEn}>Next Virtue</div>
-          <div style={{ fontSize: '.8rem', color: 'var(--ink-faint)', fontStyle: 'italic', lineHeight: 1.4, margin: '.2rem 0' }}>
-            To be earned
+        {/* Placeholder — next virtue to be earned. Doubles as an alternate
+            entry point to the Add Award modal when the viewer can edit. */}
+        {canEdit ? (
+          <button
+            type="button"
+            className={s.badgeCard}
+            style={placeholderBtn}
+            onClick={() => setModalOpen(true)}
+            onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7' }}
+            onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.4' }}
+            aria-label="Add character award"
+          >
+            <div className={s.badgeIcon} style={{ background: 'var(--cream-dark)', fontSize: 22 }}>+</div>
+            <div className={s.badgeHeb} style={{ color: 'var(--ink-faint)' }}>???</div>
+            <div className={s.badgeEn}>Next Virtue</div>
+            <div style={{ fontSize: '.8rem', color: 'var(--ink-faint)', fontStyle: 'italic', lineHeight: 1.4, margin: '.2rem 0' }}>
+              To be earned
+            </div>
+            <div className={s.badgeDate} style={{ color: 'transparent' }}>&mdash;</div>
+          </button>
+        ) : (
+          <div className={s.badgeCard} style={{ opacity: 0.4, borderStyle: 'dashed' }}>
+            <div className={s.badgeIcon} style={{ background: 'var(--cream-dark)', fontSize: 22 }}>+</div>
+            <div className={s.badgeHeb} style={{ color: 'var(--ink-faint)' }}>???</div>
+            <div className={s.badgeEn}>Next Virtue</div>
+            <div style={{ fontSize: '.8rem', color: 'var(--ink-faint)', fontStyle: 'italic', lineHeight: 1.4, margin: '.2rem 0' }}>
+              To be earned
+            </div>
+            <div className={s.badgeDate} style={{ color: 'transparent' }}>&mdash;</div>
           </div>
-          <div className={s.badgeDate} style={{ color: 'transparent' }}>&mdash;</div>
-        </div>
+        )}
       </div>
 
       {/* AI narrative panel */}
@@ -166,9 +203,21 @@ export default function CharacterArc({ characterAwards, teacherNotes, studentId,
         />
       )}
 
-      {/* Inline data entry — admin/teacher only */}
-      {(role === 'admin' || role === 'teacher') && studentId && (
-        <InlineCharacterForm studentId={studentId} />
+      {/* Inline data entry — admin/teacher only. Two triggers (placeholder
+          card above + button here) share one controlled modal. */}
+      {canEdit && studentId && (
+        <>
+          <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--rule)', paddingTop: '1rem' }}>
+            <button style={addAwardBtn} onClick={() => setModalOpen(true)}>
+              + Add Award
+            </button>
+          </div>
+          <InlineCharacterForm
+            studentId={studentId}
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+          />
+        </>
       )}
     </section>
   )
