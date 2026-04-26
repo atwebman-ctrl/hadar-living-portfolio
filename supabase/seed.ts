@@ -26,15 +26,37 @@ if (existsSync('.env.local')) {
   }
 }
 
+// ── Environment guard ────────────────────────────────────────────────
+// Refuse to run against non-local Supabase by default. seed.ts wipes and
+// re-seeds the demo student; running it against production is destructive.
+// Override with SEED_ALLOW_REMOTE=1 if you genuinely intend to seed remote.
+const SEED_URL = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+const isLocal = SEED_URL.includes('127.0.0.1') || SEED_URL.includes('localhost')
+if (!isLocal && !process.env.SEED_ALLOW_REMOTE) {
+  console.error('')
+  console.error('  ✗ seed.ts refusing to run against non-local Supabase.')
+  console.error(`    Detected URL: ${SEED_URL || '(none)'}`)
+  console.error('')
+  console.error('  To run against local:')
+  console.error('    SUPABASE_URL=http://127.0.0.1:54321 \\')
+  console.error('      SUPABASE_SERVICE_ROLE_KEY=<from `npx supabase status`> \\')
+  console.error('      npx tsx supabase/seed.ts')
+  console.error('')
+  console.error('  To run against remote (destructive — wipes and reseeds demo student):')
+  console.error('    SEED_ALLOW_REMOTE=1 npx tsx supabase/seed.ts')
+  console.error('')
+  process.exit(1)
+}
+
 // ── Fixed UUIDs ───────────────────────────────────────────────────────────────
 const SCHOOL_ID  = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d' // Hadar (in migration 0002)
 const STUDENT_ID = 'b1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c' // Athena Lonsdale
 
 // ── Supabase admin client ─────────────────────────────────────────────────────
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+const url = SEED_URL
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 if (!url || !key) {
-  console.error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
+  console.error('Missing SUPABASE_URL / NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
   process.exit(1)
 }
 const db = createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } })
@@ -45,6 +67,25 @@ async function insert<T extends object>(table: string, rows: T | T[]): Promise<v
   if (error) throw new Error(`[${table}] ${error.message}`)
   const count = Array.isArray(rows) ? rows.length : 1
   console.log(`  ✓ ${table}: ${count} row${count !== 1 ? 's' : ''}`)
+}
+
+// ── Storage helpers ──────────────────────────────────────────────────────────
+const BUCKET = 'portfolio-assets'
+
+async function ensureBucket(name: string): Promise<void> {
+  const { data } = await db.storage.getBucket(name)
+  if (data) return
+  const { error } = await db.storage.createBucket(name, { public: true })
+  if (error && !/already exists/i.test(error.message)) throw error
+  console.log(`  ✓ bucket: ${name}`)
+}
+
+async function uploadSeedAsset(localPath: string, storagePath: string): Promise<void> {
+  const bytes = readFileSync(`supabase/seed-assets/${localPath}`)
+  const { error } = await db.storage
+    .from(BUCKET)
+    .upload(storagePath, bytes, { upsert: true, contentType: 'image/jpeg' })
+  if (error) throw new Error(`[storage ${storagePath}] ${error.message}`)
 }
 
 // ── MAPS assessment data ──────────────────────────────────────────────────────
@@ -78,13 +119,16 @@ async function main() {
   if (delErr) throw new Error(`[students delete] ${delErr.message}`)
   console.log('  ✓ cleared previous demo student\n')
 
+  // 1b. Ensure storage bucket exists (no-op if already present)
+  await ensureBucket(BUCKET)
+
   // 2. Student ─────────────────────────────────────────────────────────────────
   await insert('students', {
     id:               STUDENT_ID,
     school_id:        SCHOOL_ID,
     first_name:       'Athena',
     last_name:        'Lonsdale',
-    grade_level:      'Grade 3',
+    grade_level:      '3',
     academic_year:    '2025-2026',
     parent_user_ids:  [],
     profile_photo_path: null,
@@ -249,6 +293,9 @@ async function main() {
   ])
 
   // 10. Handwriting samples (3 — Fall / Winter / Spring) ────────────────────────
+  await uploadSeedAsset('handwriting/fall-2025-cursive.jpg',   `${SCHOOL_ID}/${STUDENT_ID}/handwriting/fall-2025-cursive.jpg`)
+  await uploadSeedAsset('handwriting/winter-2026-cursive.jpg', `${SCHOOL_ID}/${STUDENT_ID}/handwriting/winter-2026-cursive.jpg`)
+  await uploadSeedAsset('handwriting/spring-2026-cursive.jpg', `${SCHOOL_ID}/${STUDENT_ID}/handwriting/spring-2026-cursive.jpg`)
   await insert('handwriting_samples', [
     {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
@@ -277,6 +324,10 @@ async function main() {
   ])
 
   // 11. Photos (4 — key school events across the year) ─────────────────────────
+  await uploadSeedAsset('photos/science-fair-2026.jpg',        `${SCHOOL_ID}/${STUDENT_ID}/photos/science-fair-2026.jpg`)
+  await uploadSeedAsset('photos/purim-play-2026.jpg',          `${SCHOOL_ID}/${STUDENT_ID}/photos/purim-play-2026.jpg`)
+  await uploadSeedAsset('photos/shabbat-celebration-2025.jpg', `${SCHOOL_ID}/${STUDENT_ID}/photos/shabbat-celebration-2025.jpg`)
+  await uploadSeedAsset('photos/art-exhibition-2026.jpg',      `${SCHOOL_ID}/${STUDENT_ID}/photos/art-exhibition-2026.jpg`)
   await insert('photos', [
     {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
@@ -313,6 +364,8 @@ async function main() {
   ])
 
   // 12. Parent uploads (2 — art + story) ────────────────────────────────────────
+  await uploadSeedAsset('parent-uploads/mosaic-jerusalem.jpg', `${SCHOOL_ID}/${STUDENT_ID}/parent-uploads/mosaic-jerusalem.jpg`)
+  await uploadSeedAsset('parent-uploads/the-lost-compass.jpg', `${SCHOOL_ID}/${STUDENT_ID}/parent-uploads/the-lost-compass.jpg`)
   await insert('parent_uploads', [
     {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
@@ -329,7 +382,7 @@ async function main() {
       school_id: SCHOOL_ID, student_id: STUDENT_ID,
       upload_type:   'story',
       title:         'The Lost Compass',
-      storage_path:  `${SCHOOL_ID}/${STUDENT_ID}/parent-uploads/the-lost-compass.pdf`,
+      storage_path:  `${SCHOOL_ID}/${STUDENT_ID}/parent-uploads/the-lost-compass.jpg`,
       description:   'Original short story written over a weekend.',
       date:          '2025-10-18',
       grade_level:   'Grade 3',
