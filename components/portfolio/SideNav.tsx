@@ -8,6 +8,7 @@
 // plus standalone Teacher journal + Gallery links.
 // ============================================================
 
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import styles from './SideNav.module.css'
 
@@ -74,12 +75,16 @@ export default function SideNav({
 
   return (
     <nav className={styles.sidenav}>
-      <div className={styles.logo}>
+      <Link
+        href="/dashboard"
+        className={styles.logo}
+        style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}
+      >
         <div className={styles.logoMark}>{schoolName ?? 'Hadar · 2025–26'}</div>
         {!schoolName && (
           <div className={styles.schoolName}>Jewish Classical Academy</div>
         )}
-      </div>
+      </Link>
       <div className={styles.navLabel}>Portfolio</div>
 
       {studentName && (

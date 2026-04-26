@@ -81,7 +81,16 @@ export function PageHeader({
         justifyContent: 'space-between',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <Link
+        href="/dashboard"
+        style={{
+          display:        'flex',
+          alignItems:     'center',
+          gap:            '0.75rem',
+          textDecoration: 'none',
+          color:          'inherit',
+        }}
+      >
         {schoolLogoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -101,7 +110,7 @@ export function PageHeader({
         >
           {schoolName}
         </span>
-      </div>
+      </Link>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
         <HeaderIconButton
