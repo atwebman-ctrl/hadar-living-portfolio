@@ -131,7 +131,7 @@ Kept in-tree to avoid churn. **Do not wire these into new pages or the real port
 - **Hero section: slim identity strip** — Left cluster is the student (72px photo with `2px solid var(--gold)` border + name + "Grade {n} · Age {age}" line + optional InviteParentButton). Right cluster is school logo (or first-initial fallback) + italic school name at 50% opacity. No metrics.
 - **StatsBar removed from hub** — Year filtering happens inside detail views only (GroupDetailClient + SectionDetailClient). The hub dashboard does not filter by year.
 - **Year selector placement** — Standalone `<YearSelector>` rendered by `GroupDetailClient` only for tabs that filter by year (math, english, the-canon). `SectionDetailClient` has its own for the same slugs. Never add a third instance, and never add one to the hub.
-- **Supabase RLS status** — Verified 2026-04-25 against production: RLS is enabled on all **24 public tables** with **80 policies live across 21 of them**. Service role bypasses RLS for all `app/api/` routes. Two known gaps: `report_cards` and `student_videos` have RLS-on but no policies (tracked separately for the next session's work). Four reference tables intentionally have RLS-on with no policies (`academic_years`, `book_catalog`, `class_assignments`, `enrollment_records`) — they're reference data accessed only via service-role server routes. Schema matches migrations as of 2026-04-25. ⚠️ Close the 2 gaps before giving parents direct DB access.
+- **Supabase RLS status** — see "Schema and RLS state" section below for current coverage and reference patterns. Service role bypasses RLS for all `app/api/` routes.
 
 ## Environment Variables
 ```
@@ -162,6 +162,97 @@ npm run db:reset        # Reset local DB and replay all migrations (local only)
 - ⚠️ **0001–0014 may be ghost migrations** — they were retroactively marked applied without necessarily having run their DDL. If a column/constraint/index declared in one of those files is missing in production, create a new timestamped migration with idempotent DDL (`add column if not exists`, `drop constraint if exists` + `add constraint`, etc.) and push it. **Never edit the historical `00NN_*.sql` files in place** — the migration ledger is immutable once recorded. (See ARCHIVE.md for the one documented exception — 0012.)
 - **Docker Desktop is NOT required** for `db:new` or `db:push` — only for `db:pull` and `db:reset` (local dev features we don't use).
 - Migration files live in `supabase/migrations/` and are committed to git like any other code.
+
+## Schema and RLS state (verified Apr 27, 2026)
+
+### Current RLS coverage
+
+24 tables have RLS enabled. 24 tables have at least one policy. 111 total
+policies in `public` schema as of `6589f3d`.
+
+Healthy reference patterns (use as templates for new tables):
+- `assessments`, `students`, `videos`, `scope_and_sequence` — admins/teachers
+  full CRUD, parents read own children. Standard student-data shape.
+- `schools`, `academic_years`, `book_catalog` — school-wide read, admin-only
+  writes. Use for tenant config.
+
+All policies use the JWT-helper pattern: `current_school_id()`,
+`current_org_role()`, `current_clerk_user_id()`. Avoid `auth.uid()` and
+`school_members` joins — those are deprecated pre-Clerk patterns.
+
+### Closed: RLS-on-no-policies on 6 tables
+
+Resolved in `6589f3d` (Apr 27). Tables previously had RLS enabled with zero
+policies, silently fail-closed for non-service-role traffic. App worked
+because all DB queries use service-role bypass. Future migration to
+JWT-based RLS would have locked parents out across the product.
+
+Tables: `academic_years`, `book_catalog`, `class_assignments`,
+`enrollment_records`, `report_cards`, `student_videos`. 28 policies added.
+
+### Tools and trust
+
+**Use `pg_policies` directly for RLS state, not `supabase db diff --linked`.**
+The `db diff` shadow-database approach produced misleading output during
+the Apr 27 audit — claimed 7 policies existed on `book_catalog` and
+`student_videos` that did not actually exist in prod, and conflated `videos`
+with `student_videos`. Direct queries against `pg_policies` are
+authoritative.
+
+Useful queries:
+
+```sql
+-- Per-table policy counts
+SELECT tablename, count(*) AS policy_count
+FROM pg_policies
+WHERE schemaname = 'public'
+GROUP BY tablename
+ORDER BY tablename;
+
+-- RLS-on-no-policies check (catches future fail-closed regressions)
+SELECT c.relname AS table_name
+FROM pg_class c
+WHERE c.relnamespace = 'public'::regnamespace
+  AND c.relkind = 'r'
+  AND c.relrowsecurity = true
+  AND NOT EXISTS (
+    SELECT 1 FROM pg_policies p
+    WHERE p.schemaname = 'public' AND p.tablename = c.relname
+  );
+
+-- Verbatim policy definitions for a table
+SELECT policyname, cmd, qual, with_check
+FROM pg_policies
+WHERE schemaname = 'public' AND tablename = ''
+ORDER BY policyname;
+```
+
+### Deployment
+
+**Vercel does not auto-apply Supabase migrations.** After merging a migration
+to `main`, run `npx supabase db push` from the local machine to apply it
+to the linked remote project. Verify with a `pg_policies` query against
+prod.
+
+### Known schema drift (open)
+
+- `handwriting_samples`, `photos` and possibly other tables have audit-column
+  drift (`updated_by`, `updated_at`, `deleted_at`, etc.) added via Supabase
+  dashboard SQL editor without migrations. Pattern surfaced during Apr 27
+  audit. Reconciliation pending.
+- `videos` and `student_videos` exist as separate tables. App uses
+  `student_videos` for CRUD (5 references), `videos` referenced once in
+  `lib/getStudentPortfolio.ts:129`. Consolidation candidate.
+- `book_catalog` migration `0007_book_catalog.sql` exists in source but its
+  policy creation was a no-op in prod (likely deployed against a different
+  schema or rolled back). Cleaned up in `6589f3d`. Worth checking other
+  early migrations (0001-0014) for similar drift.
+
+### Working rule
+
+**All schema changes go through `supabase/migrations/` via
+`npx supabase migration new`.** Never the dashboard SQL editor. Direct
+dashboard edits create the drift class above and break source-of-truth.
 
 ## Verification Commands
 ```bash
