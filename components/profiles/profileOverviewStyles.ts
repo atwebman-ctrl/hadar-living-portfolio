@@ -20,6 +20,13 @@ export const EYEBROW: CSSProperties = {
   color: 'var(--ink-faint)', marginBottom: 12,
 }
 
+export const BACK_LINK: CSSProperties = {
+  display: 'inline-block',
+  fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 400,
+  color: 'var(--ink-mid)', textDecoration: 'none',
+  marginBottom: 16,
+}
+
 // Empty state
 export const EMPTY_CARD: CSSProperties = {
   background: 'var(--white)', border: '1px solid var(--rule)',

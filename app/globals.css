@@ -44,6 +44,7 @@
   --crimson:     #8B2635;  /* error, alert */
   --forest:      #3A5C38;  /* secondary positive */
   --plum:        #7A4868;  /* 4th chart color (AVANT Writing skill) */
+  --sage:        #7BA784;  /* in-progress marker on profile sections */
 
   /* ── State (status bars, inline form feedback) ──────────── */
   --state-error:          var(--crimson);

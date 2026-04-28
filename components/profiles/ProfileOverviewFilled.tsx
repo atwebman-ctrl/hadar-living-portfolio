@@ -20,7 +20,7 @@ import {
 import SubmitForReviewButton from './SubmitForReviewButton'
 import ResetForDemoButton from './ResetForDemoButton'
 import {
-  PAGE, SHELL, EYEBROW,
+  PAGE, SHELL, EYEBROW, BACK_LINK,
   HEADER, AVATAR, HEADER_NAME, HEADER_META,
   STAT_GRID, STAT_BOX, STAT_LABEL, STAT_VALUE,
   SECTION_LIST, SECTION_ROW, SECTION_ROW_LAST,
@@ -45,10 +45,10 @@ const STATUS_LABEL: Record<ProfileSectionStatus, string> = {
 }
 
 const STATUS_ACCENT: Record<ProfileSectionStatus, string> = {
-  not_started:     'transparent',
-  in_progress:     'var(--gold)',
-  awaiting_review: 'var(--gold)',
-  complete:        'var(--teal)',
+  not_started:     'var(--rule)',
+  in_progress:     'var(--sage)',
+  awaiting_review: 'var(--plum)',
+  complete:        'var(--gold)',
 }
 
 const STATUS_TEXT_COLOR: Record<ProfileSectionStatus, string> = {
@@ -89,6 +89,10 @@ export default function ProfileOverviewFilled({
   return (
     <div style={PAGE}>
       <div style={SHELL}>
+        <Link href="/dashboard" style={BACK_LINK}>
+          ← {student.firstName} {student.lastName}
+        </Link>
+
         <div style={EYEBROW}>
           {SEASON_LABEL[season]} {academicYearLabel} profile · status {profile.status}
         </div>
@@ -132,6 +136,13 @@ export default function ProfileOverviewFilled({
           </div>
         </div>
 
+        {isDraft && (
+          <div style={allRequiredDone ? SUMMARY_BANNER_READY : SUMMARY_BANNER}>
+            {requiredComplete} of {requiredTotal} sections complete
+            {allRequiredDone && <span style={SUMMARY_BANNER_SUFFIX}> · Ready for review</span>}
+          </div>
+        )}
+
         <div style={STAT_GRID}>
           <div style={STAT_BOX}>
             <div style={STAT_LABEL}>Complete</div>
@@ -157,8 +168,7 @@ export default function ProfileOverviewFilled({
             const baseRow = isLast ? SECTION_ROW_LAST : SECTION_ROW
             const rowStyle = {
               ...baseRow,
-              borderLeft: `3px solid ${STATUS_ACCENT[s.status]}`,
-              opacity: s.status === 'complete' ? 0.65 : 1,
+              borderLeft: `4px solid ${STATUS_ACCENT[s.status]}`,
             }
             const statusStyle = {
               ...SECTION_STATUS,
@@ -232,6 +242,23 @@ const REVIEW_BANNER = {
   marginBottom: 16,
   fontFamily: 'var(--font-body)', fontSize: 13,
   color: 'var(--ink-mid)',
+} as const
+const SUMMARY_BANNER = {
+  background: 'var(--cream-dark)',
+  border: '1px solid var(--rule)',
+  borderRadius: 8,
+  padding: '12px 18px',
+  marginBottom: 16,
+  fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 500,
+  color: 'var(--navy)',
+} as const
+const SUMMARY_BANNER_READY = {
+  ...SUMMARY_BANNER,
+  borderLeft: '3px solid var(--gold)',
+} as const
+const SUMMARY_BANNER_SUFFIX = {
+  color: 'var(--gold)', fontWeight: 600,
+  letterSpacing: '0.04em',
 } as const
 const PUBLISHED_BANNER = {
   background: 'var(--white)',
