@@ -89,7 +89,7 @@ export default function ProfileOverviewFilled({
   return (
     <div style={PAGE}>
       <div style={SHELL}>
-        <Link href="/dashboard" style={BACK_LINK}>
+        <Link href={`/portfolio/${student.id}`} style={BACK_LINK}>
           ← {student.firstName} {student.lastName}
         </Link>
 
