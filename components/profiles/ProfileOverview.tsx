@@ -19,10 +19,11 @@ type Props = {
   sections: ProfileSection[]
   season: 'fall' | 'spring'
   academicYearLabel: string
+  viewerRole: 'admin' | 'teacher' | 'parent'
 }
 
 export default function ProfileOverview({
-  student, profile, sections, season, academicYearLabel,
+  student, profile, sections, season, academicYearLabel, viewerRole,
 }: Props) {
   if (profile === null) {
     return (
@@ -40,6 +41,7 @@ export default function ProfileOverview({
       sections={sections}
       season={season}
       academicYearLabel={academicYearLabel}
+      viewerRole={viewerRole}
     />
   )
 }

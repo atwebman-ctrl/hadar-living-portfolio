@@ -32,6 +32,24 @@ import { POST as createProfilePOST } from '@/app/api/dashboard/profiles/route'
 import { POST as submitPOST }       from '@/app/api/dashboard/profiles/[profileId]/submit/route'
 import { POST as approvePOST }      from '@/app/api/dashboard/profiles/[profileId]/approve/route'
 import { POST as requestChangesPOST } from '@/app/api/dashboard/profiles/[profileId]/request-changes/route'
+import { POST as resetDemoPOST }    from '@/app/api/dashboard/profiles/[profileId]/reset-demo/route'
+
+async function setIsDemo(studentId: string, value: boolean): Promise<void> {
+  const { error } = await adminClient()
+    .from('students')
+    .update({ is_demo: value })
+    .eq('id', studentId)
+  if (error) throw new Error(`setIsDemo: ${error.message}`)
+}
+
+async function approveProfile(profileId: string, adminCtx: ReturnType<typeof makeAuthContext>): Promise<void> {
+  mockGetAuthContext.mockResolvedValueOnce(adminCtx)
+  const res = await approvePOST(
+    new NextRequest(`http://localhost/api/dashboard/profiles/${profileId}/approve`, { method: 'POST' }),
+    { params: Promise.resolve({ profileId }) },
+  )
+  expect(res.status).toBe(200)
+}
 
 async function markAllSectionsComplete(profileId: string): Promise<void> {
   const { error } = await adminClient()
@@ -158,5 +176,97 @@ describe('Review queue flow', () => {
     const resubmitted = (await resubmitRes.json()).profile
     expect(resubmitted.status).toBe('in_review')
     expect(resubmitted.reviewFeedback).toBeNull()
+  })
+
+  it('reset-demo: published profile flips to in_review and clears reviewer fields', async () => {
+    const student   = await seedStudent(schoolId, { firstName: 'DemoReset', gradeLevel: '5' })
+    await setIsDemo(student.id, true)
+    const profileId = await createDraftProfile(student.id, teacherCtx)
+    await markAllSectionsComplete(profileId)
+
+    // Submit → approve → published
+    mockGetAuthContext.mockResolvedValueOnce(teacherCtx)
+    await submitPOST(
+      new NextRequest(`http://localhost/api/dashboard/profiles/${profileId}/submit`, { method: 'POST' }),
+      { params: Promise.resolve({ profileId }) },
+    )
+    await approveProfile(profileId, adminCtx)
+
+    // Reset
+    mockGetAuthContext.mockResolvedValueOnce(adminCtx)
+    const resetRes = await resetDemoPOST(
+      new NextRequest(`http://localhost/api/dashboard/profiles/${profileId}/reset-demo`, { method: 'POST' }),
+      { params: Promise.resolve({ profileId }) },
+    )
+    expect(resetRes.status).toBe(200)
+    const reset = (await resetRes.json()).profile
+    expect(reset.status).toBe('in_review')
+    expect(reset.publishedAt).toBeNull()
+    expect(reset.reviewedAt).toBeNull()
+    expect(reset.reviewedBy).toBeNull()
+    expect(reset.reviewFeedback).toBeNull()
+    expect(reset.updatedBy).toBe(adminCtx.userId)
+  })
+
+  it('reset-demo: rejects non-demo students with 403 NOT_DEMO', async () => {
+    const student   = await seedStudent(schoolId, { firstName: 'NotDemo', gradeLevel: '6' })
+    // is_demo defaults to false; do not flip
+    const profileId = await createDraftProfile(student.id, teacherCtx)
+    await markAllSectionsComplete(profileId)
+
+    mockGetAuthContext.mockResolvedValueOnce(teacherCtx)
+    await submitPOST(
+      new NextRequest(`http://localhost/api/dashboard/profiles/${profileId}/submit`, { method: 'POST' }),
+      { params: Promise.resolve({ profileId }) },
+    )
+    await approveProfile(profileId, adminCtx)
+
+    mockGetAuthContext.mockResolvedValueOnce(adminCtx)
+    const res = await resetDemoPOST(
+      new NextRequest(`http://localhost/api/dashboard/profiles/${profileId}/reset-demo`, { method: 'POST' }),
+      { params: Promise.resolve({ profileId }) },
+    )
+    expect(res.status).toBe(403)
+    const body = await res.json()
+    expect(body.code).toBe('NOT_DEMO')
+  })
+
+  it('reset-demo: rejects non-published profiles with 409 INVALID_STATE', async () => {
+    const student   = await seedStudent(schoolId, { firstName: 'StillDraft', gradeLevel: '2' })
+    await setIsDemo(student.id, true)
+    const profileId = await createDraftProfile(student.id, teacherCtx)
+    // Leave in draft — do NOT submit/approve
+
+    mockGetAuthContext.mockResolvedValueOnce(adminCtx)
+    const res = await resetDemoPOST(
+      new NextRequest(`http://localhost/api/dashboard/profiles/${profileId}/reset-demo`, { method: 'POST' }),
+      { params: Promise.resolve({ profileId }) },
+    )
+    expect(res.status).toBe(409)
+    const body = await res.json()
+    expect(body.code).toBe('INVALID_STATE')
+  })
+
+  it('reset-demo: rejects teacher callers with 403 FORBIDDEN', async () => {
+    const student   = await seedStudent(schoolId, { firstName: 'TeacherTry', gradeLevel: '1' })
+    await setIsDemo(student.id, true)
+    const profileId = await createDraftProfile(student.id, teacherCtx)
+    await markAllSectionsComplete(profileId)
+
+    mockGetAuthContext.mockResolvedValueOnce(teacherCtx)
+    await submitPOST(
+      new NextRequest(`http://localhost/api/dashboard/profiles/${profileId}/submit`, { method: 'POST' }),
+      { params: Promise.resolve({ profileId }) },
+    )
+    await approveProfile(profileId, adminCtx)
+
+    mockGetAuthContext.mockResolvedValueOnce(teacherCtx)
+    const res = await resetDemoPOST(
+      new NextRequest(`http://localhost/api/dashboard/profiles/${profileId}/reset-demo`, { method: 'POST' }),
+      { params: Promise.resolve({ profileId }) },
+    )
+    expect(res.status).toBe(403)
+    const body = await res.json()
+    expect(body.code).toBe('FORBIDDEN')
   })
 })

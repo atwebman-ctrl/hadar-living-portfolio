@@ -18,6 +18,7 @@ import {
   type ProfileSectionStatus,
 } from '@/lib/types/profileBuilder'
 import SubmitForReviewButton from './SubmitForReviewButton'
+import ResetForDemoButton from './ResetForDemoButton'
 import {
   PAGE, SHELL, EYEBROW,
   HEADER, AVATAR, HEADER_NAME, HEADER_META,
@@ -33,6 +34,7 @@ type Props = {
   sections: ProfileSection[]
   season: 'fall' | 'spring'
   academicYearLabel: string
+  viewerRole: 'admin' | 'teacher' | 'parent'
 }
 
 const STATUS_LABEL: Record<ProfileSectionStatus, string> = {
@@ -64,7 +66,7 @@ const STATUS_TEXT_WEIGHT: Record<ProfileSectionStatus, number> = {
 }
 
 export default function ProfileOverviewFilled({
-  student, profile, sections, season, academicYearLabel,
+  student, profile, sections, season, academicYearLabel, viewerRole,
 }: Props) {
   const counts: Record<ProfileSectionStatus, number> = {
     complete:        sections.filter(s => s.status === 'complete').length,
@@ -109,7 +111,12 @@ export default function ProfileOverviewFilled({
 
         {isPublished && (
           <div style={PUBLISHED_BANNER}>
-            Published {profile.publishedAt ? new Date(profile.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : ''}.
+            <div>
+              Published {profile.publishedAt ? new Date(profile.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : ''}.
+            </div>
+            {viewerRole === 'admin' && student.isDemo && (
+              <ResetForDemoButton profileId={profile.id} />
+            )}
           </div>
         )}
 
@@ -235,4 +242,9 @@ const PUBLISHED_BANNER = {
   marginBottom: 16,
   fontFamily: 'var(--font-body)', fontSize: 13,
   color: 'var(--ink-mid)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 16,
+  flexWrap: 'wrap' as const,
 } as const

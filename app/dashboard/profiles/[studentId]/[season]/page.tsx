@@ -29,6 +29,7 @@ export default async function ProfileOverviewPage({ params }: Props) {
   if (season !== 'fall' && season !== 'spring') notFound()
 
   const { userId, schoolId, role } = await getAuthContext().catch(() => notFound())
+  const viewerRole: 'admin' | 'teacher' | 'parent' = role
 
   // Parents see the published parent view at a different route — keep
   // them out of the builder entirely for now.
@@ -88,6 +89,7 @@ export default async function ProfileOverviewPage({ params }: Props) {
       sections={sections}
       season={season}
       academicYearLabel={academicYearLabel}
+      viewerRole={viewerRole}
     />
   )
 }
