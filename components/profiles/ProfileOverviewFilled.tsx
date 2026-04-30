@@ -16,6 +16,7 @@ import {
   type Profile,
   type ProfileSection,
   type ProfileSectionStatus,
+  type ProfileStatus,
 } from '@/lib/types/profileBuilder'
 import SubmitForReviewButton from './SubmitForReviewButton'
 import ResetForDemoButton from './ResetForDemoButton'
@@ -35,6 +36,13 @@ type Props = {
   season: 'fall' | 'spring'
   academicYearLabel: string
   viewerRole: 'admin' | 'teacher' | 'parent'
+}
+
+const PROFILE_STATUS_LABEL: Record<ProfileStatus, string> = {
+  draft:        'Draft',
+  in_review:    'In Review',
+  published:    'Published',
+  unpublished:  'Unpublished',
 }
 
 const STATUS_LABEL: Record<ProfileSectionStatus, string> = {
@@ -94,7 +102,7 @@ export default function ProfileOverviewFilled({
         </Link>
 
         <div style={EYEBROW}>
-          {SEASON_LABEL[season]} {academicYearLabel} profile · status {profile.status}
+          {SEASON_LABEL[season]} {academicYearLabel} profile · status: {PROFILE_STATUS_LABEL[profile.status]}
         </div>
 
         {hasFeedback && (

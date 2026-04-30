@@ -24,9 +24,10 @@ export default function ResetForDemoButton({ profileId }: Props) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError]           = useState<string | null>(null)
+  const [success, setSuccess]       = useState(false)
 
   const onClick = async () => {
-    if (!confirm('Reset this published profile to “in review” for a demo? Reviewer fields will be cleared.')) return
+    if (!confirm('Reset this published profile to "in review" for a demo? Reviewer fields will be cleared.')) return
     setSubmitting(true)
     setError(null)
     try {
@@ -37,6 +38,9 @@ export default function ResetForDemoButton({ profileId }: Props) {
         setSubmitting(false)
         return
       }
+      setSuccess(true)
+      setSubmitting(false)
+      setTimeout(() => setSuccess(false), 3000)
       router.refresh()
     } catch {
       setError('Network error.')
@@ -67,6 +71,11 @@ export default function ResetForDemoButton({ profileId }: Props) {
       {error && (
         <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: '#B0413E' }}>
           {error}
+        </span>
+      )}
+      {success && (
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--sage)' }}>
+          Reset successful.
         </span>
       )}
     </div>
