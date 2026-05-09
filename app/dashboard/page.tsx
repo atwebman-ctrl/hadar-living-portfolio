@@ -69,6 +69,9 @@ export default async function DashboardPage() {
   if (ctx.role !== 'admin' && ctx.role !== 'teacher') redirect('/')
 
   // ── Fetch students for this school ────────────────────────
+  // Defensive cap: roster is rendered as one flat list with client-side
+  // sorting. Above ~500 students per school we'll need real pagination;
+  // until then this just prevents a runaway query.
   const { data, error } = await supabaseAdmin
     .from('students')
     .select('*')
@@ -76,6 +79,7 @@ export default async function DashboardPage() {
     .is('deleted_at', null)
     .order('last_name',  { ascending: true })
     .order('first_name', { ascending: true })
+    .limit(500)
 
   if (error) console.error('[Dashboard] Failed to fetch students', error)
 

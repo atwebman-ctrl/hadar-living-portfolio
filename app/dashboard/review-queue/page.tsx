@@ -29,6 +29,9 @@ export default async function ReviewQueuePage() {
 
   if (ctx.role !== 'admin') redirect('/dashboard')
 
+  // Defensive cap: queue is normally well under 50 items (only profiles
+  // currently awaiting Dr. Worth's review). 200 leaves headroom for a
+  // backlog without blowing up the page.
   const { data, error } = await supabaseAdmin
     .from('profiles')
     .select(`
@@ -39,6 +42,7 @@ export default async function ReviewQueuePage() {
     .eq('status', 'in_review')
     .is('deleted_at', null)
     .order('updated_at', { ascending: true })
+    .limit(200)
 
   if (error) console.error('[review-queue] fetch failed', error)
 
