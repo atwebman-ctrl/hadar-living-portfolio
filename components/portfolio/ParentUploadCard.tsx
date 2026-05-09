@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modalStyles'
 import { TERM_OPTIONS } from '@/lib/constants'
@@ -89,7 +90,15 @@ export default function ParentUploadCard({ item, studentId, canEdit, onExpand }:
       >
         {/* Visual area — image or icon placeholder */}
         {item.showImg ? (
-          <img src={item.publicUrl!} alt={item.title} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }} />
+          <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3' }}>
+            <Image
+              src={item.publicUrl!}
+              alt={item.title}
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              style={{ objectFit: 'cover' }}
+            />
+          </div>
         ) : (
           <div style={{ aspectRatio: '4/3', background: 'var(--cream-dark)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--rule)', gap: '0.4rem' }}>
             <span style={{ fontSize: '2rem', lineHeight: 1 }} aria-hidden>{item.icon}</span>

@@ -253,6 +253,8 @@ function CompositionBlock({ samples }: { samples: CompositionSample[] }) {
             <div style={S.SAMPLE_META}>Grade {s.gradeLevel} · {s.academicYear}</div>
           </div>
           {s.imagePublicUrl && (
+            // Composition images have unknown intrinsic dimensions — published view sizes by max-width only.
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={s.imagePublicUrl} alt={s.title ?? 'Composition'} style={S.SAMPLE_IMG} />
           )}
           {s.body && <p style={S.SAMPLE_BODY}>{s.body}</p>}

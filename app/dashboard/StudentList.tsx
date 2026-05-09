@@ -16,6 +16,7 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Student } from '@/lib/types'
 import type { StudentProfileStatus } from '@/lib/profileStatus'
 import { GRADE_LEVELS, formatGrade } from '@/lib/gradeLevel'
@@ -120,6 +121,7 @@ export default function StudentList({ students, profileStatuses }: Props) {
               <tr key={s.id}>
                 <td className="db-list-col-photo">
                   <div style={{
+                    position: 'relative',
                     width: 36,
                     height: 36,
                     borderRadius: '50%',
@@ -130,15 +132,12 @@ export default function StudentList({ students, profileStatuses }: Props) {
                     borderStyle: photoUrl ? 'solid' : 'dashed',
                   }}>
                     {photoUrl && (
-                      <img
+                      <Image
                         src={photoUrl}
                         alt={`${s.firstName} ${s.lastName}`}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          display: 'block',
-                        }}
+                        fill
+                        sizes="36px"
+                        style={{ objectFit: 'cover' }}
                       />
                     )}
                   </div>

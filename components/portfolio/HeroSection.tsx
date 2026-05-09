@@ -1,6 +1,7 @@
 'use client'
 
 import type React from 'react'
+import Image from 'next/image'
 import type { Student, SchoolConfig, Assessment, UserRole } from '@/lib/types'
 import { ordinal } from '@/lib/utils'
 import InlineEditableText from '@/components/shared/InlineEditableText'
@@ -123,7 +124,17 @@ export default function HeroSection({
     <div className={`${heroStyles.hero}${compact ? ` ${heroStyles.compact}` : ''}`} id="overview">
       <div className={heroStyles.heroPhoto}>
         {photoUrl
-          ? <img src={photoUrl} alt={`${firstName} ${lastName}`} style={{ ...photoCircle, objectFit: 'cover' }} />
+          ? (
+            <div style={{ ...photoCircle, position: 'relative' }}>
+              <Image
+                src={photoUrl}
+                alt={`${firstName} ${lastName}`}
+                fill
+                sizes="72px"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
+          )
           : <div style={photoCircle}>{initials}</div>
         }
       </div>
@@ -157,11 +168,12 @@ export default function HeroSection({
         flexShrink:    0,
       }}>
         {school?.logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={school.logoUrl}
             alt={school.name}
-            style={{ maxHeight: 36, marginBottom: '0.4rem', mixBlendMode: 'screen' }}
+            width={108}
+            height={36}
+            style={{ height: 36, width: 'auto', marginBottom: '0.4rem', mixBlendMode: 'screen' }}
           />
         ) : (
           <div style={{

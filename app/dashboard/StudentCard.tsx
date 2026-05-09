@@ -8,6 +8,7 @@
 // ============================================================
 
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Student } from '@/lib/types'
 import { formatGrade } from '@/lib/gradeLevel'
 import EditStudentForm from '@/components/dashboard/EditStudentForm'
@@ -69,7 +70,7 @@ export function StudentCard({
         <div className="db-card-head">
           <div className="db-card-photo">
             {photoUrl
-              ? <img src={photoUrl} alt={`${student.firstName} ${student.lastName}`} />
+              ? <Image src={photoUrl} alt={`${student.firstName} ${student.lastName}`} fill sizes="56px" />
               : <span className="db-card-initials">{initials}</span>}
           </div>
           <div className="db-card-identity">

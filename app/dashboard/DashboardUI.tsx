@@ -6,6 +6,7 @@
 // ============================================================
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { OrganizationSwitcher } from '@clerk/nextjs'
 import type { DashboardView } from './dashboardTypes'
 
@@ -92,11 +93,12 @@ export function PageHeader({
         }}
       >
         {schoolLogoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={schoolLogoUrl}
             alt=""
-            style={{ maxHeight: 28, mixBlendMode: 'screen', opacity: 0.9 }}
+            width={120}
+            height={28}
+            style={{ height: 28, width: 'auto', mixBlendMode: 'screen', opacity: 0.9 }}
           />
         )}
         <span

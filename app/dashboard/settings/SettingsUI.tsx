@@ -10,6 +10,7 @@
 
 import { useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const MAX_LOGO_BYTES = 2 * 1024 * 1024
 
@@ -103,11 +104,12 @@ export default function SettingsUI({ schoolName, initialLogoUrl }: Props) {
               {/* Logo preview */}
               <div style={{ flexShrink: 0 }}>
                 {logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={logoUrl}
                     alt={`${schoolName} logo`}
-                    style={{ maxHeight: 120, maxWidth: 240, display: 'block' }}
+                    width={240}
+                    height={120}
+                    style={{ height: 'auto', maxHeight: 120, width: 'auto', maxWidth: 240, display: 'block' }}
                   />
                 ) : (
                   <div

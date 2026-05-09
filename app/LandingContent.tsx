@@ -8,6 +8,7 @@
 // ============================================================
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { SignIn } from '@clerk/nextjs'
 import './styles/landing-layout.css'
 import './styles/landing-left-panel.css'
@@ -88,16 +89,16 @@ export default function LandingContent() {
         <span className="lp-corner br">✦</span>
 
         <div className="lp-corner" style={{ top: 8, left: 8, zIndex: 3, opacity: 0.85, fontSize: 0 }}>
-          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true" style={{ transform: 'rotate(0deg)', display: 'block' }} />
+          <Image src="/images/corner-ornament.png" width={120} height={120} alt="" aria-hidden="true" style={{ transform: 'rotate(0deg)', display: 'block' }} />
         </div>
         <div className="lp-corner" style={{ top: 8, right: 8, zIndex: 3, opacity: 0.85, fontSize: 0 }}>
-          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true" style={{ transform: 'rotate(90deg)', display: 'block' }} />
+          <Image src="/images/corner-ornament.png" width={120} height={120} alt="" aria-hidden="true" style={{ transform: 'rotate(90deg)', display: 'block' }} />
         </div>
         <div className="lp-corner" style={{ bottom: 8, right: 8, zIndex: 3, opacity: 0.85, fontSize: 0 }}>
-          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true" style={{ transform: 'rotate(180deg)', display: 'block' }} />
+          <Image src="/images/corner-ornament.png" width={120} height={120} alt="" aria-hidden="true" style={{ transform: 'rotate(180deg)', display: 'block' }} />
         </div>
         <div className="lp-corner" style={{ bottom: 8, left: 8, zIndex: 3, opacity: 0.85, fontSize: 0 }}>
-          <img src="/images/corner-ornament.png" width={120} alt="" aria-hidden="true" style={{ transform: 'rotate(270deg)', display: 'block' }} />
+          <Image src="/images/corner-ornament.png" width={120} height={120} alt="" aria-hidden="true" style={{ transform: 'rotate(270deg)', display: 'block' }} />
         </div>
 
         <div className="left-inner">
@@ -108,7 +109,7 @@ export default function LandingContent() {
           </div>
 
           {/* Middle: illustration — takes ~50% of vertical space */}
-          <img src="/images/kid.png" className="left-illustration" alt="Hadar student" />
+          <Image src="/images/kid.png" className="left-illustration" alt="Hadar student" width={600} height={600} />
 
           {/* Bottom: colophon anchored to foot */}
           <div className="colophon">

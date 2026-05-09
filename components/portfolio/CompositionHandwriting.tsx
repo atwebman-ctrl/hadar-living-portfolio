@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import type { HandwritingSample, UserRole } from '@/lib/types'
 import DirectUploadButton from '@/components/shared/DirectUploadButton'
 import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
@@ -109,12 +110,18 @@ function SampleCard({ label, notes, imageUrl, onExpand }: {
   return (
     <div style={{ border: '1px solid var(--rule)', background: 'var(--parchment)' }}>
       {imageUrl ? (
-        <img
-          src={imageUrl}
-          alt={`Handwriting sample — ${label}`}
+        <div
           onClick={onExpand}
-          style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block', borderBottom: '1px solid var(--rule)', cursor: onExpand ? 'zoom-in' : 'default' }}
-        />
+          style={{ position: 'relative', width: '100%', height: 180, borderBottom: '1px solid var(--rule)', cursor: onExpand ? 'zoom-in' : 'default' }}
+        >
+          <Image
+            src={imageUrl}
+            alt={`Handwriting sample — ${label}`}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            style={{ objectFit: 'cover' }}
+          />
+        </div>
       ) : (
         <div style={{ height: 180, background: 'var(--cream-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--rule)' }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '.65rem', color: 'var(--ink-faint)', letterSpacing: '.1em', textTransform: 'uppercase' }}>

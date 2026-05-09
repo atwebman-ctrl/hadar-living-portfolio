@@ -9,6 +9,7 @@
 // ============================================================
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { TERM_OPTIONS } from '@/lib/constants'
 import { MODAL_OVERLAY, MODAL_HEADER, MODAL_BODY, modalPanel } from '@/lib/modalStyles'
@@ -100,7 +101,17 @@ export default function PhotoCard({ photo, studentId, canEdit, onExpand }: Props
         style={{ margin: 0, border: '1px solid var(--rule)', background: 'var(--parchment)', cursor: clickable ? 'zoom-in' : 'default', overflow: 'hidden', position: 'relative' }}
       >
         {photo.publicUrl
-          ? <img src={photo.publicUrl} alt={photo.caption ?? 'Portfolio photo'} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }} />
+          ? (
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3' }}>
+              <Image
+                src={photo.publicUrl}
+                alt={photo.caption ?? 'Portfolio photo'}
+                fill
+                sizes="(max-width: 768px) 50vw, 25vw"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
+          )
           : <PhotoPlaceholder caption={photo.caption ?? ''} />
         }
         {(photo.caption || tag) && (

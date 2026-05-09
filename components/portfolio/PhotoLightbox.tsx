@@ -92,6 +92,8 @@ export default function PhotoLightbox({ photos, index, onClose, onNav }: Props) 
 
       {/* Image */}
       <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative', maxWidth: '90vw', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {/* Lightbox sizes to viewport (maxHeight 78vh, objectFit contain) — next/image fill mode requires a positioned wrapper with known dims, which would break the contain-to-viewport behavior. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photo.publicUrl}
           alt={photo.caption ?? 'Portfolio photo'}

@@ -66,6 +66,8 @@ function SampleCard({ s }: { s: CompositionSample }) {
         <div style={CARD_META}>{meta}</div>
       </div>
       {s.imagePublicUrl && (
+        // Composition images have unknown intrinsic dimensions — sized by max-width only.
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={s.imagePublicUrl}
           alt={titleLabel}

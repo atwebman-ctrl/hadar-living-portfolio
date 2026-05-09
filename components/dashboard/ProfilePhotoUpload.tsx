@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import Image from 'next/image'
 
 interface Props {
   studentId:        string
@@ -79,6 +80,7 @@ export default function ProfilePhotoUpload({
         onClick={openPicker}
         title="Click to change photo"
         style={{
+          position: 'relative',
           width: size, height: size, borderRadius: '50%', overflow: 'hidden',
           border: '2px solid rgba(184,160,80,0.4)', flexShrink: 0,
           cursor: uploading ? 'default' : 'pointer',
@@ -87,7 +89,7 @@ export default function ProfilePhotoUpload({
         }}
       >
         {displayUrl
-          ? <img src={displayUrl} alt={`${firstName} ${lastName}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          ? <Image src={displayUrl} alt={`${firstName} ${lastName}`} fill sizes={`${size}px`} style={{ objectFit: 'cover' }} />
           : <span style={{ fontFamily: 'var(--font-heading)', fontSize: `${fontSize}px`, color: '#fff', fontWeight: 700, userSelect: 'none' }}>{initials}</span>
         }
       </div>

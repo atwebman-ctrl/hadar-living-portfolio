@@ -161,6 +161,8 @@ export default function BatchPhotosMode({ students }: Props) {
               const sc = STATUS_COLORS[p.status]
               return (
                 <div key={p.id} style={S.card}>
+                  {/* Local blob URL from FileReader; not eligible for next/image optimization. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={p.preview} alt="" style={S.thumb} />
                   <div style={S.fname}>{p.file.name}</div>
                   {p.status === 'ready' ? (
