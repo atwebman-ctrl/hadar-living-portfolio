@@ -88,7 +88,7 @@ describe('DELETE /api/dashboard/students/[studentId]', () => {
     })
   })
 
-  it('returns 204 and calls update with an archived_at timestamp', async () => {
+  it('returns 204 and calls update with a deleted_at timestamp', async () => {
     const { chain, updateSpy, getCapturedArg } = makeUpdateChain({ data: null, error: null })
     mockFrom()
       .mockReturnValueOnce(makeSelectChain({ data: { id: STUDENT_ID, is_demo: false }, error: null }))
@@ -100,10 +100,10 @@ describe('DELETE /api/dashboard/students/[studentId]', () => {
     expect(updateSpy).toHaveBeenCalledOnce()
 
     const updateArg = getCapturedArg()
-    expect(updateArg).toHaveProperty('archived_at')
-    expect(typeof updateArg?.archived_at).toBe('string')
+    expect(updateArg).toHaveProperty('deleted_at')
+    expect(typeof updateArg?.deleted_at).toBe('string')
     // Must be a valid ISO 8601 date string
-    expect(new Date(updateArg?.archived_at as string).toString()).not.toBe('Invalid Date')
+    expect(new Date(updateArg?.deleted_at as string).toString()).not.toBe('Invalid Date')
   })
 
   it('returns 403 and skips the update when student is a demo', async () => {

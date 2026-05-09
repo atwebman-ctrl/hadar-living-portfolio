@@ -51,7 +51,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
     .select('*')
     .eq('id', studentId)
     .eq('school_id', ctx.schoolId)
-    .is('archived_at', null)
+    .is('deleted_at', null)
     .single()
 
   if (dbError || !data) {
@@ -66,9 +66,9 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
 
 // ── DELETE /api/dashboard/students/[studentId] ────────────────────────────────
 //
-// Soft delete: sets archived_at to now. The student record is preserved;
-// all dashboard queries filter on archived_at IS NULL to exclude it.
-// Demo students cannot be archived via this API.
+// Soft delete: sets deleted_at to now. The student record is preserved;
+// all dashboard queries filter on deleted_at IS NULL to exclude it.
+// Demo students cannot be soft-deleted via this API.
 
 export async function DELETE(_req: NextRequest, { params }: RouteContext) {
   const { studentId } = await params
@@ -84,7 +84,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
 
   if (ctx.role !== 'admin' && ctx.role !== 'teacher') {
     return NextResponse.json(
-      { error: 'Only admins and teachers can archive students.', code: 'FORBIDDEN' },
+      { error: 'Only admins and teachers can delete students.', code: 'FORBIDDEN' },
       { status: 403 }
     )
   }
@@ -97,7 +97,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
     .select('id, is_demo')
     .eq('id', studentId)
     .eq('school_id', ctx.schoolId)
-    .is('archived_at', null)
+    .is('deleted_at', null)
     .single()
 
   if (fetchError || !student) {
@@ -109,21 +109,21 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
 
   if ((student as Record<string, unknown>).is_demo) {
     return NextResponse.json(
-      { error: 'Demo students cannot be archived.', code: 'FORBIDDEN' },
+      { error: 'Demo students cannot be deleted.', code: 'FORBIDDEN' },
       { status: 403 }
     )
   }
 
   const { error: dbError } = await supabaseAdmin
     .from('students')
-    .update({ archived_at: new Date().toISOString() })
+    .update({ deleted_at: new Date().toISOString(), updated_by: ctx.userId })
     .eq('id', studentId)
     .eq('school_id', ctx.schoolId)
 
   if (dbError) {
     return dbErrorResponse(dbError, {
       route: 'DELETE /api/dashboard/students/:id',
-      op:    'archive student',
+      op:    'soft-delete student',
     })
   }
 

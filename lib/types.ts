@@ -83,7 +83,7 @@ export interface Student {
   summary: string | null;
   progressSummary: string | null;
   isDemo: boolean;
-  archivedAt: string | null;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
   // 0011 profile fields

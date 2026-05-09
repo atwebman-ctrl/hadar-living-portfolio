@@ -30,7 +30,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
     .select('grade_level, academic_year')
     .eq('id', studentId)
     .eq('school_id', ctx.schoolId)
-    .is('archived_at', null)
+    .is('deleted_at', null)
     .single()
 
   if (studentErr || !student) {
@@ -45,7 +45,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
     .select('id, first_name')
     .eq('school_id', ctx.schoolId)
     .eq('grade_level', grade_level)
-    .is('archived_at', null)
+    .is('deleted_at', null)
 
   if (classmatesErr || !classmates?.length) {
     return NextResponse.json({

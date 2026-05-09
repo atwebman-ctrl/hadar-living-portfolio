@@ -44,7 +44,7 @@ export async function GET(_req: NextRequest) {
     .from('students')
     .select('*')
     .eq('school_id', ctx.schoolId)
-    .is('archived_at', null)
+    .is('deleted_at', null)
     .order('last_name', { ascending: true })
     .order('first_name', { ascending: true })
 

@@ -22,7 +22,7 @@ describe('mapStudent', () => {
     profile_photo_path:  'avatars/ayala.jpg',
     summary:             'A curious learner.',
     is_demo:             false,
-    archived_at:         null,
+    deleted_at:          null,
     created_at:          '2025-09-01T00:00:00.000Z',
     updated_at:          '2025-09-01T00:00:00.000Z',
   }
@@ -43,15 +43,15 @@ describe('mapStudent', () => {
     expect(result.updatedAt).toBe('2025-09-01T00:00:00.000Z')
   })
 
-  it('maps archivedAt when null', () => {
+  it('maps deletedAt when null', () => {
     const result = mapStudent(row)
-    expect(result.archivedAt).toBeNull()
+    expect(result.deletedAt).toBeNull()
   })
 
-  it('maps archivedAt when set to a timestamp', () => {
-    const archivedRow = { ...row, archived_at: '2026-01-15T12:00:00.000Z' }
-    const result = mapStudent(archivedRow)
-    expect(result.archivedAt).toBe('2026-01-15T12:00:00.000Z')
+  it('maps deletedAt when set to a timestamp', () => {
+    const deletedRow = { ...row, deleted_at: '2026-01-15T12:00:00.000Z' }
+    const result = mapStudent(deletedRow)
+    expect(result.deletedAt).toBe('2026-01-15T12:00:00.000Z')
   })
 
   it('defaults parentUserIds to empty array when absent', () => {

@@ -37,7 +37,7 @@ export function mapStudent(row: Row): Student {
     summary: (row.summary as string) ?? null,
     progressSummary: (row.progress_summary as string) ?? null,
     isDemo: row.is_demo as boolean,
-    archivedAt: (row.archived_at as string) ?? null,
+    deletedAt: (row.deleted_at as string) ?? null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
     // 0011 profile fields — nullable on pre-migration rows

@@ -77,7 +77,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     .select('id')
     .eq('id', studentId)
     .eq('school_id', ctx.schoolId)
-    .is('archived_at', null)
+    .is('deleted_at', null)
     .single()
 
   if (studentError || !student) {
