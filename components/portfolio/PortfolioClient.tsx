@@ -104,7 +104,7 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
         role={role}
         existingDraft={aiDrafts.find((d) => d.sectionType === 'virtue_badges')}
       />
-      <PortfolioFooter />
+      <PortfolioFooter schoolName={school.name} />
     </>
   )
 }

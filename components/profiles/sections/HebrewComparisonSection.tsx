@@ -5,7 +5,7 @@
 //
 // Body of the Hebrew · National comparison section editor. A
 // hand-rolled SVG grouped bar chart compares the student's
-// latest AVANT scores to Hadar grade-level cohort averages.
+// latest AVANT scores to AVANT STAMP national grade-level averages.
 // ============================================================
 
 import type { CSSProperties } from 'react'
@@ -73,7 +73,7 @@ export default function HebrewComparisonSection({
 
   const matchedGrade = bestMatchingGrade(athenaScores.composite)
   const statLine = matchedGrade
-    ? `Composite ${athenaScores.composite.toFixed(2)} · matches Hadar ${matchedGrade}th-grade cohort average`
+    ? `Composite ${athenaScores.composite.toFixed(2)} · matches AVANT ${matchedGrade}th-grade national average`
     : `Composite ${athenaScores.composite.toFixed(2)}`
 
   const firstName = studentName.split(' ')[0]

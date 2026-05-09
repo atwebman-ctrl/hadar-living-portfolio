@@ -80,10 +80,7 @@ export default function SideNav({
         className={styles.logo}
         style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}
       >
-        <div className={styles.logoMark}>{schoolName ?? 'Hadar · 2025–26'}</div>
-        {!schoolName && (
-          <div className={styles.schoolName}>Jewish Classical Academy</div>
-        )}
+        {schoolName && <div className={styles.logoMark}>{schoolName}</div>}
       </Link>
       <div className={styles.navLabel}>Portfolio</div>
 

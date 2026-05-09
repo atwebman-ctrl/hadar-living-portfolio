@@ -38,7 +38,7 @@ export default function DemoPortfolio() {
       >
         ← Return Home
       </Link>
-      <SideNav />
+      <SideNav schoolName="Hadar · 2025–26" />
       <div className={layoutStyles.main}>
         <HeroSection />
         <TheCanon />
@@ -46,7 +46,10 @@ export default function DemoPortfolio() {
         <EnglishSection selectedYear="all" />
         <HebrewSection />
         <CharacterArc />
-        <PortfolioFooter />
+        <PortfolioFooter
+          schoolName="Hadar Jewish Classical Academy"
+          tagline="Torah Im Derech Eretz"
+        />
       </div>
     </>
   )
