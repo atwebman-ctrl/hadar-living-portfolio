@@ -42,7 +42,7 @@ export async function loadLexileBand(
 ): Promise<LexileBand | null> {
   const { data: lexRow } = await supabaseAdmin
     .from('assessments')
-    .select('*')
+    .select('lexile_value, term, notes')
     .eq('student_id', studentId)
     .eq('school_id', schoolId)
     .eq('assessment_type', 'lexile')
@@ -140,9 +140,12 @@ export async function loadCanonReadings(
   studentId: string,
   schoolId:  string,
 ): Promise<Reading[]> {
+  // Mirror of READING_COLS in lib/getStudentPortfolio.ts — the same mapper
+  // is used, so any column the mapper reads must appear here.
+  const READING_COLS = 'id, school_id, student_id, title, author, academic_year, completed, sort_order, why_chosen, values_skills, page_count, teacher_notes, reading_difficulty, student_rating, date_started, date_finished, key_quote, curriculum_connection, created_at'
   const { data: rows } = await supabaseAdmin
     .from('readings')
-    .select('*')
+    .select(READING_COLS)
     .eq('student_id', studentId)
     .eq('school_id', schoolId)
     .is('deleted_at', null)
@@ -203,9 +206,11 @@ export async function loadCharacterAwards(
   studentId: string,
   schoolId:  string,
 ): Promise<CharacterAward[]> {
+  // Mirror of CHARACTER_AWARD_COLS in lib/getStudentPortfolio.ts.
+  const CHARACTER_AWARD_COLS = 'id, school_id, student_id, virtue_hebrew, virtue_transliteration, virtue_english, award_date, description, created_at'
   const { data: rows } = await supabaseAdmin
     .from('character_awards')
-    .select('*')
+    .select(CHARACTER_AWARD_COLS)
     .eq('student_id', studentId)
     .eq('school_id', schoolId)
     .is('deleted_at', null)

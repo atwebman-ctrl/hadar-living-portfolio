@@ -56,12 +56,17 @@ export async function getStudentPortfolioUncached(
   schoolId: string
 ): Promise<PortfolioData> {
   // Fetch school and student first — these must succeed.
+  // Column lists track exactly what each mapper reads. Anything added to a
+  // mapper must also be added here, or the field will silently be undefined.
+  const SCHOOL_COLS = 'id, name, slug, logo_url, theme_json, enabled_sections, website_url, clerk_org_id, pedagogical_schools'
+  const STUDENT_COLS = 'id, school_id, first_name, last_name, grade_level, grade_level_legacy, academic_year, parent_user_ids, profile_photo_path, summary, progress_summary, is_demo, deleted_at, created_at, updated_at, gender, date_of_birth, enrollment_status'
+
   const [{ data: schoolRow, error: schoolError }, { data: studentRow, error: studentError }] =
     await Promise.all([
-      supabaseAdmin.from("schools").select("*").eq("id", schoolId).single(),
+      supabaseAdmin.from("schools").select(SCHOOL_COLS).eq("id", schoolId).single(),
       supabaseAdmin
         .from("students")
-        .select("*")
+        .select(STUDENT_COLS)
         .eq("id", studentId)
         .eq("school_id", schoolId)
         .single(),
@@ -73,6 +78,24 @@ export async function getStudentPortfolioUncached(
   if (studentError || !studentRow) {
     throw new Error(`Student not found or does not belong to school: ${studentId}`);
   }
+
+  // Per-table column lists. These mirror the snake_case columns each mapper
+  // in lib/mappers.ts reads. Tables that participate in the soft-delete filter
+  // below MUST include `deleted_at`; otherwise the in-memory `notDeleted`
+  // check would always pass and soft-deleted rows would leak.
+  const ASSESSMENT_COLS       = 'id, school_id, student_id, assessment_type, score, percentile, rit_score, lexile_value, term, academic_year, notes, pdf_path, created_at, deleted_at'
+  const READING_COLS          = 'id, school_id, student_id, title, author, academic_year, completed, sort_order, why_chosen, values_skills, page_count, teacher_notes, reading_difficulty, student_rating, date_started, date_finished, key_quote, curriculum_connection, created_at, deleted_at'
+  const WRITING_SAMPLE_COLS   = 'id, school_id, student_id, language, grade_level, title, body, storage_path, image_path, ocr_text, academic_year, created_at, genre, excerpt, teacher_comments, term, file_path, deleted_at'
+  const HANDWRITING_COLS      = 'id, school_id, student_id, image_path, ocr_text, teacher_notes, term, academic_year, created_at, deleted_at'
+  const VIDEO_COLS            = 'id, school_id, student_id, video_type, title, description, storage_path, external_url, thumbnail_path, recorded_at, academic_year, created_at'
+  const CHARACTER_AWARD_COLS  = 'id, school_id, student_id, virtue_hebrew, virtue_transliteration, virtue_english, award_date, description, created_at, deleted_at'
+  const PHOTO_COLS            = 'id, school_id, student_id, storage_path, caption, term, category, date_taken, grade_level, academic_year, created_at, deleted_at'
+  const PARENT_UPLOAD_COLS    = 'id, school_id, student_id, upload_type, category, title, storage_path, description, date, grade_level, academic_year, uploaded_by, created_at, deleted_at'
+  const TEACHER_NOTE_COLS     = 'id, school_id, student_id, section_type, section_category, author_name, text, term, highlight_quote, visible_to_parents, section_anchor, created_at, deleted_at'
+  const SCOPE_COLS            = 'subject, unit, completion_pct, notes'
+  const AI_DRAFT_COLS         = 'id, school_id, student_id, section_type, reference_id, content_draft, content_final, status, reviewed_by, reviewed_at, created_at'
+  const STUDENT_VIDEO_COLS    = 'id, school_id, student_id, title, video_url, video_storage_path, grade_level, term, category, language, created_at, deleted_at'
+  const REPORT_CARD_COLS      = 'id, school_id, student_id, title, description, academic_year, term, grade_level, storage_path, file_type, uploaded_by, created_at, deleted_at'
 
   // Run all content queries in parallel.
   const [
@@ -95,7 +118,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("assessments")
-        .select("*")
+        .select(ASSESSMENT_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("academic_year", { ascending: false })
@@ -103,7 +126,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("readings")
-        .select("*")
+        .select(READING_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("sort_order", { ascending: true })
@@ -111,7 +134,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("writing_samples")
-        .select("*")
+        .select(WRITING_SAMPLE_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("created_at", { ascending: false })
@@ -119,7 +142,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("handwriting_samples")
-        .select("*")
+        .select(HANDWRITING_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("academic_year", { ascending: true })
@@ -127,7 +150,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("videos")
-        .select("*")
+        .select(VIDEO_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("recorded_at", { ascending: false })
@@ -135,7 +158,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("character_awards")
-        .select("*")
+        .select(CHARACTER_AWARD_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("award_date", { ascending: false })
@@ -143,7 +166,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("photos")
-        .select("*")
+        .select(PHOTO_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("date_taken", { ascending: false })
@@ -151,7 +174,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("parent_uploads")
-        .select("*")
+        .select(PARENT_UPLOAD_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("date", { ascending: false })
@@ -160,7 +183,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("teacher_notes")
-        .select("*")
+        .select(TEACHER_NOTE_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("created_at", { ascending: false })
@@ -169,7 +192,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("scope_and_sequence")
-        .select("*")
+        .select(SCOPE_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("subject", { ascending: true })
@@ -178,7 +201,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("ai_drafts")
-        .select("*")
+        .select(AI_DRAFT_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .eq("status", "accepted")
@@ -187,7 +210,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("student_videos")
-        .select("*")
+        .select(STUDENT_VIDEO_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("created_at", { ascending: true })
@@ -196,7 +219,7 @@ export async function getStudentPortfolioUncached(
     safeQuery(() =>
       supabaseAdmin
         .from("report_cards")
-        .select("*")
+        .select(REPORT_CARD_COLS)
         .eq("student_id", studentId)
         .eq("school_id", schoolId)
         .order("academic_year", { ascending: false })
