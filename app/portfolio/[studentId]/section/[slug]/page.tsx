@@ -13,14 +13,8 @@ import { enforceParentAccess } from '@/lib/portfolioAuth'
 import SideNav from '@/components/portfolio/SideNav'
 import RevealObserver from '@/components/portfolio/RevealObserver'
 import SectionDetailClient from '@/components/portfolio/SectionDetailClient'
+import { buildValidSectionSlugs } from '@/lib/portfolioTabs'
 import '../../../../demo/portfolio.css'
-
-const FIXED_SLUGS = [
-  'the-canon',
-  'math',
-  'english',
-  'soulcraft',
-] as const
 
 type Props = {
   params:      Promise<{ studentId: string; slug: string }>
@@ -45,10 +39,7 @@ export default async function SectionPage({ params, searchParams }: Props) {
   if (!portfolio) return notFound()
 
   // Guard invalid slugs (fixed sections + per-school third languages)
-  const validSlugs: readonly string[] = [
-    ...FIXED_SLUGS,
-    ...(portfolio.school.thirdLanguages ?? []).map((l) => l.code),
-  ]
+  const validSlugs = buildValidSectionSlugs(portfolio.school.thirdLanguages ?? [])
   if (!validSlugs.includes(slug)) notFound()
 
   if (role === 'parent') {

@@ -18,6 +18,7 @@ import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
 import LanguageSection from '@/components/portfolio/LanguageSection'
 import CharacterArc from '@/components/portfolio/CharacterArc'
+import { buildPortfolioTabs, type PortfolioTabDef } from '@/lib/portfolioTabs'
 
 // ── Error boundary ────────────────────────────────────────────
 
@@ -53,20 +54,10 @@ class TabErrorBoundary extends Component<
 
 // ── Tab definitions per group ─────────────────────────────────
 
-interface TabDef { slug: string; label: string }
+type TabDef = PortfolioTabDef
 
 export const GROUP_TITLES: Record<string, string> = {
   portfolio: 'Portfolio',
-}
-
-function buildPortfolioTabs(thirdLanguages: ThirdLanguage[]): TabDef[] {
-  return [
-    { slug: 'the-canon', label: 'The Canon' },
-    { slug: 'math',      label: 'Math'      },
-    { slug: 'english',   label: 'English'   },
-    ...thirdLanguages.map((l) => ({ slug: l.code, label: l.label })),
-    { slug: 'soulcraft', label: 'Soulcraft' },
-  ]
 }
 
 // ── Section renderer ──────────────────────────────────────────
