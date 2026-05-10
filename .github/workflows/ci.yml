@@ -7,9 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  # Unit suite — fast, offline. This is the only job gating branch protection
-  # (`check`). Integration and E2E below are non-blocking placeholders until
-  # the harness is battle-tested locally.
+  # Unit suite — fast, offline. Required check.
   check:
     runs-on: ubuntu-latest
     steps:
@@ -23,8 +21,10 @@ jobs:
       - run: npx vitest run
 
   # Integration suite — spins up local Supabase via the CLI, applies all
-  # migrations, runs the integration harness. Non-blocking for now. Make
-  # this a required check once we've watched it stay green for a week.
+  # migrations, runs the integration harness. Promoted to a blocking job
+  # 2026-05-09 once cross-tenant isolation coverage landed. To make it a
+  # required check in branch protection, add `integration` to the required
+  # checks list in GitHub Settings → Branches → main.
   #
   # NOTE: NEXT_PUBLIC_SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY below
   # are the well-known Supabase local-development JWTs shipped with every
@@ -35,7 +35,6 @@ jobs:
   # and never referenced from this workflow.
   integration:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
