@@ -14,10 +14,22 @@ const nextConfig: NextConfig = {
 }
 
 export default withSentryConfig(nextConfig, {
-  // Suppresses source map upload logs during build
-  silent: true,
-  // Disables automatic release creation — we'll wire this up when Sentry org/project are set
-  disableLogger: true,
-  // Automatically tree-shake Sentry logger statements in production
-  automaticVercelMonitors: false,
+  // Org + project are needed for source-map upload. Auth token is
+  // read from SENTRY_AUTH_TOKEN env var (set in Vercel, never committed).
+  org:     process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Suppress source map upload logs during build (CI-friendly).
+  silent: !process.env.CI,
+
+  webpack: {
+    // Tree-shake Sentry's verbose logger statements in production builds.
+    treeshake: { removeDebugLogging: true },
+    // Don't auto-create Vercel cron monitors (we don't use them yet).
+    automaticVercelMonitors: false,
+  },
+
+  // Delete uploaded source maps from the client bundle after upload —
+  // readable stack traces in Sentry, not in browser devtools.
+  sourcemaps: { deleteSourcemapsAfterUpload: true },
 })
