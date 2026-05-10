@@ -296,17 +296,32 @@ grep -r "school_id" --include="*.ts" --include="*.tsx" | grep -v node_modules | 
 
 **E2E (Playwright + Chromium)**
 - Run: `npm run test:e2e`
-- Config: `playwright.config.ts` (Chromium only, auto-boots `next dev -p 3100`)
-- Currently 1 test (landing-page smoke)
-- Known issues:
-  - Dev server reads `.env.local` not `.env.test` — fix before first real feature E2E test that relies on test-mode Clerk keys.
-  - Local Chromium hits `ERR_NAME_NOT_RESOLVED` on 127.0.0.1 from inside Playwright's worker on this machine. Runs fine on CI (Ubuntu).
+- Config: `playwright.config.ts` (Chromium only, auto-boots `next dev --webpack -p 3100`)
+- Currently: landing smoke + auth-harness (4 assertions across admin/teacher/parent/anonymous)
+- Webpack mode is intentional — Turbopack drops `Set-Cookie` headers on Clerk handshake redirects, breaking sign-in. Reassess once `@clerk/nextjs` ships a Turbopack-compatible release.
+- BASE_URL uses `localhost`, not `127.0.0.1` — Clerk's cookie scope treats them as different origins; mixing them triggers the "session token refresh redirect loop" defensive bail.
+- Known issue: local Chromium occasionally hits `ERR_NAME_NOT_RESOLVED` on 127.0.0.1 from inside Playwright's worker on this machine. Runs fine on CI (Ubuntu).
+
+**Clerk dev-instance setup for E2E (one-time)**
+The Playwright auth setup in `tests/e2e/global.setup.ts` signs in three test users via `@clerk/testing`. Three things must be true on the Clerk dev instance for sign-in to complete:
+1. **Password sign-in enabled, email-code sign-in disabled.** Dashboard → User & authentication → Email tab → "Sign-in with email" section: turn OFF "Email verification code" and "Email verification link". Leave Password as the only first-factor strategy.
+2. **MFA fully off.** Dashboard → Multi-factor: every strategy gray, "Require multi-factor authentication" gray.
+3. **Each test user has `bypass_client_trust: true`.** Clerk's adaptive-MFA flags every Playwright run as a "new device" and demands a second factor unless this per-user flag is set. There's no dashboard toggle — patch via Backend API:
+   ```bash
+   set -a; source .env.test; set +a
+   for uid in <admin_user_id> <teacher_user_id> <parent_user_id>; do
+     curl -sS -X PATCH -H "Authorization: Bearer $CLERK_SECRET_KEY" \
+       -H "Content-Type: application/json" \
+       "https://api.clerk.com/v1/users/$uid" \
+       -d '{"bypass_client_trust": true}'
+   done
+   ```
 
 **CI (`.github/workflows/ci.yml`)**
-- `check` job (tsc + vitest run) — blocking, required check
-- `integration` job — continue-on-error: true, spins up supabase locally
-- `e2e` job — continue-on-error: true, installs Playwright + Chromium
-- Integration + E2E will be promoted to required checks after staying green for a week
+- `check` job (tsc + vitest run) — blocking
+- `integration` job — blocking as of 2026-05-09 (multi-tenant isolation coverage landed); spins up supabase locally
+- `e2e` job — continue-on-error: true, installs Playwright + Chromium (still flaky on local Chromium DNS)
+- Branch protection in GitHub still needs `integration` added to required checks list (Settings → Branches → main); workflow change alone makes the job fail loudly but doesn't block merges until that's done
 
 **Workflow rules going forward**
 - Every new feature should ship with at least one integration test covering its critical path
