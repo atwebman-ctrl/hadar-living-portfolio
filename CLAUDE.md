@@ -61,6 +61,7 @@ Next.js 16 · TypeScript (strict) · Tailwind CSS 4 · Supabase · Clerk (Organi
 - Solo-dev mode: pushes go directly to `main`. Husky runs the unit suite pre-commit as the main gate.
 - GitHub branch protection exists but allows admin bypass; this is acceptable while Aaron is the only committer.
 - When a second engineer joins the repo, formalize PR gating: all changes via PR, integration + e2e CI jobs promoted to required checks, admin bypass disabled.
+- After cloning to a new machine: run `git fetch --prune` to drop stale remote-tracking refs (branches deleted on GitHub after merge), and `git stash list` to surface old stashes. Branch/stash leftovers that predate the clone are usually obsolete archaeology — verify the work shipped via `git log --all -- <file>` before deleting, but don't tiptoe around it.
 
 ## Code Hygiene Rules (enforce always)
 1. No file over 300 lines — split into sub-components immediately
