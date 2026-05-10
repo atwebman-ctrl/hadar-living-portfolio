@@ -8,6 +8,7 @@
 // ============================================================
 
 import type React from 'react'
+import Link from 'next/link'
 import type { PortfolioData, Student, UserRole } from '@/lib/types'
 import InlineEditableText from '@/components/shared/InlineEditableText'
 import {
@@ -141,6 +142,41 @@ export default function PortfolioHub({ portfolio, studentId, role }: Props) {
           subtitle={`${galleryCount} item${galleryCount !== 1 ? 's' : ''}`}
         />
       </div>
+
+      {role !== 'parent' && (
+        <section
+          style={{
+            marginTop:  '1.5rem',
+            paddingTop: '1.25rem',
+            borderTop:  '1px solid var(--rule)',
+            textAlign:  'center',
+          }}
+        >
+          <div
+            style={{
+              fontFamily:    'var(--font-mono)',
+              fontSize:      11,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color:         'var(--ink-faint)',
+              marginBottom:  6,
+            }}
+          >
+            For teachers
+          </div>
+          <Link
+            href={`/dashboard/profiles/${studentId}/spring`}
+            style={{
+              color:          'var(--gold)',
+              fontFamily:     'var(--font-body)',
+              fontSize:       '0.95rem',
+              textDecoration: 'none',
+            }}
+          >
+            Open Spring 2025–26 Profile →
+          </Link>
+        </section>
+      )}
     </div>
   )
 }
