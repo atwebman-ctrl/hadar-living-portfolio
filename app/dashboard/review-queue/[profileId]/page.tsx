@@ -19,7 +19,7 @@ import {
   loadLexileBand,
   loadMapsScores,
   loadAvantAssessments,
-  hebrewComparisonFromAvant,
+  avantComparisonFromAssessments,
   loadCanonReadings,
   loadCompositionSamples,
   loadCharacterAwards,
@@ -29,6 +29,7 @@ import PublishedProfile, {
   type SectionPayload,
 } from '@/components/portfolio/published/PublishedProfile'
 import type { PublishedSectionData } from '@/components/portfolio/published/PublishedSectionRenderer'
+import type { SchoolConfig } from '@/lib/types'
 import ReviewActionBar from '@/components/dashboard/ReviewActionBar'
 
 type Props = { params: Promise<{ profileId: string }> }
@@ -98,6 +99,7 @@ export default async function ReviewPreviewPage({ params }: Props) {
           websiteUrl:       (schoolRow.website_url as string | null) ?? null,
           clerkOrgId:       (schoolRow.clerk_org_id as string | null) ?? null,
           pedagogicalSchools: [],
+          thirdLanguages:   (schoolRow.third_languages as SchoolConfig['thirdLanguages']) ?? [],
         }}
         student={student}
         profile={profile}
@@ -137,7 +139,7 @@ async function loadSectionData(
   }
   if (kind === 'hebrew_comparison') {
     const merged = await loadAvantAssessments(studentId, schoolId, gradeLevel, academicYear)
-    const athenaScores = hebrewComparisonFromAvant(merged)
+    const athenaScores = avantComparisonFromAssessments(merged)
     return { kind: 'hebrew_comparison', athenaScores, firstName: ctx.firstName }
   }
   if (kind === 'canon_reading') {

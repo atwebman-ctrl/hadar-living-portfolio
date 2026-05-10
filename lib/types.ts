@@ -57,6 +57,15 @@ export interface PedagogicalSchool {
   order: number;
 }
 
+// Per-tenant additional language slot. The `code` doubles as the URL slug
+// and as the writing_samples.language / student_videos.language value.
+// `hasAvantNorms` controls whether the LanguageComparisonSection renders.
+export interface ThirdLanguage {
+  code: string;
+  label: string;
+  hasAvantNorms: boolean;
+}
+
 export interface SchoolConfig {
   id: string;
   name: string;
@@ -67,6 +76,7 @@ export interface SchoolConfig {
   websiteUrl: string | null;
   clerkOrgId: string | null;
   pedagogicalSchools: PedagogicalSchool[];
+  thirdLanguages: ThirdLanguage[];
 }
 
 // ── Student ──────────────────────────────────────────────────
@@ -138,7 +148,11 @@ export interface WritingSample {
   id: string;
   schoolId: string;
   studentId: string;
-  language: "english" | "hebrew";
+  // Free-form lowercase code (e.g. 'english', 'hebrew', 'latin', 'greek').
+  // Constrained at the DB layer via writing_samples_language_format_check.
+  // English samples use 'english'; third-language samples use the school's
+  // third_languages[i].code.
+  language: string;
   gradeLevel: string;
   title: string;
   body: string | null;
@@ -348,7 +362,9 @@ export interface StudentVideo {
   gradeLevel: string;
   term: string;
   category: StudentVideoCategory;
-  language: "english" | "hebrew";
+  // Free-form lowercase code matching school.thirdLanguages[i].code (or 'english').
+  // Constrained at the DB layer via student_videos_language_format_check.
+  language: string;
   createdAt: string;
 }
 

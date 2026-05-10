@@ -15,7 +15,7 @@ import YearSelector from '@/components/portfolio/YearSelector'
 import TheCanon from '@/components/portfolio/TheCanon'
 import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
-import HebrewSection from '@/components/portfolio/HebrewSection'
+import LanguageSection from '@/components/portfolio/LanguageSection'
 import CharacterArc from '@/components/portfolio/CharacterArc'
 import layoutStyles from '@/components/portfolio/layout.module.css'
 
@@ -79,8 +79,29 @@ export default function SectionDetailClient({
     router.push(year === 'all' ? base : `${base}?year=${year}`)
   }
 
+  const thirdLanguages = portfolio.school.thirdLanguages ?? []
+
   // ── Section renderer ────────────────────────────────────────
   const renderSection = () => {
+    const language = thirdLanguages.find((l) => l.code === slug)
+    if (language) {
+      return (
+        <LanguageSection
+          language={language}
+          assessments={assessments}
+          studentVideos={portfolio.studentVideos}
+          writingSamples={portfolio.writingSamples}
+          handwritingSamples={portfolio.handwritingSamples}
+          teacherNotes={teacherNotes}
+          studentId={studentId}
+          studentName={student.firstName}
+          role={role}
+          gradeLevel={student.gradeLevel}
+          existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
+        />
+      )
+    }
+
     switch (slug) {
       case 'the-canon':
         return (
@@ -123,21 +144,6 @@ export default function SectionDetailClient({
             academicYear={student.academicYear}
             selectedYear={selectedYear}
             existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
-          />
-        )
-      case 'hebrew':
-        return (
-          <HebrewSection
-            assessments={assessments}
-            studentVideos={portfolio.studentVideos}
-            writingSamples={portfolio.writingSamples}
-            handwritingSamples={portfolio.handwritingSamples}
-            teacherNotes={teacherNotes}
-            studentId={studentId}
-            studentName={student.firstName}
-            role={role}
-            gradeLevel={student.gradeLevel}
-            existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
           />
         )
       case 'soulcraft':

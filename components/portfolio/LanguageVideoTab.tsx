@@ -1,11 +1,12 @@
 'use client'
 
-import type { StudentVideo, TeacherNote, UserRole } from '@/lib/types'
+import type { StudentVideo, TeacherNote, UserRole, ThirdLanguage } from '@/lib/types'
 import InlineVideoForm from '@/components/portfolio/InlineVideoForm'
 import InlineSectionComment from '@/components/shared/InlineSectionComment'
 import s from './sections.module.css'
 
 interface Props {
+  language:     ThirdLanguage
   videos:       StudentVideo[]
   canEdit:      boolean
   studentId?:   string
@@ -76,12 +77,12 @@ function EmbedVideoCard({ video }: { video: StudentVideo }) {
   )
 }
 
-export default function HebrewVideoTab({ videos, canEdit, studentId, teacherNotes, role }: Props) {
+export default function LanguageVideoTab({ language, videos, canEdit, studentId, teacherNotes, role }: Props) {
   const commentEl = studentId ? (
     <InlineSectionComment
       studentId={studentId}
       sectionCategory="immersion_engine"
-      sectionAnchor="hebrew-video"
+      sectionAnchor={`${language.code}-video`}
       canEdit={canEdit}
       notes={teacherNotes}
       role={role}
@@ -92,7 +93,7 @@ export default function HebrewVideoTab({ videos, canEdit, studentId, teacherNote
     return (
       <div style={{ padding: '2rem 0' }}>
         <p style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '1.25rem', maxWidth: 560 }}>
-          No Hebrew videos yet. Add a YouTube or Vimeo link below to start documenting Hebrew speaking progress.
+          No {language.label} videos yet. Add a YouTube or Vimeo link below to start documenting {language.label} speaking progress.
         </p>
         {commentEl}
         {canEdit && studentId && <InlineVideoForm studentId={studentId} />}
@@ -104,7 +105,7 @@ export default function HebrewVideoTab({ videos, canEdit, studentId, teacherNote
   return (
     <div style={{ paddingTop: '1.25rem' }}>
       <p className="reveal" style={{ fontSize: '.9rem', color: 'var(--ink-light)', marginBottom: '2rem', maxWidth: 560 }}>
-        {videos.length} Hebrew video{videos.length !== 1 ? 's' : ''} — trace the arc of spoken performance over time.
+        {videos.length} {language.label} video{videos.length !== 1 ? 's' : ''} — trace the arc of spoken performance over time.
       </p>
       {then && now && (
         <div className={`${s.thenNow} reveal`}>

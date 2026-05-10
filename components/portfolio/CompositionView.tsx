@@ -10,25 +10,23 @@ import groupStyles from '@/components/portfolio/GroupDetail.module.css'
 import s from './sections.module.css'
 
 interface Props {
-  writingSamples:     WritingSample[]
-  handwritingSamples: HandwritingSample[]
-  teacherNotes?:      TeacherNote[]
-  studentId:          string
-  studentName?:       string
-  role:               UserRole
-  initialLanguage?:   'english' | 'hebrew'
-  existingDraft?:     AiDraft
-  academicYear?:      string
-  gradeLevel?:        string
+  writingSamples:      WritingSample[]
+  handwritingSamples:  HandwritingSample[]
+  teacherNotes?:       TeacherNote[]
+  studentId:           string
+  studentName?:        string
+  role:                UserRole
+  initialLanguage?:    string
+  /** Display label for the pinned language. Used in copy when initialLanguage is set. */
+  languageLabel?:      string
+  /** Cross-language view: which language pills to show (omit 'all' — added automatically). */
+  availableLanguages?: { code: string; label: string }[]
+  existingDraft?:      AiDraft
+  academicYear?:       string
+  gradeLevel?:         string
 }
 
-type LangFilter = 'all' | 'english' | 'hebrew'
-
-const LANG_PILLS: { slug: LangFilter; label: string }[] = [
-  { slug: 'all',     label: 'All'     },
-  { slug: 'english', label: 'English' },
-  { slug: 'hebrew',  label: 'Hebrew'  },
-]
+type LangFilter = string  // 'all' | language code
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -69,7 +67,7 @@ function buildDraftContext(samples: WritingSample[], studentFirstName: string | 
 
 // ── Sub-components ────────────────────────────────────────────
 
-function LanguageTag({ language }: { language: 'english' | 'hebrew' }) {
+function LanguageTag({ language }: { language: string }) {
   return (
     <span style={{
       fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em',
@@ -145,12 +143,23 @@ export default function CompositionView({
   studentName,
   role,
   initialLanguage,
+  languageLabel,
+  availableLanguages,
   existingDraft,
   academicYear,
   gradeLevel,
 }: Props) {
   const [filter,     setFilter]     = useState<LangFilter>(initialLanguage ?? 'all')
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+
+  const langPills: { slug: string; label: string }[] = [
+    { slug: 'all', label: 'All' },
+    { slug: 'english', label: 'English' },
+    ...(availableLanguages ?? []).map((l) => ({ slug: l.code, label: l.label })),
+  ]
+  const filterLabel = filter === 'all'
+    ? ''
+    : (langPills.find((p) => p.slug === filter)?.label ?? filter) + ' '
 
   const toggleExpanded = (id: string) => {
     setExpandedIds((prev) => {
@@ -182,7 +191,7 @@ export default function CompositionView({
       {/* ── Language filter pills (hidden when parent section pins the language) ── */}
       {!initialLanguage && (
         <div className={groupStyles.groupTabBar} style={{ marginBottom: '1.5rem' }}>
-          {LANG_PILLS.map((p) => (
+          {langPills.map((p) => (
             <button
               key={p.slug}
               className={`${groupStyles.groupTab}${filter === p.slug ? ` ${groupStyles.groupTabActive}` : ''}`}
@@ -197,7 +206,7 @@ export default function CompositionView({
       {/* ── Writing samples list ─────────────────────────────── */}
       {sorted.length === 0 ? (
         <p style={{ fontSize: '.9rem', color: 'var(--ink-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
-          No {filter === 'all' ? '' : filter + ' '}compositions yet.
+          No {initialLanguage ? (languageLabel ?? '') + ' ' : filterLabel}compositions yet.
         </p>
       ) : (
         <div className="reveal">

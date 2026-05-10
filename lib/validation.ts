@@ -143,7 +143,10 @@ export type UpdateReadingInput  = z.infer<typeof UpdateReadingSchema>;
 
 export const CreateWritingSampleSchema = z.object({
   studentId:   uuid,
-  language:    z.enum(["english", "hebrew"]),
+  // Free-form lowercase language code; matches DB CHECK
+  // writing_samples_language_format_check. 'english' for English samples;
+  // third-language samples use the school's third_languages[i].code.
+  language:    z.string().regex(/^[a-z][a-z0-9_]{0,31}$/, 'language must be a short lowercase code'),
   gradeLevel:  nonEmptyString,
   title:       nonEmptyString,
   body:        z.string().nullable().optional(),

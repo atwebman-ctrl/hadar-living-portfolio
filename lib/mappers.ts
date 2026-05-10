@@ -58,6 +58,7 @@ export function mapSchool(row: Row): SchoolConfig {
     websiteUrl: (row.website_url as string) ?? null,
     clerkOrgId: (row.clerk_org_id as string) ?? null,
     pedagogicalSchools: (row.pedagogical_schools as SchoolConfig['pedagogicalSchools']) ?? [],
+    thirdLanguages:     (row.third_languages     as SchoolConfig['thirdLanguages'])     ?? [],
   };
 }
 

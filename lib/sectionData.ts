@@ -12,7 +12,7 @@ import { supabaseAdmin } from './supabaseAdmin'
 import { mapReading, mapCharacterAward } from './mappers'
 import { mergeMapsAssessments, type MAPSAssessment } from './mapsHelpers'
 import { mergeAvantAssessments, type AVANTAssessment } from './avantHelpers'
-import type { HebrewSkillAverages } from './hebrewComparisonNorms'
+import type { LanguageSkillAverages } from './avantNorms'
 import { storagePublicUrl } from './storage'
 import type { Reading, CharacterAward } from './types'
 import type { CompositionSample } from '@/components/profiles/sections/CompositionSection'
@@ -91,7 +91,13 @@ export async function loadMapsScores(
   )
 }
 
-// ── AVANT (Hebrew) ───────────────────────────────────────────
+// ── AVANT (third-language proficiency) ────────────────────────
+//
+// AVANT STAMP is currently the only third-language assessment Quire
+// integrates with. For Hadar this scores Hebrew; in principle the same
+// loader handles any AVANT-tested language since assessment_type prefix
+// is `avant_*` regardless of language. Schools without AVANT data get
+// an empty array and the comparison section short-circuits to "no data."
 
 export async function loadAvantAssessments(
   studentId:    string,
@@ -114,12 +120,12 @@ export async function loadAvantAssessments(
   )
 }
 
-// Derives the HebrewSkillAverages shape from the latest merged AVANT row.
+// Derives the LanguageSkillAverages shape from the latest merged AVANT row.
 // Accepts pre-loaded assessments so callers can share a single query when
 // they need both the raw trajectory and the latest composite.
-export function hebrewComparisonFromAvant(
+export function avantComparisonFromAssessments(
   merged: AVANTAssessment[],
-): HebrewSkillAverages {
+): LanguageSkillAverages {
   const latest = merged.length > 0 ? merged[merged.length - 1] : null
   const present = [latest?.reading, latest?.writing, latest?.listening, latest?.speaking]
     .filter((s): s is number => s != null)
@@ -154,7 +160,7 @@ export async function loadCanonReadings(
   return (rows ?? []).map((r) => mapReading(r as Record<string, unknown>))
 }
 
-// ── Composition (English / Hebrew) ───────────────────────────
+// ── Composition (English or any school third-language) ───────
 
 // `academicYear` scopes results to a single year label (e.g. "2025-2026") and
 // is intended for profile surfaces — published report card, review queue
@@ -169,7 +175,7 @@ export async function loadCanonReadings(
 export async function loadCompositionSamples(
   studentId:     string,
   schoolId:      string,
-  language:      'english' | 'hebrew',
+  language:      string,
   academicYear?: string,
 ): Promise<CompositionSample[]> {
   let query = supabaseAdmin
@@ -189,7 +195,7 @@ export async function loadCompositionSamples(
     const row = r as Record<string, unknown>
     return {
       id:             row.id as string,
-      language,
+      language:       (row.language as string) ?? language,
       gradeLevel:     (row.grade_level as string) ?? '',
       academicYear:   (row.academic_year as string) ?? '',
       title:          (row.title as string) ?? null,

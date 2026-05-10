@@ -53,6 +53,7 @@ export default async function GroupPage({ params, searchParams }: Props) {
         studentId={studentId}
         role={role}
         activeGroup={groupSlug}
+        thirdLanguages={portfolio.school.thirdLanguages}
       />
       <GroupDetailClient
         portfolio={portfolio}

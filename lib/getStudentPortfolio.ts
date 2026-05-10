@@ -58,7 +58,7 @@ export async function getStudentPortfolioUncached(
   // Fetch school and student first — these must succeed.
   // Column lists track exactly what each mapper reads. Anything added to a
   // mapper must also be added here, or the field will silently be undefined.
-  const SCHOOL_COLS = 'id, name, slug, logo_url, theme_json, enabled_sections, website_url, clerk_org_id, pedagogical_schools'
+  const SCHOOL_COLS = 'id, name, slug, logo_url, theme_json, enabled_sections, website_url, clerk_org_id, pedagogical_schools, third_languages'
   const STUDENT_COLS = 'id, school_id, first_name, last_name, grade_level, grade_level_legacy, academic_year, parent_user_ids, profile_photo_path, summary, progress_summary, is_demo, deleted_at, created_at, updated_at, gender, date_of_birth, enrollment_status'
 
   const [{ data: schoolRow, error: schoolError }, { data: studentRow, error: studentError }] =

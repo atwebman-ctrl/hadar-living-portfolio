@@ -17,7 +17,7 @@ import {
 } from '@/lib/types/profileBuilder'
 import SectionEditorShell from '@/components/profiles/sections/SectionEditorShell'
 import HebrewComparisonSection from '@/components/profiles/sections/HebrewComparisonSection'
-import type { HebrewSkillAverages } from '@/lib/hebrewComparisonNorms'
+import type { LanguageSkillAverages } from '@/lib/avantNorms'
 
 const ATHENA_HEBREW_COMPARISON_DRAFT =
   "Athena's Hebrew language skills sit comfortably at or above the national average for 6th-grade Hebrew immersion students — three years above her current grade level. Her listening and reading have reached parity with the most advanced cohort, and her speaking and writing are progressing at a pace consistent with steady upward growth. This comparison places her firmly in the upper percentile of Hebrew immersion learners nationally."
@@ -31,7 +31,7 @@ type Props = {
   gradeLabel:       string
   termLabel:        string
   backHref:         string
-  athenaScores:     HebrewSkillAverages
+  athenaScores:     LanguageSkillAverages
 }
 
 export default function HebrewComparisonSectionWrapper({

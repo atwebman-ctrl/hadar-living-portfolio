@@ -14,7 +14,7 @@ import UploadDropZone from './UploadDropZone'
 
 export interface CompositionSample {
   id:           string
-  language:     'english' | 'hebrew'
+  language:     string  // 2-value enum lifted to free string for multi-language support
   gradeLevel:   string
   academicYear: string
   title:        string | null

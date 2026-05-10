@@ -91,7 +91,7 @@ export interface AvantCompositeSummary {
   strongestSkill: AvantSkill | null
 }
 
-// Grade-equivalent bands borrowed from HebrewSection.tsx
+// Grade-equivalent bands borrowed from LanguageSection.tsx
 const GRADE_BENCHMARKS = [
   { grade: '3rd', threshold: 2.49 },
   { grade: '4th', threshold: 3.44 },

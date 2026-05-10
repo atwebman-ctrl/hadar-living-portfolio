@@ -25,7 +25,7 @@ import {
   loadLexileBand,
   loadMapsScores,
   loadAvantAssessments,
-  hebrewComparisonFromAvant,
+  avantComparisonFromAssessments,
   loadCanonReadings,
   loadCompositionSamples,
   loadCharacterAwards,
@@ -153,7 +153,7 @@ export default async function SectionEditorPage({ params }: Props) {
     const merged = await loadAvantAssessments(
       studentId, schoolId, student.gradeLevel, student.academicYear,
     )
-    const athenaScores = hebrewComparisonFromAvant(merged)
+    const athenaScores = avantComparisonFromAssessments(merged)
     return <HebrewComparisonSectionWrapper {...commonProps} athenaScores={athenaScores} />
   }
 

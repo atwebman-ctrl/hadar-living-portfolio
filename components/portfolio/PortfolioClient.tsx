@@ -15,7 +15,7 @@ import HeroSection from '@/components/portfolio/HeroSection'
 import TheCanon from '@/components/portfolio/TheCanon'
 import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
-import HebrewSection from '@/components/portfolio/HebrewSection'
+import LanguageSection from '@/components/portfolio/LanguageSection'
 import CharacterArc from '@/components/portfolio/CharacterArc'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 import InviteParentButton from '@/components/shared/InviteParentButton'
@@ -86,17 +86,21 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
         selectedYear={selectedYear}
         existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
       />
-      <HebrewSection
-        assessments={assessments}
-        studentVideos={portfolio.studentVideos}
-        writingSamples={portfolio.writingSamples}
-        handwritingSamples={portfolio.handwritingSamples}
-        studentId={studentId}
-        studentName={student.firstName}
-        role={role}
-        gradeLevel={student.gradeLevel}
-        existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
-      />
+      {school.thirdLanguages.map((language) => (
+        <LanguageSection
+          key={language.code}
+          language={language}
+          assessments={assessments}
+          studentVideos={portfolio.studentVideos}
+          writingSamples={portfolio.writingSamples}
+          handwritingSamples={portfolio.handwritingSamples}
+          studentId={studentId}
+          studentName={student.firstName}
+          role={role}
+          gradeLevel={student.gradeLevel}
+          existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
+        />
+      ))}
       <CharacterArc
         characterAwards={portfolio.characterAwards}
         studentId={studentId}

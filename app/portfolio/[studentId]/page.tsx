@@ -39,6 +39,7 @@ export default async function PortfolioPage({ params }: Props) {
         studentName={studentName}
         studentId={studentId}
         role={role}
+        thirdLanguages={portfolio.school.thirdLanguages}
       />
       <HubShell portfolio={portfolio} studentId={studentId} role={role} />
       {role !== 'parent' && (

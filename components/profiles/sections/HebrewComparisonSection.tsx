@@ -10,14 +10,14 @@
 
 import type { CSSProperties } from 'react'
 import {
-  HEBREW_GRADE_AVERAGES,
-  HEBREW_SKILLS,
-  type HebrewSkillAverages,
-  type HebrewSkill,
-} from '@/lib/hebrewComparisonNorms'
+  AVANT_GRADE_AVERAGES,
+  AVANT_SKILLS,
+  type LanguageSkillAverages,
+  type AvantSkill,
+} from '@/lib/avantNorms'
 
 type Props = {
-  athenaScores:      HebrewSkillAverages
+  athenaScores:      LanguageSkillAverages
   studentName:       string
   narrative:         string
   onNarrativeChange: (next: string) => void
@@ -25,7 +25,7 @@ type Props = {
   onGenerateDraft:   () => void
 }
 
-const SKILL_LABEL: Record<HebrewSkill, string> = {
+const SKILL_LABEL: Record<AvantSkill, string> = {
   reading: 'Reading', writing: 'Writing', listening: 'Listening',
   speaking: 'Speaking', composite: 'Composite',
 }
@@ -52,7 +52,7 @@ function bestMatchingGrade(athenaComposite: number): 3 | 4 | 5 | 6 | null {
   let best: 3 | 4 | 5 | 6 | null = null
   let bestDiff = Infinity
   for (const g of [3, 4, 5, 6] as const) {
-    const diff = Math.abs(HEBREW_GRADE_AVERAGES[g].composite - athenaComposite)
+    const diff = Math.abs(AVANT_GRADE_AVERAGES[g].composite - athenaComposite)
     if (diff < bestDiff) { bestDiff = diff; best = g }
   }
   return best
@@ -62,7 +62,7 @@ export default function HebrewComparisonSection({
   athenaScores, studentName, narrative,
   onNarrativeChange, isGenerating, onGenerateDraft,
 }: Props) {
-  const groupCount = HEBREW_SKILLS.length
+  const groupCount = AVANT_SKILLS.length
   const groupGap = 16
   const groupW = (PLOT_W - groupGap * (groupCount - 1)) / groupCount
   const barCount = 5
@@ -102,14 +102,14 @@ export default function HebrewComparisonSection({
                 </g>
               ))}
 
-              {HEBREW_SKILLS.map((skill, gi) => {
+              {AVANT_SKILLS.map((skill, gi) => {
                 const groupX = PAD_L + gi * (groupW + groupGap)
                 const bars: Array<{ fill: string; v: number; x: number }> = [
                   { fill: 'var(--gold)',     v: athenaScores[skill],          x: groupX + 0 * (barW + barGap) },
-                  { fill: GRADE_BAR_FILL[3], v: HEBREW_GRADE_AVERAGES[3][skill], x: groupX + 1 * (barW + barGap) },
-                  { fill: GRADE_BAR_FILL[4], v: HEBREW_GRADE_AVERAGES[4][skill], x: groupX + 2 * (barW + barGap) },
-                  { fill: GRADE_BAR_FILL[5], v: HEBREW_GRADE_AVERAGES[5][skill], x: groupX + 3 * (barW + barGap) },
-                  { fill: GRADE_BAR_FILL[6], v: HEBREW_GRADE_AVERAGES[6][skill], x: groupX + 4 * (barW + barGap) },
+                  { fill: GRADE_BAR_FILL[3], v: AVANT_GRADE_AVERAGES[3][skill], x: groupX + 1 * (barW + barGap) },
+                  { fill: GRADE_BAR_FILL[4], v: AVANT_GRADE_AVERAGES[4][skill], x: groupX + 2 * (barW + barGap) },
+                  { fill: GRADE_BAR_FILL[5], v: AVANT_GRADE_AVERAGES[5][skill], x: groupX + 3 * (barW + barGap) },
+                  { fill: GRADE_BAR_FILL[6], v: AVANT_GRADE_AVERAGES[6][skill], x: groupX + 4 * (barW + barGap) },
                 ]
                 return (
                   <g key={skill}>
@@ -159,7 +159,7 @@ export default function HebrewComparisonSection({
               </div>
             </div>
             {([6, 5, 4, 3] as const).map((g) => {
-              const a = HEBREW_GRADE_AVERAGES[g]
+              const a = AVANT_GRADE_AVERAGES[g]
               return (
                 <div key={g} style={SOURCE_ROW}>
                   <div style={SOURCE_TERM}>Grade {g} avg</div>

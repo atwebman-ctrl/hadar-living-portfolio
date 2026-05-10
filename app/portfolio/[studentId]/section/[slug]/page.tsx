@@ -15,11 +15,10 @@ import RevealObserver from '@/components/portfolio/RevealObserver'
 import SectionDetailClient from '@/components/portfolio/SectionDetailClient'
 import '../../../../demo/portfolio.css'
 
-const VALID_SLUGS = [
+const FIXED_SLUGS = [
   'the-canon',
   'math',
   'english',
-  'hebrew',
   'soulcraft',
 ] as const
 
@@ -31,9 +30,6 @@ type Props = {
 export default async function SectionPage({ params, searchParams }: Props) {
   const { studentId, slug } = await params
   const { year } = await searchParams
-
-  // Guard invalid slugs
-  if (!(VALID_SLUGS as readonly string[]).includes(slug)) notFound()
 
   const { userId, schoolId, role } = await getAuthContext().catch(() => notFound())
 
@@ -47,6 +43,13 @@ export default async function SectionPage({ params, searchParams }: Props) {
     return notFound()
   }
   if (!portfolio) return notFound()
+
+  // Guard invalid slugs (fixed sections + per-school third languages)
+  const validSlugs: readonly string[] = [
+    ...FIXED_SLUGS,
+    ...(portfolio.school.thirdLanguages ?? []).map((l) => l.code),
+  ]
+  if (!validSlugs.includes(slug)) notFound()
 
   if (role === 'parent') {
     await enforceParentAccess(userId, schoolId, studentId)
@@ -72,6 +75,7 @@ export default async function SectionPage({ params, searchParams }: Props) {
         studentId={studentId}
         role={role}
         activeSlug={slug}
+        thirdLanguages={portfolio.school.thirdLanguages}
       />
       <SectionDetailClient
         portfolio={portfolio}

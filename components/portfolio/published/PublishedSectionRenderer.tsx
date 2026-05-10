@@ -11,9 +11,9 @@ import type { Reading, CharacterAward } from '@/lib/types'
 import type { AVANTAssessment } from '@/lib/avantHelpers'
 import type { MAPSAssessment } from '@/lib/mapsHelpers'
 import {
-  HEBREW_GRADE_AVERAGES, HEBREW_SKILLS,
-  type HebrewSkillAverages, type HebrewSkill,
-} from '@/lib/hebrewComparisonNorms'
+  AVANT_GRADE_AVERAGES, AVANT_SKILLS,
+  type LanguageSkillAverages, type AvantSkill,
+} from '@/lib/avantNorms'
 import type { CompositionSample } from '@/components/profiles/sections/CompositionSection'
 import { percentileColor } from '@/lib/percentileColor'
 import * as S from './publishedStyles'
@@ -22,7 +22,7 @@ export type PublishedSectionData =
   | { kind: 'maps_scores';         assessments: MAPSAssessment[] }
   | { kind: 'lexile';               band: { label: string; rangeMinL: number; rangeMaxL: number; termLabel: string; notes: string | null } | null }
   | { kind: 'avant_hebrew';         assessments: AVANTAssessment[] }
-  | { kind: 'hebrew_comparison';    athenaScores: HebrewSkillAverages; firstName: string }
+  | { kind: 'hebrew_comparison';    athenaScores: LanguageSkillAverages; firstName: string }
   | { kind: 'canon_reading';        readings: Reading[] }
   | { kind: 'english_composition';  samples: CompositionSample[] }
   | { kind: 'hebrew_composition';   samples: CompositionSample[] }
@@ -189,13 +189,13 @@ function AvantBlock({ assessments }: { assessments: AVANTAssessment[] }) {
   )
 }
 
-const HEBREW_LABEL: Record<HebrewSkill, string> = {
+const AVANT_LABEL: Record<AvantSkill, string> = {
   reading: 'Reading', writing: 'Writing', listening: 'Listening',
   speaking: 'Speaking', composite: 'Composite',
 }
 
 function HebrewComparisonBlock({ athenaScores, firstName }:
-  { athenaScores: HebrewSkillAverages; firstName: string }) {
+  { athenaScores: LanguageSkillAverages; firstName: string }) {
   return (
     <table style={S.TABLE}>
       <thead>
@@ -209,16 +209,16 @@ function HebrewComparisonBlock({ athenaScores, firstName }:
         </tr>
       </thead>
       <tbody>
-        {HEBREW_SKILLS.map((skill) => (
+        {AVANT_SKILLS.map((skill) => (
           <tr key={skill}>
-            <td style={S.TD}>{HEBREW_LABEL[skill]}</td>
+            <td style={S.TD}>{AVANT_LABEL[skill]}</td>
             <td style={{ ...S.TD, color: 'var(--gold)', fontWeight: 600 }}>
               {athenaScores[skill].toFixed(2)}
             </td>
-            <td style={S.TD}>{HEBREW_GRADE_AVERAGES[3][skill].toFixed(2)}</td>
-            <td style={S.TD}>{HEBREW_GRADE_AVERAGES[4][skill].toFixed(2)}</td>
-            <td style={S.TD}>{HEBREW_GRADE_AVERAGES[5][skill].toFixed(2)}</td>
-            <td style={S.TD}>{HEBREW_GRADE_AVERAGES[6][skill].toFixed(2)}</td>
+            <td style={S.TD}>{AVANT_GRADE_AVERAGES[3][skill].toFixed(2)}</td>
+            <td style={S.TD}>{AVANT_GRADE_AVERAGES[4][skill].toFixed(2)}</td>
+            <td style={S.TD}>{AVANT_GRADE_AVERAGES[5][skill].toFixed(2)}</td>
+            <td style={S.TD}>{AVANT_GRADE_AVERAGES[6][skill].toFixed(2)}</td>
           </tr>
         ))}
       </tbody>

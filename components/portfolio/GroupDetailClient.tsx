@@ -9,14 +9,14 @@
 // ============================================================
 
 import { useState, useMemo, Component, type ReactNode } from 'react'
-import type { UserRole, PortfolioData } from '@/lib/types'
+import type { UserRole, PortfolioData, ThirdLanguage } from '@/lib/types'
 import YearSelector from '@/components/portfolio/YearSelector'
 import layoutStyles from '@/components/portfolio/layout.module.css'
 import groupStyles from '@/components/portfolio/GroupDetail.module.css'
 import TheCanon from '@/components/portfolio/TheCanon'
 import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
-import HebrewSection from '@/components/portfolio/HebrewSection'
+import LanguageSection from '@/components/portfolio/LanguageSection'
 import CharacterArc from '@/components/portfolio/CharacterArc'
 
 // ── Error boundary ────────────────────────────────────────────
@@ -55,30 +55,50 @@ class TabErrorBoundary extends Component<
 
 interface TabDef { slug: string; label: string }
 
-export const GROUP_TABS: Record<string, TabDef[]> = {
-  portfolio: [
+export const GROUP_TITLES: Record<string, string> = {
+  portfolio: 'Portfolio',
+}
+
+function buildPortfolioTabs(thirdLanguages: ThirdLanguage[]): TabDef[] {
+  return [
     { slug: 'the-canon', label: 'The Canon' },
     { slug: 'math',      label: 'Math'      },
     { slug: 'english',   label: 'English'   },
-    { slug: 'hebrew',    label: 'Hebrew'    },
+    ...thirdLanguages.map((l) => ({ slug: l.code, label: l.label })),
     { slug: 'soulcraft', label: 'Soulcraft' },
-  ],
-}
-
-export const GROUP_TITLES: Record<string, string> = {
-  portfolio: 'Portfolio',
+  ]
 }
 
 // ── Section renderer ──────────────────────────────────────────
 
 const YEAR_FILTER_TABS = new Set(['math', 'english', 'the-canon'])
 
-function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
+function RenderSection({ slug, portfolio, studentId, role, selectedYear, thirdLanguages }: {
   slug: string; portfolio: PortfolioData; studentId: string; role: UserRole; selectedYear: string
+  thirdLanguages: ThirdLanguage[]
 }) {
   const { student, assessments, aiDrafts, teacherNotes } = portfolio
   const filtered = <T extends { academicYear?: string | null }>(items: T[]): T[] =>
     selectedYear === 'all' ? items : items.filter((i) => i.academicYear === selectedYear)
+
+  const language = thirdLanguages.find((l) => l.code === slug)
+  if (language) {
+    return (
+      <LanguageSection
+        language={language}
+        assessments={assessments}
+        studentVideos={portfolio.studentVideos}
+        writingSamples={portfolio.writingSamples}
+        handwritingSamples={portfolio.handwritingSamples}
+        teacherNotes={teacherNotes}
+        studentId={studentId}
+        studentName={student.firstName}
+        role={role}
+        gradeLevel={student.gradeLevel}
+        existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
+      />
+    )
+  }
 
   switch (slug) {
     case 'the-canon':
@@ -124,21 +144,6 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear }: {
           existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
         />
       )
-    case 'hebrew':
-      return (
-        <HebrewSection
-          assessments={assessments}
-          studentVideos={portfolio.studentVideos}
-          writingSamples={portfolio.writingSamples}
-          handwritingSamples={portfolio.handwritingSamples}
-          teacherNotes={teacherNotes}
-          studentId={studentId}
-          studentName={student.firstName}
-          role={role}
-          gradeLevel={student.gradeLevel}
-          existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
-        />
-      )
     case 'soulcraft':
       return (
         <CharacterArc
@@ -166,7 +171,8 @@ interface Props {
 }
 
 export default function GroupDetailClient({ portfolio, studentId, role, groupSlug, initialTab }: Props) {
-  const tabs  = GROUP_TABS[groupSlug] ?? []
+  const thirdLanguages = portfolio.school.thirdLanguages ?? []
+  const tabs  = groupSlug === 'portfolio' ? buildPortfolioTabs(thirdLanguages) : []
   const title = GROUP_TITLES[groupSlug] ?? groupSlug
   const [activeTab,    setActiveTab]    = useState(initialTab ?? tabs[0]?.slug ?? '')
   const [selectedYear, setSelectedYear] = useState('all')
@@ -229,6 +235,7 @@ export default function GroupDetailClient({ portfolio, studentId, role, groupSlu
           studentId={studentId}
           role={role}
           selectedYear={selectedYear}
+          thirdLanguages={thirdLanguages}
         />
       </TabErrorBoundary>
     </div>

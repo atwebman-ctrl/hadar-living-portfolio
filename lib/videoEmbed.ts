@@ -9,7 +9,7 @@
 // Three older copies of this logic live in:
 //   components/portfolio/RhetoricRoom.tsx
 //   components/portfolio/EnglishVideoTab.tsx
-//   components/portfolio/HebrewVideoTab.tsx
+//   components/portfolio/LanguageVideoTab.tsx
 // They will be migrated to this helper in a follow-up commit.
 // ============================================================
 

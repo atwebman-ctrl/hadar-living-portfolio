@@ -9,7 +9,7 @@ import HeroSection from '@/components/portfolio/HeroSection'
 import TheCanon from '@/components/portfolio/TheCanon'
 import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
-import HebrewSection from '@/components/portfolio/HebrewSection'
+import LanguageSection from '@/components/portfolio/LanguageSection'
 import CharacterArc from '@/components/portfolio/CharacterArc'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 
@@ -44,7 +44,7 @@ export default function DemoPortfolio() {
         <TheCanon />
         <MathSection selectedYear="all" />
         <EnglishSection selectedYear="all" />
-        <HebrewSection />
+        <LanguageSection language={{ code: 'hebrew', label: 'Hebrew', hasAvantNorms: true }} />
         <CharacterArc />
         <PortfolioFooter
           schoolName="Hadar Jewish Classical Academy"
