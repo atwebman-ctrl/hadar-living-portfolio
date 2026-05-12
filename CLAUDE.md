@@ -282,7 +282,7 @@ grep -r "school_id" --include="*.ts" --include="*.tsx" | grep -v node_modules | 
 - Run: `npm test`
 - Config: `vitest.config.ts` (excludes tests/integration/** and tests/e2e/**)
 - Pattern: mocks `@/lib/supabaseAdmin` + `@/lib/auth`, no DB
-- Currently 132 tests across 13 files
+- Currently 235 tests across 27 files
 - Fast, offline, no dependencies
 
 **Integration (Vitest against local Supabase)**
@@ -364,7 +364,7 @@ Per Tayler's feedback, Claude should NOT be named in product UI copy. Use "Quire
 ## Profile Builder phase plan
 - ✅ **Phase 1–3**: Profile Builder structure + 9 sections (schema, creation flow, per-section editors, section data sources)
 - ✅ **Phase 4**: Dr. Worth review queue — shipped 2026-04-19 in Session A. `draft → in_review → published | draft-with-feedback` state machine. Admin-only `/dashboard/review-queue` list + preview. Section PATCH returns 403 LOCKED while profile is in_review. Three POST endpoints: `/submit`, `/approve`, `/request-changes`.
-- ⏳ **Phase 5**: real Claude API drafting behind Generate Draft buttons
+- 🟡 **Phase 5** (in progress): real Claude API drafting behind Generate Draft buttons. **MAPS shipped 2026-05-10**: `POST /api/dashboard/profiles/[profileId]/sections/[sectionId]/generate` calls Claude Haiku 4.5 via a per-kind prompt builder in `lib/aiPrompts.ts`, persists to `profile_sections.narrative_draft` + status='in_progress'. Same auth/LOCKED/rate-limit (5/min/user) guards as PATCH. MAPSSectionWrapper now calls it. Other 8 wrappers still stubbed; route returns 501 NOT_IMPLEMENTED for those kinds until prompt builders land. The legacy `app/api/ai/draft` route writes to a different table (`ai_drafts`) under the old taxonomy and is **not** used by Profile Builder — treat it as dead code for new Profile Builder work.
 - ⏳ **Phase 6**: published-view polish (charts in published view instead of tables, poetry iframe, PDF export)
 - ⏳ **Phase 7**: Quick Capture (StreamComposer reactivation)
 

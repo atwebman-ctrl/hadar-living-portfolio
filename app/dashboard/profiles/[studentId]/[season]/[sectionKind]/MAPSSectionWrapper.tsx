@@ -20,9 +20,6 @@ import MAPSSection, {
   type MAPSAssessment,
 } from '@/components/profiles/sections/MAPSSection'
 
-const ATHENA_MAPS_DRAFT =
-  "Athena's performance on the MAP assessments has been strong and consistent. Over seven administrations, she has advanced from the 76th percentile in math to the 95th, and from the 90th percentile in English to the 98th. Her RIT scores place her well above grade level in both subjects, and the trajectory is continuing upward."
-
 type Props = {
   profileId:        string
   sectionId:        string
@@ -106,12 +103,25 @@ export default function MAPSSectionWrapper({
     })
   }
 
-  function handleGenerateDraft() {
+  async function handleGenerateDraft() {
     setIsGenerating(true)
-    setTimeout(() => {
-      setNarrative(ATHENA_MAPS_DRAFT)
+    setErrorMessage(null)
+    setSaveMessage(null)
+    try {
+      const res = await fetch(
+        `/api/dashboard/profiles/${profileId}/sections/${sectionId}/generate`,
+        { method: 'POST' },
+      )
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? 'Draft generation failed.')
+      setNarrative(body.text as string)
+      setStatus('in_progress')
+      setSaveMessage('Draft generated.')
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Draft generation failed.')
+    } finally {
       setIsGenerating(false)
-    }, 600)
+    }
   }
 
   return (
