@@ -375,7 +375,7 @@ Per Tayler's feedback, Claude should NOT be named in product UI copy. Use "Quire
 
 ## Blocked / pending items
 - **Replace Lexile metric** — ⏳ BLOCKED: pending Karissa's input on preferred reading-level framework (Fountas & Pinnell, DRA, or narrative description). Lexile bar chart remains in place until decision.
-- **Scope and sequence from Lobel team** — ⏳ BLOCKED: Lobel team has not supplied curriculum scope and sequence content. `ScopeAndSequence.tsx` is orphaned with placeholder/seed data. Build import or admin UI once format is confirmed.
+- **Scope and sequence is per-school, not Lobel-sourced** — every tenant brings its own curriculum, so there is no single upstream content drop to wait on. Reframe as a school-managed surface: either (a) an admin-UI for the school to enter/upload their scope and sequence, or (b) a simple external link field on the school config so parents can be pointed to the school's own curriculum doc. `ScopeAndSequence.tsx` remains orphaned until this is designed.
 - **Load real Athena data** — Demo student currently uses hardcoded seed data; seed Athena's real assessment scores, readings, and samples so the demo portfolio reflects genuine student work.
 - **Sentry error tracking** — not yet installed.
 - **Tech debt**: `hadar-living-portfolio → quire-platform` rename (good moment: during a routing-heavy phase). `lib/types.ts` refactor into directory (re-export stopgap working fine for now). Broader ghost-migration audit for 0001–0011 columns.
