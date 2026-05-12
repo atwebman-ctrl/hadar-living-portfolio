@@ -52,16 +52,25 @@ export const PROFILE_SECTION_KIND_LABELS: Record<ProfileSectionKind, string> = {
 
 // Which section kinds are REQUIRED by default for a new profile.
 // Optional section kinds are only added when the teacher adds them.
+// Ordering reflects the classical-education report-card sequence:
+// character first, then canon and qualitative classroom work, then
+// the foreign-language block, then rhetoric, with standardized
+// measurements (Lexile, MAPS) at the end as evidentiary appendix.
+//
+// Future Phase 8 sections "Mathematics and Logic" and a merged
+// "Hebrew · Proficiency, class observations, and national
+// comparison" will slot in at positions 4 and 5 respectively when
+// they land.
 export const REQUIRED_SECTION_KINDS: ProfileSectionKind[] = [
-  'maps_scores',
-  'lexile',
-  'avant_hebrew',
-  'hebrew_comparison',
+  'character_middot',
   'canon_reading',
   'english_composition',
+  'avant_hebrew',
+  'hebrew_comparison',
   'hebrew_composition',
-  'character_middot',
   'poetry_recitation',
+  'lexile',
+  'maps_scores',
 ]
 
 export const OPTIONAL_SECTION_KINDS: ProfileSectionKind[] = [

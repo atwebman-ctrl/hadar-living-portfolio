@@ -20,16 +20,19 @@
 import { createClient } from '@supabase/supabase-js'
 import { randomUUID } from 'node:crypto'
 
+// Mirror of REQUIRED_SECTION_KINDS in lib/types/profileBuilder.ts.
+// Kept in sync manually so this file has no `lib/` import (E2E
+// helpers run outside the Next build and shouldn't pull app code).
 const REQUIRED_SECTION_KINDS = [
-  'maps_scores',
-  'lexile',
-  'avant_hebrew',
-  'hebrew_comparison',
+  'character_middot',
   'canon_reading',
   'english_composition',
+  'avant_hebrew',
+  'hebrew_comparison',
   'hebrew_composition',
-  'character_middot',
   'poetry_recitation',
+  'lexile',
+  'maps_scores',
 ] as const
 
 export interface ProfileFixture {
