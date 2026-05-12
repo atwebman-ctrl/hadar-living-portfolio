@@ -54,6 +54,15 @@ describe('buildMapsPrompt', () => {
     expect(system).toMatch(/no bullets/i)
   })
 
+  it('bans em dashes and en dashes in the system rules (and in its own copy)', () => {
+    const { system } = buildMapsPrompt({
+      studentFirstName: 'A', gradeLabel: '3', termLabel: 'Spring', assessments: [],
+    })
+    expect(system).toMatch(/em dash/i)
+    // The rule string itself must not contain the punctuation it forbids.
+    expect(system).not.toMatch(/[–—]/)
+  })
+
   it('handles an empty assessments array without throwing', () => {
     const { user } = buildMapsPrompt({
       studentFirstName: 'A', gradeLabel: '3', termLabel: 'Spring', assessments: [],

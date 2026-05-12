@@ -23,10 +23,11 @@
 import type { MAPSAssessment } from './mapsHelpers'
 
 const BASE_RULES = `Write a single paragraph of 2-4 sentences for a student's living portfolio.\
-The audience is the student's parents. Voice: warm, literate, celebratory — like a thoughtful\
-letter from an admired teacher. Third person, plain prose only — no markdown, no headings,\
-no bullets, no lists. Never invent scores, percentiles, or specific facts not present in the\
-data provided. Do not mention AI, models, or that this draft was generated.`
+The audience is the student's parents. Voice: warm, literate, celebratory, like a thoughtful\
+letter from an admired teacher. Third person, plain prose only, no markdown, no headings,\
+no bullets, no lists. Use commas, colons, or periods instead of em dashes or en dashes.\
+Never invent scores, percentiles, or specific facts not present in the data provided.\
+Do not mention AI, models, or that this draft was generated.`
 
 function nameClause(firstName: string | null): string {
   return firstName
@@ -53,7 +54,7 @@ export function buildMapsPrompt(input: MapsPromptInput): PromptPair {
 ${BASE_RULES} ${nameClause(input.studentFirstName)} The section you are writing covers NWEA\
 MAP Growth assessment results for math and reading. Speak to growth across administrations\
 when the data shows it; speak to current standing relative to grade-level norms when the\
-percentiles support it. Avoid jargon like "RIT" or "percentile rank" — translate into plain\
+percentiles support it. Avoid jargon like "RIT" or "percentile rank"; translate into plain\
 language a parent can read.`
 
   const rows = input.assessments.map((a) => ({
