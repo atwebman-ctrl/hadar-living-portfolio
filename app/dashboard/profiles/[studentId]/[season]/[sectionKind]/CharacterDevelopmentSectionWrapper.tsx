@@ -18,9 +18,6 @@ import type { CharacterAward } from '@/lib/types'
 import SectionEditorShell from '@/components/profiles/sections/SectionEditorShell'
 import CharacterDevelopmentSection from '@/components/profiles/sections/CharacterDevelopmentSection'
 
-const ATHENA_CHARACTER_DRAFT =
-  "Athena has demonstrated middot tovot — good character — on three occasions this year, receiving awards for Ometz (courage), Herut (freedom), and Achrayut (responsibility). Her teachers and Dr. Worth recognize in her the quiet persistence that classical formation aims to cultivate. These are not merely certificates; they are markers of a child coming to love what is good and to practice it in the company of others."
-
 type Props = {
   profileId:        string
   sectionId:        string
@@ -104,12 +101,25 @@ export default function CharacterDevelopmentSectionWrapper({
     })
   }
 
-  function handleGenerateDraft() {
+  async function handleGenerateDraft() {
     setIsGenerating(true)
-    setTimeout(() => {
-      setNarrative(ATHENA_CHARACTER_DRAFT)
+    setErrorMessage(null)
+    setSaveMessage(null)
+    try {
+      const res = await fetch(
+        `/api/dashboard/profiles/${profileId}/sections/${sectionId}/generate`,
+        { method: 'POST' },
+      )
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? 'Draft generation failed.')
+      setNarrative(body.text as string)
+      setStatus('in_progress')
+      setSaveMessage('Draft generated.')
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Draft generation failed.')
+    } finally {
       setIsGenerating(false)
-    }, 600)
+    }
   }
 
   return (

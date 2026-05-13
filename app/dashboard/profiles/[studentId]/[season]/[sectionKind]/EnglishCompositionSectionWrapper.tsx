@@ -19,9 +19,6 @@ import CompositionSection, {
   type CompositionSample,
 } from '@/components/profiles/sections/CompositionSection'
 
-const ATHENA_ENGLISH_COMPOSITION_DRAFT =
-  "Athena's English compositions across grades 1, 2, and 3 trace a striking arc of growth. Her early pieces show a strong instinct for narrative voice; the more recent work pairs that voice with denser sentences, sharper word choice, and a willingness to revise. Across the term she's moved from short, energetic paragraphs into multi-paragraph pieces that hold a thread from beginning to end."
-
 type Props = {
   profileId:        string
   sectionId:        string
@@ -105,12 +102,25 @@ export default function EnglishCompositionSectionWrapper({
     })
   }
 
-  function handleGenerateDraft() {
+  async function handleGenerateDraft() {
     setIsGenerating(true)
-    setTimeout(() => {
-      setNarrative(ATHENA_ENGLISH_COMPOSITION_DRAFT)
+    setErrorMessage(null)
+    setSaveMessage(null)
+    try {
+      const res = await fetch(
+        `/api/dashboard/profiles/${profileId}/sections/${sectionId}/generate`,
+        { method: 'POST' },
+      )
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? 'Draft generation failed.')
+      setNarrative(body.text as string)
+      setStatus('in_progress')
+      setSaveMessage('Draft generated.')
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Draft generation failed.')
+    } finally {
       setIsGenerating(false)
-    }, 600)
+    }
   }
 
   return (

@@ -11,7 +11,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // ── Mocks ────────────────────────────────────────────────────
 vi.mock('@/lib/auth', () => ({ getAuthContext: vi.fn() }))
 vi.mock('@/lib/supabaseAdmin', () => ({ supabaseAdmin: { from: vi.fn() } }))
-vi.mock('@/lib/sectionData', () => ({ loadMapsScores: vi.fn() }))
+vi.mock('@/lib/sectionData', () => ({
+  loadMapsScores:                vi.fn(),
+  loadLexileBand:                vi.fn(),
+  loadCanonReadings:             vi.fn(),
+  loadCompositionSamples:        vi.fn(),
+  loadAvantAssessments:          vi.fn(),
+  avantComparisonFromAssessments: vi.fn(),
+  loadCharacterAwards:           vi.fn(),
+  loadPoetryVideo:               vi.fn(),
+}))
 
 const mockCreate = vi.fn()
 vi.mock('@anthropic-ai/sdk', () => ({
@@ -135,8 +144,10 @@ describe('POST /api/dashboard/profiles/[profileId]/sections/[sectionId]/generate
   })
 
   it('returns 501 NOT_IMPLEMENTED for an unsupported section kind', async () => {
+    // All 9 required kinds are wired; optional kinds (art_projects, field_trips,
+    // custom) still return 501. Use one of those to exercise the default branch.
     fromMock()
-      .mockReturnValueOnce(selectChain({ data: joinedSectionRow({ kind: 'lexile' }), error: null }))
+      .mockReturnValueOnce(selectChain({ data: joinedSectionRow({ kind: 'art_projects' }), error: null }))
       .mockReturnValueOnce(selectChain({ data: studentRow(), error: null }))
     const res = await POST(makeReq(), PARAMS)
     expect(res.status).toBe(501)

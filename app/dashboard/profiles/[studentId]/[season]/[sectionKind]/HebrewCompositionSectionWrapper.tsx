@@ -19,9 +19,6 @@ import CompositionSection, {
   type CompositionSample,
 } from '@/components/profiles/sections/CompositionSection'
 
-const ATHENA_HEBREW_COMPOSITION_DRAFT =
-  "Athena's Hebrew compositions are still being collected for this term. As pages are added, this section will follow her progression in script formation, vocabulary range, and the ability to sustain a longer Hebrew thought across multiple sentences."
-
 type Props = {
   profileId:        string
   sectionId:        string
@@ -105,12 +102,25 @@ export default function HebrewCompositionSectionWrapper({
     })
   }
 
-  function handleGenerateDraft() {
+  async function handleGenerateDraft() {
     setIsGenerating(true)
-    setTimeout(() => {
-      setNarrative(ATHENA_HEBREW_COMPOSITION_DRAFT)
+    setErrorMessage(null)
+    setSaveMessage(null)
+    try {
+      const res = await fetch(
+        `/api/dashboard/profiles/${profileId}/sections/${sectionId}/generate`,
+        { method: 'POST' },
+      )
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? 'Draft generation failed.')
+      setNarrative(body.text as string)
+      setStatus('in_progress')
+      setSaveMessage('Draft generated.')
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Draft generation failed.')
+    } finally {
       setIsGenerating(false)
-    }, 600)
+    }
   }
 
   return (

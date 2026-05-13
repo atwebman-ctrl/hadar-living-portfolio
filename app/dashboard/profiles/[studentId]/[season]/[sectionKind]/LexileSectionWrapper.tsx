@@ -22,9 +22,6 @@ import {
 import SectionEditorShell from '@/components/profiles/sections/SectionEditorShell'
 import LexileSection from '@/components/profiles/sections/LexileSection'
 
-const ATHENA_LEXILE_DRAFT =
-  "Athena's reading proficiency sits at the upper end of advanced. Her Lexile range — 1150L to 1300L — places her well within the college and career readiness benchmark established for 11th and 12th graders. She reads texts of substantial complexity with sustained attention and increasingly sophisticated interpretive skill."
-
 type Band = {
   label: string
   rangeMinL: number
@@ -116,15 +113,25 @@ export default function LexileSectionWrapper({
     })
   }
 
-  function handleGenerateDraft() {
+  async function handleGenerateDraft() {
     setIsGenerating(true)
-    // Stub: a real call would POST to /api/ai/draft. For Phase 3
-    // we hand back a Quire-voiced paragraph so the editor flow
-    // can be tested end-to-end without burning model calls.
-    setTimeout(() => {
-      setNarrative(ATHENA_LEXILE_DRAFT)
+    setErrorMessage(null)
+    setSaveMessage(null)
+    try {
+      const res = await fetch(
+        `/api/dashboard/profiles/${profileId}/sections/${section.id}/generate`,
+        { method: 'POST' },
+      )
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? 'Draft generation failed.')
+      setNarrative(body.text as string)
+      setStatus('in_progress')
+      setSaveMessage('Draft generated.')
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Draft generation failed.')
+    } finally {
       setIsGenerating(false)
-    }, 600)
+    }
   }
 
   return (

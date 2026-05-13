@@ -19,9 +19,6 @@ import SectionEditorShell from '@/components/profiles/sections/SectionEditorShel
 import HebrewComparisonSection from '@/components/profiles/sections/HebrewComparisonSection'
 import type { LanguageSkillAverages } from '@/lib/avantNorms'
 
-const ATHENA_HEBREW_COMPARISON_DRAFT =
-  "Athena's Hebrew language skills sit comfortably at or above the national average for 6th-grade Hebrew immersion students — three years above her current grade level. Her listening and reading have reached parity with the most advanced cohort, and her speaking and writing are progressing at a pace consistent with steady upward growth. This comparison places her firmly in the upper percentile of Hebrew immersion learners nationally."
-
 type Props = {
   profileId:        string
   sectionId:        string
@@ -105,12 +102,25 @@ export default function HebrewComparisonSectionWrapper({
     })
   }
 
-  function handleGenerateDraft() {
+  async function handleGenerateDraft() {
     setIsGenerating(true)
-    setTimeout(() => {
-      setNarrative(ATHENA_HEBREW_COMPARISON_DRAFT)
+    setErrorMessage(null)
+    setSaveMessage(null)
+    try {
+      const res = await fetch(
+        `/api/dashboard/profiles/${profileId}/sections/${sectionId}/generate`,
+        { method: 'POST' },
+      )
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? 'Draft generation failed.')
+      setNarrative(body.text as string)
+      setStatus('in_progress')
+      setSaveMessage('Draft generated.')
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Draft generation failed.')
+    } finally {
       setIsGenerating(false)
-    }, 600)
+    }
   }
 
   return (

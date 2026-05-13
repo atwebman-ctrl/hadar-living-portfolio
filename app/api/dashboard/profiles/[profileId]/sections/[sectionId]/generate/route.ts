@@ -13,9 +13,9 @@
 //   to Dr. Worth, no edits or AI redrafts until she returns it).
 // Rate limit: 5/min per user (Claude calls are billable).
 //
-// Section coverage: maps_scores is wired in this revision. Other
-// section kinds return 501 NOT_IMPLEMENTED until their prompt
-// builders + data loaders land.
+// Section coverage: all 9 required section kinds are wired.
+// Optional kinds (art_projects, field_trips, custom) return 501
+// NOT_IMPLEMENTED — they have no prompt builders yet.
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -23,8 +23,27 @@ import Anthropic from '@anthropic-ai/sdk'
 import { getAuthContext } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { authErrorResponse, rateLimit, rateLimitResponse } from '@/lib/apiHelpers'
-import { loadMapsScores } from '@/lib/sectionData'
-import { buildMapsPrompt } from '@/lib/aiPrompts'
+import {
+  loadMapsScores,
+  loadLexileBand,
+  loadCanonReadings,
+  loadCompositionSamples,
+  loadAvantAssessments,
+  avantComparisonFromAssessments,
+  loadCharacterAwards,
+  loadPoetryVideo,
+} from '@/lib/sectionData'
+import {
+  buildMapsPrompt,
+  buildLexilePrompt,
+  buildCanonPrompt,
+  buildCompositionPrompt,
+  buildAvantPrompt,
+  buildHebrewComparisonPrompt,
+  buildCharacterPrompt,
+  buildPoetryPrompt,
+} from '@/lib/aiPrompts'
+import { AVANT_GRADE_AVERAGES } from '@/lib/avantNorms'
 import type { ProfileSectionKind } from '@/lib/types/profileBuilder'
 
 type RouteContext = { params: Promise<{ profileId: string; sectionId: string }> }
@@ -147,20 +166,73 @@ export async function POST(_req: NextRequest, { params }: RouteContext) {
   }
 
   // Build the per-kind prompt
+  const common = {
+    studentFirstName: student.first_name,
+    gradeLabel:       student.grade_level,
+    termLabel:        resolved.termLabel,
+  }
   let prompt: { system: string; user: string }
   switch (resolved.sectionKind) {
     case 'maps_scores': {
       const assessments = await loadMapsScores(
-        resolved.studentId,
-        ctx.schoolId,
-        student.grade_level,
-        student.academic_year,
+        resolved.studentId, ctx.schoolId, student.grade_level, student.academic_year,
       )
-      prompt = buildMapsPrompt({
-        studentFirstName: student.first_name,
-        gradeLabel:       student.grade_level,
-        termLabel:        resolved.termLabel,
-        assessments,
+      prompt = buildMapsPrompt({ ...common, assessments })
+      break
+    }
+    case 'lexile': {
+      const band = await loadLexileBand(resolved.studentId, ctx.schoolId)
+      prompt = buildLexilePrompt({ ...common, band })
+      break
+    }
+    case 'canon_reading': {
+      const readings = await loadCanonReadings(resolved.studentId, ctx.schoolId)
+      prompt = buildCanonPrompt({ ...common, readings })
+      break
+    }
+    case 'english_composition':
+    case 'hebrew_composition': {
+      const language = resolved.sectionKind === 'english_composition' ? 'english' : 'hebrew'
+      const languageLabel = resolved.sectionKind === 'english_composition' ? 'English' : 'Hebrew'
+      const samples = await loadCompositionSamples(
+        resolved.studentId, ctx.schoolId, language, student.academic_year,
+      )
+      prompt = buildCompositionPrompt({ ...common, languageLabel, samples })
+      break
+    }
+    case 'avant_hebrew': {
+      const assessments = await loadAvantAssessments(
+        resolved.studentId, ctx.schoolId, student.grade_level, student.academic_year,
+      )
+      prompt = buildAvantPrompt({ ...common, languageLabel: 'Hebrew', assessments })
+      break
+    }
+    case 'hebrew_comparison': {
+      const merged = await loadAvantAssessments(
+        resolved.studentId, ctx.schoolId, student.grade_level, student.academic_year,
+      )
+      const athenaScores = avantComparisonFromAssessments(merged)
+      const gradeInt = parseInt(student.grade_level, 10)
+      const nationalAverage =
+        gradeInt === 3 || gradeInt === 4 || gradeInt === 5 || gradeInt === 6
+          ? AVANT_GRADE_AVERAGES[gradeInt]
+          : null
+      prompt = buildHebrewComparisonPrompt({
+        ...common, languageLabel: 'Hebrew', athenaScores, nationalAverage,
+      })
+      break
+    }
+    case 'character_middot': {
+      const awards = await loadCharacterAwards(resolved.studentId, ctx.schoolId)
+      prompt = buildCharacterPrompt({ ...common, awards })
+      break
+    }
+    case 'poetry_recitation': {
+      const { videoUrl, title } = await loadPoetryVideo(resolved.studentId, ctx.schoolId)
+      prompt = buildPoetryPrompt({
+        ...common,
+        videoTitle: title,
+        hasVideo:   videoUrl !== null,
       })
       break
     }

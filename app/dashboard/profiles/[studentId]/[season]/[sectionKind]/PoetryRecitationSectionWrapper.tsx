@@ -19,9 +19,6 @@ import {
 import SectionEditorShell from '@/components/profiles/sections/SectionEditorShell'
 import PoetryRecitationSection from '@/components/profiles/sections/PoetryRecitationSection'
 
-const ATHENA_POETRY_DRAFT =
-  "Athena memorized and recited ten bronze-level poems this year, standing before the school to share them aloud. Classical education begins the long work of rhetoric not with argument but with recitation — the child's first contribution to the tradition is to lend her voice to words already worth hearing. Her willingness to stand and speak them is the beginning of her formation as a speaker, and as a witness to what is excellent."
-
 type Props = {
   profileId:         string
   sectionId:         string
@@ -107,12 +104,25 @@ export default function PoetryRecitationSectionWrapper({
     })
   }
 
-  function handleGenerateDraft() {
+  async function handleGenerateDraft() {
     setIsGenerating(true)
-    setTimeout(() => {
-      setNarrative(ATHENA_POETRY_DRAFT)
+    setErrorMessage(null)
+    setSaveMessage(null)
+    try {
+      const res = await fetch(
+        `/api/dashboard/profiles/${profileId}/sections/${sectionId}/generate`,
+        { method: 'POST' },
+      )
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? 'Draft generation failed.')
+      setNarrative(body.text as string)
+      setStatus('in_progress')
+      setSaveMessage('Draft generated.')
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Draft generation failed.')
+    } finally {
       setIsGenerating(false)
-    }, 600)
+    }
   }
 
   async function handleVideoUrlSave(next: string) {

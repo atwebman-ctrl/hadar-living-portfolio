@@ -19,9 +19,6 @@ import SectionEditorShell from '@/components/profiles/sections/SectionEditorShel
 import ReadingListSection from '@/components/profiles/sections/ReadingListSection'
 import type { Reading } from '@/lib/types'
 
-const ATHENA_CANON_DRAFT =
-  "Athena has read nine of the ten books on this year's English canon, with a tenth (Guns for General Washington) currently in progress. The selection ranges from canonical fairy tales (Grimm, Andersen) to chapter-book classics (Black Beauty, The Jungle Book) to children's adaptations of the Western canon (Tales from Shakespeare). Her reading pace and breadth this year speak to a deeply established love of stories, and her ability to move between Victorian English and contemporary American children's literature without losing comprehension or interest."
-
 type Props = {
   profileId:        string
   sectionId:        string
@@ -105,12 +102,25 @@ export default function ReadingListSectionWrapper({
     })
   }
 
-  function handleGenerateDraft() {
+  async function handleGenerateDraft() {
     setIsGenerating(true)
-    setTimeout(() => {
-      setNarrative(ATHENA_CANON_DRAFT)
+    setErrorMessage(null)
+    setSaveMessage(null)
+    try {
+      const res = await fetch(
+        `/api/dashboard/profiles/${profileId}/sections/${sectionId}/generate`,
+        { method: 'POST' },
+      )
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? 'Draft generation failed.')
+      setNarrative(body.text as string)
+      setStatus('in_progress')
+      setSaveMessage('Draft generated.')
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Draft generation failed.')
+    } finally {
       setIsGenerating(false)
-    }, 600)
+    }
   }
 
   return (

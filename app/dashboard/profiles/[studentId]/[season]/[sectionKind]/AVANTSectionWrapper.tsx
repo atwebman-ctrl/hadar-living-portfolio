@@ -20,9 +20,6 @@ import AVANTSection, {
   type AVANTAssessment,
 } from '@/components/profiles/sections/AVANTSection'
 
-const ATHENA_AVANT_DRAFT =
-  "Athena's Hebrew language proficiency has grown steadily across all four skills. Her listening comprehension reached the Advanced band by Aug 2025 and has held there. Her reading has progressed from Novice through Intermediate to a strong Advanced. Her speaking and writing are advancing from Intermediate, with measurable growth between each administration. Her overall trajectory mirrors what is expected of immersion students at Hadar — steady, multi-skill development with the receptive skills (listening, reading) leading the productive skills (speaking, writing)."
-
 type Props = {
   profileId:        string
   sectionId:        string
@@ -106,12 +103,25 @@ export default function AVANTSectionWrapper({
     })
   }
 
-  function handleGenerateDraft() {
+  async function handleGenerateDraft() {
     setIsGenerating(true)
-    setTimeout(() => {
-      setNarrative(ATHENA_AVANT_DRAFT)
+    setErrorMessage(null)
+    setSaveMessage(null)
+    try {
+      const res = await fetch(
+        `/api/dashboard/profiles/${profileId}/sections/${sectionId}/generate`,
+        { method: 'POST' },
+      )
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? 'Draft generation failed.')
+      setNarrative(body.text as string)
+      setStatus('in_progress')
+      setSaveMessage('Draft generated.')
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Draft generation failed.')
+    } finally {
       setIsGenerating(false)
-    }, 600)
+    }
   }
 
   return (
