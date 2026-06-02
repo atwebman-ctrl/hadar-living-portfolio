@@ -24,27 +24,27 @@ const SPANISH: ThirdLanguage = { code: 'spanish', label: 'Spanish', hasAvantNorm
 const MANDARIN: ThirdLanguage = { code: 'mandarin', label: 'Mandarin', hasAvantNorms: false }
 
 describe('buildPortfolioTabs', () => {
-  it('produces the Hadar tab order: Canon · Math · English · Hebrew · Soulcraft', () => {
+  it('produces the Hadar tab order: Canon · Math · English · Hebrew · Scripture · Soulcraft', () => {
     const tabs = buildPortfolioTabs([HEBREW])
     expect(tabs.map((t) => t.slug)).toEqual([
-      'the-canon', 'math', 'english', 'hebrew', 'soulcraft',
+      'the-canon', 'math', 'english', 'hebrew', 'scripture', 'soulcraft',
     ])
     expect(tabs.map((t) => t.label)).toEqual([
-      'The Canon', 'Math', 'English', 'Hebrew', 'Soulcraft',
+      'The Canon', 'Math', 'English', 'Hebrew', 'Scripture', 'Soulcraft',
     ])
   })
 
   it('drops the third-language slot when no languages are configured', () => {
     const tabs = buildPortfolioTabs([])
     expect(tabs.map((t) => t.slug)).toEqual([
-      'the-canon', 'math', 'english', 'soulcraft',
+      'the-canon', 'math', 'english', 'scripture', 'soulcraft',
     ])
   })
 
-  it('inserts each configured language between English and Soulcraft, in order', () => {
+  it('inserts each configured language between English and Scripture, in order', () => {
     const tabs = buildPortfolioTabs([SPANISH, MANDARIN])
     expect(tabs.map((t) => t.slug)).toEqual([
-      'the-canon', 'math', 'english', 'spanish', 'mandarin', 'soulcraft',
+      'the-canon', 'math', 'english', 'spanish', 'mandarin', 'scripture', 'soulcraft',
     ])
   })
 

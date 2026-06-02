@@ -20,8 +20,9 @@ export interface PortfolioTabDef {
 }
 
 // Sections every school always has, in display order. The
-// third-language slot sits between English and Soulcraft.
-export const FIXED_SECTION_SLUGS = ['the-canon', 'math', 'english', 'soulcraft'] as const
+// third-language slot sits between English and Scripture; Scripture
+// sits between the third-language slot and Soulcraft.
+export const FIXED_SECTION_SLUGS = ['the-canon', 'math', 'english', 'scripture', 'soulcraft'] as const
 
 export function buildPortfolioTabs(thirdLanguages: ThirdLanguage[]): PortfolioTabDef[] {
   return [
@@ -29,6 +30,7 @@ export function buildPortfolioTabs(thirdLanguages: ThirdLanguage[]): PortfolioTa
     { slug: 'math',      label: 'Math'      },
     { slug: 'english',   label: 'English'   },
     ...thirdLanguages.map((l) => ({ slug: l.code, label: l.label })),
+    { slug: 'scripture', label: 'Scripture' },
     { slug: 'soulcraft', label: 'Soulcraft' },
   ]
 }

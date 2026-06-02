@@ -17,6 +17,8 @@ import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
 import LanguageSection from '@/components/portfolio/LanguageSection'
 import CharacterArc from '@/components/portfolio/CharacterArc'
+import ScriptureEmpty from '@/components/portfolio/ScriptureEmpty'
+import { buildPortfolioTabs } from '@/lib/portfolioTabs'
 import layoutStyles from '@/components/portfolio/layout.module.css'
 
 // ── Error boundary ────────────────────────────────────────────
@@ -81,6 +83,13 @@ export default function SectionDetailClient({
 
   const thirdLanguages = portfolio.school.thirdLanguages ?? []
 
+  // 1-based ordinal of this section within the school's tab list.
+  // Drives the gold mono number in each section header.
+  const sectionIndex = Math.max(
+    1,
+    buildPortfolioTabs(thirdLanguages).findIndex((t) => t.slug === slug) + 1,
+  )
+
   // ── Section renderer ────────────────────────────────────────
   const renderSection = () => {
     const language = thirdLanguages.find((l) => l.code === slug)
@@ -98,6 +107,7 @@ export default function SectionDetailClient({
           role={role}
           gradeLevel={student.gradeLevel}
           existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
+          sectionIndex={sectionIndex}
         />
       )
     }
@@ -112,6 +122,7 @@ export default function SectionDetailClient({
             studentName={student.firstName}
             role={role}
             existingDraft={aiDrafts.find((d) => d.sectionType === 'reading_bookshelf')}
+            sectionIndex={sectionIndex}
           />
         )
       case 'math':
@@ -127,6 +138,7 @@ export default function SectionDetailClient({
             currentYear={student.academicYear}
             selectedYear={selectedYear}
             existingMathDraft={aiDrafts.find((d) => d.sectionType === 'math_scores')}
+            sectionIndex={sectionIndex}
           />
         )
       case 'english':
@@ -144,8 +156,11 @@ export default function SectionDetailClient({
             academicYear={student.academicYear}
             selectedYear={selectedYear}
             existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
+            sectionIndex={sectionIndex}
           />
         )
+      case 'scripture':
+        return <ScriptureEmpty sectionIndex={sectionIndex} />
       case 'soulcraft':
         return (
           <CharacterArc
@@ -155,6 +170,7 @@ export default function SectionDetailClient({
             studentName={student.firstName}
             role={role}
             existingDraft={aiDrafts.find((d) => d.sectionType === 'virtue_badges')}
+            sectionIndex={sectionIndex}
           />
         )
       default:

@@ -18,6 +18,7 @@ import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
 import LanguageSection from '@/components/portfolio/LanguageSection'
 import CharacterArc from '@/components/portfolio/CharacterArc'
+import ScriptureEmpty from '@/components/portfolio/ScriptureEmpty'
 import { buildPortfolioTabs, type PortfolioTabDef } from '@/lib/portfolioTabs'
 
 // ── Error boundary ────────────────────────────────────────────
@@ -64,9 +65,10 @@ export const GROUP_TITLES: Record<string, string> = {
 
 const YEAR_FILTER_TABS = new Set(['math', 'english', 'the-canon'])
 
-function RenderSection({ slug, portfolio, studentId, role, selectedYear, thirdLanguages }: {
+function RenderSection({ slug, portfolio, studentId, role, selectedYear, thirdLanguages, sectionIndex }: {
   slug: string; portfolio: PortfolioData; studentId: string; role: UserRole; selectedYear: string
   thirdLanguages: ThirdLanguage[]
+  sectionIndex: number
 }) {
   const { student, assessments, aiDrafts, teacherNotes } = portfolio
   const filtered = <T extends { academicYear?: string | null }>(items: T[]): T[] =>
@@ -87,6 +89,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear, thirdLa
         role={role}
         gradeLevel={student.gradeLevel}
         existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
+        sectionIndex={sectionIndex}
       />
     )
   }
@@ -101,6 +104,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear, thirdLa
           studentName={student.firstName}
           role={role}
           existingDraft={aiDrafts.find((d) => d.sectionType === 'reading_bookshelf')}
+          sectionIndex={sectionIndex}
         />
       )
     case 'math':
@@ -116,6 +120,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear, thirdLa
           currentYear={student.academicYear}
           selectedYear={selectedYear}
           existingMathDraft={aiDrafts.find((d) => d.sectionType === 'math_scores')}
+          sectionIndex={sectionIndex}
         />
       )
     case 'english':
@@ -133,8 +138,11 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear, thirdLa
           academicYear={student.academicYear}
           selectedYear={selectedYear}
           existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
+          sectionIndex={sectionIndex}
         />
       )
+    case 'scripture':
+      return <ScriptureEmpty sectionIndex={sectionIndex} />
     case 'soulcraft':
       return (
         <CharacterArc
@@ -144,6 +152,7 @@ function RenderSection({ slug, portfolio, studentId, role, selectedYear, thirdLa
           studentName={student.firstName}
           role={role}
           existingDraft={aiDrafts.find((d) => d.sectionType === 'virtue_badges')}
+          sectionIndex={sectionIndex}
         />
       )
     default:
@@ -227,6 +236,7 @@ export default function GroupDetailClient({ portfolio, studentId, role, groupSlu
           role={role}
           selectedYear={selectedYear}
           thirdLanguages={thirdLanguages}
+          sectionIndex={Math.max(1, tabs.findIndex((t) => t.slug === activeTab) + 1)}
         />
       </TabErrorBoundary>
     </div>

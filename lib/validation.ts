@@ -226,6 +226,7 @@ export const SECTION_CATEGORY_VALUES = [
   "english",
   "hebrew",
   "composition",
+  "scripture",
   "soulcraft",
 ] as const;
 

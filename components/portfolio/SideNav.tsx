@@ -23,6 +23,7 @@ const FIXED_ITEMS_BEFORE = [
 ] as const
 
 const FIXED_ITEMS_AFTER = [
+  { slug: 'scripture', label: 'Scripture' },
   { slug: 'soulcraft', label: 'Soulcraft' },
 ] as const
 
@@ -64,6 +65,7 @@ export default function SideNav({
     { href: '#math',      label: 'Math'      },
     { href: '#english',   label: 'English'   },
     ...thirdLanguages.map((l) => ({ href: `#${l.code}`, label: l.label })),
+    { href: '#scripture', label: 'Scripture' },
     { href: '#character', label: 'Soulcraft' },
   ]
 

@@ -17,9 +17,11 @@ import MathSection from '@/components/portfolio/MathSection'
 import EnglishSection from '@/components/portfolio/EnglishSection'
 import LanguageSection from '@/components/portfolio/LanguageSection'
 import CharacterArc from '@/components/portfolio/CharacterArc'
+import ScriptureEmpty from '@/components/portfolio/ScriptureEmpty'
 import PortfolioFooter from '@/components/portfolio/PortfolioFooter'
 import InviteParentButton from '@/components/shared/InviteParentButton'
 import YearSelector from '@/components/portfolio/YearSelector'
+import { buildPortfolioTabs } from '@/lib/portfolioTabs'
 
 interface Props {
   portfolio: PortfolioData
@@ -42,6 +44,11 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
 
   const { student, school, assessments, aiDrafts } = portfolio
 
+  // Source of truth for section numbering in the long-scroll view.
+  // Order matches buildPortfolioTabs(): Canon · Math · English · [third langs] · Scripture · Soulcraft.
+  const tabs = buildPortfolioTabs(school.thirdLanguages ?? [])
+  const indexOf = (slug: string) => Math.max(1, tabs.findIndex((t) => t.slug === slug) + 1)
+
   return (
     <>
       <HeroSection
@@ -61,6 +68,7 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
         studentName={student.firstName}
         role={role}
         existingDraft={aiDrafts.find((d) => d.sectionType === 'reading_bookshelf')}
+        sectionIndex={indexOf('the-canon')}
       />
       <MathSection
         assessments={assessments}
@@ -72,6 +80,7 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
         currentYear={student.academicYear}
         selectedYear={selectedYear}
         existingMathDraft={aiDrafts.find((d) => d.sectionType === 'math_scores')}
+        sectionIndex={indexOf('math')}
       />
       <EnglishSection
         assessments={assessments}
@@ -85,6 +94,7 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
         academicYear={student.academicYear}
         selectedYear={selectedYear}
         existingEnglishDraft={aiDrafts.find((d) => d.sectionType === 'english_scores')}
+        sectionIndex={indexOf('english')}
       />
       {school.thirdLanguages.map((language) => (
         <LanguageSection
@@ -99,14 +109,17 @@ export default function PortfolioClient({ portfolio, studentId, role }: Props) {
           role={role}
           gradeLevel={student.gradeLevel}
           existingDraft={aiDrafts.find((d) => d.sectionType === 'immersion')}
+          sectionIndex={indexOf(language.code)}
         />
       ))}
+      <ScriptureEmpty sectionIndex={indexOf('scripture')} />
       <CharacterArc
         characterAwards={portfolio.characterAwards}
         studentId={studentId}
         studentName={student.firstName}
         role={role}
         existingDraft={aiDrafts.find((d) => d.sectionType === 'virtue_badges')}
+        sectionIndex={indexOf('soulcraft')}
       />
       <PortfolioFooter schoolName={school.name} />
     </>
