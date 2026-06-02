@@ -30,6 +30,7 @@ export const PROFILE_SECTION_KINDS = [
   'art_projects',
   'field_trips',
   'custom',
+  'scripture',
 ] as const
 export type ProfileSectionKind = typeof PROFILE_SECTION_KINDS[number]
 
@@ -48,6 +49,7 @@ export const PROFILE_SECTION_KIND_LABELS: Record<ProfileSectionKind, string> = {
   art_projects: 'Art & creative projects',
   field_trips: 'Field trips & experiences',
   custom: 'Custom section',
+  scripture: 'Scripture · Memory work & devotion',
 }
 
 // Which section kinds are REQUIRED by default for a new profile.
@@ -77,6 +79,7 @@ export const OPTIONAL_SECTION_KINDS: ProfileSectionKind[] = [
   'art_projects',
   'field_trips',
   'custom',
+  'scripture',
 ]
 
 export const ATTACHMENT_KINDS = ['photo', 'video', 'certificate', 'document'] as const

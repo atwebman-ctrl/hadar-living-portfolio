@@ -171,5 +171,9 @@ async function loadSectionData(
     return { kind: 'poetry_recitation', videoUrl, title }
   }
 
+  if (kind === 'scripture') {
+    return { kind: 'scripture' }
+  }
+
   return { kind: 'placeholder' }
 }

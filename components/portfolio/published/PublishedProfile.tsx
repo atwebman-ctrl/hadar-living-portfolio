@@ -22,9 +22,15 @@ const CANONICAL_ORDER: ProfileSectionKind[] = [
   'canon_reading',
   'english_composition',
   'hebrew_composition',
+  'scripture',
   'character_middot',
   'poetry_recitation',
 ]
+
+// Section kinds that always render in the published view even when no
+// profile_sections row exists for them — they show as a themed placeholder
+// card so parents see the future shape of the report.
+const ALWAYS_RENDER: ProfileSectionKind[] = ['scripture']
 
 export type SectionPayload = {
   section: ProfileSection
@@ -49,9 +55,23 @@ export default function PublishedProfile({ school, student, profile, payloads }:
   const byKind = new Map<ProfileSectionKind, SectionPayload>()
   for (const p of payloads) byKind.set(p.section.sectionKind, p)
 
-  const ordered = CANONICAL_ORDER
-    .map((k) => byKind.get(k))
-    .filter((p): p is SectionPayload => p != null)
+  // For each canonical kind, either use the real payload or — for ALWAYS_RENDER
+  // kinds (e.g. scripture) — synthesize a placeholder card so the section shows
+  // even when no profile_sections row was created for it.
+  type RenderItem = {
+    key:         string
+    sectionKind: ProfileSectionKind
+    narrative:   string | null
+    data:        PublishedSectionData
+  }
+  const ordered: RenderItem[] = CANONICAL_ORDER.flatMap((k) => {
+    const p = byKind.get(k)
+    if (p) return [{ key: p.section.id, sectionKind: k, narrative: p.section.narrativeText, data: p.data }]
+    if (ALWAYS_RENDER.includes(k) && k === 'scripture') {
+      return [{ key: `placeholder-${k}`, sectionKind: k, narrative: null, data: { kind: 'scripture' as const } }]
+    }
+    return []
+  })
 
   return (
     <article style={DOC}>
@@ -71,12 +91,12 @@ export default function PublishedProfile({ school, student, profile, payloads }:
       </header>
 
       <div style={BODY}>
-        {ordered.map((p) => (
+        {ordered.map((item) => (
           <PublishedSectionRenderer
-            key={p.section.id}
-            sectionKind={p.section.sectionKind}
-            narrative={p.section.narrativeText}
-            data={p.data}
+            key={item.key}
+            sectionKind={item.sectionKind}
+            narrative={item.narrative}
+            data={item.data}
           />
         ))}
       </div>

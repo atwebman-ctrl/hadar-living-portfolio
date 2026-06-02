@@ -28,6 +28,7 @@ export type PublishedSectionData =
   | { kind: 'hebrew_composition';   samples: CompositionSample[] }
   | { kind: 'character_middot';     awards: CharacterAward[] }
   | { kind: 'poetry_recitation';    videoUrl: string | null; title: string | null }
+  | { kind: 'scripture' }
   | { kind: 'placeholder' }
 
 const SECTION_TITLES: Record<ProfileSectionKind, string> = {
@@ -43,6 +44,7 @@ const SECTION_TITLES: Record<ProfileSectionKind, string> = {
   art_projects:        'Art Projects',
   field_trips:         'Field Trips',
   custom:              'Highlight',
+  scripture:           'Scripture',
 }
 
 const SECTION_DESCRIPTORS: Record<ProfileSectionKind, string> = {
@@ -58,6 +60,7 @@ const SECTION_DESCRIPTORS: Record<ProfileSectionKind, string> = {
   art_projects:        'Studio work',
   field_trips:         'Excursions and visits',
   custom:              '',
+  scripture:           'Memory work, recitations, and devotional reflections',
 }
 
 type Props = {
@@ -116,8 +119,18 @@ function renderData(data: PublishedSectionData) {
     case 'hebrew_composition':   return <CompositionBlock samples={data.samples} />
     case 'character_middot':     return <CharacterBlock awards={data.awards} />
     case 'poetry_recitation':    return <PoetryBlock videoUrl={data.videoUrl} title={data.title} />
+    case 'scripture':            return <ScriptureBlock />
     case 'placeholder':          return <Empty>This section is not yet wired into the published view.</Empty>
   }
+}
+
+function ScriptureBlock() {
+  return (
+    <Empty>
+      Memory work, recitations, and devotional reflections will appear here in a
+      future edition of this profile.
+    </Empty>
+  )
 }
 
 // ── Blocks ────────────────────────────────────────────────────
