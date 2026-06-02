@@ -27,6 +27,9 @@ interface Props {
   currentYear?:       string
   /** 'all' = trajectory view; any year string = filter to that year */
   selectedYear?:      string
+  /** 1-based position in the current tab/scroll list. Falls back to the
+   *  section's legacy number when unset (used by orphaned DemoPortfolio). */
+  sectionIndex?:      number
 }
 
 // ── Helpers (copied verbatim from IntellectualArc) ────────────
@@ -120,7 +123,9 @@ export default function MathSection({
   academicYear,
   currentYear,
   selectedYear,
+  sectionIndex,
 }: Props) {
+  const numLabel = String(sectionIndex ?? 1).padStart(2, '0')
   const canEdit = !!studentId && (role === 'admin' || role === 'teacher')
 
   // When showing all years and there is real math data, delegate to the trajectory view.
@@ -130,7 +135,7 @@ export default function MathSection({
     return (
       <section id="math">
         <div className={`${s.sectionHeader} reveal`}>
-          <span className={s.sectionNum}>01</span>
+          <span className={s.sectionNum}>{numLabel}</span>
           <h2 className={s.sectionTitle}>Math</h2>
           <div className={s.sectionRule} />
         </div>
@@ -186,7 +191,7 @@ export default function MathSection({
   return (
     <section id="math">
       <div className={`${s.sectionHeader} reveal`}>
-        <span className={s.sectionNum}>01</span>
+        <span className={s.sectionNum}>{numLabel}</span>
         <h2 className={s.sectionTitle}>Math</h2>
         <div className={s.sectionRule} />
       </div>

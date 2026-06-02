@@ -27,6 +27,9 @@ interface Props {
   gradeLevel?:           string
   academicYear?:         string
   selectedYear?:         string
+  /** 1-based position in the current tab/scroll list. Falls back to the
+   *  section's legacy number when unset (used by orphaned DemoPortfolio). */
+  sectionIndex?:         number
 }
 
 type SubTab = 'spelling' | 'grammar' | 'composition' | 'video'
@@ -139,8 +142,10 @@ export default function EnglishSection({
   gradeLevel,
   academicYear,
   selectedYear,
+  sectionIndex,
 }: Props) {
   const [activeTab, setActiveTab] = useState<SubTab>('spelling')
+  const numLabel = String(sectionIndex ?? 1).padStart(2, '0')
 
   const visibleAssessments = (selectedYear && selectedYear !== 'all')
     ? assessments?.filter((a) => a.academicYear === selectedYear)
@@ -166,7 +171,7 @@ export default function EnglishSection({
   return (
     <section id="english">
       <div className={`${s.sectionHeader} reveal`}>
-        <span className={s.sectionNum}>01</span>
+        <span className={s.sectionNum}>{numLabel}</span>
         <h2 className={s.sectionTitle}>English</h2>
         <div className={s.sectionRule} />
       </div>

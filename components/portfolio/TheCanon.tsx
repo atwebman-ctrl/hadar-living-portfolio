@@ -29,6 +29,9 @@ interface Props {
   studentName?:   string
   role?:          UserRole
   existingDraft?: AiDraft
+  /** 1-based position in the current tab/scroll list. Falls back to the
+   *  section's legacy number when unset (used by orphaned DemoPortfolio). */
+  sectionIndex?:  number
 }
 
 function buildDraftContext(readings: Reading[], firstName: string | null) {
@@ -42,7 +45,7 @@ function buildDraftContext(readings: Reading[], firstName: string | null) {
   }
 }
 
-export default function TheCanon({ readings, teacherNotes, studentId, studentName, role, existingDraft }: Props) {
+export default function TheCanon({ readings, teacherNotes, studentId, studentName, role, existingDraft, sectionIndex }: Props) {
   const optimistic = useOptimisticList<Reading>(readings ?? [])
   const isDemo = (!readings || readings.length === 0) && !studentId
   const displayReadings = isDemo ? DEMO_READINGS : optimistic.items
@@ -56,7 +59,7 @@ export default function TheCanon({ readings, teacherNotes, studentId, studentNam
   return (
     <section id="canon">
       <div className={`${s.sectionHeader} reveal`}>
-        <span className={s.sectionNum}>03</span>
+        <span className={s.sectionNum}>{String(sectionIndex ?? 3).padStart(2, '0')}</span>
         <h2 className={s.sectionTitle}>The Canon</h2>
         <div className={s.sectionRule} />
       </div>

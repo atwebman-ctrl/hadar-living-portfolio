@@ -23,6 +23,9 @@ interface Props {
   role?:               UserRole
   existingDraft?:      AiDraft
   gradeLevel?:         string
+  /** 1-based position in the current tab/scroll list. Falls back to the
+   *  section's legacy number when unset (used by orphaned DemoPortfolio). */
+  sectionIndex?:       number
 }
 
 type SubTab = 'spelling' | 'grammar' | 'composition' | 'video'
@@ -187,8 +190,10 @@ export default function LanguageSection({
   role,
   existingDraft,
   gradeLevel,
+  sectionIndex,
 }: Props) {
   const [activeTab, setActiveTab] = useState<SubTab>('spelling')
+  const numLabel = String(sectionIndex ?? 2).padStart(2, '0')
 
   const hasData = !!assessments && assessments.length > 0
   const avantData = language.hasAvantNorms && hasData ? buildAvantData(assessments!) : null
@@ -219,7 +224,7 @@ export default function LanguageSection({
   return (
     <section id={language.code}>
       <div className={`${s.sectionHeader} reveal`}>
-        <span className={s.sectionNum}>02</span>
+        <span className={s.sectionNum}>{numLabel}</span>
         <h2 className={s.sectionTitle}>{language.label}</h2>
         <div className={s.sectionRule} />
       </div>

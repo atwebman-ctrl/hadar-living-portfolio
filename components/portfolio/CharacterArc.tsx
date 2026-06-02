@@ -26,6 +26,9 @@ interface Props {
   studentName?:     string
   role?:            UserRole
   existingDraft?:   AiDraft
+  /** 1-based position in the current tab/scroll list. Falls back to the
+   *  section's legacy number when unset (used by orphaned DemoPortfolio). */
+  sectionIndex?:    number
 }
 
 // Background tints for badge icons — cycled when there are more awards than colours
@@ -93,7 +96,8 @@ function buildDraftContext(characterAwards: CharacterAward[], studentFirstName: 
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function CharacterArc({ characterAwards, teacherNotes, studentId, studentName, role, existingDraft }: Props) {
+export default function CharacterArc({ characterAwards, teacherNotes, studentId, studentName, role, existingDraft, sectionIndex }: Props) {
+  const numLabel = String(sectionIndex ?? 6).padStart(2, '0')
   const hasData = !!characterAwards && characterAwards.length > 0
   const canEdit = !!studentId && (role === 'admin' || role === 'teacher')
   const [modalOpen, setModalOpen] = useState(false)
@@ -122,7 +126,7 @@ export default function CharacterArc({ characterAwards, teacherNotes, studentId,
   return (
     <section id="character">
       <div className={`${s.sectionHeader} reveal`}>
-        <span className={s.sectionNum}>06</span>
+        <span className={s.sectionNum}>{numLabel}</span>
         <h2 className={s.sectionTitle}>Soulcraft</h2>
         <div className={s.sectionRule} />
       </div>
