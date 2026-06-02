@@ -30,6 +30,7 @@ const REQUIRED_SECTION_KINDS = [
   'avant_hebrew',
   'hebrew_comparison',
   'hebrew_composition',
+  'scripture',
   'poetry_recitation',
   'lexile',
   'maps_scores',

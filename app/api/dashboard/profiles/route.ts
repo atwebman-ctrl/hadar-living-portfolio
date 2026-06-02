@@ -155,14 +155,18 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // 9. Insert the 9 required section rows in a single batch
+  // 9. Insert the required section rows in a single batch.
+  // 'scripture' is a placeholder kind — seeded as 'complete' so it
+  // renders a "coming soon" card in both the workspace and the
+  // published report without blocking submit-for-review. Teachers do
+  // not need to author it until the real Scripture wiring lands.
   const sectionRows = REQUIRED_SECTION_KINDS.map((kind, idx) => ({
     profile_id:    profileRow.id as string,
     school_id:     ctx.schoolId,
     section_kind:  kind,
     section_order: idx,
     is_required:   true,
-    status:        'not_started' as const,
+    status:        (kind === 'scripture' ? 'complete' : 'not_started') as 'complete' | 'not_started',
     created_by:    ctx.userId,
     updated_by:    ctx.userId,
   }))

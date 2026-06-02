@@ -55,7 +55,7 @@ describe('Profile Builder critical path', () => {
     if (schoolId) await deleteSchool(schoolId)
   })
 
-  it('creates a profile with 9 required sections seeded in draft status', async () => {
+  it('creates a profile with 10 required sections seeded in draft status', async () => {
     mockGetAuthContext.mockResolvedValueOnce(teacherCtx)
 
     const req = new NextRequest('http://localhost/api/dashboard/profiles', {
@@ -74,15 +74,22 @@ describe('Profile Builder critical path', () => {
     expect(profile.status).toBe('draft')
     expect(profile.season).toBe('spring')
 
-    // Verify 9 sections were seeded.
+    // Verify 10 sections were seeded.
     const { data: sections } = await adminClient()
       .from('profile_sections')
       .select('section_kind, status, is_required')
       .eq('profile_id', profile.id)
       .order('section_order')
-    expect(sections).toHaveLength(9)
+    expect(sections).toHaveLength(10)
     expect(sections?.every(s => s.is_required)).toBe(true)
-    expect(sections?.every(s => s.status === 'not_started')).toBe(true)
+    // scripture is seeded as 'complete' (placeholder kind); all other
+    // required kinds start at 'not_started'.
+    const byKind = new Map(sections!.map(s => [s.section_kind, s.status]))
+    expect(byKind.get('scripture')).toBe('complete')
+    for (const s of sections!) {
+      if (s.section_kind === 'scripture') continue
+      expect(s.status).toBe('not_started')
+    }
   })
 
   it('fills two sections with narrative and marks them complete, then publishes, then parent sees the full published profile', async () => {
@@ -195,14 +202,14 @@ describe('Profile Builder critical path', () => {
     expect(new Date(parentProfile!.published_at as string).getTime())
       .toBe(new Date(publishedAt).getTime())
 
-    // All 9 sections present in published read.
+    // All 10 sections present in published read.
     const { data: publishedSections } = await adminClient()
       .from('profile_sections')
       .select('section_kind, status, narrative_text')
       .eq('profile_id', profileId)
       .is('deleted_at', null)
       .order('section_order')
-    expect(publishedSections).toHaveLength(9)
+    expect(publishedSections).toHaveLength(10)
 
     // The 2 filled sections carry their narrative into the published read.
     const publishedMaps = publishedSections?.find(s => s.section_kind === 'maps_scores')

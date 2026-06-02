@@ -70,6 +70,7 @@ export const REQUIRED_SECTION_KINDS: ProfileSectionKind[] = [
   'avant_hebrew',
   'hebrew_comparison',
   'hebrew_composition',
+  'scripture',
   'poetry_recitation',
   'lexile',
   'maps_scores',
@@ -79,7 +80,6 @@ export const OPTIONAL_SECTION_KINDS: ProfileSectionKind[] = [
   'art_projects',
   'field_trips',
   'custom',
-  'scripture',
 ]
 
 export const ATTACHMENT_KINDS = ['photo', 'video', 'certificate', 'document'] as const
